@@ -1,7 +1,9 @@
 @import 'mixins';
 
 .transmission-chain-edit-mode {
-  margin-top: 1.6rem;
+  &:not(:empty) {
+    margin-top: 1.6rem;
+  }
 
   .person-summary-container {
     @include breakpoint('gt-lg') {

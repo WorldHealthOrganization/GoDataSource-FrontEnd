@@ -3,7 +3,6 @@ import { Observable, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { GridReadyEvent, IsFullWidthRowParams, RowHeightParams, RowNode, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
@@ -30,7 +29,7 @@ import {
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel, IV2Link, V2ActionMenuItem, V2ActionType } from './models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel, IV2GroupActions, IV2Link, V2ActionType } from './models/action.model';
 import { IV2GroupedData, IV2GroupedDataValue } from './models/grouped-data.model';
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
@@ -59,6 +58,7 @@ import { AppListTableV2DetailRowComponent } from './components/detail/app-list-t
 import { AppListTableV2DetailColumnComponent } from './components/detail/app-list-table-v2-detail-column.component';
 import { IV2RowExpandRow, V2RowType } from './models/row.model';
 import { determineIfTouchDevice } from '../../../core/methods/touch-device';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -91,6 +91,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // check if this is a touch device
   isTouchDevice: boolean = determineIfTouchDevice();
+
+  // language handler
+  languageSubscription: Subscription;
 
   // records
   recordsSubscription: Subscription;
@@ -155,6 +158,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // paginator disabled ?
   @Input() paginatorDisabled: boolean = false;
 
+  // refresh list disabled ?
+  @Input() refreshDisabled: boolean = false;
+
   // has at least one table header filter ?
   hasTableHeaderFilters: boolean = false;
 
@@ -204,7 +210,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   @Input() quickActions: IV2ActionMenuLabel;
 
   // group actions
-  @Input() groupActions: V2ActionMenuItem[];
+  @Input() groupActions: IV2GroupActions;
   @Input() groupActionsSingleRecord: boolean;
 
   // add button
@@ -383,6 +389,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return !!this._pageSettingsKey;
   }
 
+  // collapse / expand bottom section
+  bottomSectionIsCollapsed: boolean = false;
+  bottomSectionSavingConfig: boolean = false;
+  private _pageSettingsKeyBottomSectionCollapsed: string = 'bottomSectionCollapsed';
+
   // info values - used to display additional information relevant for this page
   private _infos: string[];
   infosJoined: string;
@@ -397,7 +408,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       this._infos.length > 0
     ) {
       this._infos.forEach((info) => {
-        this.infosJoined += `<div>${this.translateService.instant(info)}</div>`;
+        this.infosJoined += `<div>${this.i18nService.instant(info)}</div>`;
       });
     }
   }
@@ -428,10 +439,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // simple item ?
         if (Array.isArray(item.value)) {
           // create html
-          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span>`;
+          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-items">`;
           (item.value as ILabelValuePairModel[]).forEach((subItem) => {
-            html += `<span class="gd-list-table-bottom-left-legend-item">${AppListTableV2Component.renderStatusForm({ type: IV2ColumnStatusFormType.SQUARE, color: subItem.color }, false)} ${this.translateService.instant(subItem.label)}</span>`;
+            html += `<span class="gd-list-table-bottom-left-legend-items-item">${AppListTableV2Component.renderStatusForm({ type: IV2ColumnStatusFormType.SQUARE, color: subItem.color }, false)} ${this.i18nService.instant(subItem.label)}</span>`;
           });
+
+          // close items list
+          html += '</span>';
 
           // add legend
           this._suffixLegendsHTML.push({
@@ -439,7 +453,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           });
         } else {
           this._suffixLegendsHTML.push({
-            html: `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-item">${item.value}</span>`
+            html: `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-items"><span class="gd-list-table-bottom-left-legend-items-item">${item.value}</span></span>`
           });
         }
       });
@@ -598,7 +612,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected location: Location,
     protected renderer2: Renderer2,
     protected elementRef: ElementRef,
@@ -607,8 +621,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     protected authDataService: AuthDataService,
     protected toastV2Service: ToastV2Service
   ) {
-    // update small screen mode
-    this.updateRenderMode(true);
+    // update bottom section collapse / expand
+    this.loadBottomSectionConfig();
   }
 
   /**
@@ -667,12 +681,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       undefined;
     this._showHeaderFilters = filterVisibility === undefined || filterVisibility;
 
-    // update table size
-    // - hack to rectify some things not being rendered
-    this.resizeTable();
-    setTimeout(() => {
-      this.resizeTable();
-    });
+    // update small screen mode
+    // - calls this.resizeTable
+    this.updateRenderMode();
+
+    // subscribe to language change
+    this.initializeLanguageChangeListener();
   }
 
   /**
@@ -686,6 +700,34 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (this.clickListener) {
       this.clickListener();
       this.clickListener = undefined;
+    }
+
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+  }
+
+  /**
+   *  Subscribe to language change
+   */
+  private initializeLanguageChangeListener(): void {
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        this.updateColumnDefinitions();
+      });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
     }
   }
 
@@ -769,11 +811,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         this._recordsData.forEach((record) => {
           this._recordsDataMap[record[this.keyField]] = record;
         });
-
-        // no records found ?
-        if (this._recordsData.length < 1) {
-          this._agTable.api.showNoRowsOverlay();
-        }
 
         // unselect everything
         this._agTable.api.deselectAll();
@@ -894,8 +931,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // attach items selection column only if we have group actions
     if (
-      this.groupActions?.length > 0 ||
-      this.groupActionsSingleRecord
+      this.groupActionsSingleRecord || (
+        this.groupActions && (
+          !this.groupActions.visible ||
+          this.groupActions.visible()
+        ) &&
+        this.groupActions.actions?.length > 0
+      )
     ) {
       columnDefs.push({
         pinned: this.isSmallScreenMode ?
@@ -920,7 +962,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             icon: 'expand_more',
             menuOptions: this.groupActionsSingleRecord ?
               [
-                ...(this.groupActions ? this.groupActions : [])
+                ...(this.groupActions?.actions?.length > 0 ? this.groupActions.actions : [])
               ] : [
                 {
                   label: {
@@ -959,7 +1001,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                     );
                   }
                 },
-                ...(this.groupActions ? this.groupActions : [])
+                ...(this.groupActions?.actions?.length > 0 ? this.groupActions.actions : [])
               ]
           }]
         }
@@ -1010,7 +1052,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // attach column to list of visible columns
       columnDefs.push({
         headerName: column.label && column.format?.type !== V2ColumnFormat.STATUS ?
-          this.translateService.instant(column.label) :
+          this.i18nService.instant(column.label) :
           '',
         field: column.field,
         pinned: this.isSmallScreenMode ?
@@ -1039,14 +1081,17 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // go through legends
         statusColumn.legends.forEach((legend) => {
           // render legends
-          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(legend.title)}</span> `;
+          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(legend.title)}</span><span class="gd-list-table-bottom-left-legend-items">`;
 
           // render legend
           legend.items.forEach((legendItem) => {
-            html += `<span class="gd-list-table-bottom-left-legend-item">
-              ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.translateService.instant(legendItem.label)}
+            html += `<span class="gd-list-table-bottom-left-legend-items-item">
+              ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.i18nService.instant(legendItem.label)}
             </span>`;
           });
+
+          // close items list
+          html += '</span>';
 
           // add to legends to render
           this.legends.push({
@@ -1117,7 +1162,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       if (this.isSmallScreenMode) {
         // add it to the beginning
         columnDefs.splice(
-          this.groupActions?.length > 0 || this.groupActionsSingleRecord ? 1 : 0,
+          this.groupActionsSingleRecord || (
+            this.groupActions && (
+              !this.groupActions.visible ||
+              this.groupActions.visible()
+            ) &&
+            this.groupActions.actions?.length > 0
+          ) ? 1 : 0,
           0,
           actionColumn
         );
@@ -1152,6 +1203,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // re-render page
     this.detectChanges();
+
+    // update table size
+    this.resizeTable();
   }
 
   /**
@@ -1169,12 +1223,22 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // path or method ?
       const formatType: string = typeof columnDefinition.format.type;
       if (formatType === 'string') {
-        return _.get(
+        // determine value
+        const tmpValue: any = _.get(
           valueFormat.data,
-          columnDefinition.format.type as string,
-          ''
+          columnDefinition.format.type as string
         );
 
+        // empty value ?
+        if (
+          tmpValue === undefined ||
+          tmpValue === null
+        ) {
+          return '';
+        }
+
+        // finished
+        return tmpValue;
       } else if (formatType === 'function') {
         return (columnDefinition.format.type as (any) => string)(valueFormat.data);
 
@@ -1198,10 +1262,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // AGE
           case V2ColumnFormat.AGE:
             return fieldValue?.months > 0 ?
-              fieldValue?.months + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
+              fieldValue?.months + ' ' + this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
               (
                 fieldValue?.years > 0 ?
-                  (fieldValue?.years + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS')) :
+                  (fieldValue?.years + ' ' + this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS')) :
                   ''
               );
 
@@ -1220,8 +1284,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // BOOLEAN
           case V2ColumnFormat.BOOLEAN:
             return fieldValue ?
-              this.translateService.instant('LNG_COMMON_LABEL_YES') :
-              this.translateService.instant('LNG_COMMON_LABEL_NO');
+              this.i18nService.instant('LNG_COMMON_LABEL_YES') :
+              this.i18nService.instant('LNG_COMMON_LABEL_NO');
 
           // COLOR & ICON
           case V2ColumnFormat.COLOR:
@@ -1249,9 +1313,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     }
 
     // default - try to translate if string
-    return valueFormat.value && typeof valueFormat.value === 'string' ?
-      this.translateService.instant(valueFormat.value) :
-      valueFormat.value;
+    return typeof valueFormat.value === 'string' ?
+      (
+        valueFormat.value ?
+          this.i18nService.instant(valueFormat.value) :
+          ''
+      ) : (
+        valueFormat.value === null || valueFormat.value === undefined ?
+          '' :
+          valueFormat.value
+      );
   }
 
   /**
@@ -1280,7 +1351,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         }
 
         // retrieve url link
-        const url: string = basicColumn.link(params.data);
+        const url: string = value ?
+          basicColumn.link(params.data) :
+          undefined;
 
         // create link
         return url ?
@@ -1301,7 +1374,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<div class="gd-list-table-color"><span style="background-color: ${value};"></span> ${value}</div>` :
-            this.translateService.instant(colorColumn.noColorLabel);
+            this.i18nService.instant(colorColumn.noColorLabel);
         };
       }
 
@@ -1318,7 +1391,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<img class="gd-list-table-icon-url" src="${value}" alt="${URLIconColumn.noIconLabel}" />` :
-            this.translateService.instant(URLIconColumn.noIconLabel);
+            this.i18nService.instant(URLIconColumn.noIconLabel);
         };
       }
 
@@ -1335,7 +1408,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<span class="gd-list-table-icon-material"><span class="material-icons">${value}</span></span>` :
-            this.translateService.instant(materialIconColumn.noIconLabel);
+            this.i18nService.instant(materialIconColumn.noIconLabel);
         };
       }
 
@@ -1563,7 +1636,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // filter out pinned columns since those are handled by a different button
       .filter((item) => !item.alwaysVisible && (!item.exclude || !item.exclude(item)))
       // sort columns by their label
-      .sort((v1, v2) => this.translateService.instant(v1.label).localeCompare(this.translateService.instant(v2.label)));
+      .sort((v1, v2) => this.i18nService.instant(v1.label).localeCompare(this.i18nService.instant(v2.label)));
 
     // construct list of checkboxes
     const checkboxInputs: V2SideDialogConfigInput[] = [];
@@ -1966,7 +2039,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // sort
     this.sortBy.emit({
-      field: this._sortBy.column?.columnDefinition.field,
+      field: typeof this._sortBy.column?.columnDefinition.sortable === 'string' ?
+        this._sortBy.column.columnDefinition.sortable :
+        this._sortBy.column?.columnDefinition.field,
       direction: this._sortBy.direction
     });
   }
@@ -2181,23 +2256,25 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Update
    */
   @HostListener('window:resize')
-  private updateRenderMode(dontUpdate?: boolean): void {
+  private updateRenderMode(): void {
     // determine
     const isSmallScreenMode = determineIfSmallScreenMode();
 
-    // same as before ?
-    if (isSmallScreenMode === this.isSmallScreenMode) {
-      return;
-    }
+    // update column definitions only if responsive changes
+    if (isSmallScreenMode !== this.isSmallScreenMode) {
+      // small screen mode ?
+      this.isSmallScreenMode = isSmallScreenMode;
 
-    // small screen mode ?
-    this.isSmallScreenMode = isSmallScreenMode;
-
-    // must update
-    if (!dontUpdate) {
+      // this.detectChanges / this.resizeTable() are called by resize layout by updateColumnDefinitions
       this.updateColumnDefinitions();
+
+      // wait for html to be rendered since isSmallScreenMode was changed
+      setTimeout(() => {
+        this.resizeTable();
+      });
+    } else {
+      // update table size
       this.resizeTable();
-      this.detectChanges();
     }
   }
 
@@ -2224,5 +2301,51 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // finished
     return newData;
+  }
+
+  /**
+   * Retrieve bottom section setting
+   */
+  private loadBottomSectionConfig(): void {
+    // retrieve collapse / expand value
+    const authUser: UserModel = this.authDataService.getAuthenticatedUser();
+    this.bottomSectionIsCollapsed = !!authUser.getSettings(this._pageSettingsKeyBottomSectionCollapsed);
+  }
+
+  /**
+   * Expand / collapse bottom section (legend & pagination)
+   */
+  expandCollapseBottomSection(): void {
+    // disable while saving user settings
+    this.bottomSectionSavingConfig = true;
+
+    // attach / detach collapsed class
+    this.bottomSectionIsCollapsed = !this.bottomSectionIsCollapsed;
+
+    // refresh html
+    this.detectChanges();
+    this.resizeTable();
+
+    // update settings
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [this._pageSettingsKeyBottomSectionCollapsed]: this.bottomSectionIsCollapsed
+      })
+      .pipe(
+        catchError((err) => {
+          // error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished saving
+        this.bottomSectionSavingConfig = false;
+
+        // update layout
+        this.detectChanges();
+      });
   }
 }

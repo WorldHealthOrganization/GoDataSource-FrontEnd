@@ -5,7 +5,7 @@ import {
   RequestFilterGenerator,
   RequestQueryBuilder
 } from '../helperClasses/request-query-builder';
-import { Moment, moment } from '../helperClasses/x-moment';
+import { Moment } from '../helperClasses/x-moment';
 
 // addresses types
 export enum AddressType {
@@ -30,17 +30,34 @@ export class AddressModel {
   filterLocationIds: string[];
 
   /**
-     * Search for current address
-     * @param addresses
-     * @returns {AddressModel | undefined}
-     */
+   * Search for current address
+   */
   static getCurrentAddress(addresses: AddressModel[]): AddressModel {
     return _.find(addresses, { typeId: AddressType.CURRENT_ADDRESS });
   }
 
   /**
-     * Constructor
-     */
+   * Check if address is empty
+   */
+  static isNotEmpty(address: AddressModel): boolean {
+    return address && (
+      !!address.date ||
+      !!address.emailAddress ||
+      !!address.phoneNumber ||
+      !!address.locationId ||
+      !!address.city ||
+      !!address.postalCode ||
+      !!address.addressLine1 ||
+      !!address.emailAddress || (
+        typeof address.geoLocation?.lat === 'number' &&
+        typeof address.geoLocation?.lng === 'number'
+      )
+    );
+  }
+
+  /**
+   * Constructor
+   */
   constructor(
     data = null,
     locationsMap?: {
@@ -53,9 +70,12 @@ export class AddressModel {
     this.addressLine1 = _.get(data, 'addressLine1');
     this.locationId = _.get(data, 'locationId');
     this.location = locationsMap && this.locationId ?
-      locationsMap[this.locationId] :
-      new LocationModel(_.get(data, 'location'));
-    this.date = _.get(data, 'date', moment().toISOString());
+      locationsMap[this.locationId] : (
+        _.get(data, 'location') ?
+          new LocationModel(_.get(data, 'location')) :
+          undefined
+      );
+    this.date = _.get(data, 'date');
     this.geoLocation = _.get(data, 'geoLocation', {});
     this.geoLocationAccurate = _.get(data, 'geoLocationAccurate', false);
     this.phoneNumber = _.get(data, 'phoneNumber');
@@ -75,8 +95,8 @@ export class AddressModel {
   }
 
   /**
-     * Create query builder that will search an address
-     */
+   * Create query builder that will search an address
+   */
   static buildSearchFilter(
     address: string,
     property: string,
@@ -194,8 +214,8 @@ export class AddressModel {
   }
 
   /**
-     * Create query builder that will filter an address
-     */
+   * Create query builder that will filter an address
+   */
   static buildAddressFilter(
     property: string,
     isArray: boolean,
@@ -366,8 +386,8 @@ export class AddressModel {
   }
 
   /**
-     * Create query builder that will search for a phone number
-     */
+   * Create query builder that will search for a phone number
+   */
   static buildPhoneSearchFilter(
     phoneNumber: string,
     property: string,
@@ -420,8 +440,8 @@ export class AddressModel {
   }
 
   /**
-     * Clone class
-     */
+   * Clone class
+   */
   sanitize(): Object {
     // create clone
     const address = _.cloneDeep(this);

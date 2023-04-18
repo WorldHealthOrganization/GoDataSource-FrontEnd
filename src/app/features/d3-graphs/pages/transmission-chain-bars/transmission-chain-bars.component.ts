@@ -1,8 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { TransmissionChainBarsService } from '../../services/transmission-chain-bars.service';
-import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
-import * as domtoimage from 'dom-to-image';
-import * as FileSaver from 'file-saver';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TransmissionChainBarsDataService } from '../../services/transmission-chain-bars.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -28,12 +25,14 @@ import * as _ from 'lodash';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { ConvertHtmlToPDFStep, DomService } from '../../../../core/services/helper/dom.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-transmission-chain-bars',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './transmission-chain-bars.component.html',
-  styleUrls: ['./transmission-chain-bars.component.less']
+  styleUrls: ['./transmission-chain-bars.component.scss']
 })
 export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   // breadcrumbs
@@ -60,7 +59,21 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   legendColors: any;
 
   graphData: any;
-  cellWidth: number = 91;
+
+  // cell width column
+  selectedCellWidthValue: string = '91';
+  cellWidthOptions: ILabelValuePairModel[] = [
+    {
+      label: '91',
+      value: '91'
+    }, {
+      label: '110',
+      value: '110'
+    }, {
+      label: '150',
+      value: '150'
+    }
+  ];
 
   @ViewChild('chart', { static: true }) chartContainer: ElementRef;
 
@@ -76,30 +89,30 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   advancedFilters: V2AdvancedFilter[];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private authDataService: AuthDataService,
     private transmissionChainBarsService: TransmissionChainBarsService,
     private transmissionChainBarsDataService: TransmissionChainBarsDataService,
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
-    private importExportDataService: ImportExportDataService,
     private i18nService: I18nService,
     protected toastV2Service: ToastV2Service,
-    protected activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute,
+    private domService: DomService
   ) {}
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // init color rectangles
     this.legendColors = {
-      rectCD: `<div class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.isolationColor};"></div>`,
-      rectLAB: `<div class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.labResultColor};"></div>`,
-      rectOUT: `<div class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.dateOutcomeColor};"></div>`,
-      rectB: `<div class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.dateOutcomeBurialColor};"></div>`
+      rectCD: `<span class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.isolationColor};"></span>`,
+      rectLAB: `<span class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.labResultColor};"></span>`,
+      rectOUT: `<span class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.dateOutcomeColor};"></span>`,
+      rectB: `<span class="legend-rect" style="background-color: ${this.transmissionChainBarsService.graphConfig.dateOutcomeBurialColor};"></span>`
     };
 
     // authenticated user
@@ -359,12 +372,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
-    // release graph data
-    this.transmissionChainBarsService.destroy();
-
     // release subscriber
     if (this.outbreakSubscriber) {
       this.outbreakSubscriber.unsubscribe();
@@ -394,8 +404,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * (Re)Build the graph
-     */
+   * (Re)Build the graph
+   */
   private loadGraph() {
     if (!this.selectedOutbreak) {
       return;
@@ -429,8 +439,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Redraw graph
-     */
+   * Redraw graph
+   */
   redrawGraph() {
     // there is no point in drawing graph if we have no data
     if (this.graphData === undefined) {
@@ -442,30 +452,34 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
       this.chartContainer.nativeElement,
       this.graphData,
       this.centerTokenToNameMap, {
-        cellWidth: this.cellWidth
+        cellWidth: parseInt(this.selectedCellWidthValue, 10)
       }
     );
   }
 
   /**
-     * Changed cell width
-     * @param cellWidth
-     */
-  cellWidthChanged(cellWidth: number) {
-    this.cellWidth = cellWidth;
+   * Changed cell width
+   */
+  cellWidthChanged(): void {
     this.redrawGraph();
   }
 
   /**
-     * Display loading dialog
-     */
+   * Display loading dialog
+   */
   private showLoadingDialog() {
+    // loading dialog already visible ?
+    if (this.loadingDialog) {
+      return;
+    }
+
+    // show
     this.loadingDialog = this.dialogV2Service.showLoadingDialog();
   }
 
   /**
-     * Hide loading dialog
-     */
+   * Hide loading dialog
+   */
   private closeLoadingDialog() {
     if (this.loadingDialog) {
       this.loadingDialog.close();
@@ -474,37 +488,79 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Export visible chain as PDF
-     */
+   * Export visible chain as PDF
+   */
   exportChain() {
     // display loading
     this.showLoadingDialog();
 
     // convert dom container to image
-    setTimeout(() => {
-      (domtoimage as any).toPng(this.chartContainer.nativeElement)
-        .then((dataUrl) => {
-          const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
+    this.domService
+      .convertHTML2PDF(
+        this.chartContainer.nativeElement,
+        `${this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE')}.pdf`, {
+          onclone: (_document, element) => {
+            // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
+            const dateSection = element.querySelector<HTMLElement>('.gd-dates-section');
+            const dateSectionContainer = dateSection.querySelector<HTMLElement>('.gd-dates-section-container');
+            const chartSection = element.querySelector<HTMLElement>('.gd-entities-section');
+            const chartSectionHeader = chartSection.querySelector<HTMLElement>('.gd-entities-section-header');
+            const chartSectionContainer = chartSection.querySelector<HTMLElement>('.gd-entities-section-container');
+            if (
+              dateSection &&
+              dateSectionContainer &&
+              chartSection &&
+              chartSectionHeader &&
+              chartSectionContainer
+            ) {
+              element.style.whiteSpace = 'nowrap';
+              element.style.width = 'fit-content';
+              element.style.height = 'fit-content';
+              dateSection.style.height = 'fit-content';
+              dateSectionContainer.style.overflow = 'visible';
+              dateSectionContainer.style.height = 'fit-content';
+              chartSection.style.width = 'fit-content';
+              chartSection.style.height = 'fit-content';
+              chartSectionHeader.style.overflow = 'visible';
+              chartSectionHeader.style.width = 'fit-content';
+              chartSectionContainer.style.overflow = 'visible';
+              chartSectionContainer.style.width = 'fit-content';
+              chartSectionContainer.style.height = 'fit-content';
+            }
+          }
+        },
+        (step) => {
+          // determine percent
+          let percent: number;
+          switch (step) {
+            case ConvertHtmlToPDFStep.INITIALIZED:
+              percent = 5;
+              break;
+            case ConvertHtmlToPDFStep.CONVERTING_HTML_TO_PDF:
+              percent = 50;
+              break;
+            case ConvertHtmlToPDFStep.EXPORTING_PDF:
+              percent = 99;
+              break;
+          }
 
-          this.importExportDataService
-            .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                this.closeLoadingDialog();
-                return throwError(err);
-              })
-            )
-            .subscribe((blob) => {
-              const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE');
-              FileSaver.saveAs(
-                blob,
-                `${fileName}.pdf`
-              );
-              this.closeLoadingDialog();
-            });
-        });
-    });
+          // update dialog percent
+          this.loadingDialog.message({
+            message: `${percent}%`
+          });
+        }
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          this.closeLoadingDialog();
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished
+        this.closeLoadingDialog();
+      });
   }
 
   /**

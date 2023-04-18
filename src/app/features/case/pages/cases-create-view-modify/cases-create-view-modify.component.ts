@@ -41,13 +41,17 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Location } from '@angular/common';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputLinkWithAction,
+  IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
@@ -59,6 +63,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 /**
  * Component
@@ -68,6 +73,10 @@ import { DomSanitizer } from '@angular/platform-browser';
   templateUrl: './cases-create-view-modify.component.html'
 })
 export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<CaseModel> implements OnDestroy {
+  // constants
+  private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
+  private static readonly TAB_NAMES_QUESTIONNAIRE_AS_CONTACT: string = 'questionnaire_as_contact';
+
   // case visual id mask
   private _caseVisualIDMask: {
     mask: string
@@ -79,7 +88,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   // check for duplicate
   private _duplicateCheckingTimeout: any;
   private _duplicateCheckingSubscription: Subscription;
-  private _personDuplicates: (ContactModel | CaseModel)[] = [];
+  private _personDuplicates: EntityModel[] = [];
   private _previousChecked: {
     firstName: string,
     lastName: string,
@@ -92,6 +101,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
   // custom uuid creation ?
   customCaseUUID: string;
+
+  // hide/show question numbers
+  hideCaseQuestionNumbers: boolean = false;
+  hideContactQuestionNumbers: boolean = false;
 
   /**
    * Constructor
@@ -130,6 +143,22 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this.customCaseUUID = uid;
       }
     }
+
+    // do we have tabs options already saved ?
+    const generalSettings: {
+      [key: string]: any
+    } = this.authDataService
+      .getAuthenticatedUser()
+      .getSettings(UserSettings.CASE_GENERAL);
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
+      undefined;
+
+    // use the saved options
+    this.hideCaseQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] : false;
+    this.hideContactQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT] : false;
   }
 
   /**
@@ -147,7 +176,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     }
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -156,7 +187,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   protected createNewItem(): CaseModel {
     return new CaseModel({
       addresses: [new AddressModel({
-        typeId: AddressType.CURRENT_ADDRESS
+        typeId: AddressType.CURRENT_ADDRESS,
+        date: moment().toISOString()
       })]
     });
   }
@@ -194,10 +226,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.isModify
     ) {
       // remove global notifications
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
-      // check
+      // show global notifications
       this.checkForPersonExistence();
+      this.checkForOnsetAfterReporting();
+      this.checkForOnsetAfterHospitalizationStartDate();
     }
   }
 
@@ -318,6 +352,51 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs
    */
   protected initializeTabs(): void {
+    // tab custom configuration
+    this.tabConfiguration = {
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TAB_OPTIONS'
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_CASE_TAB_OPTION_SHOW_CASE_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_CASE_TAB_OPTION_SHOW_CASE_QUESTION_NUMBERS',
+          value: !this.hideCaseQuestionNumbers
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_CASE_TAB_OPTION_SHOW_CONTACT_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_CASE_TAB_OPTION_SHOW_CONTACT_QUESTION_NUMBERS',
+          value: !this.hideContactQuestionNumbers
+        }
+      ],
+      apply: (data, finish) => {
+        // save settings
+        const hideCaseQuestionNumbers: boolean = !(data.map[CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
+        const hideContactQuestionNumbers: boolean = !(data.map[CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT] as IV2SideDialogConfigInputToggleCheckbox).value;
+        this.updateGeneralSettings(
+          `${UserSettings.CASE_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideCaseQuestionNumbers,
+            [CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT]: hideContactQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideCaseQuestionNumbers = hideCaseQuestionNumbers;
+            this.hideContactQuestionNumbers = hideContactQuestionNumbers;
+            this.tabsV2Component.detectChanges();
+
+            // finish
+            finish();
+          });
+      }
+    };
+
+    // tabs
     this.tabData = {
       // tabs
       tabs: [
@@ -678,7 +757,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             definition: {
               add: {
                 label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
-                newItem: () => new AddressModel()
+                newItem: () => new AddressModel({
+                  date: moment().toISOString()
+                })
               },
               remove: {
                 label: 'LNG_COMMON_BUTTON_DELETE',
@@ -744,7 +825,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.dateOfOnset,
               set: (value) => {
+                // set data
                 this.itemData.dateOfOnset = value;
+
+                // check onset after reporting
+                this.checkForOnsetAfterReporting();
               }
             },
             maxDate: this._today,
@@ -840,8 +925,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 // set data
                 this.itemData.outcomeId = value;
 
-                // reset data if not decease
+                // reset data if not deceased
                 if (this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
+                  this.itemData.deathLocationId = null;
                   this.itemData.safeBurial = null;
                   this.itemData.dateOfBurial = null;
                   this.itemData.burialLocationId = null;
@@ -881,6 +967,23 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               set: (value) => {
                 this.itemData.transferRefused = value;
               }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
+            name: 'deathLocationId',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
+            description: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID_DESCRIPTION',
+            useOutbreakLocations: true,
+            value: {
+              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
+                undefined :
+                this.itemData.deathLocationId,
+              set: (value) => {
+                this.itemData.deathLocationId = value;
+              }
+            },
+            disabled: () => {
+              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
             }
           }, {
             type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
@@ -964,7 +1067,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.dateOfReporting,
               set: (value) => {
+                // set data
                 this.itemData.dateOfReporting = value;
+
+                // check onset after reporting
+                this.checkForOnsetAfterReporting();
               }
             },
             maxDate: this._today,
@@ -1057,6 +1164,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             itemsChanged: (list) => {
               // update documents
               this.itemData.dateRanges = list.items;
+
+              // validate hospitalization start date against date of onset
+              this.checkForOnsetAfterHospitalizationStartDate();
             },
             definition: {
               add: {
@@ -1076,10 +1186,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                     return this.itemData.dateRanges[index];
                   }
                 },
-                startDateValidators: {
-                  dateSameOrAfter: () => [
-                    'dateOfOnset'
-                  ]
+                changed: () => {
+                  // validate hospitalization start date against date of onset
+                  this.checkForOnsetAfterHospitalizationStartDate();
                 }
               }
             }
@@ -1096,7 +1205,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'questionnaire',
+      name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
       label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -1107,6 +1216,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           set: (value) => {
             this.itemData.questionnaireAnswers = value;
           }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideCaseQuestionNumbers;
         },
         updateErrors: (errorsHTML) => {
           errors = errorsHTML;
@@ -1125,7 +1237,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private initializeTabsQuestionnaireAsContact(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'questionnaire_as_contact',
+      name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
       label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -1133,14 +1245,18 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         questionnaire: this.selectedOutbreak.contactInvestigationTemplate,
         value: {
           get: () => this.itemData.questionnaireAnswersContact,
-          set: () => {}
+          set: (value) => {
+            this.itemData.questionnaireAnswersContact = value;
+          }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideContactQuestionNumbers;
         },
         updateErrors: () => {}
       },
-      visible: () => this.isView &&
+      visible: () => (this.isView || !this.selectedOutbreak.disableModifyingLegacyQuestionnaire) &&
         this.selectedOutbreak.contactInvestigationTemplate?.length > 0 &&
-        this.itemData.wasContact &&
-        this.itemData.hasQuestionnaireAnswersContact
+        this.itemData.wasContact
     };
   }
 
@@ -1453,7 +1569,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           // refresh data
           localTab.records$ = this.entityLabResultService
             .retrieveRecords(
-              this.selectedOutbreak.id,
+              this.selectedOutbreak,
               EntityModel.getLinkForEntityType(this.itemData.type),
               this.itemData.id,
               localTab.queryBuilder
@@ -1549,8 +1665,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           authUser: this.authUser,
           team: this.activatedRoute.snapshot.data.team,
           user: this.activatedRoute.snapshot.data.user,
+          dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,
           options: {
-            dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
           }
         }),
@@ -1980,7 +2096,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
 
           // check for duplicates
-          this.caseDataService
+          this.entityDataService
             .findDuplicates(
               this.selectedOutbreak.id,
               this.isCreate ?
@@ -2017,15 +2133,16 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
               // hide notification
               // - hide alert
-              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
               // construct list of actions
               const itemsToManage: IV2SideDialogConfigInputLinkWithAction[] = response.duplicates.map((item, index) => {
                 return {
                   type: V2SideDialogConfigInputType.LINK_WITH_ACTION,
                   name: `actionsLink[${item.model.id}]`,
-                  placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
-                    item.model as CaseModel,
+                  placeholder: (index + 1) + '. ' + EntityModel.getDuplicatePersonDetails(
+                    item,
+                    this.translateService.instant(item.model.type),
                     this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                     this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
@@ -2046,7 +2163,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                       },
                       {
                         label: Constants.DUPLICATE_ACTION.MERGE,
-                        value: Constants.DUPLICATE_ACTION.MERGE
+                        value: Constants.DUPLICATE_ACTION.MERGE,
+                        disabled: item.model.type !== EntityType.CASE
                       }
                     ]
                   }
@@ -2157,7 +2275,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: CaseModel) => ['/cases', item.id, 'view'],
-      statusVisible: true,
+      statusVisible: this.expandListColumnRenderer?.statusVisible === undefined ?
+        true :
+        this.expandListColumnRenderer.statusVisible,
       maxNoOfStatusForms: 3,
       get: {
         status: (item: CaseModel) => {
@@ -2300,32 +2420,47 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
     this.toastV2Service.notice(
-      this.translateService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_CONTACTS') +
+      this.translateService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_PERSONS') +
       ' ' +
       this._personDuplicates
         .map((item) => {
           // check rights
           if (
             (
-              item.type === EntityType.CONTACT &&
+              item.model.type === EntityType.CASE &&
+              !CaseModel.canView(this.authUser)
+            ) || (
+              item.model.type === EntityType.CONTACT &&
               !ContactModel.canView(this.authUser)
             ) || (
-              item.type === EntityType.CASE &&
-              !CaseModel.canView(this.authUser)
+              item.model.type === EntityType.CONTACT_OF_CONTACT &&
+              !ContactOfContactModel.canView(this.authUser)
             )
           ) {
-            return `${item.name} (${this.translateService.instant(item.type)})`;
+            return `${item.model.name} (${this.translateService.instant(item.type)})`;
           }
 
           // create url
-          const url: string = `${item.type === EntityType.CONTACT ? '/contacts' : '/cases'}/${item.id}/view`;
+          let entityPath: string = '';
+          switch (item.model.type) {
+            case EntityType.CASE:
+              entityPath = 'cases';
+              break;
+            case EntityType.CONTACT:
+              entityPath = 'contacts';
+              break;
+            case EntityType.CONTACT_OF_CONTACT:
+              entityPath = 'contacts-of-contacts';
+              break;
+          }
+          const url =  `${entityPath}/${item.model.id}/view`;
 
           // finished
-          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)})</span></a>`;
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.translateService.instant(item.model.type)})</span></a>`;
         })
         .join(', '),
       undefined,
-      AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT
+      AppMessages.APP_MESSAGE_DUPLICATE_PERSONS
     );
   }
 
@@ -2362,7 +2497,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         const updateAlert = () => {
           // must update message ?
           // - hide alert
-          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
           // show duplicates alert
           this.showDuplicatesAlert();
@@ -2414,61 +2549,99 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this._previousChecked.middleName = this.itemData.middleName;
 
         // check for duplicates
-        this._duplicateCheckingSubscription = forkJoin([
-          this.contactDataService
-            .findDuplicates(
-              this.selectedOutbreak.id,
+        this._duplicateCheckingSubscription = this.entityDataService
+          .findDuplicates(
+            this.selectedOutbreak.id,
+            this.isView || this.isModify ?
+              {
+                id: this.itemData.id,
+                ...this._previousChecked
+              } :
               this._previousChecked
-            ),
-          this.caseDataService
-            .findDuplicates(
-              this.selectedOutbreak.id,
-              this.isView || this.isModify ?
-                {
-                  id: this.itemData.id,
-                  ...this._previousChecked
-                } :
-                this._previousChecked
-            )
-        ]).pipe(
-          // handle error
-          catchError((err) => {
-            // show error
-            this.toastV2Service.error(err);
+          )
+          .pipe(
+            // handle error
+            catchError((err) => {
+              // show error
+              this.toastV2Service.error(err);
 
-            // finished
-            return throwError(err);
-          }),
+              // finished
+              return throwError(err);
+            }),
 
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        ).subscribe((
-          [foundContacts, foundCases]: [
-            EntityDuplicatesModel,
-            EntityDuplicatesModel
-          ]
-        ) => {
-          // request executed
-          this._duplicateCheckingSubscription = undefined;
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          ).subscribe((foundPersons: EntityDuplicatesModel) => {
+            // request executed
+            this._duplicateCheckingSubscription = undefined;
 
-          // update what we found
-          this._personDuplicates = [];
-          if (foundContacts?.duplicates?.length > 0) {
-            this._personDuplicates.push(
-              ...foundContacts.duplicates.map((item) => item.model as ContactModel)
-            );
-          }
-          if (foundCases?.duplicates?.length > 0) {
-            this._personDuplicates.push(
-              ...foundCases.duplicates.map((item) => item.model as CaseModel)
-            );
-          }
+            // update what we found
+            this._personDuplicates = foundPersons?.duplicates?.length ?
+              [...foundPersons.duplicates] :
+              [];
 
-          // update alert
-          updateAlert();
-        });
+            // update alert
+            updateAlert();
+          });
       },
       400
     );
+  }
+
+  /**
+   * Check if "date of onset" is after "date of reporting
+   */
+  private checkForOnsetAfterReporting() {
+    if (
+      this.itemData.dateOfOnset &&
+      this.itemData.dateOfReporting &&
+      moment(this.itemData.dateOfOnset).isAfter(moment(this.itemData.dateOfReporting))
+    ) {
+      this.toastV2Service.notice(
+        'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_IS_AFTER_DATE_OF_REPORTING',
+        undefined,
+        AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+      );
+    } else {
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    }
+  }
+
+  /**
+   * Check if hospitalization start date is before date of onset
+   */
+  private checkForOnsetAfterHospitalizationStartDate() {
+    // return if there is no valid date of onset or no hospitalization
+    if (
+      !this.itemData.dateOfOnset ||
+      !moment(this.itemData.dateOfOnset).isValid() ||
+      !this.itemData.dateRanges?.length
+    ) {
+      // make sure that there is no warning
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+
+      return;
+    }
+
+    // parse hospitalization items
+    for (const item of this.itemData.dateRanges) {
+      if (
+        item.startDate &&
+        moment(item.startDate).isValid() &&
+        moment(item.startDate).isBefore(moment(this.itemData.dateOfOnset))
+      ) {
+        this.toastV2Service.notice(
+          'LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE',
+          undefined,
+          AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+        );
+
+        // return if at least one mismatch found
+        return;
+      }
+    }
+
+    // hide warning if no mismatch found
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 }

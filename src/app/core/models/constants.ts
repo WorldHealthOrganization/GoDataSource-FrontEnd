@@ -630,6 +630,10 @@ export class Constants {
 
   // used for the criteria radio buttons in the chains of transmission settings
   static TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS = {
+    NONE: {
+      label: 'LNG_COMMON_LABEL_NONE',
+      value: 'none'
+    },
     CERTAINITY_LEVEL: {
       label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
       value: 'certaintyLevelId'
@@ -925,6 +929,10 @@ export class Constants {
     FILE_ATTACHMENT: {
       label: 'LNG_MODULE_LABEL_FILE_ATTACHMENT',
       value: 'fileAttachment'
+    },
+    IMPORT_MAPPING: {
+      label: 'LNG_MODULE_LABEL_IMPORT_MAPPING',
+      value: 'importMapping'
     }
   };
 
@@ -1017,6 +1025,10 @@ export class Constants {
     DEVICE_HISTORY: {
       label: 'LNG_MODULE_LABEL_DEVICE_HISTORY',
       value: 'deviceHistory'
+    },
+    IMPORT_MAPPING: {
+      label: 'LNG_MODULE_LABEL_IMPORT_MAPPING',
+      value: 'importMapping'
     }
   };
 
@@ -1128,6 +1140,18 @@ export class Constants {
       value: 'LNG_COT_STATUS_IN_PROGRESS'
     }
   };
+
+  // export groups
+  static EXPORT_GROUP = {
+    RELATIONSHIPS_DATA: 'LNG_COMMON_LABEL_EXPORT_GROUP_RELATIONSHIPS_DATA',
+    RECORD_CREATION_AND_UPDATE_DATA: 'LNG_COMMON_LABEL_EXPORT_GROUP_RECORD_CREATION_AND_UPDATE_DATA'
+  };
+
+  // go data who link
+  static readonly GO_DATA_WHO_LINK: string = 'https://godata.who.int';
+
+  // regex email
+  static readonly REGEX_EMAIL_VALIDATOR = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
   /**
      * Today date

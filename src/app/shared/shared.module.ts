@@ -19,13 +19,16 @@ import * as formV2Components from './forms-v2/components';
 import * as v2Components from './components-v2';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { ToastrModule } from 'ngx-toastr';
-import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
-import { HotTableModule } from '@handsontable/angular';
+import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { CdkMenuModule } from '@angular/cdk/menu';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 
 @NgModule({
   imports: [
     AgGridModule,
+    CdkMenuModule,
+    ClipboardModule,
     ColorPickerModule,
     CommonModule,
     DragDropModule,
@@ -37,9 +40,8 @@ import { ColorPickerModule } from 'ngx-color-picker';
     TranslateModule,
     FileUploadModule,
     NgxWigModule,
-    NgxMaterialTimepickerModule,
+    NgxMatTimepickerModule,
     NgxMatSelectSearchModule,
-    HotTableModule.forRoot(),
     ScrollingModule,
     ExperimentalScrollingModule,
     ToastrModule.forRoot({

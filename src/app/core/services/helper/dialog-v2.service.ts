@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject, throwError } from 'rxjs';
+import { Observable, Subject, switchMap, throwError } from 'rxjs';
 import {
   IV2SideDialog,
   IV2SideDialogAdvancedFiltersResponse,
@@ -57,6 +57,7 @@ import { AuthDataService } from '../data/auth.data.service';
 import { BaseModel } from '../../models/base.model';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
 import { AppFormSelectGroupsV2Component } from '../../../shared/forms-v2/components/app-form-select-groups-v2/app-form-select-groups-v2.component';
+import { ErrorModel } from '../../models/error.model';
 
 @Injectable()
 export class DialogV2Service {
@@ -260,7 +261,7 @@ export class DialogV2Service {
     // add divider for groups and fields
     if (
       config.export.allow.groups ||
-      config.export.allow.fields
+      config.export.allow.fields?.options?.length > 0
     ) {
       inputs.push({
         type: V2SideDialogConfigInputType.DIVIDER
@@ -276,7 +277,18 @@ export class DialogV2Service {
           placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
           name: 'fieldsGroupAll',
           checked: true,
-          change: (data): void => {
+          change: (data, handler): void => {
+            // trigger callback ?
+            if (
+              config.export.allow.groups &&
+              config.export.allow.groups.change
+            ) {
+              config.export.allow.groups.change(
+                data,
+                handler
+              );
+            }
+
             // all fields groups checked ?
             if ((data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked) {
               // clear specific groups
@@ -314,12 +326,23 @@ export class DialogV2Service {
               return !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
             }
           },
-          change: (data): void => {
+          change: (data, handler): void => {
             // nothing to do ?
-            if (
-              !config.export.allow.groups ||
-              !config.export.allow.groups.required
-            ) {
+            if (!config.export.allow.groups) {
+              // finished
+              return;
+            }
+
+            // trigger callback ?
+            if (config.export.allow.groups.change) {
+              config.export.allow.groups.change(
+                data,
+                handler
+              );
+            }
+
+            // if there are no required fields then we don't need to proceed further
+            if (!config.export.allow.groups.required) {
               // finished
               return;
             }
@@ -363,7 +386,7 @@ export class DialogV2Service {
     }
 
     // specific fields
-    if (config.export.allow.fields) {
+    if (config.export.allow.fields?.options?.length > 0) {
       // all
       inputs.push(
         {
@@ -376,7 +399,18 @@ export class DialogV2Service {
               false :
               !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
           },
-          change: (data): void => {
+          change: (data, handler): void => {
+            // trigger callback ?
+            if (
+              config.export.allow.fields &&
+              config.export.allow.fields.change
+            ) {
+              config.export.allow.fields.change(
+                data,
+                handler
+              );
+            }
+
             // all fields ?
             if ((data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked) {
               (data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown).values = [];
@@ -392,7 +426,7 @@ export class DialogV2Service {
           placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS',
           name: 'fieldsList',
           values: [],
-          options: config.export.allow.fields,
+          options: config.export.allow.fields.options,
           disabled: (data): boolean => {
             return (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked || (
               data.map.fieldsGroupAll &&
@@ -406,6 +440,18 @@ export class DialogV2Service {
                 (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked
               );
             }
+          },
+          change: (data, handler) => {
+            // trigger callback ?
+            if (
+              config.export.allow.fields &&
+              config.export.allow.fields.change
+            ) {
+              config.export.allow.fields.change(
+                data,
+                handler
+              );
+            }
           }
         }
       );
@@ -414,7 +460,7 @@ export class DialogV2Service {
     // add divider for groups and fields
     if (
       config.export.allow.groups ||
-      config.export.allow.fields
+      config.export.allow.fields?.options?.length > 0
     ) {
       inputs.push({
         type: V2SideDialogConfigInputType.DIVIDER
@@ -504,6 +550,39 @@ export class DialogV2Service {
     if (config.export.inputs?.append) {
       inputs.push(...config.export.inputs.append);
     }
+
+    // handle custom catches
+    const handleCatchError = (err: Blob | Error | ErrorModel) => {
+      // handle blob errors
+      if (
+        err instanceof Blob &&
+        err.type === 'application/json'
+      ) {
+        return new Observable((subscriber) => {
+          err.text()
+            .then((text) => {
+              // any error would be caught by promise.catch
+              const jsonErr = JSON.parse(text);
+              subscriber.next(
+                jsonErr.error ?
+                  jsonErr.error :
+                  jsonErr
+              );
+              subscriber.complete();
+            })
+            .catch((blobErr) => {
+              // couldn't handle the custom error
+              subscriber.next(blobErr);
+              subscriber.complete();
+            });
+        }).pipe(switchMap((localErr: Blob | Error | ErrorModel) => {
+          return config.export.catchError(localErr);
+        }));
+      }
+
+      // continue
+      return config.export.catchError(err);
+    };
 
     // display dialog
     this._sideDialogSubject$
@@ -596,6 +675,14 @@ export class DialogV2Service {
             });
           }
 
+          // prefilter form data
+          if (config.export.formDataPrefilter) {
+            config.export.formDataPrefilter(
+              formData,
+              qb
+            );
+          }
+
           // show loading dialog
           response.handler.loading.show();
 
@@ -623,11 +710,16 @@ export class DialogV2Service {
           )
             .pipe(
               catchError((err) => {
-                // show error
-                this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
-
                 // close dialog
                 response.handler.hide();
+
+                // custom error handler ?
+                if (config.export.catchError) {
+                  return handleCatchError(err);
+                }
+
+                // show error
+                this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                 // send error down the road
                 return throwError(err);
@@ -751,11 +843,16 @@ export class DialogV2Service {
                   .getExportLog((blobOrJson as { exportLogId: string }).exportLogId)
                   .pipe(
                     catchError((err) => {
-                      // show error
-                      this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
-
                       // close dialog
                       response.handler.hide();
+
+                      // custom error handler ?
+                      if (config.export.catchError) {
+                        return handleCatchError(err);
+                      }
+
+                      // show error
+                      this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                       // send error down the road
                       return throwError(err);
@@ -822,11 +919,16 @@ export class DialogV2Service {
                         )
                         .pipe(
                           catchError((err) => {
-                            // show error
-                            this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
-
                             // close dialog
                             response.handler.hide();
+
+                            // custom error handler ?
+                            if (config.export.catchError) {
+                              return handleCatchError(err);
+                            }
+
+                            // show error
+                            this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                             // send error down the road
                             return throwError(err);
@@ -1829,19 +1931,22 @@ export class DialogV2Service {
       }));
 
       // add sorting criteria
+      const sortField: string = typeof filterDefinition.sortable === 'string' ?
+        filterDefinition.sortable :
+        filterDefinition.field;
       if (
         objectDetailsSort &&
         objectDetailsSort[appliedSort.sortBy.value]
       ) {
         objectDetailsSort[appliedSort.sortBy.value].forEach((childProperty) => {
           queryBuilder.sort.by(
-            `${filterDefinition.field}.${childProperty}`,
+            `${sortField}.${childProperty}`,
             appliedSort.order.value as RequestSortDirection
           );
         });
       } else {
         queryBuilder.sort.by(
-          filterDefinition.field,
+          sortField,
           appliedSort.order.value as RequestSortDirection
         );
       }

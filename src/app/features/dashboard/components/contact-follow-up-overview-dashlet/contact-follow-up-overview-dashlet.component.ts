@@ -10,7 +10,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { MetricContactsFollowedUpReportModel } from '../../../../core/models/metrics/metric-contacts-followed-up-report.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
-import { FormatFunction } from 'c3';
+import { FormatFunction } from 'billboard.js';
 
 @Component({
   selector: 'app-contact-follow-up-overview-dashlet',
@@ -191,7 +191,7 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
     };
 
     // build chart data
-    _.forEach(metricData, (metric) => {
+    (metricData || []).forEach((metric) => {
       // create the array with categories ( dates displayed on x axis )
       this.chartDataCategories.push(moment(metric.day).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
 

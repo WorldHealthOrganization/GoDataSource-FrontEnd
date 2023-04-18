@@ -18,6 +18,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
@@ -31,6 +32,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     date: ILabelValuePairModel[],
     dateOfReporting: ILabelValuePairModel[],
     isDateOfReportingApproximate: ILabelValuePairModel[],
+    visualId: ILabelValuePairModel[],
     responsibleUserId: ILabelValuePairModel[],
     eventCategory: ILabelValuePairModel[],
     endDate: ILabelValuePairModel[],
@@ -46,6 +48,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
     private translateService: TranslateService,
+    private locationDataService: LocationDataService,
     protected toastV2Service: ToastV2Service,
     authDataService: AuthDataService,
     renderer2: Renderer2,
@@ -102,97 +105,173 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
           })
         )
         .subscribe((mergeRecords) => {
-          // determine data
-          this._uniqueOptions = {
-            name: this.getFieldOptions(
-              mergeRecords,
-              'name'
-            ).options,
-            date: this.getFieldOptions(
-              mergeRecords,
-              'date'
-            ).options,
-            dateOfReporting: this.getFieldOptions(
-              mergeRecords,
-              'dateOfReporting'
-            ).options,
-            isDateOfReportingApproximate: this.getFieldOptions(
-              mergeRecords,
-              'isDateOfReportingApproximate'
-            ).options,
-            responsibleUserId: this.getFieldOptions(
-              mergeRecords,
-              'responsibleUserId'
-            ).options,
-            eventCategory: this.getFieldOptions(
-              mergeRecords,
-              'eventCategory'
-            ).options,
-            endDate: this.getFieldOptions(
-              mergeRecords,
-              'endDate'
-            ).options,
-            description: this.getFieldOptions(
-              mergeRecords,
-              'description'
-            ).options,
-            addresses: []
+          // map locations
+          const locationsMap: {
+            [id: string]: string
+          } = {};
+
+          // determine and format data for each item
+          const finish = () => {
+            // determine data
+            this._uniqueOptions = {
+              name: this.getFieldOptions(
+                mergeRecords,
+                'name'
+              ).options,
+              date: this.getFieldOptions(
+                mergeRecords,
+                'date'
+              ).options,
+              dateOfReporting: this.getFieldOptions(
+                mergeRecords,
+                'dateOfReporting'
+              ).options,
+              isDateOfReportingApproximate: this.getFieldOptions(
+                mergeRecords,
+                'isDateOfReportingApproximate'
+              ).options,
+              visualId: this.getFieldOptions(
+                mergeRecords,
+                'visualId'
+              ).options,
+              responsibleUserId: this.getFieldOptions(
+                mergeRecords,
+                'responsibleUserId'
+              ).options,
+              eventCategory: this.getFieldOptions(
+                mergeRecords,
+                'eventCategory'
+              ).options,
+              endDate: this.getFieldOptions(
+                mergeRecords,
+                'endDate'
+              ).options,
+              description: this.getFieldOptions(
+                mergeRecords,
+                'description'
+              ).options,
+              addresses: []
+            };
+
+            // go through records and determine data
+            mergeRecords.forEach((item) => {
+              // determine addresses
+              const event = item.model as EventModel;
+              const eventFullAddress = event.address?.fullAddress;
+
+              // create a full address with all fields (filter is used to remove empty strings or undefined values)
+              const addressLabelFields: string = [
+                eventFullAddress,
+                event.address?.locationId ? locationsMap[event.address.locationId] : undefined,
+                event.address?.postalCode,
+                event.address?.emailAddress,
+                event.address?.phoneNumber,
+                event.address?.geoLocation?.lat,
+                event.address?.geoLocation?.lng
+              ].map((e) => e ? e.toString().trim() : e)
+                .filter((e) => e)
+                .join(', ');
+
+              // add to list ?
+              if (addressLabelFields) {
+                this._uniqueOptions.addresses.push({
+                  label: addressLabelFields,
+                  value: event.id,
+                  data: event.address
+                });
+              }
+            });
+
+            // auto-select if only one value
+            const data: EventModel = new EventModel();
+            data.name = this._uniqueOptions.name.length === 1 ?
+              this._uniqueOptions.name[0].value :
+              data.name;
+            data.date = this._uniqueOptions.date.length === 1 ?
+              this._uniqueOptions.date[0].value :
+              data.date;
+            data.dateOfReporting = this._uniqueOptions.dateOfReporting.length === 1 ?
+              this._uniqueOptions.dateOfReporting[0].value :
+              data.dateOfReporting;
+            data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
+              this._uniqueOptions.isDateOfReportingApproximate[0].value :
+              data.isDateOfReportingApproximate;
+            data.visualId = this._uniqueOptions.visualId.length === 1 ?
+              this._uniqueOptions.visualId[0].value :
+              data.visualId;
+            data.responsibleUserId = this._uniqueOptions.responsibleUserId.length === 1 ?
+              this._uniqueOptions.responsibleUserId[0].value :
+              data.responsibleUserId;
+            data.eventCategory = this._uniqueOptions.eventCategory.length === 1 ?
+              this._uniqueOptions.eventCategory[0].value :
+              data.eventCategory;
+            data.endDate = this._uniqueOptions.endDate.length === 1 ?
+              this._uniqueOptions.endDate[0].value :
+              data.endDate;
+            data.description = this._uniqueOptions.description.length === 1 ?
+              this._uniqueOptions.description[0].value :
+              data.description;
+            this._addressID = this._uniqueOptions.addresses.length === 1 ?
+              this._uniqueOptions.addresses[0].value :
+              undefined;
+            data.address = this._addressID !== undefined ?
+              this._uniqueOptions.addresses.find((addressItem) => addressItem.value === this._addressID).data :
+              undefined;
+
+            // finish
+            subscriber.next(data);
+            subscriber.complete();
           };
 
-          // go through records and determine data
+          // map list of location Ids
+          const locationIdsMap: {
+            [locationId: string]: true
+          } = {};
           mergeRecords.forEach((item) => {
-            // determine addresses
-            const event = item.model as EventModel;
-
-            // add to list ?
-            if (
-              event.address.locationId ||
-              event.address.fullAddress
-            ) {
-              this._uniqueOptions.addresses.push({
-                label: event.address.fullAddress,
-                value: event.id,
-                data: event.address
-              });
+            if ((item.model as EventModel)?.address?.locationId) {
+              locationIdsMap[(item.model as EventModel).address.locationId] = true;
             }
           });
 
-          // auto-select if only one value
-          const data: EventModel = new EventModel();
-          data.name = this._uniqueOptions.name.length === 1 ?
-            this._uniqueOptions.name[0].value :
-            data.name;
-          data.date = this._uniqueOptions.date.length === 1 ?
-            this._uniqueOptions.date[0].value :
-            data.date;
-          data.dateOfReporting = this._uniqueOptions.dateOfReporting.length === 1 ?
-            this._uniqueOptions.dateOfReporting[0].value :
-            data.dateOfReporting;
-          data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
-            this._uniqueOptions.isDateOfReportingApproximate[0].value :
-            data.isDateOfReportingApproximate;
-          data.responsibleUserId = this._uniqueOptions.responsibleUserId.length === 1 ?
-            this._uniqueOptions.responsibleUserId[0].value :
-            data.responsibleUserId;
-          data.eventCategory = this._uniqueOptions.eventCategory.length === 1 ?
-            this._uniqueOptions.eventCategory[0].value :
-            data.eventCategory;
-          data.endDate = this._uniqueOptions.endDate.length === 1 ?
-            this._uniqueOptions.endDate[0].value :
-            data.endDate;
-          data.description = this._uniqueOptions.description.length === 1 ?
-            this._uniqueOptions.description[0].value :
-            data.description;
-          this._addressID = this._uniqueOptions.addresses.length === 1 ?
-            this._uniqueOptions.addresses[0].value :
-            undefined;
-          data.address = this._addressID !== undefined ?
-            this._uniqueOptions.addresses.find((addressItem) => addressItem.value === this._addressID).data :
-            undefined;
+          // check if there are location to retrieve
+          const locationIds: string[] = Object.keys(locationIdsMap);
+          if (locationIds.length) {
+            // construct query builder
+            const qbLocations: RequestQueryBuilder = new RequestQueryBuilder();
+            qb.fields(
+              'id',
+              'name'
+            );
+            qbLocations.filter.bySelect(
+              'id',
+              locationIds,
+              false,
+              null
+            );
 
-          // finish
-          subscriber.next(data);
-          subscriber.complete();
+            // retrieve locations
+            this.locationDataService
+              .getLocationsList(qbLocations)
+              .pipe(
+                catchError((err) => {
+                  // finished
+                  subscriber.error(err);
+                  return throwError(err);
+                })
+              )
+              .subscribe((locations) => {
+                // map the new locations
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location.name;
+                });
+
+                // format data
+                finish();
+              });
+          } else {
+            // format data
+            finish();
+          }
         });
     });
   }
@@ -456,6 +535,21 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
               get: () => this.itemData.isDateOfReportingApproximate as any,
               set: (value) => {
                 this.itemData.isDateOfReportingApproximate = value as any;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'visualId',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+            description: () => this.translateService.instant(
+              'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+              this.selectedOutbreak.eventIdMask
+            ),
+            options: this._uniqueOptions.visualId,
+            value: {
+              get: () => this.itemData.visualId,
+              set: (value) => {
+                this.itemData.visualId = value;
               }
             }
           }, {

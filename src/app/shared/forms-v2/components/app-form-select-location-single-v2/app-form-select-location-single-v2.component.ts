@@ -5,11 +5,11 @@ import {
   Host, Input,
   OnDestroy, OnInit,
   Optional, Output,
-  SkipSelf, ViewEncapsulation
+  SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { MAT_SELECT_CONFIG } from '@angular/material/select';
+import { MAT_SELECT_CONFIG, MatSelect } from '@angular/material/select';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -50,6 +50,25 @@ export class AppFormSelectLocationSingleV2Component
   // selected location changed
   @Output() selectedLocationChanged = new EventEmitter<ILocation>();
 
+  // input
+  private _input: MatSelect;
+  private _openAfterInit: boolean = false;
+  @ViewChild(MatSelect) set input(input: MatSelect) {
+    // set
+    this._input = input;
+
+    // do we need to open after init ?
+    if (this._openAfterInit) {
+      this.open();
+    }
+  }
+  get input(): MatSelect {
+    return this._input;
+  }
+
+  // timers
+  private _openTimer: any;
+
   /**
    * Constructor
    */
@@ -86,6 +105,9 @@ export class AppFormSelectLocationSingleV2Component
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
+
+    // timers
+    this.stopOpenTimer();
   }
 
   /**
@@ -100,7 +122,9 @@ export class AppFormSelectLocationSingleV2Component
       // hack to force re-render, otherwise we see an empty scroll
       if (this.value) {
         // determine value to search
-        const index: number = this.locations.findIndex((option) => option.id === this.value);
+        const index: number = this.locations ?
+          this.locations.findIndex((option) => option.id === this.value) :
+          -1;
         if (index > -1) {
           this.cdkVirtualScrollViewport.scrollToIndex(index);
         }
@@ -127,5 +151,37 @@ export class AppFormSelectLocationSingleV2Component
       // tooltip included
       this.addLocationConditionAndRefresh();
     }
+  }
+
+  /**
+   * Timer - open
+   */
+  private stopOpenTimer(): void {
+    if (this._openTimer) {
+      clearTimeout(this._openTimer);
+      this._openTimer = undefined;
+    }
+  }
+
+  /**
+   * Open select
+   */
+  open(): void {
+    // timer - open
+    this.stopOpenTimer();
+
+    // wait for binds to take effect
+    this._openTimer = setTimeout(() => {
+      // reset
+      this._openTimer = undefined;
+
+      // open
+      if (this.input) {
+        this._openAfterInit = false;
+        this.input.open();
+      } else {
+        this._openAfterInit = true;
+      }
+    });
   }
 }

@@ -74,11 +74,11 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
     this._deviceId = record?.id ?? this._deviceId;
 
     // retrieve data
-    return new Observable(subscriber => {
+    return new Observable((subscriber) => {
       this.deviceDataService.getHistoryDevice(this._deviceId)
         .subscribe((results) => {
           this._devicesHistoryPlaceholders = [];
-          this._devicesHistoryValues = results.map(item => {
+          this._devicesHistoryValues = results.map((item) => {
             // format status
             this._devicesHistoryPlaceholders.push(
               item.status ?

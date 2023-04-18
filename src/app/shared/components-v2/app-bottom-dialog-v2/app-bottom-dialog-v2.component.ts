@@ -164,7 +164,7 @@ export class AppBottomDialogV2Component implements OnInit, OnDestroy {
   }
 
   /**
-   * Hide sidenav
+   * Hide dialog
    */
   hide(
     type: IV2BottomDialogConfigButtonType = IV2BottomDialogConfigButtonType.CANCEL,

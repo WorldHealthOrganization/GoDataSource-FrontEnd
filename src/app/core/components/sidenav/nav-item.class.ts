@@ -1,5 +1,6 @@
 import { PERMISSION } from '../../models/permission.model';
 import { PermissionExpression, UserModel } from '../../models/user.model';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 export class AbstractNavItem {
   /**
@@ -41,7 +42,8 @@ export class NavItem extends AbstractNavItem {
     public permissions: PERMISSION[] | PermissionExpression | ((u: UserModel) => boolean) = [],
     public children: ChildNavItem[] = [],
     public link: string | null = null,
-    public additionalVisibilityCheck?: () => boolean
+    public additionalVisibilityCheck?: () => boolean,
+    public menuOpenedTrigger?: MatMenuTrigger
   ) {
     super(false);
 

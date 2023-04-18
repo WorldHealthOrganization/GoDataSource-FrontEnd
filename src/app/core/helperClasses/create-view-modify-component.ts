@@ -2,7 +2,7 @@ import { Observable, ReplaySubject, throwError } from 'rxjs';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel, UserSettings } from '../models/user.model';
-import { ICreateViewModifyV2 } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { ICreateViewModifyV2, ICreateViewModifyV2Config } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { ActivatedRoute } from '@angular/router';
 import { Directive, Renderer2, ViewChild } from '@angular/core';
 import { TopnavComponent } from '../components/topnav/topnav.component';
@@ -21,6 +21,10 @@ import { AppCreateViewModifyV2Component } from '../../shared/components-v2/app-c
 @Directive()
 export abstract class CreateViewModifyComponent<T>
   extends ConfirmOnFormChanges {
+  // constants
+  protected static readonly GENERAL_SETTINGS_TAB_OPTIONS: string = 'tabsOptions';
+  protected static readonly GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS: string = 'hideQuestionNumbers';
+
   // handler for stopping take until
   protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
@@ -73,6 +77,9 @@ export abstract class CreateViewModifyComponent<T>
   // tabs
   tabData: ICreateViewModifyV2;
 
+  // tab configuration
+  tabConfiguration: ICreateViewModifyV2Config;
+
   // expanded list records observable
   expandListRecords$: Observable<T[]>;
 
@@ -100,7 +107,7 @@ export abstract class CreateViewModifyComponent<T>
     protected renderer2: Renderer2,
     protected redirectService: RedirectService,
     activatedRoute: ActivatedRoute,
-    authDataService: AuthDataService,
+    protected authDataService: AuthDataService,
     dontDisableOutbreakSelect?: boolean
   ) {
     // initialize parent
@@ -265,6 +272,35 @@ export abstract class CreateViewModifyComponent<T>
         this.redirectService.to([event.target.parentElement.getAttribute('href')]);
       }
     );
+  }
+
+  /**
+   * Updates user general settings
+   */
+  updateGeneralSettings(
+    settingsPath: string,
+    options: {
+      [setting: string]: boolean
+    },
+    finish: () => void
+  ) {
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [settingsPath]: Object.keys(options).length ? options : undefined
+      })
+      .pipe(
+        catchError((err) => {
+          // error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finish
+        finish();
+      });
   }
 
   /**

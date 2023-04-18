@@ -118,8 +118,8 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // retrieve ref data
     this.displayLoading = true;
@@ -153,8 +153,8 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // outbreak subscriber
     if (this.outbreakSubscriber) {

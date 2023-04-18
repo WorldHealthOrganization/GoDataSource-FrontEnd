@@ -12,7 +12,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
-import { MAT_SELECT_CONFIG } from '@angular/material/select';
+import { MAT_SELECT_CONFIG, MatSelect } from '@angular/material/select';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 @Component({
@@ -154,11 +154,34 @@ export class AppFormSelectSingleV2Component
     return this.allOptions;
   }
 
+  // search value
+  startSearch: string;
+  searchValue: string;
+
   // allow disabled options to be selected ?
   @Input() allowDisabledToBeSelected: boolean = false;
 
   // vscroll handler
   @ViewChild('cdkVirtualScrollViewport') cdkVirtualScrollViewport: CdkVirtualScrollViewport;
+
+  // input
+  private _input: MatSelect;
+  private _openAfterInit: boolean = false;
+  @ViewChild(MatSelect) set input(input: MatSelect) {
+    // set
+    this._input = input;
+
+    // do we need to open after init ?
+    if (this._openAfterInit) {
+      this.open();
+    }
+  }
+  get input(): MatSelect {
+    return this._input;
+  }
+
+  // timers
+  private _openTimer: any;
 
   /**
    * Constructor
@@ -179,34 +202,72 @@ export class AppFormSelectSingleV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // timers
+    this.stopOpenTimer();
+  }
+
+  /**
+   * Update visible options depending on if they were disabled or not
+   */
+  writeValue(value: string) {
+    // parent
+    super.writeValue(value);
+
+    // do we need to update options ?
+    if (
+      !this.allowDisabledToBeSelected &&
+      this.value
+    ) {
+      this.filterOptions();
+    }
   }
 
   /**
    * Filter options
    */
-  filterOptions(byValue?: string): void {
+  filterOptions(searchValue?: string): void {
+    // update search value
+    if (searchValue !== undefined) {
+      this.searchValue = searchValue;
+    }
+
     // nothing to filter ?
-    if (!this.options) {
+    if (!this.options?.length) {
       this.filteredOptions = [];
       return;
     }
 
     // filter options
-    if (!byValue) {
+    if (!this.searchValue) {
       // all visible options
-      this.filteredOptions = this.options;
+      this.filteredOptions = this.allowDisabledToBeSelected ?
+        this.options :
+        this.options.filter((item: ILabelValuePairModel): boolean => {
+          return !item.disabled || (
+            this.value &&
+            item.value === this.value
+          );
+        });
 
       // finished
       return;
     }
 
     // case insensitive
-    byValue = byValue.toLowerCase();
+    const byValue: string = this.searchValue.toLowerCase();
 
     // filter
     this.filteredOptions = this.options.filter((item: ILabelValuePairModel): boolean => {
-      return item.label.toLowerCase().indexOf(byValue) > -1;
+      return (
+        this.allowDisabledToBeSelected ||
+        !item.disabled || (
+          this.value &&
+          item.value === this.value
+        )
+      ) && item.label.toLowerCase().indexOf(byValue) > -1;
     });
   }
 
@@ -254,5 +315,52 @@ export class AppFormSelectSingleV2Component
     if (iconB.clickAction) {
       iconB.clickAction(this);
     }
+  }
+
+  /**
+   * Timer - open
+   */
+  private stopOpenTimer(): void {
+    if (this._openTimer) {
+      clearTimeout(this._openTimer);
+      this._openTimer = undefined;
+    }
+  }
+
+  /**
+   * Open select
+   */
+  open(startSearch?: string): void {
+    // timer - open
+    this.stopOpenTimer();
+
+    // wait for binds to take effect
+    this._openTimer = setTimeout(() => {
+      // reset
+      this._openTimer = undefined;
+
+      // open
+      if (this.input) {
+        // init
+        this._openAfterInit = false;
+        this.startSearch = startSearch;
+        this.input.open();
+
+        // filter ?
+        if (this.startSearch) {
+          // filter
+          this.filterOptions(this.startSearch);
+
+          // make active first one
+          if (this.filteredOptions.length) {
+            setTimeout(() => {
+              this.input._keyManager.setFirstItemActive();
+            });
+          }
+        }
+      } else {
+        this._openAfterInit = true;
+      }
+    });
   }
 }

@@ -10,6 +10,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
   selector: 'app-reset-password',
@@ -29,6 +30,7 @@ export class ResetPasswordComponent {
 
   // constants
   RenderMode = RenderMode;
+  Constants = Constants;
 
   /**
    * Constructor

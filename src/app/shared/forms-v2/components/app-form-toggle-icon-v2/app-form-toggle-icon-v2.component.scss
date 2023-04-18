@@ -3,6 +3,8 @@
 
 /* Form Radio Toggle */
 .gd-form-toggle-icon-v2 {
+  @include flex(flex);
+
   .mat-button-toggle {
     background: rgba(var(--gd-secondary-rgb), 0.35);
     @include border-radius(0.4rem);
@@ -97,7 +99,7 @@
       &.mat-button-toggle-disabled {
         background: rgba(var(--gd-primary-rgb), 0.25);
         color: var(--gd-background);
-  
+
         .mat-button-toggle-button {
           .mat-button-toggle-label-content {
             .mat-icon {
@@ -109,3 +111,18 @@
     }
   }
 }
+
+.gd-form-toggle-icon-v2-big {
+  .gd-form-toggle-icon-v2 {
+    .mat-button-toggle {
+      height: 3.6rem;
+      min-width: 4.8rem;
+      width: 4.8rem;
+
+      @include breakpoint('xxs') {
+        height: 3.2rem;
+      }
+    }
+  }
+}
+

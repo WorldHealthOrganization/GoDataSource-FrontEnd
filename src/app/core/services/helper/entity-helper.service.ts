@@ -31,6 +31,7 @@ import { IBasicCount } from '../../models/basic-count.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { v4 as uuid } from 'uuid';
 import { catchError } from 'rxjs/operators';
+import { AuthDataService } from '../data/auth.data.service';
 
 /**
  * From ?
@@ -157,7 +158,8 @@ export class EntityHelperService {
     private relationshipDataService: RelationshipDataService,
     private i18nService: I18nService,
     private toastV2Service: ToastV2Service,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private authDataService: AuthDataService
   ) {}
 
   /**
@@ -202,6 +204,9 @@ export class EntityHelperService {
               })
             )
             .subscribe((data) => {
+              // get the authenticated user
+              const authUser = this.authDataService.getAuthenticatedUser();
+
               // construct list of inputs to display
               const entitiesList: IV2SideDialogConfigInputAccordion = {
                 type: V2SideDialogConfigInputType.ACCORDION,
@@ -232,7 +237,12 @@ export class EntityHelperService {
                     relationshipData.model.id,
                     'view'
                   ],
-                  visible: () => relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT || selectedOutbreak?.isContactsOfContactsActive
+                  visible: () => (
+                    relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
+                    selectedOutbreak?.isContactsOfContactsActive
+                  ) &&
+                    relationshipData.model.canView(authUser) &&
+                    !relationshipData.model.deleted
                 }, {
                   type: V2SideDialogConfigInputType.DIVIDER
                 });
@@ -270,7 +280,14 @@ export class EntityHelperService {
                   placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE',
                   link: () => [
                     `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${relationshipData.relationship.id}/view`
-                  ]
+                  ],
+                  visible: () => RelationshipModel.canView(authUser) &&
+                    (
+                      relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
+                      selectedOutbreak?.isContactsOfContactsActive
+                    ) &&
+                    relationshipData.model.canView(authUser) &&
+                    !relationshipData.model.deleted
                 }, {
                   type: V2SideDialogConfigInputType.DIVIDER
                 });
@@ -532,6 +549,9 @@ export class EntityHelperService {
           value: entity.dateOfInfection ?
             moment(entity.dateOfInfection).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
+        }, {
+          label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+          value: entity.outcomeId
         }
       );
     }
@@ -556,6 +576,9 @@ export class EntityHelperService {
         {
           label: 'LNG_EVENT_FIELD_LABEL_NAME',
           value: entity.name
+        }, {
+          label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+          value: entity.visualId
         }, {
           label: 'LNG_EVENT_FIELD_LABEL_DATE',
           value: entity.date ?
@@ -584,9 +607,9 @@ export class EntityHelperService {
     relationship: RelationshipModel
   ): ILabelValuePairModel[] {
     // determine source and target
-    const sourcePerson = _.find(relationship.persons, person => person.source === true);
-    const sourcePeople = _.find(relationship.people, people => people.model.id === sourcePerson.id);
-    const destinationPeople = _.find(relationship.people, people => people.model.id !== sourcePerson.id);
+    const sourcePerson = _.find(relationship.persons, (person) => person.source === true);
+    const sourcePeople = _.find(relationship.people, (people) => people.model.id === sourcePerson.id);
+    const destinationPeople = _.find(relationship.people, (people) => people.model.id !== sourcePerson.id);
 
     // create list of fields to display
     const lightObject: ILabelValuePairModel[] = [];
@@ -832,6 +855,11 @@ export class EntityHelperService {
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
+        },
+        link: (data) => {
+          return data.model && data.model.canView(definitions.authUser) && !data.model.deleted ?
+            `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
+            undefined;
         }
       },
       {
@@ -845,6 +873,11 @@ export class EntityHelperService {
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
+        },
+        link: (data) => {
+          return data.model && data.model.canView(definitions.authUser) && !data.model.deleted ?
+            `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
+            undefined;
         }
       },
       {
@@ -858,6 +891,11 @@ export class EntityHelperService {
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
+        },
+        link: (data) => {
+          return data.model && data.model.canView(definitions.authUser) && !data.model.deleted ?
+            `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
+            undefined;
         }
       },
       {

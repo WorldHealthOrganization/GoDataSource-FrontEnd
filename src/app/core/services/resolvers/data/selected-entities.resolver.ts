@@ -46,7 +46,8 @@ export class SelectedEntitiesDataResolver implements IMapResolverV2<CaseModel | 
       'firstName',
       'lastName',
       'middleName',
-      'name'
+      'name',
+      'dateOfOnset'
     );
 
     // retrieve all selected entities

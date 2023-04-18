@@ -34,12 +34,19 @@ import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IAppFormIconButtonV2 } from '../../../../shared/forms-v2/core/app-form-icon-button-v2';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { Constants } from '../../../../core/models/constants';
+import { EntityType } from '../../../../core/models/entity-type';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
   templateUrl: './relationships-create-view-modify.component.html'
 })
 export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComponent<RelationshipModel> implements OnDestroy {
+  // constants
+  private static readonly PROPERTY_LAST_CONTACT: string = 'contactDate';
+
   // today
   private _today: Moment = moment();
 
@@ -59,6 +66,23 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     [id: string]: CaseModel | ContactModel | EventModel | ContactOfContactModel
   } = {};
 
+  // warning messages
+  private _warnings: {
+    sourceDateOfOnset: string | null,
+    entities: {
+      [entityId: string]: {
+        id: string,
+        name: string,
+        type: string,
+        dateOfOnset: string | null,
+      }
+    }
+  } = {
+      sourceDateOfOnset: null,
+      entities: {}
+    };
+
+
   /**
    * Constructor
    */
@@ -70,6 +94,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     protected entityHelperService: EntityHelperService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
+    protected location: Location,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -117,6 +142,9 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -144,7 +172,22 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   /**
    * Data initialized
    */
-  protected initializedData(): void {}
+  protected initializedData(): void {
+    // validate Last Contact Date against Date of Onset
+    if (
+      this.isView ||
+      this.isModify
+    ) {
+      // remove global notifications
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+
+      // show global notifications
+      this.checkForLastContactBeforeCaseOnSet(
+        { [this._entity.id]: this._entity.name },
+        this.itemData.contactDate
+      );
+    }
+  }
 
   /**
    * Initialize page title
@@ -308,6 +351,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     // view / modify ?
     if (!this.isCreate) {
       return [this.initializeTabsDetails(
+        'LNG_COMMON_MODEL_FIELD_LABEL_ID',
         'LNG_COMMON_LABEL_DETAILS',
         (property) => property,
         this.itemData
@@ -319,6 +363,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       // since merging forms overwrites the array due to spread operator we need unique root properties
       // - fields = { ...fields, ...this.getFields(form) };
       return this.initializeTabsDetails(
+        item.id,
         item.name,
         (property) => `r_${_.camelCase(item.id)}[${item.id}][${property}]`,
         this._createRelationships[index]
@@ -330,6 +375,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
    * Initialize tab details
    */
   private initializeTabsDetails(
+    entityId: string,
     title: string,
     name: (property: string) => string,
     relationshipData: RelationshipModel
@@ -370,6 +416,12 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               get: () => relationshipData.contactDate,
               set: (value) => {
                 relationshipData.contactDate = value;
+
+                // validate against date of onset
+                this.checkForLastContactBeforeCaseOnSet(
+                  { [entityId]: title },
+                  relationshipData.contactDate
+                );
               }
             },
             maxDate: this._today,
@@ -814,18 +866,139 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             }
 
             // copy values
-            this._createRelationships.forEach((rel) => {
+            // keep also the entities for which contact date was copied
+            const updatedEntities: {
+              [id: string]: string
+            } = {};
+            this._createRelationships.forEach((rel, index) => {
               // we already have data, no need to replace
               if (rel[prop]) {
                 return;
               }
 
               // replace with new data
-              rel[prop] = _.cloneDeep(item.value);
+              const propValue = _.cloneDeep(item.value);
+              rel[prop] = propValue;
+
+              // keep entity to validate against date of onset
+              if (prop === RelationshipsCreateViewModifyComponent.PROPERTY_LAST_CONTACT) {
+                updatedEntities[this._createEntities[index].id] = this._createEntities[index].name;
+              }
             });
+
+            // validate against date of onset
+            this.checkForLastContactBeforeCaseOnSet(
+              updatedEntities,
+              item.value
+            );
           });
         }
       }] :
       undefined;
+  }
+
+  /**
+   * Check if "Date of Last Contact" is before "Date of Onset" of the source case
+   *
+   * @param entities A list of pairs: entity id/name
+   * @param contactDate Contact Date
+   * @private
+   */
+  private checkForLastContactBeforeCaseOnSet(
+    entities: {
+      [id: string]: string
+    },
+    contactDate: Moment | string
+  ) {
+    // validate if only the feature is enabled
+    if (
+      !this.selectedOutbreak.checkLastContactDateAgainstDateOnSet ||
+      !Object.keys(entities).length
+    ) {
+      return;
+    }
+
+    // check all entities
+    Object.keys(entities).forEach((entityId) => {
+      // get the source entity
+      const sourceEntity = this.relationshipType === RelationshipType.CONTACT ?
+        this._entity :
+        this.isCreate ?
+          this._createEntitiesMap[entityId] :
+          this.itemData.relatedEntity(this._entity.id)?.model;
+
+      // validate contact date
+      if (
+        (sourceEntity as CaseModel)?.dateOfOnset &&
+        contactDate &&
+        moment(contactDate).isValid() &&
+        moment(contactDate).isBefore(moment((sourceEntity as CaseModel).dateOfOnset))
+      ) {
+        // when new contacts are added keep the source date of onset
+        if (RelationshipType.CONTACT) {
+          this._warnings.sourceDateOfOnset = moment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        }
+
+        this._warnings.entities[this.isCreate ? entityId : sourceEntity.id] = {
+          id: this.isCreate ? entityId : sourceEntity.id,
+          name: this.isCreate ? entities[entityId] : sourceEntity.name,
+          type: this.isCreate ? (this._createEntitiesMap[entityId] as CaseModel).type : sourceEntity.type,
+          dateOfOnset: moment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+        };
+      } else {
+        // remove if exists
+        delete this._warnings.entities[this.isCreate ? entityId : sourceEntity.id];
+      }
+    });
+
+    // hide current warning to re-display the updated message
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+
+    // show the updated message
+    if (Object.keys(this._warnings.entities).length) {
+      this.toastV2Service.notice(
+        this.isCreate ?
+          (
+            this.relationshipType === RelationshipType.CONTACT ?
+              'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_WARNING_CONTACT_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET' :
+              'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_WARNING_EXPOSURE_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET'
+          ) : (
+            this.relationshipType === RelationshipType.CONTACT ?
+              'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_WARNING_CONTACT_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET' :
+              'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_WARNING_EXPOSURE_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET'
+          ),
+        {
+          // for same case get the first date of onset (modify relationship and create contacts)
+          dateOfOnset: this._warnings.sourceDateOfOnset,
+          entities: Object.values(this._warnings.entities).map((item) => {
+            // check rights
+            if (
+              (
+                this.isCreate &&
+                this.relationshipType === RelationshipType.CONTACT
+              ) || (
+                item.type === EntityType.CASE &&
+                !CaseModel.canView(this.authUser)
+              )
+            ) {
+              return `${item.name} (${this.translateService.instant(item.type)})`;
+            }
+
+            // create url
+            const url: string = `/cases/${item.id}/view`;
+
+            // finished
+            const additionalInfo = this.isCreate && this.relationshipType === RelationshipType.EXPOSURE ?
+              this.translateService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
+              '';
+
+            // return entity as a link
+            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)}) ${additionalInfo}</span></a>`;
+          })
+            .join(', ')
+        },
+        AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+      );
+    }
   }
 }

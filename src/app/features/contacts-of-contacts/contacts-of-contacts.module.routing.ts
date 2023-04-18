@@ -24,6 +24,7 @@ import { ExposureDurationDataResolver } from '../../core/services/resolvers/data
 import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -106,45 +107,53 @@ const routes: Routes = [
   // Bulk Add Contacts of Contacts
   {
     path: 'create-bulk',
-    component: fromPages.BulkCreateContactsOfContactsComponent,
+    component: fromPages.ContactsOfContactsBulkCreateModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ],
     resolve: {
+      entity: RelationshipPersonDataResolver,
       gender: GenderDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       occupation: OccupationDataResolver,
-      risk: RiskDataResolver,
       documentType: DocumentTypeDataResolver,
+      yesNo: YesNoDataResolver,
+      risk: RiskDataResolver,
       certaintyLevel: CertaintyLevelDataResolver,
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
-      contextOfTransmission: ContextOfTransmissionDataResolver
+      contextOfTransmission: ContextOfTransmissionDataResolver,
+      cluster: ClusterDataResolver
     }
   },
   // Bulk Modify Contacts of Contacts
   {
     path: 'modify-bulk',
-    component: fromPages.BulkModifyContactsOfContactsComponent,
+    component: fromPages.ContactsOfContactsBulkCreateModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ],
     resolve: {
       gender: GenderDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       occupation: OccupationDataResolver,
-      risk: RiskDataResolver
+      risk: RiskDataResolver,
+      yesNo: YesNoDataResolver
     }
   },
   // View Contact of contact movement

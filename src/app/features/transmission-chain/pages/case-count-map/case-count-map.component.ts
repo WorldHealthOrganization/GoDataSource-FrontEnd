@@ -23,6 +23,8 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TransmissionChainFilters } from '../../classes/filter';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-case-count-map',
@@ -51,7 +53,26 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
 
   filters: TransmissionChainFilters = new TransmissionChainFilters();
 
+  // cluster distance
+  displayClusterDistance: boolean = false;
+
   clusterDistance: number = 10;
+
+  clusterDistanceOptions: ILabelValuePairModel[] = [
+    {
+      label: '10',
+      value: 10
+    }, {
+      label: '50',
+      value: 50
+    }, {
+      label: '100',
+      value: 100
+    }, {
+      label: '150',
+      value: 150
+    }
+  ];
 
   @ViewChild('worldMap') worldMap: WorldMapComponent;
 
@@ -153,6 +174,17 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
         }
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
+        field: 'labSequenceResult',
+        label: 'LNG_PAGE_CASE_COUNT_LAB_SEQUENCE_RESULT',
+        options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        allowedComparators: [
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+        ],
+        filterBy: (_qb, filter) => {
+          this.filters.labSequenceResult = filter.value;
+        }
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER',
         options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -190,7 +222,7 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
       }, {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
-        label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE',
+        label: 'LNG_PAGE_CASE_COUNT_DATE',
         allowedComparators: [
           _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BETWEEN }),
           _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BEFORE }),
@@ -256,8 +288,8 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Export case count map
-     */
+   * Export case count map
+   */
   exportCaseCountMap() {
     if (this.worldMap) {
       const loadingDialog = this.dialogV2Service.showLoadingDialog();
@@ -275,9 +307,65 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Reload case data
-     */
-  reloadCases() {
+   * Reload case data
+   */
+  reloadCases(response?: IV2SideDialogAdvancedFiltersResponse): void {
+    // must reset filters ?
+    if (
+      response !== undefined &&
+      (
+        !response.queryBuilder ||
+        !response.filtersApplied?.appliedFilters?.length
+      )
+    ) {
+      // reset
+      this.filters = new TransmissionChainFilters();
+    } else if (response?.filtersApplied) {
+      // check if some filters were removed
+      const usedFilters: {
+        [uniqueKey: string]: true
+      } = {};
+      (response.filtersApplied.appliedFilters || []).forEach((filter) => {
+        usedFilters[filter.filter.uniqueKey] = true;
+      });
+
+      // check if we need to remove
+      if (!usedFilters['classificationIdLNG_CASE_FIELD_LABEL_CLASSIFICATION']) {
+        this.filters.classificationId = undefined;
+      }
+      if (!usedFilters['occupationLNG_CONTACT_FIELD_LABEL_OCCUPATION']) {
+        this.filters.occupation = undefined;
+      }
+      if (!usedFilters['outcomeIdLNG_CASE_FIELD_LABEL_OUTCOME']) {
+        this.filters.outcomeId = undefined;
+      }
+      if (!usedFilters['firstNameLNG_CONTACT_FIELD_LABEL_FIRST_NAME']) {
+        this.filters.firstName = undefined;
+      }
+      if (!usedFilters['lastNameLNG_CONTACT_FIELD_LABEL_LAST_NAME']) {
+        this.filters.lastName = undefined;
+      }
+      if (!usedFilters['genderLNG_CASE_FIELD_LABEL_GENDER']) {
+        this.filters.gender = undefined;
+      }
+      if (!usedFilters['labSequenceResultLNG_PAGE_CASE_COUNT_LAB_SEQUENCE_RESULT']) {
+        this.filters.labSequenceResult = undefined;
+      }
+      if (!usedFilters['locationIdsLNG_ADDRESS_FIELD_LABEL_LOCATION']) {
+        this.filters.locationIds = undefined;
+      }
+      if (!usedFilters['clusterIdsLNG_RELATIONSHIP_FIELD_LABEL_CLUSTER']) {
+        this.filters.clusterIds = undefined;
+      }
+      if (!usedFilters['ageLNG_ENTITY_FIELD_LABEL_AGE']) {
+        this.filters.age = undefined;
+      }
+      if (!usedFilters['dateLNG_PAGE_CASE_COUNT_DATE']) {
+        this.filters.date = undefined;
+      }
+    }
+
+    // retrieve data
     if (this.outbreakId) {
       // display loading
       this.displayLoading = true;

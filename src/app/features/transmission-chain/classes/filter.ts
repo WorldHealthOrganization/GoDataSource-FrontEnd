@@ -9,6 +9,7 @@ export class TransmissionChainFilters {
   outcomeId: string[];
   firstName: string;
   lastName: string;
+  labSequenceResult?: string[];
   gender: string[];
   locationIds: string[];
   clusterIds: string[];
@@ -29,6 +30,7 @@ export class TransmissionChainFilters {
     outcomeId?: string[],
     firstName?: string,
     lastName?: string,
+    labSequenceResult?: string[],
     gender?: string[],
     locationIds?: string[],
     clusterIds?: string[],
@@ -47,6 +49,26 @@ export class TransmissionChainFilters {
    * Attach conditions to query builder
    */
   attachConditionsToRequestQueryBuilder(qb: RequestQueryBuilder) {
+    // clusterIds
+    if (!_.isEmpty(this.clusterIds)) {
+      const relationshipQueryBuilder = qb.addChildQueryBuilder('relationship');
+      relationshipQueryBuilder.filter.where({
+        clusterId: {
+          inq: this.clusterIds
+        }
+      });
+    }
+
+    // Lab result variant/strain result
+    if (!_.isEmpty(this.labSequenceResult)) {
+      const labResultQueryBuilder = qb.addChildQueryBuilder('labResult');
+      labResultQueryBuilder.filter.where({
+        'sequence.resultId': {
+          inq: this.labSequenceResult
+        }
+      });
+    }
+
     // case classification
     if (!_.isEmpty(this.classificationId)) {
       qb.filter.where({

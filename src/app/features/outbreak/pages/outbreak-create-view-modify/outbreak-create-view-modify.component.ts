@@ -32,6 +32,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { QuestionModel } from '../../../../core/models/question.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 /**
  * Component
@@ -45,9 +46,6 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   private _styleUrlValidationCache: {
     [url: string]: Observable<boolean | IGeneralAsyncValidatorResponse>
   } = {};
-
-  // created from a template ?
-  private _outbreakTemplateId: string;
 
   /**
    * Constructor
@@ -80,6 +78,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
   }
 
   /**
@@ -110,12 +111,14 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       const outbreakTemplate: OutbreakTemplateModel = this.activatedRoute.snapshot.data.outbreakTemplate;
       if (outbreakTemplate) {
         // delete the id of the outbreak template
-        this._outbreakTemplateId = outbreakTemplate.id;
         delete outbreakTemplate.id;
 
         // make the new outbreak which is merged with the outbreak template
         this.itemData = new OutbreakModel(outbreakTemplate);
       }
+    } else {
+      // show global notifications
+      this.checkDuplicateEntityMasks();
     }
   }
 
@@ -386,6 +389,26 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
               }
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'eventIdMask',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_EVENT_ID_MASK',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_EVENT_ID_MASK_DESCRIPTION',
+              value: {
+                get: () => this.itemData.eventIdMask,
+                set: (value) => {
+                  this.itemData.eventIdMask = value;
+
+                  // check duplicate mask
+                  this.checkDuplicateEntityMasks();
+                }
+              },
+              validators: {
+                regex: () => ({
+                  expression: '^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$',
+                  msg: 'LNG_FORM_VALIDATION_ERROR_PATTERN'
+                })
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXT,
               name: 'caseIdMask',
               placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK',
               description: () => 'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION',
@@ -393,6 +416,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                 get: () => this.itemData.caseIdMask,
                 set: (value) => {
                   this.itemData.caseIdMask = value;
+
+                  // check duplicate mask
+                  this.checkDuplicateEntityMasks();
                 }
               },
               validators: {
@@ -410,6 +436,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                 get: () => this.itemData.contactIdMask,
                 set: (value) => {
                   this.itemData.contactIdMask = value;
+
+                  // check duplicate mask
+                  this.checkDuplicateEntityMasks();
                 }
               },
               validators: {
@@ -427,6 +456,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                 get: () => this.itemData.contactOfContactIdMask,
                 set: (value) => {
                   this.itemData.contactOfContactIdMask = value;
+
+                  // check duplicate mask
+                  this.checkDuplicateEntityMasks();
                 }
               },
               validators: {
@@ -492,6 +524,28 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                 get: () => this.itemData.isContactsOfContactsActive,
                 set: (value) => {
                   this.itemData.isContactsOfContactsActive = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'checkLastContactDateAgainstDateOnSet',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET_DESCRIPTION',
+              value: {
+                get: () => this.itemData.checkLastContactDateAgainstDateOnSet,
+                set: (value) => {
+                  this.itemData.checkLastContactDateAgainstDateOnSet = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'disableModifyingLegacyQuestionnaire',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.disableModifyingLegacyQuestionnaire,
+                set: (value) => {
+                  this.itemData.disableModifyingLegacyQuestionnaire = value;
                 }
               }
             }
@@ -762,7 +816,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
 
                 // try to fetch sources
                 fetch(url)
-                  .then(r => r.json())
+                  .then((r) => r.json())
                   .then((glStyle: {
                     sources: {
                       [name: string]: any
@@ -1005,17 +1059,6 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       data,
       finished
     ) => {
-      // are we creating an outbreak from a template ?
-      if (
-        type === CreateViewModifyV2ActionType.CREATE &&
-        this._outbreakTemplateId
-      ) {
-        data = {
-          ...this.itemData,
-          ...data
-        };
-      }
-
       // sanitize questionnaire - case
       // - remove fields used by ui (e.g. collapsed...)
       if (data.caseInvestigationTemplate) {
@@ -1052,10 +1095,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       // create / modify
       (
         type === CreateViewModifyV2ActionType.CREATE ?
-          this.outbreakDataService.createOutbreak(
-            data,
-            this._outbreakTemplateId
-          ) :
+          this.outbreakDataService.createOutbreak(data) :
           this.outbreakDataService.modifyOutbreak(
             this.itemData.id,
             data
@@ -1180,5 +1220,38 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
+  }
+
+  /**
+   * Check if there are duplicate masks for case/contact/contact of contact
+   */
+  private checkDuplicateEntityMasks() {
+    // create an array with all masks
+    const entityMasks = [
+      this.itemData.eventIdMask,
+      this.itemData.caseIdMask,
+      this.itemData.contactIdMask,
+      this.itemData.contactOfContactIdMask
+    ];
+
+    // find duplicates and also check if any of them contains at least one "9" digit
+    // "9" means that there is an auto-generated sequence number
+    if (
+      entityMasks
+        .filter((item, index) => index !== entityMasks.indexOf(item))
+        .filter((item) => item?.includes('9')).length
+    ) {
+      this.toastV2Service.notice(
+        'LNG_OUTBREAK_FIELD_CHECK_DUPLICATE_ENTITY_MASK',
+        undefined,
+        AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK
+      );
+
+      // no need to continue since it will hide warning
+      return;
+    }
+
+    // hide warning if no mismatch found
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
   }
 }

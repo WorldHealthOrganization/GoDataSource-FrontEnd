@@ -9,7 +9,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { Observable, throwError } from 'rxjs';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -31,6 +31,14 @@ import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { DomSanitizer } from '@angular/platform-browser';
+import {
+  IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { UserSettings } from '../../../../core/models/user.model';
 
 /**
  * Component
@@ -40,12 +48,18 @@ import { moment } from '../../../../core/helperClasses/x-moment';
   templateUrl: './lab-results-create-view-modify.component.html'
 })
 export class LabResultsCreateViewModifyComponent extends CreateViewModifyComponent<LabResultModel> implements OnDestroy {
+  // constants
+  private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
+
   // data
   entityData: CaseModel | ContactModel;
   private _personType: EntityType;
 
   // constants
   EntityType = EntityType;
+
+  // hide/show question numbers
+  hideQuestionNumbers: boolean = false;
 
   /**
    * Constructor
@@ -56,6 +70,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
     private dialogV2Service: DialogV2Service,
+    private domSanitizer: DomSanitizer,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -73,6 +88,21 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     // get data
     this._personType = this.activatedRoute.snapshot.data.personType;
     this.entityData = this.activatedRoute.snapshot.data.entityData;
+
+    // do we have tabs options already saved ?
+    const generalSettings: {
+      [key: string]: any
+    } = this.authDataService
+      .getAuthenticatedUser()
+      .getSettings(UserSettings.LAB_RESULT_GENERAL);
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
+      undefined;
+
+    // use the saved options
+    this.hideQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[LabResultsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] : false;
   }
 
   /**
@@ -290,6 +320,40 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Initialize tabs
    */
   protected initializeTabs(): void {
+    // tab custom configuration
+    this.tabConfiguration = {
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TAB_OPTIONS'
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: LabResultsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_LAB_RESULT_TAB_OPTION_SHOW_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_LAB_RESULT_TAB_OPTION_SHOW_QUESTION_NUMBERS',
+          value: !this.hideQuestionNumbers
+        }
+      ],
+      apply: (data, finish) => {
+        // save settings
+        const hideQuestionNumbers: boolean = !(data.map[LabResultsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
+        this.updateGeneralSettings(
+          `${UserSettings.LAB_RESULT_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [LabResultsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideQuestionNumbers = hideQuestionNumbers;
+            this.tabsV2Component.detectChanges();
+
+            // finish
+            finish();
+          });
+      }
+    };
+
+    // tabs
     this.tabData = {
       // tabs
       tabs: [
@@ -653,7 +717,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'questionnaire',
+      name: LabResultsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
       label: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -664,6 +728,9 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           set: (value) => {
             this.itemData.questionnaireAnswers = value;
           }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideQuestionNumbers;
         },
         updateErrors: (errorsHTML) => {
           errors = errorsHTML;
@@ -841,7 +908,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    */
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = this.entityData.deleted ? undefined : {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: LabResultModel) => {
         if (this._personType === EntityType.CONTACT) {
           return [`/lab-results/contacts/${this.entityData.id}/${item.id}`];
@@ -849,10 +916,40 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           return [`/lab-results/cases/${this.entityData.id}/${item.id}`];
         }
       },
+      statusVisible: this.expandListColumnRenderer?.statusVisible === undefined ?
+        true :
+        this.expandListColumnRenderer.statusVisible,
+      maxNoOfStatusForms: 1,
       get: {
+        status: (item: LabResultModel) => {
+          // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
+          if (!item.uiStatusForms) {
+            // determine forms
+            const forms: V2ColumnStatusForm[] = LabResultModel.getStatusForms({
+              item,
+              translateService: this.translateService
+            });
+
+            // create html
+            let html: string = '';
+            forms.forEach((form, formIndex) => {
+              html += AppListTableV2Component.renderStatusForm(
+                form,
+                formIndex < forms.length - 1
+              );
+            });
+
+            // convert to safe html
+            item.uiStatusForms = this.domSanitizer.bypassSecurityTrustHtml(html);
+          }
+
+          // finished
+          return item.uiStatusForms;
+        },
         text: (item: LabResultModel) => item.sampleIdentifier?.trim().length > 0 ?
           item.sampleIdentifier :
-          moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+          moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+        details: undefined
       }
     };
   }
@@ -864,7 +961,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     this.expandListQueryFields = [
       'id',
       'sampleIdentifier',
-      'dateSampleTaken'
+      'dateSampleTaken',
+      'questionnaireAnswers'
     ];
   }
 
@@ -908,6 +1006,14 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         data.queryBuilder
       )
       .pipe(
+        // determine alertness
+        map((labResults: LabResultModel[]) => {
+          return LabResultModel.determineAlertness(
+            this.selectedOutbreak.labResultsTemplate,
+            labResults
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );

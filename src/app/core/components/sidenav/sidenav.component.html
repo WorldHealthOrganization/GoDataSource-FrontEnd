@@ -120,11 +120,12 @@
               <!-- Icon -->
               <div
                 #levelOneTrigger="matMenuTrigger"
-                class="gd-main-menu-option"
+                class="gd-main-menu-option gd-main-menu-option-margin-right"
                 [matMenuTriggerFor]="menu"
-                (menuOpened)="mainMenuOpened(menuOption.id)"
-                (mouseenter)="menuOptionEnter(levelOneTrigger)"
-                (mouseleave)="menuOptionLeave(levelOneTrigger)">
+                (menuOpened)="mainMenuOpened(menuOption, levelOneTrigger)"
+                (menuClosed)="mainMenuClosed(menuOption)"
+                (mouseenter)="menuOptionEnter(menuOption, levelOneTrigger)"
+                (mouseleave)="menuOptionLeave(menuOption)">
                 <div
                   class="gd-main-menu-option-header">
                   <ng-template
@@ -139,8 +140,8 @@
                 class="gd-main-menu-option-float-menu {{menuOption.id}}"
                 [hasBackdrop]="false">
                 <div
-                  (mouseenter)="floatingMenuEnter()"
-                  (mouseleave)="floatingMenuLeave(levelOneTrigger)">
+                  (mouseenter)="floatingMenuEnter(menuOption)"
+                  (mouseleave)="floatingMenuLeave(menuOption)">
 
                   <!-- Floating menu title -->
                   <div

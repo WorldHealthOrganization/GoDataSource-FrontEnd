@@ -304,7 +304,7 @@ export class SavedImportMappingComponent extends ListComponent<SavedImportMappin
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
@@ -326,7 +326,7 @@ export class SavedImportMappingComponent extends ListComponent<SavedImportMappin
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }

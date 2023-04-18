@@ -27,6 +27,9 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 export class AppFormTimepickerV2Component
   extends AppFormBaseV2<string> implements OnDestroy {
 
+  // timers
+  private _attachClassTimer: any = null;
+
   // tooltip
   tooltipButton: IAppFormIconButtonV2;
   private _tooltip: string;
@@ -70,6 +73,50 @@ export class AppFormTimepickerV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // stop attach class timer
+    this.stopAttachTimer();
+  }
+
+  /**
+   * Stop attach timer
+   */
+  private stopAttachTimer(): void {
+    if (this._attachClassTimer) {
+      clearTimeout(this._attachClassTimer);
+      this._attachClassTimer = undefined;
+    }
+  }
+
+  /**
+   * Calendar opened
+   */
+  opened(): void {
+    // clear previous
+    this.stopAttachTimer();
+
+    // hack since we can't provide / inject config for overlay wrapper css class....with current version (14.0.8)
+    // #TODO - once we update to a newer version that allows us to specify backdrop class we need to refactor this logic
+    this._attachClassTimer = setTimeout(() => {
+      // finished
+      this._attachClassTimer = undefined;
+
+      // find panel parent and attach class
+      const timerPanels = document.getElementsByClassName('gd-form-timepicker-v2-panel');
+      for (let elementIndex = 0; elementIndex < timerPanels.length; elementIndex++) {
+        const container = timerPanels.item(elementIndex).closest('.cdk-overlay-container');
+        if (container) {
+          const backdrop = container.querySelector('.cdk-overlay-backdrop');
+          if (
+            backdrop &&
+            !backdrop.classList.contains('gd-form-timepicker-v2-backdrop')
+          ) {
+            backdrop.classList.add('gd-form-timepicker-v2-backdrop');
+          }
+        }
+      }
+    });
   }
 }

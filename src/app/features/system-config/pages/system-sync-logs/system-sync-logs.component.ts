@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { throwError } from 'rxjs';
+import { EMPTY, ObservableInput, throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -24,6 +24,8 @@ import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-
 import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { Constants } from '../../../../core/models/constants';
+import { ExportSyncErrorModel, ExportSyncErrorModelCode } from '../../../../core/models/export-sync-error.model';
 
 @Component({
   selector: 'app-system-sync-logs-list',
@@ -749,8 +751,7 @@ export class SystemSyncLogsComponent
     // display export dialog
     this.dialogV2Service.showExportData({
       title: {
-        get: () =>
-          'LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE'
+        get: () => 'LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE'
       },
       export: {
         url: 'sync/database-snapshot',
@@ -805,7 +806,10 @@ export class SystemSyncLogsComponent
               name: 'filter[where][includeUsers]',
               value: false,
               visible: (data): boolean => {
-                return !_.isEmpty((data.map['filter[where][exportType]'] as IV2SideDialogConfigInputSingleDropdown).value);
+                // display only if Export Type is selected, excluding "Mobile" (because the Users, including Teams and Roles collections, are included by default in Mobile)
+                const exportType = (data.map['filter[where][exportType]'] as IV2SideDialogConfigInputSingleDropdown).value;
+                return !_.isEmpty(exportType) &&
+                 exportType !== Constants.SYNC_PACKAGE_EXPORT_TYPES.MOBILE.value;
               }
             },
             {
@@ -816,6 +820,34 @@ export class SystemSyncLogsComponent
               value: undefined
             }
           ]
+        },
+        formDataPrefilter: (data) => {
+          // remove outbreak filter if no outbreak is selected
+          if (
+            data.filter?.where?.outbreakId &&
+            !data.filter.where.outbreakId.inq
+          ) {
+            delete data.filter.where.outbreakId;
+          }
+        },
+        catchError: (err: Blob | Error | ExportSyncErrorModel): ObservableInput<any> => {
+          // custom error message ?
+          if ((err as ExportSyncErrorModel).code === ExportSyncErrorModelCode.SYNC_NO_DATA_TO_EXPORT) {
+            // normal error, continue with default process
+            this.toastV2Service.notice('LNG_COMMON_LABEL_EXPORT_ERROR_NO_DATA');
+
+            // send error further down the road
+            // - DO NOT use of(..) because it goes into subscribe
+            // - EMPTY allows you to not call callback from subscribe and also not show the error in console
+            return EMPTY;
+          }
+
+          // normal error, continue with default process
+          // show error
+          this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
+
+          // send error further down the road
+          return throwError(err as any);
         }
       }
     });

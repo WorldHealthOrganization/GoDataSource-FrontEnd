@@ -4,7 +4,7 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IV2Column, IV2ColumnAction, IV2ColumnPinned, V2ColumnFormat } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType } from '../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -29,6 +29,7 @@ import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { LocationDataService } from '../data/location.data.service';
 import * as moment from 'moment';
+import { ReferenceDataEntryModel } from '../../models/reference-data.model';
 
 @Injectable({
   providedIn: 'root'
@@ -473,8 +474,8 @@ export class EntityFollowUpHelperService {
     authUser: UserModel,
     team: IResolverV2ResponseModel<TeamModel>,
     user: IResolverV2ResponseModel<UserModel>,
+    dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>,
     options: {
-      dailyFollowUpStatus: ILabelValuePairModel[],
       yesNoAll: ILabelValuePairModel[]
     }
   }): IV2Column[] {
@@ -526,8 +527,49 @@ export class EntityFollowUpHelperService {
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: definitions.options.dailyFollowUpStatus
+          options: definitions.dailyFollowUpStatus.options
         }
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // status
+          {
+            title: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+            items: definitions.dailyFollowUpStatus.list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          },
+
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' '
+            }]
+          }
+        ],
+        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
+          item: data,
+          translateService: this.translateService,
+          dailyFollowUpStatus: definitions.dailyFollowUpStatus
+        })
       },
       {
         field: 'targeted',
@@ -1005,7 +1047,8 @@ export class EntityFollowUpHelperService {
       'updatedBy',
       'updatedByUser',
       'updatedAt',
-      'personId'
+      'personId',
+      'questionnaireAnswers'
     ];
   }
 }

@@ -32,6 +32,9 @@ export class AppFormToggleV2Component
   // options
   @Input() options: ILabelValuePairModel[];
 
+  // vertical
+  @Input() vertical: boolean;
+
   /**
    * Constructor
    */

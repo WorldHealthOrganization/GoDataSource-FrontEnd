@@ -66,6 +66,8 @@ import { SavedFilterData } from '../../../../core/models/saved-filters.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
+import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
+import { IV2NumberRange } from '../../../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -226,7 +228,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       nodeShapeCriteria: Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.NONE.value
     };
   // default legend
-  legend: any = {
+  originalLegend: any = {
     nodeColorField: 'type',
     nodeNameColorField: 'classification',
     edgeColorField: 'certaintyLevelId',
@@ -239,6 +241,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     nodeColor: {},
     labSequenceColor: {},
     labSequenceColorKeys: [],
+    hasMoreVariantsStrains: false,
     nodeNameColor: {},
     nodeIcon: {},
     nodeNameColorAdditionalInfo: {
@@ -249,6 +252,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     edgeColor: {},
     nodeLabel: 'name'
   };
+  filteredLegend: any;
 
   // clusters
   clusterOptions: ClusterModel[];
@@ -500,13 +504,23 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     name?: string,
     labSeqResult?: string[],
     classification?: string[],
-    occupation?: string[]
+    occupation?: string[],
+    outcomeId?: string[],
+    gender?: string[],
+    cluster?: string[],
+    age?: IV2NumberRange,
+    date?: IV2DateRange
   } = {};
   snapshotFiltersClone: {
     name?: string,
     labSeqResult?: string[],
     classification?: string[],
-    occupation?: string[]
+    occupation?: string[],
+    outcomeId?: string[],
+    gender?: string[],
+    cluster?: string[],
+    age?: IV2NumberRange,
+    date?: IV2DateRange
   } = {};
 
   /**
@@ -688,10 +702,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 .subscribe((clusters) => {
                   this.clusterOptions = clusters;
 
-                  this.legend.clustersList = {};
+                  this.originalLegend.clustersList = {};
                   this.clusterIconMap = {};
                   _.forEach(clusters, (cluster) => {
-                    this.legend.clustersList[cluster.id] = cluster.name;
+                    this.originalLegend.clustersList[cluster.id] = cluster.name;
                     if (cluster.icon) {
                       this.clusterIconMap[cluster.id] = cluster.icon;
                     }
@@ -1060,90 +1074,97 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
   mapColorCriteria() {
     // set legend fields to be used
-    this.legend.nodeColorField = this.colorCriteria.nodeColorCriteria;
-    this.legend.nodeNameColorField = this.colorCriteria.nodeNameColorCriteria;
-    this.legend.edgeColorField = this.colorCriteria.edgeColorCriteria;
-    this.legend.edgeLabelField = this.colorCriteria.edgeLabelCriteria;
-    this.legend.edgeIconField = this.colorCriteria.edgeIconCriteria;
-    if (this.legend.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
-      this.legend.edgeLabelContextTransmissionEntries = {};
+    this.originalLegend.nodeColorField = this.colorCriteria.nodeColorCriteria;
+    this.originalLegend.nodeNameColorField = this.colorCriteria.nodeNameColorCriteria;
+    this.originalLegend.edgeColorField = this.colorCriteria.edgeColorCriteria;
+    this.originalLegend.edgeLabelField = this.colorCriteria.edgeLabelCriteria;
+    this.originalLegend.edgeIconField = this.colorCriteria.edgeIconCriteria;
+    if (this.originalLegend.edgeLabelField === Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+      this.originalLegend.edgeLabelContextTransmissionEntries = {};
       const refDataEntries = this.referenceDataEntries[this.referenceDataLabelMap[Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value].refDataCateg];
       _.forEach(refDataEntries.entries, (entry) => {
-        this.legend.edgeLabelContextTransmissionEntries[entry.value] = this.i18nService.instant(entry.value);
+        this.originalLegend.edgeLabelContextTransmissionEntries[entry.value] = this.i18nService.instant(entry.value);
       });
     }
-    this.legend.nodeIconField = this.colorCriteria.nodeIconCriteria;
-    this.legend.nodeShapeField = this.colorCriteria.nodeShapeCriteria;
+    this.originalLegend.nodeIconField = this.colorCriteria.nodeIconCriteria;
+    this.originalLegend.nodeShapeField = this.colorCriteria.nodeShapeCriteria;
     // set legend labels
-    this.legend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
-    this.legend.nodeNameColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].label;
-    this.legend.edgeColorLabel = this.colorCriteria.edgeColorCriteria === 'clusterId' ? 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' : this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].label;
-    this.legend.edgeIconLabel = this.colorCriteria.edgeIconCriteria === 'clusterId' ?
+    this.originalLegend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
+    this.originalLegend.nodeNameColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].label;
+    this.originalLegend.edgeColorLabel = this.colorCriteria.edgeColorCriteria === 'clusterId' ?
+      'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' :
+      this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria] ?
+        this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].label :
+        '';
+    this.originalLegend.edgeIconLabel = this.colorCriteria.edgeIconCriteria === 'clusterId' ?
       'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' : (
         this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria] ?
           this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria].label :
           ''
       );
-    this.legend.nodeIconLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].label : '';
-    this.legend.nodeShapeLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria].label : '';
+    this.originalLegend.nodeIconLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].label : '';
+    this.originalLegend.nodeShapeLabel = (this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria]) ? this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria].label : '';
     // re-initialize legend entries
-    this.legend.nodeColor = {};
-    this.legend.nodeColorKeys = [];
-    this.legend.labSequenceColor = {};
-    this.legend.nodeNameColor = {};
-    this.legend.nodeNameColorKeys = [];
-    this.legend.edgeColor = {};
-    this.legend.edgeColorKeys = [];
-    this.legend.edgeIcon = {};
-    this.legend.edgeIconKeys = [];
-    this.legend.nodeIcon = {};
-    this.legend.nodeIconKeys = [];
-    this.legend.nodeShape = {};
-    this.legend.nodeShapeKeys = [];
+    this.originalLegend.nodeColor = {};
+    this.originalLegend.nodeColorKeys = [];
+    this.originalLegend.labSequenceColor = {};
+    this.originalLegend.hasMoreVariantsStrains = false;
+    this.originalLegend.nodeNameColor = {};
+    this.originalLegend.nodeNameColorKeys = [];
+    this.originalLegend.edgeColor = {};
+    this.originalLegend.edgeColorKeys = [];
+    this.originalLegend.edgeIcon = {};
+    this.originalLegend.edgeIconKeys = [];
+    this.originalLegend.nodeIcon = {};
+    this.originalLegend.nodeIconKeys = [];
+    this.originalLegend.nodeShape = {};
+    this.originalLegend.nodeShapeKeys = [];
 
     // set legend entries
     const nodeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].refDataCateg], 'entries', []);
     _.forEach(nodeColorReferenceDataEntries, (value) => {
-      this.legend.nodeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+      this.originalLegend.nodeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
     });
-    this.legend.nodeColorKeys = Object.keys(this.legend.nodeColor);
+    this.originalLegend.nodeColorKeys = Object.keys(this.originalLegend.nodeColor);
     const nodeNameColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].refDataCateg], 'entries', []);
     _.forEach(nodeNameColorReferenceDataEntries, (value) => {
-      this.legend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+      this.originalLegend.nodeNameColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
     });
-    this.legend.nodeNameColorKeys = Object.keys(this.legend.nodeNameColor);
+    this.originalLegend.nodeNameColorKeys = Object.keys(this.originalLegend.nodeNameColor);
 
     // get lab results sequence keys
     const labSequenceColorReferenceDataEntries = _.get(this.referenceDataEntries[ReferenceDataCategory.LAB_SEQUENCE_RESULT], 'entries', []);
     _.forEach(labSequenceColorReferenceDataEntries, (value) => {
-      this.legend.labSequenceColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+      this.originalLegend.labSequenceColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
     });
-    this.legend.labSequenceColorKeys = Object.keys(this.legend.labSequenceColor);
+    this.originalLegend.labSequenceColorKeys = Object.keys(this.originalLegend.labSequenceColor);
 
-    if (this.colorCriteria.edgeColorCriteria === 'clusterId') {
-      // we should check if we have this information, if not we must wait for it to be retrieved
-      // must refactor this entire function :)
-      (this.clusterOptions || []).forEach((item) => {
-        this.legend.edgeColor[item.id] = item.colorCode ? item.colorCode : Constants.DEFAULT_COLOR_CHAINS;
-      });
-      this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
-    } else {
-      const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
-      _.forEach(edgeColorReferenceDataEntries, (value) => {
-        this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
-      });
-      this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
+    if (this.colorCriteria.edgeColorCriteria !== Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.NONE.value) {
+      if (this.colorCriteria.edgeColorCriteria === 'clusterId') {
+        // we should check if we have this information, if not we must wait for it to be retrieved
+        // must refactor this entire function :)
+        (this.clusterOptions || []).forEach((item) => {
+          this.originalLegend.edgeColor[item.id] = item.colorCode ? item.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+        });
+        this.originalLegend.edgeColorKeys = Object.keys(this.originalLegend.edgeColor);
+      } else {
+        const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
+        _.forEach(edgeColorReferenceDataEntries, (value) => {
+          this.originalLegend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+        });
+        this.originalLegend.edgeColorKeys = Object.keys(this.originalLegend.edgeColor);
+      }
     }
 
     if (this.colorCriteria.edgeIconCriteria !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
       if (this.colorCriteria.edgeIconCriteria === 'clusterId') {
         // must refactor this entire function :)
         (this.clusterOptions || []).forEach((item) => {
-          this.legend.edgeIcon[item.id] = {
+          this.originalLegend.edgeIcon[item.id] = {
             icon: item.icon
           };
         });
-        this.legend.edgeIconKeys = Object.keys(this.legend.edgeIcon);
+        this.originalLegend.edgeIconKeys = Object.keys(this.originalLegend.edgeIcon);
       } else {
         const edgeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria].refDataCateg], 'entries', []);
         // get edge icons based on the selected criteria
@@ -1154,19 +1175,19 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           getEdgeIconFunc = GraphEdgeModel.getEdgeIconExposureType;
         }
         _.forEach(edgeIconReferenceDataEntries, (value) => {
-          this.legend.edgeIcon[value.value] = {
+          this.originalLegend.edgeIcon[value.value] = {
             icon: getEdgeIconFunc(value.value)
           };
         });
-        this.legend.edgeIconKeys = Object.keys(this.legend.edgeIcon);
+        this.originalLegend.edgeIconKeys = Object.keys(this.originalLegend.edgeIcon);
       }
     }
     if (this.colorCriteria.nodeIconCriteria !== Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value) {
       const nodeIconReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeIconCriteria].refDataCateg], 'entries', []);
       _.forEach(nodeIconReferenceDataEntries, (value) => {
-        this.legend.nodeIcon[value.value] = value.iconUrl ? value.iconUrl : '';
+        this.originalLegend.nodeIcon[value.value] = value.iconUrl ? value.iconUrl : '';
       });
-      this.legend.nodeIconKeys = Object.keys(this.legend.nodeIcon);
+      this.originalLegend.nodeIconKeys = Object.keys(this.originalLegend.nodeIcon);
     }
     if (this.colorCriteria.nodeShapeCriteria !== Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.NONE.value) {
       const nodeShapeReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.nodeShapeCriteria].refDataCateg], 'entries', []);
@@ -1178,55 +1199,53 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         getNodeShapeFunc = GraphNodeModel.getNodeShapeClassification;
       }
       _.forEach(nodeShapeReferenceDataEntries, (value) => {
-        this.legend.nodeShape[value.value] = getNodeShapeFunc(value.value);
+        this.originalLegend.nodeShape[value.value] = getNodeShapeFunc(value.value);
       });
-      this.legend.nodeShapeKeys = Object.keys(this.legend.nodeShape);
+      this.originalLegend.nodeShapeKeys = Object.keys(this.originalLegend.nodeShape);
     }
     // set node label to be displayed
-    this.legend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
+    this.originalLegend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
     // gender translations
-    if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
-      this.legend.nodeLabelValues = [];
+    if (this.originalLegend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
+      this.originalLegend.nodeLabelValues = [];
       const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
       _.forEach(nodeLabelValues, (value) => {
         // get gender transcriptions
-        this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
+        this.originalLegend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
       });
     }
     // occupation translations
-    if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
-      this.legend.nodeLabelValues = [];
+    if (this.originalLegend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
+      this.originalLegend.nodeLabelValues = [];
       const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OCCUPATION], 'entries', []);
       _.forEach(nodeLabelValues, (value) => {
         // get gender transcriptions
-        this.legend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
+        this.originalLegend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
       });
     }
     // populate nodeLabelValues with gender / classification / outcome values as they need to be translated
-    if (this.legend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
-      this.legend.genderValues = [];
+    if (this.originalLegend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
+      this.originalLegend.genderValues = [];
       const genderValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
       _.forEach(genderValues, (value) => {
         // get gender transcriptions
-        this.legend.genderValues[value.value] = this.i18nService.instant(value.value);
+        this.originalLegend.genderValues[value.value] = this.i18nService.instant(value.value);
       });
 
-      this.legend.classificationValues = [];
+      this.originalLegend.classificationValues = [];
       const classificationValues = _.get(this.referenceDataEntries[ReferenceDataCategory.CASE_CLASSIFICATION], 'entries', []);
       _.forEach(classificationValues, (value) => {
         // get classification transcriptions
-        this.legend.classificationValues[value.value] = this.i18nService.instant(value.value);
+        this.originalLegend.classificationValues[value.value] = this.i18nService.instant(value.value);
       });
 
-      this.legend.outcomeValues = [];
+      this.originalLegend.outcomeValues = [];
       const outcomeValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OUTCOME], 'entries', []);
       _.forEach(outcomeValues, (value) => {
         // get outcome values transcriptions
-        this.legend.outcomeValues[value.value] = this.i18nService.instant(value.value);
+        this.originalLegend.outcomeValues[value.value] = this.i18nService.instant(value.value);
       });
-
     }
-
   }
 
   /**
@@ -1596,7 +1615,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           showContactsOfContacts: this.showContactsOfContacts,
           showLabResultsSeqData: this.showLabResultsSeqData
         },
-        this.legend,
+        _.cloneDeep(this.originalLegend),
         this.locationsListMap,
         this.transmissionChainViewType,
         this.chainPages && this.chainPages[this.selectedChainPageIndex] ?
@@ -1609,6 +1628,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       if (this.transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
         this.initGeospatialMap();
       }
+
+      // update the legend
+      this.filteredLegend = this.graphElements.legend;
 
       // render
       this.renderGraph();
@@ -2574,6 +2596,18 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       if (!usedMap['occupationLNG_CONTACT_FIELD_LABEL_OCCUPATION']) {
         this.snapshotFilters.occupation = undefined;
       }
+      if (!usedMap['outcomeIdLNG_CASE_FIELD_LABEL_OUTCOME']) {
+        this.snapshotFilters.outcomeId = undefined;
+      }
+      if (!usedMap['genderLNG_ENTITY_FIELD_LABEL_GENDER']) {
+        this.snapshotFilters.gender = undefined;
+      }
+      if (!usedMap['ageLNG_ENTITY_FIELD_LABEL_AGE']) {
+        this.snapshotFilters.age = undefined;
+      }
+      if (!usedMap['dateLNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE']) {
+        this.snapshotFilters.date = undefined;
+      }
     }
 
     // do we have required data ?
@@ -3263,6 +3297,73 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.snapshotFilters.occupation = filter.value ?
               filter.value :
               undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'outcomeId',
+          label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+          options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.outcomeId = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'gender',
+          label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.gender = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'clusterId',
+          label: 'LNG_ENTITY_FIELD_LABEL_CLUSTER',
+          options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.cluster = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.RANGE_AGE,
+          field: 'age',
+          label: 'LNG_ENTITY_FIELD_LABEL_AGE',
+          filterBy: (_qb, filter) => {
+            this.snapshotFilters.age = filter.value;
+          }
+        }, {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'date',
+          label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE',
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BETWEEN }),
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BEFORE }),
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.AFTER })
+          ],
+          filterBy: (_qb, filter) => {
+            this.snapshotFilters.date = filter.value;
           }
         }],
         this.advancedFiltersApplied,

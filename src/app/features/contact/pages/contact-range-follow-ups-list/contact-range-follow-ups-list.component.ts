@@ -31,6 +31,10 @@ import * as momentOriginal from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { AddressModel } from '../../../../core/models/address.model';
+import { UserModel } from '../../../../core/models/user.model';
+import {
+  FollowUpCreateViewModifyComponent
+} from '../follow-up-create-view-modify/follow-up-create-view-modify.component';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -41,6 +45,22 @@ import { AddressModel } from '../../../../core/models/address.model';
 export class ContactRangeFollowUpsListComponent
   extends ListComponent<any>
   implements OnDestroy {
+
+  // filter address
+  private _filterAddress: AddressModel = new AddressModel({
+    geoLocationAccurate: ''
+  });
+
+  // person type options
+  private _personTypeOptions: ILabelValuePairModel[] = [
+    {
+      label: EntityType.CONTACT,
+      value: EntityType.CONTACT
+    }, {
+      label: EntityType.CASE,
+      value: EntityType.CASE
+    }
+  ];
 
   // default table columns
   defaultTableColumns: IV2Column[] = [
@@ -96,6 +116,11 @@ export class ContactRangeFollowUpsListComponent
       format: {
         type: 'person.visualId'
       },
+      link: (data) => {
+        return data.person.type === EntityType.CASE ?
+          (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
+          (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+      },
       pinned: IV2ColumnPinned.LEFT,
       filter: {
         type: V2FilterType.TEXT,
@@ -116,9 +141,69 @@ export class ContactRangeFollowUpsListComponent
       filter: {
         type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
         childQueryBuilderKey: 'contact',
-        address: new AddressModel({
-          geoLocationAccurate: ''
-        }),
+        address: this._filterAddress,
+        field: 'addresses',
+        fieldIsArray: true
+      }
+    }, {
+      field: 'phoneNumber',
+      label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
+      notVisible: true,
+      format: {
+        type: 'person.mainAddress.phoneNumber'
+      },
+      filter: {
+        type: V2FilterType.ADDRESS_PHONE_NUMBER,
+        childQueryBuilderKey: 'contact',
+        address: this._filterAddress,
+        field: 'addresses',
+        fieldIsArray: true
+      }
+    },
+    {
+      field: 'emailAddress',
+      label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+      notVisible: true,
+      format: {
+        type: 'person.mainAddress.emailAddress'
+      },
+      filter: {
+        type: V2FilterType.ADDRESS_FIELD,
+        childQueryBuilderKey: 'contact',
+        address: this._filterAddress,
+        addressField: 'emailAddress',
+        field: 'addresses',
+        fieldIsArray: true
+      }
+    },
+    {
+      field: 'addressLine1',
+      label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+      notVisible: true,
+      format: {
+        type: 'person.mainAddress.addressLine1'
+      },
+      filter: {
+        type: V2FilterType.ADDRESS_FIELD,
+        childQueryBuilderKey: 'contact',
+        address: this._filterAddress,
+        addressField: 'addressLine1',
+        field: 'addresses',
+        fieldIsArray: true
+      }
+    },
+    {
+      field: 'city',
+      label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+      notVisible: true,
+      format: {
+        type: 'person.mainAddress.city'
+      },
+      filter: {
+        type: V2FilterType.ADDRESS_FIELD,
+        childQueryBuilderKey: 'contact',
+        address: this._filterAddress,
+        addressField: 'city',
         field: 'addresses',
         fieldIsArray: true
       }
@@ -149,7 +234,7 @@ export class ContactRangeFollowUpsListComponent
     },
     {
       field: 'followUpTeamId',
-      label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+      label: `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.translateService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM').toLowerCase()}`,
       format: {
         type: (data) => {
           return data.person.followUpTeamId && (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
@@ -182,15 +267,7 @@ export class ContactRangeFollowUpsListComponent
       filter: {
         type: V2FilterType.MULTIPLE_SELECT,
         childQueryBuilderKey: 'contact',
-        options: [
-          {
-            label: EntityType.CONTACT,
-            value: EntityType.CONTACT
-          }, {
-            label: EntityType.CASE,
-            value: EntityType.CASE
-          }
-        ]
+        options: this._personTypeOptions
       }
     },
     {
@@ -221,6 +298,30 @@ export class ContactRangeFollowUpsListComponent
         type: V2FilterType.MULTIPLE_SELECT,
         options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         childQueryBuilderKey: 'contact'
+      }
+    },
+    {
+      field: 'responsibleUserId',
+      label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+      notVisible: true,
+      format: {
+        type: (item) => item.person?.responsibleUserId && (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[item.person?.responsibleUserId] ?
+          (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[item.person?.responsibleUserId].name :
+          ''
+      },
+      filter: {
+        type: V2FilterType.MULTIPLE_SELECT,
+        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        childQueryBuilderKey: 'contact',
+        includeNoValue: true
+      },
+      exclude: (): boolean => {
+        return !UserModel.canListForFilters(this.authUser);
+      },
+      link: (data) => {
+        return data.person?.responsibleUserId && UserModel.canView(this.authUser) ?
+          `/users/${ data.person?.responsibleUserId }/view` :
+          undefined;
       }
     }
   ];
@@ -302,62 +403,189 @@ export class ContactRangeFollowUpsListComponent
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
+    // data
+    const personLabel: string = `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')}`;
+
+    // advanced filters
     this.advancedFilters = [
       // case / contact
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
         label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
         label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.LOCATION_MULTIPLE,
         field: 'addresses',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.phoneNumber',
+        label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.emailAddress',
+        label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.addressLine1',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.city',
+        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'followUp.endDate',
         label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'followUpTeamId',
+        childQueryBuilderKey: 'contact',
+        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'type',
+        childQueryBuilderKey: 'contact',
+        options: this._personTypeOptions,
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'occupation',
+        childQueryBuilderKey: 'contact',
+        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_OCCUPATION',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'riskLevel',
+        childQueryBuilderKey: 'contact',
+        options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_RISK',
+        relationshipLabel: personLabel
       },
 
       // follow-up
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'teamId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options
+        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'statusId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-        options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+      },
+      {
+        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+        field: 'address',
+        label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.phoneNumber',
+        label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.emailAddress',
+        label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.addressLine1',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.city',
+        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }
     ];
+
+    // restricted filters - user
+    if (UserModel.canListForFilters(this.authUser)) {
+      this.advancedFilters.push(
+        // person
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'responsibleUserId',
+          childQueryBuilderKey: 'contact',
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+          relationshipLabel: personLabel
+        },
+
+        // follow-up
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'responsibleUserId',
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+          relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+        }
+      );
+    }
   }
 
   /**
@@ -537,42 +765,58 @@ export class ContactRangeFollowUpsListComponent
             );
 
             // get grouped followups by contact & date
+            const followUpDates: string[] = [];
+            const followUpGrouped: {
+              [date: string]: FollowUpModel[]
+            } = {};
+            for (let followUpIndex: number = 0; followUpIndex < data.followUps?.length; followUpIndex++) {
+              // get data
+              const followUp: FollowUpModel = data.followUps[followUpIndex];
+
+              // no date ?
+              // - there is no need to add this follow-up
+              if (!followUp.date) {
+                continue;
+              }
+
+              // process date
+              followUp.date = moment(followUp.date).startOf('day');
+
+              // determine min & max dates
+              if (followUp.statusId) {
+                minDate = minDate ?
+                  (followUp.date.isBefore(minDate) ? moment(followUp.date) : minDate) :
+                  moment(followUp.date);
+                maxDate = maxDate ?
+                  (followUp.date.isAfter(maxDate) ? moment(followUp.date) : maxDate) :
+                  moment(followUp.date);
+              }
+
+              // init ?
+              const formattedDate: string = followUp.date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              if (!followUpGrouped[formattedDate]) {
+                followUpGrouped[formattedDate] = [];
+              }
+
+              // group
+              followUpDates.push(formattedDate);
+              followUpGrouped[formattedDate].push(followUp);
+
+              // date used
+              usedDates[formattedDate] = true;
+            }
+
+            // sort follow-ups
+            followUpDates.forEach((date) => {
+              followUpGrouped[date].sort((a, b) => {
+                return (a.date as Moment).valueOf() - (b.date as Moment).valueOf();
+              });
+            });
+
+            // finished
             return {
               person: data.person,
-              followUps: _.chain(data.followUps)
-                .groupBy((followUp: FollowUpModel) => {
-                  // determine min & max dates
-                  const date = moment(followUp.date).startOf('day');
-                  if (followUp.statusId) {
-                    minDate = minDate ?
-                      (date.isBefore(minDate) ? date : minDate) :
-                      date;
-                    maxDate = maxDate ?
-                      (date.isAfter(maxDate) ? moment(date) : maxDate) :
-                      moment(date);
-                  }
-
-                  // sort by date ascending
-                  return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                })
-                .mapValues((
-                  followUpData: FollowUpModel[],
-                  date
-                ) => {
-                  // used ?
-                  if (followUpData?.length > 0) {
-                    usedDates[date] = true;
-                  }
-
-                  // sort
-                  return _.sortBy(
-                    followUpData,
-                    (followUp: FollowUpModel) => {
-                      return moment(followUp.date);
-                    }
-                  );
-                })
-                .value()
+              followUps: followUpGrouped
             };
           });
 
@@ -586,12 +830,11 @@ export class ContactRangeFollowUpsListComponent
             while (minDate.isSameOrBefore(maxDate)) {
               // add day to list
               // - exclude dates with no data
-              const formattedFieldDate = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-              const formattedLabelDate = minDate.format('YYYY<br />MMM D');
+              const formattedFieldDate: string = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
               if (usedDates[formattedFieldDate]) {
                 daysColumns.push({
                   field: formattedFieldDate,
-                  label: formattedLabelDate,
+                  label: minDate.format('YYYY<br />MMM D'),
                   notMovable: true,
                   lockPosition: 'right',
                   width: 65,
@@ -619,7 +862,7 @@ export class ContactRangeFollowUpsListComponent
                         Constants.DEFAULT_COLOR_REF_DATA;
 
                       // construct url
-                      const url: string = `/contacts/${data.person.id}/follow-ups/${followUp.id}/${FollowUpModel.canModify(this.authUser) ? 'modify' : 'view'}`;
+                      const url: string = `/contacts/${data.person.id}/follow-ups/${followUp.id}/${FollowUpModel.canModify(this.authUser) ? 'modify' : 'view'}?origin=${FollowUpCreateViewModifyComponent.ORIGIN_FOLLOWUP_DASHBOARD}`;
 
                       // render html
                       html += `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}">
@@ -651,6 +894,10 @@ export class ContactRangeFollowUpsListComponent
 
           // load saved filters
           this.loadCachedFilters();
+
+          // we need to focus back header filter input in which we were writing
+          // - otherwise if we are a slow writer it will take focus before we finish writing in the header column of type text / date etc and you will press keyboard keys for nothing
+          // #TODO
 
           // finished
           return followUpsGroupedByContact;

@@ -34,7 +34,6 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
@@ -54,13 +53,19 @@ import { EntityModel, RelationshipModel } from '../../../../core/models/entity-a
 import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputLinkWithAction,
+  IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { EventModel } from '../../../../core/models/event.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 /**
  * Component
@@ -70,6 +75,10 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
   templateUrl: './contacts-create-view-modify.component.html'
 })
 export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent<ContactModel> implements OnDestroy {
+  // constants
+  private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
+  private static readonly TAB_NAMES_QUESTIONNAIRE_AS_CASE: string = 'questionnaire_as_case';
+
   // contact visual id mask
   private _contactVisualIDMask: {
     mask: string
@@ -81,7 +90,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
   // check for duplicate
   private _duplicateCheckingTimeout: any;
   private _duplicateCheckingSubscription: Subscription;
-  private _personDuplicates: (ContactModel | CaseModel)[] = [];
+  private _personDuplicates: EntityModel[] = [];
   private _previousChecked: {
     firstName: string,
     lastName: string,
@@ -95,6 +104,10 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
   // relationship
   private _relationship: RelationshipModel;
   private _parentEntity: CaseModel | EventModel;
+
+  // hide/show question numbers
+  hideContactQuestionNumbers: boolean = false;
+  hideCaseQuestionNumbers: boolean = false;
 
   /**
    * Constructor
@@ -132,6 +145,22 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     if (this.isCreate) {
       this._parentEntity = this.activatedRoute.snapshot.data.entity;
     }
+
+    // do we have tabs options already saved ?
+    const generalSettings: {
+      [key: string]: any
+    } = this.authDataService
+      .getAuthenticatedUser()
+      .getSettings(UserSettings.CONTACT_GENERAL);
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
+      undefined;
+
+    // use the saved options
+    this.hideContactQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] : false;
+    this.hideCaseQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE] : false;
   }
 
   /**
@@ -149,7 +178,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     }
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -158,7 +188,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
   protected createNewItem(): ContactModel {
     return new ContactModel({
       addresses: [new AddressModel({
-        typeId: AddressType.CURRENT_ADDRESS
+        typeId: AddressType.CURRENT_ADDRESS,
+        date: moment().toISOString()
       })]
     });
   }
@@ -196,9 +227,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       this.isModify
     ) {
       // remove global notifications
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
-      // check
+      // show global notifications
       this.checkForPersonExistence();
     }
 
@@ -334,6 +365,51 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs
    */
   protected initializeTabs(): void {
+    // tab custom configuration
+    this.tabConfiguration = {
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TAB_OPTIONS'
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_CONTACT_TAB_OPTION_SHOW_CONTACT_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_CONTACT_TAB_OPTION_SHOW_CONTACT_QUESTION_NUMBERS',
+          value: !this.hideContactQuestionNumbers
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE,
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_CONTACT_TAB_OPTION_SHOW_CASE_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_CONTACT_TAB_OPTION_SHOW_CASE_QUESTION_NUMBERS',
+          value: !this.hideCaseQuestionNumbers
+        }
+      ],
+      apply: (data, finish) => {
+        // save settings
+        const hideContactQuestionNumbers: boolean = !(data.map[ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
+        const hideCaseQuestionNumbers: boolean = !(data.map[ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE] as IV2SideDialogConfigInputToggleCheckbox).value;
+        this.updateGeneralSettings(
+          `${UserSettings.CONTACT_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideContactQuestionNumbers,
+            [ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE]: hideCaseQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideContactQuestionNumbers = hideContactQuestionNumbers;
+            this.hideCaseQuestionNumbers = hideCaseQuestionNumbers;
+            this.tabsV2Component.detectChanges();
+
+            // finish
+            finish();
+          });
+      }
+    };
+
+    // tab data
     this.tabData = {
       // tabs
       tabs: [
@@ -735,7 +811,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             definition: {
               add: {
                 label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
-                newItem: () => new AddressModel()
+                newItem: () => new AddressModel({
+                  date: moment().toISOString()
+                })
               },
               remove: {
                 label: 'LNG_COMMON_BUTTON_DELETE',
@@ -912,7 +990,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'questionnaire',
+      name: ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
       label: 'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -923,6 +1001,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           set: (value) => {
             this.itemData.questionnaireAnswers = value;
           }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideContactQuestionNumbers;
         },
         updateErrors: (errorsHTML) => {
           errors = errorsHTML;
@@ -941,7 +1022,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
   private initializeTabsQuestionnaireAsCase(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'questionnaire_as_case',
+      name: ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE,
       label: `${this.translateService.instant(EntityType.CASE)} ${this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -949,14 +1030,18 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         questionnaire: this.selectedOutbreak.caseInvestigationTemplate,
         value: {
           get: () => this.itemData.questionnaireAnswersCase,
-          set: () => {}
+          set: (value) => {
+            this.itemData.questionnaireAnswersCase = value;
+          }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideCaseQuestionNumbers;
         },
         updateErrors: () => {}
       },
-      visible: () => this.isView &&
+      visible: () => (this.isView || !this.selectedOutbreak.disableModifyingLegacyQuestionnaire) &&
         this.selectedOutbreak.caseInvestigationTemplate?.length > 0 &&
-        this.itemData.wasCase &&
-        this.itemData.hasQuestionnaireAnswersCase
+        this.itemData.wasCase
     };
   }
 
@@ -1000,6 +1085,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               get: () => this._relationship.contactDate,
               set: (value) => {
                 this._relationship.contactDate = value;
+
+                // check last contact before date of onset of source case
+                this.checkForLastContactBeforeCaseOnSet();
               }
             },
             maxDate: this._today,
@@ -1434,7 +1522,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           // refresh data
           localTab.records$ = this.entityLabResultService
             .retrieveRecords(
-              this.selectedOutbreak.id,
+              this.selectedOutbreak,
               EntityModel.getLinkForEntityType(this.itemData.type),
               this.itemData.id,
               localTab.queryBuilder
@@ -1511,7 +1599,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         FollowUpModel.canList(this.authUser),
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
-        pageSettingsKey: UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS,
+        pageSettingsKey: UserSettings.CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value,
         tableColumnActions: this.entityFollowUpHelperService.retrieveTableColumnActions({
           authUser: this.authUser,
@@ -1529,8 +1617,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           authUser: this.authUser,
           team: this.activatedRoute.snapshot.data.team,
           user: this.activatedRoute.snapshot.data.user,
+          dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,
           options: {
-            dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
           }
         }),
@@ -1964,7 +2052,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           }
 
           // check for duplicates
-          this.contactDataService
+          this.entityDataService
             .findDuplicates(
               this.selectedOutbreak.id,
               this.isCreate ?
@@ -2001,15 +2089,16 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
               // hide notification
               // - hide alert
-              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
               // construct list of actions
               const itemsToManage: IV2SideDialogConfigInputLinkWithAction[] = response.duplicates.map((item, index) => {
                 return {
                   type: V2SideDialogConfigInputType.LINK_WITH_ACTION,
                   name: `actionsLink[${item.model.id}]`,
-                  placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
-                    item.model as ContactModel,
+                  placeholder: (index + 1) + '. ' + EntityModel.getDuplicatePersonDetails(
+                    item,
+                    this.translateService.instant(item.model.type),
                     this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                     this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
@@ -2030,7 +2119,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                       },
                       {
                         label: Constants.DUPLICATE_ACTION.MERGE,
-                        value: Constants.DUPLICATE_ACTION.MERGE
+                        value: Constants.DUPLICATE_ACTION.MERGE,
+                        disabled: item.model.type !== EntityType.CONTACT
                       }
                     ]
                   }
@@ -2141,7 +2231,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: ContactModel) => ['/contacts', item.id, 'view'],
-      statusVisible: true,
+      statusVisible: this.expandListColumnRenderer?.statusVisible === undefined ?
+        true :
+        this.expandListColumnRenderer.statusVisible,
       maxNoOfStatusForms: 3,
       get: {
         status: (item: ContactModel) => {
@@ -2281,32 +2373,47 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
     this.toastV2Service.notice(
-      this.translateService.instant('LNG_CONTACT_FIELD_LABEL_DUPLICATE_CASES') +
+      this.translateService.instant('LNG_CONTACT_FIELD_LABEL_DUPLICATE_PERSONS') +
       ' ' +
       this._personDuplicates
         .map((item) => {
           // check rights
           if (
             (
-              item.type === EntityType.CONTACT &&
+              item.model.type === EntityType.CASE &&
+              !CaseModel.canView(this.authUser)
+            ) || (
+              item.model.type === EntityType.CONTACT &&
               !ContactModel.canView(this.authUser)
             ) || (
-              item.type === EntityType.CASE &&
-              !CaseModel.canView(this.authUser)
+              item.model.type === EntityType.CONTACT_OF_CONTACT &&
+              !ContactOfContactModel.canView(this.authUser)
             )
           ) {
-            return `${item.name} (${this.translateService.instant(item.type)})`;
+            return `${item.model.name} (${this.translateService.instant(item.type)})`;
           }
 
           // create url
-          const url: string = `${item.type === EntityType.CONTACT ? '/contacts' : '/cases'}/${item.id}/view`;
+          let entityPath: string = '';
+          switch (item.model.type) {
+            case EntityType.CASE:
+              entityPath = 'cases';
+              break;
+            case EntityType.CONTACT:
+              entityPath = 'contacts';
+              break;
+            case EntityType.CONTACT_OF_CONTACT:
+              entityPath = 'contacts-of-contacts';
+              break;
+          }
+          const url =  `${entityPath}/${item.model.id}/view`;
 
           // finished
-          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)})</span></a>`;
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.translateService.instant(item.model.type)})</span></a>`;
         })
         .join(', '),
       undefined,
-      AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT
+      AppMessages.APP_MESSAGE_DUPLICATE_PERSONS
     );
   }
 
@@ -2343,7 +2450,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         const updateAlert = () => {
           // must update message ?
           // - hide alert
-          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
           // show duplicates alert
           this.showDuplicatesAlert();
@@ -2395,61 +2502,70 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         this._previousChecked.middleName = this.itemData.middleName;
 
         // check for duplicates
-        this._duplicateCheckingSubscription = forkJoin([
-          this.contactDataService
-            .findDuplicates(
-              this.selectedOutbreak.id,
-              this.isView || this.isModify ?
-                {
-                  id: this.itemData.id,
-                  ...this._previousChecked
-                } :
-                this._previousChecked
-            ),
-          this.caseDataService
-            .findDuplicates(
-              this.selectedOutbreak.id,
+        this._duplicateCheckingSubscription = this.entityDataService
+          .findDuplicates(
+            this.selectedOutbreak.id,
+            this.isView || this.isModify ?
+              {
+                id: this.itemData.id,
+                ...this._previousChecked
+              } :
               this._previousChecked
-            )
-        ]).pipe(
-          // handle error
-          catchError((err) => {
-            // show error
-            this.toastV2Service.error(err);
+          ).pipe(
+            // handle error
+            catchError((err) => {
+              // show error
+              this.toastV2Service.error(err);
 
-            // finished
-            return throwError(err);
-          }),
+              // finished
+              return throwError(err);
+            }),
 
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        ).subscribe((
-          [foundContacts, foundCases]: [
-            EntityDuplicatesModel,
-            EntityDuplicatesModel
-          ]
-        ) => {
-          // request executed
-          this._duplicateCheckingSubscription = undefined;
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          ).subscribe((foundPersons: EntityDuplicatesModel) => {
+            // request executed
+            this._duplicateCheckingSubscription = undefined;
 
-          // update what we found
-          this._personDuplicates = [];
-          if (foundContacts?.duplicates?.length > 0) {
-            this._personDuplicates.push(
-              ...foundContacts.duplicates.map((item) => item.model as ContactModel)
-            );
-          }
-          if (foundCases?.duplicates?.length > 0) {
-            this._personDuplicates.push(
-              ...foundCases.duplicates.map((item) => item.model as CaseModel)
-            );
-          }
+            // update what we found
+            this._personDuplicates = [];
+            this._personDuplicates = foundPersons?.duplicates?.length ?
+              [...foundPersons.duplicates] :
+              [];
 
-          // update alert
-          updateAlert();
-        });
+            // update alert
+            updateAlert();
+          });
       },
       400
     );
+  }
+
+  /**
+   * Check if "Date of Last Contact" is before "Date of Onset" of the source case
+   */
+  private checkForLastContactBeforeCaseOnSet() {
+    // return if the feature is disabled
+    if (!this.selectedOutbreak.checkLastContactDateAgainstDateOnSet) {
+      return;
+    }
+
+    // validate contact date
+    if (
+      (this._parentEntity as CaseModel)?.dateOfOnset &&
+      this._relationship.contactDate &&
+      moment(this._relationship.contactDate).isValid() &&
+      moment(this._relationship.contactDate).isBefore(moment((this._parentEntity as CaseModel).dateOfOnset))
+    ) {
+      this.toastV2Service.notice(
+        'LNG_PAGE_CREATE_CONTACT_WARNING_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET',
+        {
+          dateOfOnset: moment((this._parentEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+        },
+        AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+      );
+    } else {
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    }
   }
 }

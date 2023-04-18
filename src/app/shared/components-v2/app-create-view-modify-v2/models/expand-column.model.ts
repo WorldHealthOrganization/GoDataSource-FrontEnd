@@ -26,6 +26,7 @@ interface ICreateViewModifyV2ExpandColumnText {
 
   // never
   statusVisible?: never;
+  maxNoOfStatusForms?: never;
 }
 
 /**

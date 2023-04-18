@@ -135,7 +135,7 @@
                 <div
                   *cdkVirtualFor="let record of expandListRecords; templateCacheSize: 0;"
                   [ngSwitch]="expandListColumnRenderer?.type"
-                  [ngStyle]="{height: expandListColumnRenderer.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS ? '6.4rem' : '4rem'}"
+                  [style.height]="expandListColumnRenderer.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS ? '6.4rem' : '4rem'"
                   class="gd-create-view-modify-list-data-record"
                   [class.gd-create-view-modify-list-data-record-active]="record.id === itemID">
 
@@ -181,6 +181,7 @@
 
                         <!-- Details -->
                         <span
+                          *ngIf="expandListColumnRenderer.get.details"
                           class="gd-create-view-modify-list-data-record-is-status-and-details-details-details">
                           {{ expandListColumnRenderer.get.details(record) }}
                         </span>
@@ -522,6 +523,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [viewOnly]="isView || !input.value.set"
                     [questionnaire]="input.questionnaire"
+                    [hideQuestionNumbers]="input.hideQuestionNumbers"
                     [selectedTab]="selectedTab === tab"
                     [disableValidation]="input.disableValidation"
                     app-questionnaire-answers-validator
@@ -1171,6 +1173,7 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.vaccineOptions"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                       required="true"></app-form-select-single-v2>
 
                     <!-- Date -->
@@ -1180,6 +1183,7 @@
                       name="date"
                       placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_DATE"
                       [viewOnly]="isView"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                       [disabled]="parentInput?.readonly"></app-form-date-v2>
 
                     <!-- Vaccine status -->
@@ -1191,6 +1195,7 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.vaccineStatusOptions"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                       required="true"></app-form-select-single-v2>
 
                   </div>
@@ -1210,7 +1215,8 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.typeOptions"
-                      required="true"></app-form-select-single-v2>
+                      required="true"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-select-single-v2>
 
                     <!-- From & To -->
                     <div
@@ -1226,7 +1232,8 @@
                         [disabled]="parentInput?.readonly"
                         app-date-validator
                         dateSameOrBefore="endDate"
-                        [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
+                        [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"
+                        (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-date-v2>
 
                       <!-- Date range - end -->
                       <app-form-date-v2
@@ -1237,7 +1244,8 @@
                         [viewOnly]="isView"
                         [disabled]="parentInput?.readonly"
                         app-date-validator
-                        dateSameOrAfter="startDate"></app-form-date-v2>
+                        dateSameOrAfter="startDate"
+                        (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-date-v2>
 
                     </div>
 
@@ -1248,7 +1256,8 @@
                       placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
-                      [options]="input.centerOptions"></app-form-select-single-v2>
+                      [options]="input.centerOptions"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-select-single-v2>
 
                     <!-- Location -->
                     <app-form-select-location-single-v2
@@ -1258,7 +1267,8 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       useOutbreakLocations="true"
-                      clearable="true"></app-form-select-location-single-v2>
+                      clearable="true"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-select-location-single-v2>
 
                     <!-- Comments -->
                     <app-form-textarea-v2
@@ -1266,7 +1276,8 @@
                       name="comments"
                       placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"
                       [viewOnly]="isView"
-                      [disabled]="parentInput?.readonly"></app-form-textarea-v2>
+                      [disabled]="parentInput?.readonly"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-textarea-v2>
 
                   </div>
 
@@ -1284,6 +1295,7 @@
                       placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME"
                       tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION"
                       [viewOnly]="isView"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                       required="true"></app-form-input-v2>
 
                     <!-- Vector type -->
@@ -1293,7 +1305,8 @@
                       placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_TYPE"
                       tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_TYPE_DESCRIPTION"
                       [viewOnly]="isView"
-                      [options]="input.vectorTypeOptions"></app-form-select-single-v2>
+                      [options]="input.vectorTypeOptions"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                     <!-- Url -->
                     <app-form-input-v2
@@ -1303,6 +1316,7 @@
                       tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
                       class="gd-create-view-modify-bottom-section-content-input-url"
                       [viewOnly]="isView"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                       required="true"></app-form-input-v2>
 
                     <!-- Show only if specific type -->
@@ -1318,7 +1332,8 @@
                         class="gd-create-view-modify-bottom-section-content-input-url"
                         [viewOnly]="isView"
                         app-general-async-validator
-                        [asyncValidatorObservable]="input.styleAsyncValidator(input, parentItemIndex)"></app-form-input-v2>
+                        [asyncValidatorObservable]="input.styleAsyncValidator(input, parentItemIndex)"
+                        (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                       <!-- Style source -->
                       <app-form-select-single-v2
@@ -1328,7 +1343,8 @@
                         tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_SOURCE_DESCRIPTION"
                         [viewOnly]="isView"
                         [options]="input.styleSourceOptions[input.value.get(parentItemIndex).styleUrl]"
-                        [required]="!!input.value.get(parentItemIndex).styleUrl"></app-form-select-single-v2>
+                        [required]="!!input.value.get(parentItemIndex).styleUrl"
+                        (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                     </ng-container>
 
@@ -1527,7 +1543,7 @@
                 <ng-template
                   #replaceHtml>
                   <div
-                    class="gd-create-view-modify-bottom-section-content-input-replaced"
+                    class="gd-create-view-modify-bottom-section-content-input gd-create-view-modify-bottom-section-content-input-replaced"
                     [innerHTML]="input.replace.html | safeHtml"></div>
                 </ng-template>
               </ng-template>
@@ -1628,10 +1644,10 @@
             </ng-container>
           </ng-template>
 
-          <!-- Order tabs -->
+          <!-- Configure tabs -->
           <button
-            *ngIf="enableTabReorder && !!tabData?.tabs?.length"
-            class="gd-order-tabs-button"
+            *ngIf="!!tabData?.tabs?.length && (enableTabReorder || !!tabConfiguration?.inputs?.length)"
+            class="gd-conf-tabs-button"
             type="button"
             mat-icon-button
             color="primary"

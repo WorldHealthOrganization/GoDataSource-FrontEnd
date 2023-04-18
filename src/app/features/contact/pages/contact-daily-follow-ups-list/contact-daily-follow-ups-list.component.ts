@@ -20,7 +20,6 @@ import { UserModel } from '../../../../core/models/user.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -28,19 +27,22 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2FilterDate, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
   IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputCheckbox,
   IV2SideDialogConfigInputDate,
   IV2SideDialogConfigInputDateRange,
+  IV2SideDialogConfigInputMultiDropdown,
   IV2SideDialogConfigInputNumber,
   IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogConfigInputText,
   IV2SideDialogConfigInputToggle,
   IV2SideDialogConfigInputToggleCheckbox,
   IV2SideDialogData,
+  IV2SideDialogHandler,
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -48,12 +50,18 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { AppFormSelectMultipleV2Component } from '../../../../shared/forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
+import { TranslateService } from '@ngx-translate/core';
+import { LocationModel } from '../../../../core/models/location.model';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
   templateUrl: './contact-daily-follow-ups-list.component.html'
 })
 export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpModel> implements OnDestroy {
+  // constants
+  private static readonly CREATED_BY_USER: string = 'createdByUser';
+  private static readonly UPDATED_BY_USER: string = 'updatedByUser';
+
   // case
   caseData: CaseModel;
 
@@ -69,8 +77,16 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUSID', value: 'statusId' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', value: 'targeted' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_COMMENT', value: 'comment' },
-    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL', value: 'contact.riskLevel' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER', value: 'contact.gender' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION', value: 'contact.occupation' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_AGE_YEARS', value: 'contact.age.years' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_AGE_MONTHS', value: 'contact.age.months' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_DOB', value: 'contact.dob' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY_USER', value: ContactDailyFollowUpsListComponent.CREATED_BY_USER },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY_USER', value: ContactDailyFollowUpsListComponent.UPDATED_BY_USER },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
@@ -100,7 +116,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   constructor(
     protected listHelperService: ListHelperService,
     protected followUpsDataService: FollowUpsDataService,
-    protected i18nService: I18nService,
+    protected translateService: TranslateService,
     protected outbreakDataService: OutbreakDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
@@ -577,7 +593,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             // View follow-ups
             {
               label: {
-                get: (item: FollowUpModel) => this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
+                get: (item: FollowUpModel) => this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
               },
               action: {
                 link: (item: FollowUpModel): string[] => {
@@ -607,7 +623,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     // default table columns
     this.tableColumns = [
       {
-        field: 'lastName',
+        field: 'contact.lastName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME',
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -615,9 +631,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: 'person.lastName'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-          relationshipKey: 'contact'
+          textType: V2FilterTextType.STARTS_WITH
         },
         link: (item: FollowUpModel) => {
           return item.person && (
@@ -628,13 +644,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               item.person.type === EntityType.CONTACT &&
               ContactModel.canView(this.authUser)
             )
-          ) ?
+          ) && !item.person.deleted ?
             `/${item.person.type === EntityType.CASE ? 'cases' : 'contacts'}/${item.person.id}/view` :
             undefined;
         }
       },
       {
-        field: 'firstName',
+        field: 'contact.firstName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME',
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -642,9 +658,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: 'person.firstName'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-          relationshipKey: 'contact'
+          textType: V2FilterTextType.STARTS_WITH
         },
         link: (item: FollowUpModel) => {
           return item.person && (
@@ -655,13 +671,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               item.person.type === EntityType.CONTACT &&
               ContactModel.canView(this.authUser)
             )
-          ) ?
+          ) && !item.person.deleted ?
             `/${item.person.type === EntityType.CASE ? 'cases' : 'contacts'}/${item.person.id}/view` :
             undefined;
         }
       },
       {
-        field: 'visualId',
+        field: 'contact.visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -669,9 +685,39 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: 'person.visualId'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-          relationshipKey: 'contact'
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'contact.gender',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER',
+        format: {
+          type: (item) => item.person?.gender && (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender] ?
+            this.translateService.instant((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender].value) :
+            '—'
+        },
+        filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'contact.occupation',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION',
+        format: {
+          type: (item) => item.person?.occupation && (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation] ?
+            this.translateService.instant((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation].value) :
+            '—'
+        },
+        filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
         }
       },
       {
@@ -746,6 +792,47 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             this.needsRefreshList();
           }
         }
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // status
+          {
+            title: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+            items: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          },
+
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' '
+            }]
+          }
+        ],
+        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
+          item: data,
+          translateService: this.translateService,
+          dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
+        })
       },
       {
         field: 'teamId',
@@ -825,7 +912,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           fieldIsArray: false
         },
         link: (data) => {
-          return data.address?.location?.name ?
+          return data.address?.location?.name && LocationModel.canView(this.authUser) ?
             `/locations/${ data.address.location.id }/view` :
             undefined;
         }
@@ -833,7 +920,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'phoneNumber',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
-        sortable: true,
         format: {
           type: 'address.phoneNumber'
         },
@@ -861,7 +947,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       },
       {
-        field: 'dateOfLastContact',
+        field: 'contact.dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
         sortable: true,
         format: {
@@ -870,12 +956,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          type: V2FilterType.DATE_RANGE,
-          relationshipKey: 'contact'
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
-        field: 'followUp.endDate',
+        field: 'contact.followUp.endDate',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP',
         sortable: true,
         format: {
@@ -884,25 +970,50 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          type: V2FilterType.DATE_RANGE,
-          relationshipKey: 'contact'
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
-        field: 'riskLevel',
+        field: 'contact.age',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
+        format: {
+          type: V2ColumnFormat.AGE,
+          value: (item) => item.person?.age
+        },
+        filter: {
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
+        }
+      },
+      {
+        field: 'contact.dob',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE,
+          value: (item) => item.person?.dob
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'contact.riskLevel',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
         sortable: true,
         notVisible: true,
         format: {
           type: (item) => item.person?.riskLevel && (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel] ?
-            this.i18nService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
+            this.translateService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
             '—'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-          includeNoValue: true,
-          relationshipKey: 'contact'
+          includeNoValue: true
         }
       },
       {
@@ -949,7 +1060,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         notVisible: true,
-        sortable: true,
         format: {
           type: 'address.geoLocation.lat'
         }
@@ -958,7 +1068,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         notVisible: true,
-        sortable: true,
         format: {
           type: 'address.geoLocation.lng'
         }
@@ -981,7 +1090,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       },
       {
         field: 'address.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         notVisible: true,
         sortable: true,
         format: {
@@ -1026,7 +1135,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             )
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) ?
             `/users/${ data.responsibleUserId }/view` :
             undefined;
         },
@@ -1066,7 +1175,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
@@ -1101,7 +1210,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }
@@ -1264,87 +1373,92 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       );
     }
 
-    // Contact
-    if (ContactModel.canList(this.authUser)) {
-      this.advancedFilters.push(
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'firstName',
-          label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'lastName',
-          label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.ADDRESS,
-          field: 'addresses',
-          label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-          isArray: false
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'gender',
-          label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
-          options: this.activatedRoute.snapshot.data.gender.options,
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'riskLevel',
-          label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
-          options: this.activatedRoute.snapshot.data.risk.options,
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_AGE,
-          field: 'age',
-          label: 'LNG_CONTACT_FIELD_LABEL_AGE',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_DATE,
-          field: 'dob',
-          label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'visualId',
-          label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'addresses.phoneNumber',
-          label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-          childQueryBuilderKey: 'contact'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'occupation',
-          label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-          options: this.activatedRoute.snapshot.data.occupation.options,
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        }
-      );
-    }
+    // Follow-up person
+    this.advancedFilters.push(
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.firstName',
+        label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        sortable: 'contact.firstName'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.lastName',
+        label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        sortable: 'contact.lastName'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'contact.addresses',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        isArray: false,
+        allowedComparators: [
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.ADDRESS], { value: V2AdvancedFilterComparatorType.CONTAINS }),
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.ADDRESS], { value: V2AdvancedFilterComparatorType.LOCATION })
+        ]
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'contact.gender',
+        label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
+        options: this.activatedRoute.snapshot.data.gender.options,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'contact.riskLevel',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
+        options: this.activatedRoute.snapshot.data.risk.options,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.RANGE_AGE,
+        field: 'contact.age',
+        label: 'LNG_CONTACT_FIELD_LABEL_AGE',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'contact.dob',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.visualId',
+        label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        sortable: 'contact.visualId'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.addresses.phoneNumber',
+        label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'contact.occupation',
+        label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+        options: this.activatedRoute.snapshot.data.occupation.options,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      }
+    );
 
-    // Case
+    // Contacts exposed to cases that match the criteria bellow
     if (CaseModel.canList(this.authUser)) {
       this.advancedFilters.push(
         {
@@ -1422,7 +1536,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           childQueryBuilderKey: 'case'
         },
         {
-          type: V2AdvancedFilterType.RANGE_AGE,
+          type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dob',
           label: 'LNG_CASE_FIELD_LABEL_DOB',
           relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
@@ -1585,6 +1699,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           },
           action: {
             click: () => {
+              // remove date filter since that is applied separately
+              const qb: RequestQueryBuilder = new RequestQueryBuilder();
+              qb.merge(this.queryBuilder);
+              qb.filter.removeDeep('date');
+
+              // print daily follow-up form
               this.dialogV2Service
                 .showExportData({
                   title: {
@@ -1594,8 +1714,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     url: `outbreaks/${ this.selectedOutbreak.id }/contacts/daily-followup-form/export`,
                     async: false,
                     method: ExportDataMethod.GET,
-                    fileName: this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
-                    queryBuilder: this.queryBuilder,
+                    fileName: this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
+                    queryBuilder: qb,
                     allow: {
                       types: [ExportDataExtension.PDF]
                     },
@@ -1616,12 +1736,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         },
                         {
                           type: V2SideDialogConfigInputType.DATE,
-                          name: 'printDate',
+                          name: 'date',
                           placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DATE',
                           value: this.printFollowUpsDialogExtraAPIData.startDate,
                           change: (data: IV2SideDialogData) => {
-                            this.printFollowUpsDialogExtraAPIData.startDate = moment((data.map.printDate as IV2SideDialogConfigInputDate).value).startOf('day');
-                            this.printFollowUpsDialogExtraAPIData.endDate = moment((data.map.printDate as IV2SideDialogConfigInputDate).value).endOf('day');
+                            this.printFollowUpsDialogExtraAPIData.startDate = moment((data.map.date as IV2SideDialogConfigInputDate).value).startOf('day');
+                            this.printFollowUpsDialogExtraAPIData.endDate = moment((data.map.date as IV2SideDialogConfigInputDate).value).endOf('day');
                           },
                           validators: {
                             required: () => true
@@ -1730,18 +1850,17 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   }
 
                   // cleanup
-                  this.queryBuilder.filter.removePathCondition('date');
-                  this.queryBuilder.filter.removePathCondition('or.date');
-                  this.queryBuilder.filter.removePathCondition('or.statusId');
+                  this.queryBuilder.filter.removeDeep('date');
+                  this.queryBuilder.filter.removeDeep('statusId');
 
                   // get data
                   const date = (response.data.map.date as IV2SideDialogConfigInputDate).value;
-                  const dateColumn = this.tableColumns.find(column => column.field === 'date');
+                  const dateColumn = this.tableColumns.find((column) => column.field === 'date');
 
                   // set date column filter
                   (dateColumn.filter.value as IV2DateRange) = {
-                    startDate: moment(date).startOf('day'),
-                    endDate: moment(date).endOf('day')
+                    startDate: undefined,
+                    endDate: undefined
                   };
 
                   // filter
@@ -1790,209 +1909,238 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
    * Initialize table group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      // bulk modify
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS'
-        },
-        action: {
-          link: () => {
-            return ['/contacts/follow-ups/modify-list'];
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () =>
+        (
+          FollowUpModel.canBulkModify(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
+        FollowUpModel.canExport(this.authUser) ||
+        (
+          FollowUpModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
+      actions: [
+        // bulk modify
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS'
           },
-          linkQueryParams: (selected: string[]): Params => {
-            return {
-              followUpsIds: JSON.stringify(selected)
-            };
-          }
-        },
-        visible: (): boolean => {
-          return FollowUpModel.canBulkModify(this.authUser) &&
-            this.selectedOutbreakIsActive;
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-
-      // bulk export
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
-
-            // allow deleted records
-            qb.includeDeleted();
-
-            // keep sort order
-            if (!this.queryBuilder.sort.isEmpty()) {
-              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+          action: {
+            link: () => {
+              return ['/contacts/follow-ups/modify-list'];
+            },
+            linkQueryParams: (selected: string[]): Params => {
+              return {
+                followUpsIds: JSON.stringify(selected)
+              };
             }
-
-            // export
-            this.exportFollowUps(qb);
+          },
+          visible: (): boolean => {
+            return FollowUpModel.canBulkModify(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
         },
-        visible: (): boolean => {
-          return FollowUpModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
 
-      // bulk delete
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // create query
-            const qb = new RequestQueryBuilder();
-            qb.filter.where({
-              id: {
-                inq: selected
+        // bulk export
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
+
+              // allow deleted records
+              qb.includeDeleted();
+
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
               }
-            });
 
-            // ask for confirmation
-            this.dialogV2Service
-              .showConfirmDialog({
-                config: {
-                  title: {
-                    get: () => 'LNG_PAGE_ACTION_DELETE'
-                  },
-                  message: {
-                    get: () => 'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS'
+              // export
+              this.exportFollowUps(qb);
+            }
+          },
+          visible: (): boolean => {
+            return FollowUpModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        },
+
+        // Divider
+        {
+          visible: () => (
+            (
+              FollowUpModel.canBulkModify(this.authUser) &&
+              this.selectedOutbreakIsActive
+            ) ||
+            FollowUpModel.canExport(this.authUser)
+          ) && (
+            FollowUpModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive
+          )
+        },
+
+        // bulk delete
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // create query
+              const qb = new RequestQueryBuilder();
+              qb.filter.where({
+                id: {
+                  inq: selected
+                }
+              });
+
+              // ask for confirmation
+              this.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_DELETE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS'
+                    }
                   }
-                }
-              })
-              .subscribe((response) => {
-                // canceled ?
-                if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                  // finished
-                  return;
-                }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
 
-                // show loading
-                const loading = this.dialogV2Service.showLoadingDialog();
+                  // show loading
+                  const loading = this.dialogV2Service.showLoadingDialog();
 
-                // delete follow-ups
-                this.followUpsDataService
-                  .deleteBulkFollowUps(this.selectedOutbreak.id, qb)
-                  .pipe(
-                    catchError((err) => {
-                      this.toastV2Service.error(err);
+                  // delete follow-ups
+                  this.followUpsDataService
+                    .deleteBulkFollowUps(this.selectedOutbreak.id, qb)
+                    .pipe(
+                      catchError((err) => {
+                        this.toastV2Service.error(err);
+
+                        // hide loading
+                        loading.close();
+
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe(() => {
+                      this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                       // hide loading
                       loading.close();
 
-                      return throwError(err);
-                    })
-                  )
-                  .subscribe(() => {
-                    this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-                    // hide loading
-                    loading.close();
-
-                    this.needsRefreshList(true);
-                  });
-              });
+                      this.needsRefreshList(true);
+                    });
+                });
+            }
+          },
+          visible: (): boolean => {
+            return FollowUpModel.canBulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
           }
         },
-        visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser) &&
-            this.selectedOutbreakIsActive;
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1 ||
-            !this.tableV2Component.processedSelectedResults.allNotDeleted;
-        }
-      },
 
-      // bulk restore
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // create query
-            const qb = new RequestQueryBuilder();
-            qb.filter.where({
-              id: {
-                inq: selected
-              }
-            });
+        // bulk restore
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // create query
+              const qb = new RequestQueryBuilder();
+              qb.filter.where({
+                id: {
+                  inq: selected
+                }
+              });
 
-            // ask for confirmation
-            this.dialogV2Service
-              .showConfirmDialog({
-                config: {
-                  title: {
-                    get: () => 'LNG_PAGE_ACTION_RESTORE'
-                  },
-                  message: {
-                    get: () => 'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS'
+              // ask for confirmation
+              this.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_RESTORE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS'
+                    }
                   }
-                }
-              })
-              .subscribe((response) => {
-                // canceled ?
-                if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                  // finished
-                  return;
-                }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
 
-                // show loading
-                const loading = this.dialogV2Service.showLoadingDialog();
+                  // show loading
+                  const loading = this.dialogV2Service.showLoadingDialog();
 
-                // restore follow-ups
-                this.followUpsDataService
-                  .restoreBulkFollowUps(this.selectedOutbreak.id, qb)
-                  .pipe(
-                    catchError((err) => {
-                      this.toastV2Service.error(err);
+                  // restore follow-ups
+                  this.followUpsDataService
+                    .restoreBulkFollowUps(this.selectedOutbreak.id, qb)
+                    .pipe(
+                      catchError((err) => {
+                        this.toastV2Service.error(err);
+
+                        // hide loading
+                        loading.close();
+
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe(() => {
+                      this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                       // hide loading
                       loading.close();
 
-                      return throwError(err);
-                    })
-                  )
-                  .subscribe(() => {
-                    this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-                    // hide loading
-                    loading.close();
-
-                    this.needsRefreshList(true);
-                  });
-              });
+                      this.needsRefreshList(true);
+                    });
+                });
+            }
+          },
+          visible: (): boolean => {
+            return FollowUpModel.canBulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allDeleted;
           }
-        },
-        visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser) &&
-            this.selectedOutbreakIsActive;
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1 ||
-            !this.tableV2Component.processedSelectedResults.allDeleted;
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**
@@ -2462,7 +2610,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   url: `outbreaks/${ this.selectedOutbreak.id }/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
+                  fileName: `${ this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -2479,18 +2627,211 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     },
                     groups: {
                       fields: followUpFieldGroups,
-                      required: followUpFieldGroupsRequires
+                      required: followUpFieldGroupsRequires,
+                      change: (data, handler) => {
+                        // do we need to de-select include created and updated by user data ?
+                        const includeCreatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeCreatedByUser as IV2SideDialogConfigInputCheckbox;
+                        const includeUpdatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeUpdatedByUser as IV2SideDialogConfigInputCheckbox;
+                        const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                        const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+                        if (!allGroups) {
+                          // determine if it should detect the changes
+                          let detectChanges = false;
+
+                          // check created by user
+                          if (
+                            includeCreatedByUserDataCheckbox?.checked &&
+                            (
+                              !fieldsGroupListDropdown.values?.length ||
+                              fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0
+                            )
+                          ) {
+                            // de-select include created by data
+                            includeCreatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // check updated by user
+                          if (
+                            includeUpdatedByUserDataCheckbox?.checked &&
+                            (
+                              !fieldsGroupListDropdown.values?.length ||
+                              fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0
+                            )
+                          ) {
+                            // de-select include updated by data
+                            includeUpdatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // detect changes ?
+                          if (detectChanges) {
+                            handler.detectChanges();
+                          }
+                        }
+                      }
                     },
-                    fields: this.followUpFields,
+                    fields: {
+                      options: this.followUpFields,
+                      change: (data, handler) => {
+                        // do we need to de-select include created and updated by user data ?
+                        const includeCreatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeCreatedByUser as IV2SideDialogConfigInputCheckbox;
+                        const includeUpdatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeUpdatedByUser as IV2SideDialogConfigInputCheckbox;
+                        const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                        const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+                        if (!allFields) {
+                          // determine if it should detect the changes
+                          let detectChanges = false;
+
+                          // check created by user
+                          if (
+                            includeCreatedByUserDataCheckbox?.checked
+                            && (
+                              !fieldsListDropdown.values?.length ||
+                              fieldsListDropdown.values.indexOf(ContactDailyFollowUpsListComponent.CREATED_BY_USER) < 0
+                            )
+                          ) {
+                            // de-select include updated by data
+                            includeCreatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // check updated by user
+                          if (
+                            includeUpdatedByUserDataCheckbox?.checked
+                            && (
+                              !fieldsListDropdown.values?.length ||
+                              fieldsListDropdown.values.indexOf(ContactDailyFollowUpsListComponent.UPDATED_BY_USER) < 0
+                            )
+                          ) {
+                            // de-select include updated by data
+                            includeUpdatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // detect changes ?
+                          if (detectChanges) {
+                            handler.detectChanges();
+                          }
+                        }
+                      }
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true,
                     questionnaireVariables: true
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_CREATED_BY_USER',
+                        tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_CREATED_BY_USER_DESCRIPTION',
+                        name: 'includeCreatedByUser',
+                        checked: false,
+                        change: (data, handler) => {
+                          this.checkUserDataChanged(data, handler);
+                        }
+                      }, {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_UPDATED_BY_USER',
+                        tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_UPDATED_BY_USER_DESCRIPTION',
+                        name: 'includeUpdatedByUser',
+                        checked: false,
+                        change: (data, handler) => {
+                          this.checkUserDataChanged(data, handler);
+                        }
+                      }, {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_ALERTED',
+                        tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_ALERTED_DESCRIPTION',
+                        name: 'includeAlerted',
+                        checked: false
+                      }
+                    ]
                   }
                 }
               });
             });
         }
       });
+  }
+
+  /**
+   * Checks if related "created/updated by user" group/fields options should be checked
+   */
+  private checkUserDataChanged(data: IV2SideDialogData, handler: IV2SideDialogHandler): void {
+    // return if no param provided
+    if (
+      !data ||
+      !handler
+    ) {
+      return;
+    }
+
+    // check if we need to make adjustments
+    const includeCreatedByUserData: boolean = (data.map.includeCreatedByUser as IV2SideDialogConfigInputCheckbox)?.checked;
+    const includeUpdatedByUserData: boolean = (data.map.includeUpdatedByUser as IV2SideDialogConfigInputCheckbox)?.checked;
+    if (
+      includeCreatedByUserData ||
+      includeUpdatedByUserData
+    ) {
+      // check groups & fields
+      const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+      const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+      if (!allGroups) {
+        // do we need to select record creation and update data ?
+        const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+        if (fieldsGroupListDropdown) {
+          // initialize if necessary
+          fieldsGroupListDropdown.values = fieldsGroupListDropdown.values || [];
+
+          // select relationship data since this is necessary
+          if (fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RECORD_CREATION_AND_UPDATE_DATA) < 0) {
+            // select relationship data
+            fieldsGroupListDropdown.values.push(Constants.EXPORT_GROUP.RECORD_CREATION_AND_UPDATE_DATA);
+            fieldsGroupListDropdown.values = [...fieldsGroupListDropdown.values];
+            handler.detectChanges();
+          }
+        }
+      } else if (!allFields) {
+        // do we need to select relationship data ?
+        const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+        if (fieldsListDropdown) {
+          // determine if it should detect the changes
+          let detectChanges = false;
+
+          // initialize if necessary
+          fieldsListDropdown.values = fieldsListDropdown.values || [];
+
+          // select created by user data since this is necessary
+          if (
+            includeCreatedByUserData &&
+            fieldsListDropdown.values.indexOf(ContactDailyFollowUpsListComponent.CREATED_BY_USER) < 0
+          ) {
+            // select relationship data
+            fieldsListDropdown.values.push(ContactDailyFollowUpsListComponent.CREATED_BY_USER);
+            fieldsListDropdown.values = [...fieldsListDropdown.values];
+            detectChanges = true;
+          }
+
+          // select updated by user data since this is necessary
+          if (
+            includeUpdatedByUserData &&
+            fieldsListDropdown.values.indexOf(ContactDailyFollowUpsListComponent.UPDATED_BY_USER) < 0
+          ) {
+            // select relationship data
+            fieldsListDropdown.values.push(ContactDailyFollowUpsListComponent.UPDATED_BY_USER);
+            fieldsListDropdown.values = [...fieldsListDropdown.values];
+            detectChanges = true;
+          }
+
+          // detect changes?
+          if (detectChanges) {
+            handler.detectChanges();
+          }
+        }
+      }
+    }
   }
 }

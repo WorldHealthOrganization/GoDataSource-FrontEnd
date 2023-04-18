@@ -121,6 +121,33 @@ export class ImportExportDataService {
       delete data.useQuestionVariable;
     }
 
+    // add flag includeAlerted
+    if (!_.isUndefined(data.includeAlerted)) {
+      queryBuilder.filter.flag(
+        'includeAlerted',
+        data.includeAlerted
+      );
+      delete data.includeAlerted;
+    }
+
+    // add flag includeCreatedByUser
+    if (!_.isUndefined(data.includeCreatedByUser)) {
+      queryBuilder.filter.flag(
+        'includeCreatedByUser',
+        data.includeCreatedByUser
+      );
+      delete data.includeCreatedByUser;
+    }
+
+    // add flag includeUpdatedByUser
+    if (!_.isUndefined(data.includeUpdatedByUser)) {
+      queryBuilder.filter.flag(
+        'includeUpdatedByUser',
+        data.includeUpdatedByUser
+      );
+      delete data.includeUpdatedByUser;
+    }
+
     // add flag includeContactFields
     if (!_.isUndefined(data.includeContactFields)) {
       queryBuilder.filter.flag(
@@ -137,6 +164,24 @@ export class ImportExportDataService {
         data.includeCaseFields
       );
       delete data.includeCaseFields;
+    }
+
+    // add flag includePersonExposureFields
+    if (!_.isUndefined(data.includePersonExposureFields)) {
+      queryBuilder.filter.flag(
+        'includePersonExposureFields',
+        data.includePersonExposureFields
+      );
+      delete data.includePersonExposureFields;
+    }
+
+    // add flag retrieveOldestExposure
+    if (!_.isUndefined(data.retrieveOldestExposure)) {
+      queryBuilder.filter.flag(
+        'retrieveOldestExposure',
+        data.retrieveOldestExposure
+      );
+      delete data.retrieveOldestExposure;
     }
 
     // add other custom fields caused by API inconsistencies...
@@ -235,6 +280,33 @@ export class ImportExportDataService {
       delete data.useQuestionVariable;
     }
 
+    // add flag includeAlerted
+    if (!_.isUndefined(data.includeAlerted)) {
+      queryBuilder.filter.flag(
+        'includeAlerted',
+        data.includeAlerted
+      );
+      delete data.includeAlerted;
+    }
+
+    // add flag includeCreatedByUser
+    if (!_.isUndefined(data.includeCreatedByUser)) {
+      queryBuilder.filter.flag(
+        'includeCreatedByUser',
+        data.includeCreatedByUser
+      );
+      delete data.includeCreatedByUser;
+    }
+
+    // add flag includeUpdatedByUser
+    if (!_.isUndefined(data.includeUpdatedByUser)) {
+      queryBuilder.filter.flag(
+        'includeUpdatedByUser',
+        data.includeUpdatedByUser
+      );
+      delete data.includeUpdatedByUser;
+    }
+
     // add flag includeContactFields
     if (!_.isUndefined(data.includeContactFields)) {
       queryBuilder.filter.flag(
@@ -251,6 +323,24 @@ export class ImportExportDataService {
         data.includeCaseFields
       );
       delete data.includeCaseFields;
+    }
+
+    // add flag includePersonExposureFields
+    if (!_.isUndefined(data.includePersonExposureFields)) {
+      queryBuilder.filter.flag(
+        'includePersonExposureFields',
+        data.includePersonExposureFields
+      );
+      delete data.includePersonExposureFields;
+    }
+
+    // add flag retrieveOldestExposure
+    if (!_.isUndefined(data.retrieveOldestExposure)) {
+      queryBuilder.filter.flag(
+        'retrieveOldestExposure',
+        data.retrieveOldestExposure
+      );
+      delete data.retrieveOldestExposure;
     }
 
     // filter ?

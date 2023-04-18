@@ -6,7 +6,7 @@ app-transmission-chains-dashlet {
   .gd-basic-top {
     padding-bottom: 2.4rem;
 
-    @include breakpoint('xs') {
+    @include breakpoint('lt-lg') {
       padding-bottom: 0.8rem;
     }
 
@@ -77,6 +77,8 @@ app-transmission-chains-dashlet {
 
   /* Page content */
   .gd-basic-content {
+    overflow: hidden;
+
     @include breakpoint('xs') {
       height: auto !important;
       overflow: hidden;
@@ -107,12 +109,15 @@ app-transmission-chains-dashlet {
       background-color: var(--gd-background);
       border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
       @include border-radius(0.4rem);
+      height: auto;
       left: 1.6rem;
+      max-height: calc(100% - 3.5rem);
       max-width: 37rem;
+      overflow: hidden;
       position: absolute;
       top: 1.6rem;
       width: 100%;
-      z-index: 9999;
+      z-index: 99999;
 
       @include breakpoint('xs') {
         max-width: calc(100% - 3.2rem);
@@ -153,6 +158,9 @@ app-transmission-chains-dashlet {
 
       .gd-cot-options-content {
         border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        height: auto;
+        max-height: calc(100% - 5.2rem);
+        overflow-y: auto;
         padding: 1.6rem 1.6rem 0;
 
         .gd-form-toggle-v2 {
@@ -189,7 +197,7 @@ app-transmission-chains-dashlet {
       @include border-radius(0.4rem);
       font-size: 1.2rem;
       height: auto;
-      max-height: calc(100% - 10rem);
+      max-height: calc(100% - 3.5rem);
       max-width: 30rem;
       overflow: hidden;
       position: absolute;

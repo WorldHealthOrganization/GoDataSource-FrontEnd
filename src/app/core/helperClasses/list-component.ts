@@ -11,7 +11,7 @@ import { UserModel, UserSettings } from '../models/user.model';
 import * as LzString from 'lz-string';
 import { applyResetOnAllFilters, applySortBy } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem } from '../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel, IV2GroupActions } from '../../shared/components-v2/app-list-table-v2/models/action.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IBasicCount } from '../models/basic-count.interface';
@@ -47,7 +47,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   quickActions: IV2ActionMenuLabel;
 
   // group actions
-  groupActions: V2ActionMenuItem[];
+  groupActions: IV2GroupActions;
 
   // add action
   addAction: IV2ActionIconLabel;
@@ -704,6 +704,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
 
+    // update cached filters
+    this.updateCachedFilters();
+
     // refresh
     this.needsRefreshList(
       true,
@@ -731,6 +734,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
+
+    // update cached filters
+    this.updateCachedFilters();
 
     // refresh list
     this.needsRefreshList(true);

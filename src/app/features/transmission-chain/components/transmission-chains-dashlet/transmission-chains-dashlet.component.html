@@ -237,7 +237,7 @@
   <ng-container
     *ngIf="chainGroup && !mustLoadChain && selectedChainPageIndex !== null">
     <div
-      *ngIf="legend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
+      *ngIf="filteredLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
       class="gd-cot-legend"
       [class.gd-cot-legend-fullscreen]="fullScreen"
       [class.gd-cot-legend-expanded]="!legendCollapsed">
@@ -276,6 +276,7 @@
 
           <!-- Circle -->
           <div
+            *ngIf="advancedFiltersApplied?.appliedFilters?.length"
             fxGrow="0"
             class="matches-filter"
             [style.borderColor]="Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR">
@@ -284,27 +285,29 @@
 
           <!-- details -->
           <div
+            *ngIf="advancedFiltersApplied?.appliedFilters?.length"
             fxFlex>
             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE' | translate}}
           </div>
 
           <!-- help -->
           <app-fancy-tooltip
+            *ngIf="advancedFiltersApplied?.appliedFilters?.length"
             fxGrow="0"
             tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE_DESCRIPTION"></app-fancy-tooltip>
         </div>
 
         <!-- node color -->
-        <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
+        <div *ngIf="filteredLegend.nodeColorKeys && filteredLegend.nodeColorKeys.length"
             class="legend-name">
           {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
-          <div class="legend-field-name">{{legend.nodeColorLabel | translate}}:</div>
+          <div class="legend-field-name">{{filteredLegend.nodeColorLabel | translate}}:</div>
         </div>
         <div
-          *ngFor="let nodeColorItem of legend.nodeColorKeys" class="legend-item">
+          *ngFor="let nodeColorItem of filteredLegend.nodeColorKeys" class="legend-item">
           <div
             class="legend-color"
-            [style.background-color]="legend.nodeColor[nodeColorItem]">
+            [style.background-color]="filteredLegend.nodeColor[nodeColorItem]">
           </div>
           <div>
             {{nodeColorItem | translate}}
@@ -312,16 +315,16 @@
         </div>
 
         <!-- node name color -->
-        <div *ngIf="legend.nodeNameColorKeys && legend.nodeNameColorKeys.length"
+        <div *ngIf="filteredLegend.nodeNameColorKeys && filteredLegend.nodeNameColorKeys.length"
             class="legend-name">
           {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
-          <div class="legend-field-name">{{legend.nodeNameColorLabel | translate}}:</div>
+          <div class="legend-field-name">{{filteredLegend.nodeNameColorLabel | translate}}:</div>
         </div>
         <div
-          *ngFor="let nodeNameColorItem of legend.nodeNameColorKeys" class="legend-item">
+          *ngFor="let nodeNameColorItem of filteredLegend.nodeNameColorKeys" class="legend-item">
           <div
             class="legend-color"
-            [style.background-color]="legend.nodeNameColor[nodeNameColorItem]">
+            [style.background-color]="filteredLegend.nodeNameColor[nodeNameColorItem]">
           </div>
           <div>
             {{nodeNameColorItem | translate}}
@@ -329,38 +332,38 @@
           <div *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
                       || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
                       || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
-            - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
+            - {{filteredLegend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
           </div>
         </div>
 
         <!-- edge color -->
-        <div *ngIf="legend.edgeColorKeys && legend.edgeColorKeys.length"
+        <div *ngIf="filteredLegend.edgeColorKeys && filteredLegend.edgeColorKeys.length"
             class="legend-name">
           {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
-          <div class="legend-field-name">{{legend.edgeColorLabel | translate}}:</div>
+          <div class="legend-field-name">{{filteredLegend.edgeColorLabel | translate}}:</div>
         </div>
         <div
-          *ngFor="let edgeColorItem of legend.edgeColorKeys" class="legend-item">
+          *ngFor="let edgeColorItem of filteredLegend.edgeColorKeys" class="legend-item">
           <div
             class="legend-color"
-            [style.background-color]="legend.edgeColor[edgeColorItem]">
+            [style.background-color]="filteredLegend.edgeColor[edgeColorItem]">
           </div>
           <div>
-            {{legend.clustersList && legend.clustersList[edgeColorItem] ? legend.clustersList[edgeColorItem] : (edgeColorItem | translate)}}
+            {{filteredLegend.clustersList && filteredLegend.clustersList[edgeColorItem] ? filteredLegend.clustersList[edgeColorItem] : (edgeColorItem | translate)}}
           </div>
         </div>
 
         <!-- node icon -->
-        <div *ngIf="legend.nodeIconKeys && legend.nodeIconKeys.length"
+        <div *ngIf="filteredLegend.nodeIconKeys && filteredLegend.nodeIconKeys.length"
             class="legend-name">
           {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
-          <div class="legend-field-name">{{legend.nodeIconLabel | translate}}:</div>
+          <div class="legend-field-name">{{filteredLegend.nodeIconLabel | translate}}:</div>
         </div>
         <div
-          *ngFor="let nodeIconItem of legend.nodeIconKeys" class="legend-item">
+          *ngFor="let nodeIconItem of filteredLegend.nodeIconKeys" class="legend-item">
           <div
             class="legend-icon"
-            [style.background-image]="'url(' + legend.nodeIcon[nodeIconItem] + ')'">
+            [style.background-image]="'url(' + filteredLegend.nodeIcon[nodeIconItem] + ')'">
           </div>
           <div>
             {{nodeIconItem | translate}}
@@ -368,37 +371,37 @@
         </div>
 
         <!-- node shape -->
-        <div *ngIf="legend.nodeShapeKeys && legend.nodeShapeKeys.length"
+        <div *ngIf="filteredLegend.nodeShapeKeys && filteredLegend.nodeShapeKeys.length"
             class="legend-name">
           {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate}}
-          <div class="legend-field-name">{{legend.nodeShapeLabel | translate}}:</div>
+          <div class="legend-field-name">{{filteredLegend.nodeShapeLabel | translate}}:</div>
         </div>
         <div
-          *ngFor="let nodeShapeItem of legend.nodeShapeKeys" class="legend-item">
-          <span><mat-icon>{{legend.nodeShape[nodeShapeItem]}}</mat-icon></span>
+          *ngFor="let nodeShapeItem of filteredLegend.nodeShapeKeys" class="legend-item">
+          <span><mat-icon>{{filteredLegend.nodeShape[nodeShapeItem]}}</mat-icon></span>
           <div>
             {{nodeShapeItem | translate}}
           </div>
         </div>
 
         <!-- edge icon -->
-        <div *ngIf="legend.edgeIconKeys && legend.edgeIconKeys.length"
+        <div *ngIf="filteredLegend.edgeIconKeys && filteredLegend.edgeIconKeys.length"
             class="legend-name">
           {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate}}
-          <div class="legend-field-name">{{legend.edgeIconLabel | translate}}:</div>
+          <div class="legend-field-name">{{filteredLegend.edgeIconLabel | translate}}:</div>
         </div>
         <div
-          *ngFor="let edgeIconItem of legend.edgeIconKeys" class="legend-item">
-          <span><mat-icon>{{legend.edgeIcon[edgeIconItem].icon}}</mat-icon></span>
+          *ngFor="let edgeIconItem of filteredLegend.edgeIconKeys" class="legend-item">
+          <span><mat-icon>{{filteredLegend.edgeIcon[edgeIconItem].icon}}</mat-icon></span>
           <div>
-            {{legend.clustersList && legend.clustersList[edgeIconItem] ? legend.clustersList[edgeIconItem] : (edgeIconItem | translate)}}
+            {{filteredLegend.clustersList && filteredLegend.clustersList[edgeIconItem] ? filteredLegend.clustersList[edgeIconItem] : (edgeIconItem | translate)}}
           </div>
         </div>
 
         <!-- lab result sequence color -->
         <ng-container
           *ngIf="showLabResultsSeqData">
-          <div *ngIf="legend.labSequenceColorKeys && legend.labSequenceColorKeys.length"
+          <div *ngIf="filteredLegend.labSequenceColorKeys && filteredLegend.labSequenceColorKeys.length"
               class="legend-name">
             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_COLOR_TITLE' | translate}}
           </div>
@@ -406,26 +409,29 @@
             class="legend-item"
             fxLayout="row" fxLayoutAlign="start center">
             <div
+              *ngIf="filteredLegend.hasMoreVariantsStrains"
               fxGrow="0"
               class="legend-color"
               [style.background-color]="Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR">
             </div>
             <div
+              *ngIf="filteredLegend.hasMoreVariantsStrains"
               fxFlex>
               {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE' | translate}}
             </div>
 
             <!-- help -->
             <app-fancy-tooltip
+              *ngIf="filteredLegend.hasMoreVariantsStrains"
               fxGrow="0"
               tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE_DESCRIPTION"></app-fancy-tooltip>
           </div>
           <hr />
           <div
-            *ngFor="let labSequenceColorItem of legend.labSequenceColorKeys" class="legend-item">
+            *ngFor="let labSequenceColorItem of filteredLegend.labSequenceColorKeys" class="legend-item">
             <div
               class="legend-color"
-              [style.background-color]="legend.labSequenceColor[labSequenceColorItem]">
+              [style.background-color]="filteredLegend.labSequenceColor[labSequenceColorItem]">
             </div>
             <div>
               {{labSequenceColorItem | translate}}

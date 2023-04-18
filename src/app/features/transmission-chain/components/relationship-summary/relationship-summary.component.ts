@@ -136,7 +136,7 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
      */
   canReverseRelationships(persons: RelationshipPersonModel[]) {
     // get the relationship target person
-    const targetPerson = persons.find(person => person.target === true);
+    const targetPerson = persons.find((person) => person.target === true);
     // if target person is either Contact or Contact of Contact relationship can't
     // be reversed since this entities can't be sources for a relationship
     return !(targetPerson.type === EntityType.CONTACT || targetPerson.type === EntityType.CONTACT_OF_CONTACT);

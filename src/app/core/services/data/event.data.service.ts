@@ -1,10 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {
+  Observable,
+  of,
+  throwError
+} from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { EventModel } from '../../models/event.model';
 import { IBasicCount } from '../../models/basic-count.interface';
+import {
+  VisualIdErrorModel,
+  VisualIdErrorModelCode
+} from '../../models/visual-id-error.model';
+import {
+  catchError,
+  map
+} from 'rxjs/operators';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Injectable()
 export class EventDataService {
@@ -125,6 +138,76 @@ export class EventDataService {
      */
   getEventRelationshipsCount(outbreakId: string, eventId: string): Observable<any> {
     return this.http.get(`outbreaks/${outbreakId}/events/${eventId}/relationships/filtered-count`);
+  }
+
+  /**
+   * Generate Event Visual ID
+   * @param outbreakId
+   * @param visualIdMask
+   * @param personId Optional
+   */
+  generateEventVisualID(
+    outbreakId: string,
+    visualIdMask: string,
+    personId?: string
+  ): Observable<string | VisualIdErrorModel> {
+    return this.http
+      .post(
+        `outbreaks/${outbreakId}/events/generate-visual-id`,
+        {
+          visualIdMask: visualIdMask,
+          personId: personId
+        }
+      )
+      .pipe(
+        catchError((response: Error | VisualIdErrorModel) => {
+          return (
+            (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
+            (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID
+          ) ?
+            of(
+              this.modelHelper.getModelInstance(
+                VisualIdErrorModel,
+                response
+              )
+            ) :
+            throwError(response);
+        })
+      );
+  }
+
+  /**
+   * Check if visual ID is valid
+   * @param outbreakId
+   * @param visualIdRealMask
+   * @param visualIdMask
+   * @param personId Optional
+   */
+  checkEventVisualIDValidity(
+    outbreakId: string,
+    visualIdRealMask: string,
+    visualIdMask: string,
+    personId?: string
+  ): Observable<boolean | IGeneralAsyncValidatorResponse> {
+    return this.generateEventVisualID(
+      outbreakId,
+      visualIdMask,
+      personId
+    )
+      .pipe(
+        map((visualID: string | VisualIdErrorModel) => {
+          return typeof visualID === 'string' ?
+            true : {
+              isValid: false,
+              errMsg: (visualID as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ?
+                'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK' :
+                'LNG_API_ERROR_CODE_DUPLICATE_VISUAL_ID',
+              errMsgData: {
+                mask: visualIdRealMask
+              }
+            };
+        })
+      );
   }
 }
 

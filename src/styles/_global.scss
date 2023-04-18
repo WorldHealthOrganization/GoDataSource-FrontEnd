@@ -1,12 +1,9 @@
-/* #TODO - Handsontable - to be removed at a later stage */
-@import 'handsontable/dist/handsontable.full.min.css';
-
 /* OpenLayers */
 @import './components/ol.min.css';
 
 /* AG-Grid */
-@import '@ag-grid-community/core/dist/styles/ag-grid.css';
-@import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
+@import '@ag-grid-community/styles/ag-grid.min.css';
+@import '@ag-grid-community/styles/ag-theme-balham.min.css';
 
 /* Toastr */
 @import 'ngx-toastr/toastr';
@@ -31,6 +28,6 @@
 @import './components/stepper';
 @import './components/tooltips';
 @import './components/drag-and-drop';
-@import './components/slider';
 @import './components/table';
 @import './components/color-picker';
+@import './components/context-menu';

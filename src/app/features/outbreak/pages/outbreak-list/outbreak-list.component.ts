@@ -760,6 +760,34 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
+        field: 'checkLastContactDateAgainstDateOnSet',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'disableModifyingLegacyQuestionnaire',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
         field: 'generateFollowUpsDateOfLastContact',
         label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
         notVisible: true,
@@ -803,7 +831,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
           return !OutbreakModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -836,7 +864,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
           return !OutbreakModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }
@@ -945,6 +973,8 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'id',
       'name',
       'disease',
+      'checkLastContactDateAgainstDateOnSet',
+      'disableModifyingLegacyQuestionnaire',
       'countries',
       'reportingGeographicalLevelId',
       'startDate',

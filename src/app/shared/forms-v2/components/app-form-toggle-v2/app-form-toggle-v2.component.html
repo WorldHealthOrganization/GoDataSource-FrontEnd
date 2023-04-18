@@ -5,11 +5,13 @@
     [(ngModel)]="value"
     [name]="name"
     [disabled]="disabled"
+    [vertical]="vertical"
     (blur)="onTouchItem()">
 
     <mat-button-toggle
       *ngFor="let option of options"
-      [value]="option.value">
+      [value]="option.value"
+      [disabled]="option.disabled">
 
       <!-- Icon -->
       <mat-icon>{{option.value === value ? 'radio_button_checked' : 'radio_button_unchecked'}}</mat-icon>

@@ -1,0 +1,203 @@
+<app-basic-page-v2
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [actionButton]="actionButton"
+  [actionButtonLoading]="actionButtonLoading">
+
+  <!-- Spreadsheet Editor -->
+  <ag-grid-angular
+    class="ag-theme-balham gd-spreadsheet-editor"
+    [modules]="modules"
+    enableCellChangeFlash="true"
+    undoRedoCellEditing="false"
+    suppressRowClickSelection="true"
+    suppressClipboardPaste="true"
+    [loadingOverlayComponent]="AppSpreadsheetEditorV2LoadingComponent"
+    [noRowsOverlayComponent]="AppSpreadsheetEditorV2NoDataComponent"
+    (gridReady)="gridReady($event)"
+    (mouseleave)="gridMouseLeave()"
+    (bodyScroll)="gridBodyScroll()"
+    (cellEditingStopped)="gridCellEditingStopped($event)">
+  </ag-grid-angular>
+
+</app-basic-page-v2>
+
+<!-- Cell - Context menu for spreadsheet-editor -->
+<span
+  style="display: inline-block; width: 0; height: 0; position: absolute; top: 0; left: 0;"
+  [cdkContextMenuTriggerFor]="cellContextMenu"></span>
+<ng-template
+  #cellContextMenu>
+  <div
+    cdkMenu
+    class="gd-context-menu">
+
+    <!-- Copy raw -->
+    <!-- (click) doesn't work on MacOS Safari -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (mouseup)="cellCopy(true)">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_COPY' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        {{isMac ? '⌘+C' : 'Ctrl+C'}}
+      </div>
+    </button>
+
+    <!-- Copy text -->
+    <!-- (click) doesn't work on MacOS Safari -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (mouseup)="cellCopy(false)">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_COPY_TEXT' | translate}}
+      </div>
+    </button>
+
+    <!-- Paste -->
+    <!-- (click) doesn't work on MacOS Safari -->
+    <button
+      *ngIf="showPasteMenuOption"
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length !== 1"
+      (mouseup)="cellPaste()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_PASTE' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        {{isMac ? '⌘+V' : 'Ctrl+V'}}
+      </div>
+    </button>
+
+    <!-- Undo -->
+    <!-- (click) doesn't work on MacOS Safari -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="changesIndex < 1"
+      (mouseup)="cellUndo()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_UNDO' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        {{isMac ? '⌘+Z' : 'Ctrl+Z'}}
+      </div>
+    </button>
+
+    <!-- Redo -->
+    <!-- (click) doesn't work on MacOS Safari -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="changesIndex >= changes.length"
+      (mouseup)="cellRedo()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_REDO' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        {{isMac ? '⌘+Y' : 'Ctrl+Y'}}
+      </div>
+    </button>
+
+    <!-- Splitter -->
+    <hr
+      *ngIf="editor.action === CreateViewModifyV2Action.CREATE" />
+
+    <!-- Append rows at the end -->
+    <!-- (click) doesn't work on MacOS Safari -->
+    <button
+      *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      (mouseup)="rowAppend()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_APPEND_ROW' | translate}}
+      </div>
+    </button>
+
+    <!-- Splitter -->
+    <hr />
+
+    <!-- Delete cells content -->
+    <!-- (click) doesn't work on MacOS Safari -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (mouseup)="cellDeleteContent()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_DELETE' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Delete
+      </div>
+    </button>
+
+    <!-- Delete rows -->
+    <!-- (click) doesn't work on MacOS Safari -->
+    <button
+      *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (mouseup)="rowDelete()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW' | translate}}
+      </div>
+    </button>
+
+  </div>
+</ng-template>

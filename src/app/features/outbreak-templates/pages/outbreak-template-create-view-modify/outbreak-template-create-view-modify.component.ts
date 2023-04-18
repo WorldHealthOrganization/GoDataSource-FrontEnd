@@ -344,6 +344,28 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                   this.itemData.isContactsOfContactsActive = value;
                 }
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'checkLastContactDateAgainstDateOnSet',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET_DESCRIPTION',
+              value: {
+                get: () => this.itemData.checkLastContactDateAgainstDateOnSet,
+                set: (value) => {
+                  this.itemData.checkLastContactDateAgainstDateOnSet = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'disableModifyingLegacyQuestionnaire',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.disableModifyingLegacyQuestionnaire,
+                set: (value) => {
+                  this.itemData.disableModifyingLegacyQuestionnaire = value;
+                }
+              }
             }
           ]
         },
@@ -682,6 +704,25 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                 );
               }
             }
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER,
+            visible: () => OutbreakTemplateModel.canGenerateOutbreak(this.authUser)
+          },
+
+          // Generate Outbreak
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_GENERATE_OUTBREAK',
+            action: {
+              link: () => ['/outbreaks', 'create'],
+              queryParams: () => ({
+                outbreakTemplateId: this.itemData.id
+              })
+            },
+            visible: () => OutbreakTemplateModel.canGenerateOutbreak(this.authUser)
           }
         ]
       }

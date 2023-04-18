@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -251,7 +251,77 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {}
+  protected initializeGroupActions(): void {
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => (
+        this.selectedOutbreakIsActive &&
+        LabResultModel.canBulkModify(this.authUser)
+      ) || (
+        LabResultModel.canExport(this.authUser) && (
+          CaseModel.canExportLabResult(this.authUser) ||
+          ContactModel.canExportLabResult(this.authUser)
+        )
+      ),
+      actions: [
+        // bulk modify
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_MODIFY_SELECTED_LAB_RESULTS'
+          },
+          action: {
+            link: () => {
+              return ['/lab-results/modify-list'];
+            },
+            linkQueryParams: (selected: string[]): Params => {
+              return {
+                labResultsIds: JSON.stringify(selected),
+                entityType: this.entityData.type,
+                entityId: this.entityData.id
+              };
+            }
+          },
+          visible: (): boolean => {
+            return this.selectedOutbreakIsActive &&
+              LabResultModel.canBulkModify(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        },
+
+        // Export selected lab results
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_EXPORT_SELECTED_LAB_RESULTS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // create query
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
+
+              this.exportLabResultsData(qb);
+            }
+          },
+          visible: (): boolean => {
+            return LabResultModel.canExport(this.authUser) && (
+              CaseModel.canExportLabResult(this.authUser) ||
+              ContactModel.canExportLabResult(this.authUser)
+            );
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table add action
@@ -281,36 +351,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   /**
    * Initialize table grouped data
    */
-  protected initializeGroupedData(): void {
-    this.groupActions = [
-      // Export selected lab results
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_EXPORT_SELECTED_LAB_RESULTS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // create query
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
-
-            this.exportLabResultsData(qb);
-          }
-        },
-        visible: (): boolean => {
-          return LabResultModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      }
-    ];
-  }
+  protected initializeGroupedData(): void {}
 
   /**
    * Initialize breadcrumbs
@@ -417,7 +458,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
       // retrieve the list of lab results
       this.records$ = this.entityLabResultService
         .retrieveRecords(
-          this.selectedOutbreak.id,
+          this.selectedOutbreak,
           EntityModel.getLinkForEntityType(this.personType),
           this.entityData.id,
           this.queryBuilder
@@ -618,7 +659,9 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
                     fields: labResultsFieldGroups,
                     required: labResultsFieldGroupsRequires
                   },
-                  fields: this.labFields,
+                  fields: {
+                    options: this.labFields
+                  },
                   dbColumns: true,
                   dbValues: true,
                   questionnaireVariables: true,

@@ -6,8 +6,8 @@ app-basic-page-v2 {
   .gd-basic-top {
     padding-bottom: 2.4rem;
   
-    @include breakpoint('xs') {
-      padding-bottom: 1.6rem;
+    @include breakpoint('lt-lg') {
+      padding-bottom: 0.8rem;
     }
   
     .gd-basic-top-title-buttons {
@@ -64,7 +64,8 @@ app-basic-page-v2 {
       padding: 0;
     }
 
-    app-contact-range-follow-ups-list & {
+    app-contact-range-follow-ups-list &,
+    app-transmission-chain-bars & {
       overflow: hidden;
       padding: 0;
     }

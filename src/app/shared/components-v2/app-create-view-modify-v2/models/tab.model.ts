@@ -20,6 +20,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { IGroupEventData, IGroupOptionEventData, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
 import { LocationIdentifierModel } from '../../../../core/models/location-identifier.model';
+import { IV2SideDialogData, V2SideDialogConfigInput } from '../../app-side-dialog-v2/models/side-dialog-config.model';
 
 /**
  * Input type
@@ -85,6 +86,17 @@ interface ICreateViewModifyV2TabInputActionButton {
     input: CreateViewModifyV2TabInput,
     index?: number,
   ) => boolean;
+}
+
+/**
+ * Handle changed event for inputs that support it
+ */
+export interface ICreateViewModifyV2TabInputChanged {
+  // optional
+  changed?: (
+    input: ICreateViewModifyV2TabInputChanged,
+    index?: number
+  ) => void;
 }
 
 /**
@@ -518,7 +530,7 @@ interface ICreateViewModifyV2TabInputVaccine {
 /**
  * Input - center date range
  */
-interface ICreateViewModifyV2TabInputCenterDateRange {
+interface ICreateViewModifyV2TabInputCenterDateRange extends ICreateViewModifyV2TabInputChanged {
   // required
   type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE;
   typeOptions: ILabelValuePairModel[];
@@ -530,7 +542,7 @@ interface ICreateViewModifyV2TabInputCenterDateRange {
   // optional
   startDateValidators?: {
     dateSameOrAfter?: () => (Moment | string)[]
-  }
+  };
 }
 
 /**
@@ -687,6 +699,7 @@ interface ICreateViewModifyV2TabTableFillQuestionnaire {
 
   // optional
   disableValidation?: boolean;
+  hideQuestionNumbers?: () => boolean;
 }
 
 /**
@@ -857,4 +870,15 @@ export interface ICreateViewModifyV2 {
 
   // optional
   modifyGetAllNotOnlyDirtyFields?: boolean;
+}
+
+/**
+ * Create / View / Modify tab configuration
+ */
+export interface ICreateViewModifyV2Config {
+  inputs: V2SideDialogConfigInput[];
+  apply: (
+    data: IV2SideDialogData,
+    finish: () => void
+  ) => void;
 }

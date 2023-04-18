@@ -8,6 +8,10 @@
     font-family: $gd-font-family;
     margin: 0.4rem;
     padding: 0.4rem 0.8rem;
+
+    &.gd-tooltip-error {
+      background: var(--gd-danger);
+    }
   }
 }
 

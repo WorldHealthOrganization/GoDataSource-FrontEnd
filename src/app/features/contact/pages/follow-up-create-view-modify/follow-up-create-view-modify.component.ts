@@ -27,13 +27,21 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { UserModel } from '../../../../core/models/user.model';
-import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { catchError, takeUntil } from 'rxjs/operators';
+import {
+  UserModel, UserSettings
+} from '../../../../core/models/user.model';
+import {
+  V2SideDialogConfigInputType,
+  IV2SideDialogConfigInputToggleCheckbox
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 /**
  * Component
@@ -43,11 +51,21 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
   templateUrl: './follow-up-create-view-modify.component.html'
 })
 export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent<FollowUpModel> implements OnDestroy {
+  // constants
+  public static readonly ORIGIN_FOLLOWUP_DASHBOARD: string = 'followup_dashboard';
+  private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
+
   // entity
   private _entityData: ContactModel | CaseModel;
 
   // history ?
   isHistory: boolean;
+
+  // origin link
+  origin: string;
+
+  // hide/show question numbers
+  hideQuestionNumbers: boolean = false;
 
   /**
    * Constructor
@@ -60,6 +78,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     protected dialogV2Service: DialogV2Service,
     protected followUpsDataService: FollowUpsDataService,
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
+    protected domSanitizer: DomSanitizer,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -76,6 +95,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     // retrieve data
     this._entityData = activatedRoute.snapshot.data.entityData;
     this.isHistory = !!activatedRoute.snapshot.data.isHistory;
+    this.origin = activatedRoute.snapshot.queryParams.origin;
 
     // display history follow-ups ?
     if (this._entityData?.type === EntityType.CASE) {
@@ -89,6 +109,21 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS
       );
     }
+
+    // do we have tabs options already saved ?
+    const generalSettings: {
+      [key: string]: any
+    } = this.authDataService
+      .getAuthenticatedUser()
+      .getSettings(UserSettings.FOLLOW_UP_GENERAL);
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
+      undefined;
+
+    // use the saved options
+    this.hideQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] : false;
   }
 
   /**
@@ -153,6 +188,14 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs() {
+    // determine origin link and label
+    let originLabel: string = 'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL';
+    let originLink: string = '/contacts/follow-ups';
+    if (this.origin === FollowUpCreateViewModifyComponent.ORIGIN_FOLLOWUP_DASHBOARD) {
+      originLabel = 'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL';
+      originLink = '/contacts/range-follow-ups';
+    }
+
     // reset breadcrumbs
     this.breadcrumbs = [
       {
@@ -177,12 +220,12 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         });
       }
 
-      // follow-up dashboard
+      // origin
       if (FollowUpModel.canListDashboard(this.authUser)) {
         this.breadcrumbs.push({
-          label: 'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+          label: originLabel,
           action: {
-            link: ['/contacts/range-follow-ups']
+            link: [originLink]
           }
         });
       }
@@ -217,12 +260,12 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         });
       }
 
-      // follow-up dashboard
+      // origin
       if (FollowUpModel.canListDashboard(this.authUser)) {
         this.breadcrumbs.push({
-          label: 'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+          label: originLabel,
           action: {
-            link: ['/contacts/range-follow-ups']
+            link: [originLink]
           }
         });
       }
@@ -290,6 +333,40 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs
    */
   protected initializeTabs(): void {
+    // tab custom configuration
+    this.tabConfiguration = {
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TAB_OPTIONS'
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_FOLLOW_UP_TAB_OPTION_SHOW_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_OPTION_SHOW_QUESTION_NUMBERS',
+          value: !this.hideQuestionNumbers
+        }
+      ],
+      apply: (data, finish) => {
+        // save settings
+        const hideQuestionNumbers: boolean = !(data.map[FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
+        this.updateGeneralSettings(
+          `${UserSettings.FOLLOW_UP_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideQuestionNumbers = hideQuestionNumbers;
+            this.tabsV2Component.detectChanges();
+
+            // finish
+            finish();
+          });
+      }
+    };
+
+    // tabs
     this.tabData = {
       // tabs
       tabs: [
@@ -453,7 +530,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'questionnaire',
+      name: FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
       label: 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -464,6 +541,9 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
           set: (value) => {
             this.itemData.questionnaireAnswers = value;
           }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideQuestionNumbers;
         },
         updateErrors: (errorsHTML) => {
           errors = errorsHTML;
@@ -607,10 +687,43 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    */
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: FollowUpModel) => ['/contacts', `${this._entityData.id}`, 'follow-ups', item.id, 'view'],
+      statusVisible: this.expandListColumnRenderer?.statusVisible === undefined ?
+        true :
+        this.expandListColumnRenderer.statusVisible,
+      maxNoOfStatusForms: 2,
       get: {
-        text: (item: FollowUpModel) => moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+        status: (item: FollowUpModel) => {
+          // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
+          if (!item.uiStatusForms) {
+            // determine forms
+            const forms: V2ColumnStatusForm[] = FollowUpModel.getStatusForms({
+              item,
+              translateService: this.translateService,
+              dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
+            });
+
+            // create html
+            let html: string = '';
+            forms.forEach((form, formIndex) => {
+              html += AppListTableV2Component.renderStatusForm(
+                form,
+                formIndex < forms.length - 1
+              );
+            });
+
+            // convert to safe html
+            item.uiStatusForms = this.domSanitizer.bypassSecurityTrustHtml(html);
+          }
+
+          // finished
+          return item.uiStatusForms;
+        },
+        text: (item: FollowUpModel) => item.date ?
+          moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+          '-',
+        details: undefined
       }
     };
   }
@@ -621,7 +734,9 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   protected initializeExpandListQueryFields(): void {
     this.expandListQueryFields = [
       'id',
-      'date'
+      'date',
+      'statusId',
+      'questionnaireAnswers'
     ];
   }
 
@@ -657,6 +772,14 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         data.queryBuilder
       )
       .pipe(
+        // determine alertness
+        map((followUps: FollowUpModel[]) => {
+          return FollowUpModel.determineAlertness(
+            this.selectedOutbreak.contactFollowUpTemplate,
+            followUps
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );

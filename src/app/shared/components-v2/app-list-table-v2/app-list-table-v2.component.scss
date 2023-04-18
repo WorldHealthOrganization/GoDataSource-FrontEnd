@@ -6,6 +6,10 @@
   .gd-list-top-tile-buttons {
     padding-bottom: 2.4rem;
 
+    @include breakpoint('lt-lg') {
+      padding-bottom: 0.8rem;
+    }
+
     /* Page title & view button */
     .gd-list-top-tile-buttons-title {
       overflow: hidden;
@@ -183,6 +187,10 @@
     .gd-list-table-header {
       padding: 1.6rem;
 
+      @include breakpoint('lt-lg') {
+        padding: 0.8rem;
+      }
+
       .gd-list-table-header-left {
         .gd-list-table-header-left-text {
           margin-right: 0.4rem;
@@ -209,6 +217,18 @@
         }
       }
 
+      .gd-list-table-header-right {
+        .mat-flat-button {
+          @include breakpoint('xxs') {
+            padding: 0.8rem;
+
+            .mat-icon {
+              display: none;
+            }
+          }
+        }
+      }
+
       .gd-list-table-header-right-filters-applied {
         color: var(--gd-secondary);
         font-size: 1.2rem;
@@ -223,7 +243,8 @@
         }
       }
 
-      .gd-list-table-header-right-header-filters-active {
+      .gd-list-table-header-right-header-filters-active,
+      .gd-list-table-header-right-footer-active {
         background: rgba(var(--gd-primary-rgb), 0.25);
         color: var(--gd-primary);
       }
@@ -234,5 +255,11 @@
   .gd-list-table-bottom {
     @include border-radius(0 0 0.4rem 0.4rem);
     min-height: 4.8rem;
+
+    &.gd-list-table-bottom-collapsed {
+      height: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
   }
 }

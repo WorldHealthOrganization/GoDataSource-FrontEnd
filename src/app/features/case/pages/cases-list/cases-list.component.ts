@@ -53,7 +53,6 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
     { label: 'LNG_CASE_FIELD_LABEL_LAST_NAME', value: 'lastName' },
     { label: 'LNG_CASE_FIELD_LABEL_GENDER', value: 'gender' },
-    { label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER', value: 'phoneNumber' },
     { label: 'LNG_CASE_FIELD_LABEL_OCCUPATION', value: 'occupation' },
     { label: 'LNG_CASE_FIELD_LABEL_DOB', value: 'dob' },
     { label: 'LNG_CASE_FIELD_LABEL_AGE', value: 'age' },
@@ -67,12 +66,13 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', value: 'isDateOfOnsetApproximate' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', value: 'dateBecomeCase' },
-    { label: 'LNG_CASE_FIELD_LABEL_DATE_RANGES', value: 'dateRanges' },
+    { label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS', value: 'dateRanges' },
     { label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
     { label: 'LNG_CASE_FIELD_LABEL_TYPE', value: 'type' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
     { label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused' },
+    { label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID', value: 'deathLocationId' },
     { label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
@@ -94,7 +94,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME', value: 'burialPlaceName' },
     { label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
     { label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
-    { label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' }
+    { label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' }
   ];
 
   // relationship fields
@@ -243,6 +243,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                         data: () => message.data
                       }
                     },
+                    yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK',
                     initialized: (handler) => {
                       // display loading
                       handler.loading.show();
@@ -685,7 +686,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                         get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CASE',
                         data: () => item as any
                       }
-                    }
+                    },
+                    yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                   }).subscribe((response) => {
                     // canceled ?
                     if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
@@ -927,6 +929,23 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         }
       },
       {
+        field: 'deathLocationId',
+        label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
+        format: {
+          type: 'deathLocation.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_LOCATION,
+          useOutbreakLocations: true,
+          field: 'deathLocationId.parentLocationIdFilter'
+        },
+        link: (data) => {
+          return data.deathLocation?.name && LocationModel.canView(this.authUser) ?
+            `/locations/${data.deathLocation.id}/view` :
+            undefined;
+        }
+      },
+      {
         field: 'age',
         label: 'LNG_CASE_FIELD_LABEL_AGE',
         format: {
@@ -1002,7 +1021,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           fieldIsArray: true
         },
         link: (data) => {
-          return data.mainAddress?.location?.name ?
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.mainAddress.location.id}/view` :
             undefined;
         }
@@ -1152,7 +1171,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           field: 'burialLocationId.parentLocationIdFilter'
         },
         link: (data) => {
-          return data.burialLocation?.name ?
+          return data.burialLocation?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.burialLocation.id}/view` :
             undefined;
         }
@@ -1219,7 +1238,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -1321,7 +1340,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -1354,7 +1373,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }
@@ -1660,127 +1679,135 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
    * Initialize group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => CaseModel.canExport(this.authUser) ||
+        CaseModel.canExportDossier(this.authUser) ||
+        CaseModel.canExportRelationships(this.authUser),
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
 
-            // allow deleted records
-            qb.includeDeleted();
+              // allow deleted records
+              qb.includeDeleted();
 
-            // keep sort order
-            if (!this.queryBuilder.sort.isEmpty()) {
-              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
+              }
+
+              // export
+              this.exportCases(qb);
             }
-
-            // export
-            this.exportCases(qb);
+          },
+          visible: (): boolean => {
+            return CaseModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return CaseModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      }, {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // remove id from list
-            const anonymizeFields = this.caseFields.filter((item) => {
-              return item.value !== 'id';
-            });
+        }, {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // remove id from list
+              const anonymizeFields = this.caseFields.filter((item) => {
+                return item.value !== 'id';
+              });
 
-            // export dossier
-            this.dialogV2Service.showExportData({
-              title: {
-                get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE'
-              },
-              export: {
-                url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
-                async: false,
-                method: ExportDataMethod.POST,
-                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
-                extraFormData: {
-                  append: {
-                    cases: selected
-                  }
+              // export dossier
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE'
                 },
-                allow: {
-                  types: [
-                    ExportDataExtension.ZIP
-                  ],
-                  anonymize: {
-                    fields: anonymizeFields,
-                    key: 'data'
+                export: {
+                  url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
+                  async: false,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  extraFormData: {
+                    append: {
+                      cases: selected
+                    }
+                  },
+                  allow: {
+                    types: [
+                      ExportDataExtension.ZIP
+                    ],
+                    anonymize: {
+                      fields: anonymizeFields,
+                      key: 'data'
+                    }
                   }
                 }
-              }
-            });
+              });
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canExportDossier(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return CaseModel.canExportDossier(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      }, {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            const personsQb = qb.addChildQueryBuilder('person');
+        }, {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              const personsQb = qb.addChildQueryBuilder('person');
 
-            // retrieve only relationships that have at least one persons as desired type
-            qb.filter.byEquality(
-              'persons.type',
-              EntityType.CASE
-            );
+              // retrieve only relationships that have at least one persons as desired type
+              qb.filter.byEquality(
+                'persons.type',
+                EntityType.CASE
+              );
 
-            // id
-            personsQb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
+              // id
+              personsQb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
 
-            // type
-            personsQb.filter.byEquality(
-              'type',
-              EntityType.CASE
-            );
+              // type
+              personsQb.filter.byEquality(
+                'type',
+                EntityType.CASE
+              );
 
-            // export case relationships
-            this.exportCaseRelationships(qb);
+              // export case relationships
+              this.exportCaseRelationships(qb);
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canExportRelationships(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return CaseModel.canExportRelationships(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**
@@ -1990,7 +2017,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       fields: caseFieldGroups,
                       required: caseFieldGroupsRequires
                     },
-                    fields: this.caseFields,
+                    fields: {
+                      options: this.caseFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true,
@@ -2078,7 +2107,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       fields: relationshipFieldGroups,
                       required: relationshipFieldGroupsRequires
                     },
-                    fields: this.relationshipFields,
+                    fields: {
+                      options: this.relationshipFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true
@@ -2184,6 +2215,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'dateInvestigationCompleted',
       'outcomeId',
       'dateOfOutcome',
+      'deathLocationId',
       'age',
       'gender',
       'addresses',
@@ -2245,6 +2277,11 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               locationsIdsMap[address.locationId] = true;
             });
 
+            // death location
+            if (item.deathLocationId) {
+              locationsIdsMap[item.deathLocationId] = true;
+            }
+
             // burial location
             if (item.burialLocationId) {
               locationsIdsMap[item.burialLocationId] = true;
@@ -2289,6 +2326,11 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       locationsMap[address.locationId] :
                       address.location;
                   });
+
+                  // death location
+                  item.deathLocation = item.deathLocationId && locationsMap[item.deathLocationId] ?
+                    locationsMap[item.deathLocationId] :
+                    item.deathLocation;
 
                   // burial location
                   item.burialLocation = item.burialLocationId && locationsMap[item.burialLocationId] ?

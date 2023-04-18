@@ -33,16 +33,20 @@ import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import * as moment from 'moment';
 import { TranslateService } from '@ngx-translate/core';
+import { IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputMultiDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
   templateUrl: './contacts-of-contacts-list.component.html'
 })
 export class ContactsOfContactsListComponent extends ListComponent<ContactOfContactModel> implements OnDestroy {
+  // constants
+  private static readonly RELATIONSHIP_DATA: string = 'relationship';
+
   // contact of contacts fields
   private contactsOfContactsFields: ILabelValuePairModel[] = [
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RELATIONSHIP', value: 'relationship' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RELATIONSHIP', value: ContactsOfContactsListComponent.RELATIONSHIP_DATA },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME', value: 'lastName' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER', value: 'gender' },
@@ -65,7 +69,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
@@ -206,7 +210,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                         get: () => 'LNG_DIALOG_CONFIRM_DELETE_CONTACT_OF_CONTACT',
                         data: () => ({ name: item.name })
                       }
-                    }
+                    },
+                    yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                   }).subscribe((response) => {
                     // canceled ?
                     if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
@@ -361,7 +366,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                         get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CONTACT_OF_CONTACT',
                         data: () => item as any
                       }
-                    }
+                    },
+                    yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                   }).subscribe((response) => {
                     // canceled ?
                     if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
@@ -508,9 +514,9 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           fieldIsArray: true
         },
         link: (data) => {
-          return data.mainAddress?.location?.name
-            ? `/locations/${data.mainAddress.location.id}/view`
-            : undefined;
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
+            `/locations/${data.mainAddress.location.id}/view` :
+            undefined;
         }
       },
       {
@@ -683,7 +689,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -746,7 +752,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -779,7 +785,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }
@@ -937,136 +943,148 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
    * Initialize group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect('id', selected, true, null);
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => ContactOfContactModel.canExport(this.authUser) ||
+        ContactOfContactModel.canExportDossier(this.authUser) ||
+        ContactOfContactModel.canExportRelationships(this.authUser) ||
+        (
+          ContactOfContactModel.canBulkModify(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect('id', selected, true, null);
 
-            // allow deleted records
-            qb.includeDeleted();
+              // allow deleted records
+              qb.includeDeleted();
 
-            // keep sort order
-            if (!this.queryBuilder.sort.isEmpty()) {
-              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
+              }
+
+              // export
+              this.exportContactsOfContacts(qb);
             }
-
-            // export
-            this.exportContactsOfContacts(qb);
+          },
+          visible: (): boolean => {
+            return ContactOfContactModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
         },
-        visible: (): boolean => {
-          return ContactOfContactModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // remove id from list
-            const anonymizeFields =
-              this.contactsOfContactsFields.filter((item) => {
-                return item.value !== 'id';
-              });
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // remove id from list
+              const anonymizeFields =
+                this.contactsOfContactsFields.filter((item) => {
+                  return item.value !== 'id';
+                });
 
-            // export dossier
-            this.dialogV2Service.showExportData({
-              title: {
-                get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE'
-              },
-              export: {
-                url: `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/dossier`,
-                async: false,
-                method: ExportDataMethod.POST,
-                fileName: `${this.translateService.instant(
-                  'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE'
-                )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
-                extraFormData: {
-                  append: {
-                    contactsOfContacts: selected
-                  }
+              // export dossier
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE'
                 },
-                allow: {
-                  types: [ExportDataExtension.ZIP],
-                  anonymize: {
-                    fields: anonymizeFields,
-                    key: 'data'
+                export: {
+                  url: `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/dossier`,
+                  async: false,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.translateService.instant(
+                    'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE'
+                  )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  extraFormData: {
+                    append: {
+                      contactsOfContacts: selected
+                    }
+                  },
+                  allow: {
+                    types: [ExportDataExtension.ZIP],
+                    anonymize: {
+                      fields: anonymizeFields,
+                      key: 'data'
+                    }
                   }
                 }
-              }
-            });
-          }
-        },
-        visible: (): boolean => {
-          return ContactOfContactModel.canExportDossier(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            const personsQb = qb.addChildQueryBuilder('person');
-
-            // retrieve only relationships that have at least one persons as desired type
-            qb.filter.byEquality('persons.type', EntityType.CONTACT_OF_CONTACT);
-
-            // id
-            personsQb.filter.bySelect('id', selected, true, null);
-
-            // type
-            personsQb.filter.byEquality('type', EntityType.CONTACT_OF_CONTACT);
-
-            // export Contact of contact relationships
-            this.exportContactsOfContactsRelationships(qb);
-          }
-        },
-        visible: (): boolean => {
-          return ContactOfContactModel.canExportRelationships(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS'
-        },
-        action: {
-          link: (): string[] => {
-            return ['/contacts-of-contacts', 'modify-bulk'];
+              });
+            }
           },
-          linkQueryParams: (selected: string[]): Params => {
-            return {
-              contactOfContactIds: JSON.stringify(selected)
-            };
+          visible: (): boolean => {
+            return ContactOfContactModel.canExportDossier(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
         },
-        visible: (): boolean => {
-          return ContactOfContactModel.canBulkModify(this.authUser) &&
-            this.selectedOutbreakIsActive;
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              const personsQb = qb.addChildQueryBuilder('person');
+
+              // retrieve only relationships that have at least one persons as desired type
+              qb.filter.byEquality('persons.type', EntityType.CONTACT_OF_CONTACT);
+
+              // id
+              personsQb.filter.bySelect('id', selected, true, null);
+
+              // type
+              personsQb.filter.byEquality('type', EntityType.CONTACT_OF_CONTACT);
+
+              // export Contact of contact relationships
+              this.exportContactsOfContactsRelationships(qb);
+            }
+          },
+          visible: (): boolean => {
+            return ContactOfContactModel.canExportRelationships(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
         },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS'
+          },
+          action: {
+            link: (): string[] => {
+              return ['/contacts-of-contacts', 'modify-bulk'];
+            },
+            linkQueryParams: (selected: string[]): Params => {
+              return {
+                contactOfContactIds: JSON.stringify(selected)
+              };
+            }
+          },
+          visible: (): boolean => {
+            return ContactOfContactModel.canBulkModify(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**
@@ -1261,12 +1279,105 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   },
                   groups: {
                     fields: contactsOfContactsFieldGroups,
-                    required: contactsOfContactsFieldGroupsRequires
+                    required: contactsOfContactsFieldGroupsRequires,
+                    change: (data, handler) => {
+                      // do we need to de-select exposure person data ?
+                      const includeExposurePersonDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox;
+                      const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                      const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+                      if (
+                        includeExposurePersonDataCheckbox?.checked &&
+                        !allGroups && (
+                          !fieldsGroupListDropdown.values?.length ||
+                          fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0
+                        )
+                      ) {
+                        // de-select exposure person data
+                        includeExposurePersonDataCheckbox.checked = false;
+                        handler.detectChanges();
+                      }
+                    }
                   },
-                  fields: this.contactsOfContactsFields,
+                  fields: {
+                    options: this.contactsOfContactsFields,
+                    change: (data, handler) => {
+                      // do we need to de-select exposure person data ?
+                      const includeExposurePersonDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox;
+                      const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                      const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+                      if (
+                        includeExposurePersonDataCheckbox?.checked &&
+                        !allFields && (
+                          !fieldsListDropdown.values?.length ||
+                          fieldsListDropdown.values.indexOf(ContactsOfContactsListComponent.RELATIONSHIP_DATA) < 0
+                        )
+                      ) {
+                        // de-select exposure person data
+                        includeExposurePersonDataCheckbox.checked = false;
+                        handler.detectChanges();
+                      }
+                    }
+                  },
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true
+                },
+                inputs: {
+                  append: [
+                    {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_EXPOSURE_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_EXPOSURE_INFORMATION_DESCRIPTION',
+                      name: 'includePersonExposureFields',
+                      checked: false,
+                      change: (data, handler) => {
+                        // check if we need to make adjustments
+                        const includeExposurePersonData: boolean = (data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox)?.checked;
+                        if (includeExposurePersonData) {
+                          // check groups & fields
+                          const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                          const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                          if (!allGroups) {
+                            // do we need to select relationship data ?
+                            const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+                            if (fieldsGroupListDropdown) {
+                              // initialize if necessary
+                              fieldsGroupListDropdown.values = fieldsGroupListDropdown.values || [];
+
+                              // select relationship data since this is necessary
+                              if (fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0) {
+                                // select relationship data
+                                fieldsGroupListDropdown.values.push(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA);
+                                fieldsGroupListDropdown.values = [...fieldsGroupListDropdown.values];
+                                handler.detectChanges();
+                              }
+                            }
+                          } else if (!allFields) {
+                            // do we need to select relationship data ?
+                            const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+                            if (fieldsListDropdown) {
+                              // initialize if necessary
+                              fieldsListDropdown.values = fieldsListDropdown.values || [];
+
+                              // select relationship data since this is necessary
+                              if (fieldsListDropdown.values.indexOf(ContactsOfContactsListComponent.RELATIONSHIP_DATA) < 0) {
+                                // select relationship data
+                                fieldsListDropdown.values.push(ContactsOfContactsListComponent.RELATIONSHIP_DATA);
+                                fieldsListDropdown.values = [...fieldsListDropdown.values];
+                                handler.detectChanges();
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE_DESCRIPTION',
+                      name: 'retrieveOldestExposure',
+                      checked: false
+                    }
+                  ]
                 }
               }
             });
@@ -1339,7 +1450,9 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                       fields: relationshipFieldGroups,
                       required: relationshipFieldGroupsRequires
                     },
-                    fields: this.relationshipFields,
+                    fields: {
+                      options: this.relationshipFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true

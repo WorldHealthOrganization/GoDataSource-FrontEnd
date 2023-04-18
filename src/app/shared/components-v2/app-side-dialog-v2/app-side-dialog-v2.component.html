@@ -926,6 +926,7 @@
           *ngFor="let input of config?.inputs"
           class="gd-app-side-dialog-v2-content-middle-item"
           [class.gd-app-side-dialog-v2-content-middle-item-has-sort-list]="input.type === V2SideDialogConfigInputType.SORT_LIST"
+          [class.gd-app-side-dialog-v2-content-middle-item-has-group]="input.type === V2SideDialogConfigInputType.GROUP"
           [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredForceParent[input.name])">
           <ng-template
             [ngTemplateOutlet]="commonPart"

@@ -22,6 +22,7 @@ import { LabPersonTypeDataResolver } from '../../core/services/resolvers/data/la
 import { GanttChartTypeDataResolver } from '../../core/services/resolvers/data/gantt-chart-type.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -214,6 +215,30 @@ const routes: Routes = [
       ],
       personType: EntityType.CONTACT,
       action: CreateViewModifyV2Action.MODIFY
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
+  // Modify list of Lab Results
+  {
+    path: 'modify-list',
+    component: fromPages.LabResultsBulkModifyComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.LAB_RESULT_BULK_MODIFY
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      entity: RelationshipPersonDataResolver,
+      labName: LabNameDataResolver,
+      labTestResult: LabTestResultDataResolver,
+      labResultProgress: LabProgressDataResolver,
+      labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
+      labSequenceResult: LabSequenceResultDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard

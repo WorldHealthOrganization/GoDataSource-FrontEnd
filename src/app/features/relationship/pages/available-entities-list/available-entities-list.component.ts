@@ -295,11 +295,15 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
    */
   protected initializeGroupActions(): void {
     // trick to display checkboxes
-    this.groupActions = [
-      {
-        visible: () => false
-      }
-    ];
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => true,
+      actions: [
+        {
+          visible: () => false
+        }
+      ]
+    };
   }
 
   /**
