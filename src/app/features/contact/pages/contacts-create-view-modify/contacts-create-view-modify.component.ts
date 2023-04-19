@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, of, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -66,6 +65,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { EventModel } from '../../../../core/models/event.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -117,7 +117,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     protected activatedRoute: ActivatedRoute,
     protected contactDataService: ContactDataService,
     protected caseDataService: CaseDataService,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected toastV2Service: ToastV2Service,
     protected location: Location,
     protected dialogV2Service: DialogV2Service,
@@ -341,7 +341,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_CONTACT_TITLE', {
             name: this.itemData.name
           }
@@ -351,7 +351,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_CONTACT_TITLE', {
             name: this.itemData.name
           }
@@ -436,8 +436,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -647,7 +647,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
               name: 'visualId',
               placeholder: () => 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.translateService.instant(
+              description: () => this.i18nService.instant(
                 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this._contactVisualIDMask
               ),
@@ -718,7 +718,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -922,7 +922,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             },
             replace: {
               condition: () => !TeamModel.canList(this.authUser),
-              html: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
+              html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -1023,7 +1023,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE,
-      label: `${this.translateService.instant(EntityType.CASE)} ${this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.i18nService.instant(EntityType.CASE)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersCase',
@@ -2098,9 +2098,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                   name: `actionsLink[${item.model.id}]`,
                   placeholder: (index + 1) + '. ' + EntityModel.getDuplicatePersonDetails(
                     item,
-                    this.translateService.instant(item.model.type),
-                    this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                    this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                    this.i18nService.instant(item.model.type),
+                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
                   link: () => ['/contacts', item.model.id, 'view'],
                   actions: {
@@ -2242,7 +2242,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             // determine forms
             const forms: V2ColumnStatusForm[] = ContactModel.getStatusForms({
               item,
-              translateService: this.translateService,
+              i18nService: this.i18nService,
               risk: this.activatedRoute.snapshot.data.risk
             });
 
@@ -2373,7 +2373,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
     this.toastV2Service.notice(
-      this.translateService.instant('LNG_CONTACT_FIELD_LABEL_DUPLICATE_PERSONS') +
+      this.i18nService.instant('LNG_CONTACT_FIELD_LABEL_DUPLICATE_PERSONS') +
       ' ' +
       this._personDuplicates
         .map((item) => {
@@ -2390,7 +2390,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               !ContactOfContactModel.canView(this.authUser)
             )
           ) {
-            return `${item.model.name} (${this.translateService.instant(item.type)})`;
+            return `${item.model.name} (${this.i18nService.instant(item.type)})`;
           }
 
           // create url
@@ -2409,7 +2409,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           const url =  `${entityPath}/${item.model.id}/view`;
 
           // finished
-          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.translateService.instant(item.model.type)})</span></a>`;
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.i18nService.instant(item.model.type)})</span></a>`;
         })
         .join(', '),
       undefined,

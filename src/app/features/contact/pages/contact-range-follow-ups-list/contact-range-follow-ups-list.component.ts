@@ -26,7 +26,6 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import * as momentOriginal from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
@@ -35,6 +34,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import {
   FollowUpCreateViewModifyComponent
 } from '../follow-up-create-view-modify/follow-up-create-view-modify.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -234,7 +234,7 @@ export class ContactRangeFollowUpsListComponent
     },
     {
       field: 'followUpTeamId',
-      label: `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.translateService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM').toLowerCase()}`,
+      label: `${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.i18nService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM').toLowerCase()}`,
       format: {
         type: (data) => {
           return data.person.followUpTeamId && (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
@@ -261,7 +261,7 @@ export class ContactRangeFollowUpsListComponent
       notVisible: true,
       format: {
         type: (data) => data.person?.type ?
-          this.translateService.instant(data.person.type) :
+          this.i18nService.instant(data.person.type) :
           ''
       },
       filter: {
@@ -276,7 +276,7 @@ export class ContactRangeFollowUpsListComponent
       notVisible: true,
       format: {
         type: (data) => data.person?.occupation ?
-          this.translateService.instant(data.person.occupation) :
+          this.i18nService.instant(data.person.occupation) :
           ''
       },
       filter: {
@@ -291,7 +291,7 @@ export class ContactRangeFollowUpsListComponent
       notVisible: true,
       format: {
         type: (data) => data.person?.riskLevel ?
-          this.translateService.instant(data.person.riskLevel) :
+          this.i18nService.instant(data.person.riskLevel) :
           ''
       },
       filter: {
@@ -336,7 +336,7 @@ export class ContactRangeFollowUpsListComponent
     private location: Location,
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service,
-    private translateService: TranslateService
+    private i18nService: I18nService
   ) {
     super(listHelperService);
 
@@ -404,7 +404,7 @@ export class ContactRangeFollowUpsListComponent
    */
   protected initializeTableAdvancedFilters(): void {
     // data
-    const personLabel: string = `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')}`;
+    const personLabel: string = `${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')}`;
 
     // advanced filters
     this.advancedFilters = [
@@ -614,7 +614,7 @@ export class ContactRangeFollowUpsListComponent
                   url: `outbreaks/${this.selectedOutbreak.id}/contacts/range-list/export`,
                   async: false,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.translateService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
                   allow: {
                     types: [
                       ExportDataExtension.PDF

@@ -50,8 +50,8 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { AppFormSelectMultipleV2Component } from '../../../../shared/forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
-import { TranslateService } from '@ngx-translate/core';
 import { LocationModel } from '../../../../core/models/location.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -116,7 +116,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   constructor(
     protected listHelperService: ListHelperService,
     protected followUpsDataService: FollowUpsDataService,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected outbreakDataService: OutbreakDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
@@ -593,7 +593,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             // View follow-ups
             {
               label: {
-                get: (item: FollowUpModel) => this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
+                get: (item: FollowUpModel) => this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
               },
               action: {
                 link: (item: FollowUpModel): string[] => {
@@ -695,7 +695,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER',
         format: {
           type: (item) => item.person?.gender && (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender] ?
-            this.translateService.instant((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender].value) :
+            this.i18nService.instant((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender].value) :
             '—'
         },
         filter: {
@@ -710,7 +710,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION',
         format: {
           type: (item) => item.person?.occupation && (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation] ?
-            this.translateService.instant((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation].value) :
+            this.i18nService.instant((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation].value) :
             '—'
         },
         filter: {
@@ -830,7 +830,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         ],
         forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
           item: data,
-          translateService: this.translateService,
+          i18nService: this.i18nService,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
         })
       },
@@ -1006,7 +1006,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         notVisible: true,
         format: {
           type: (item) => item.person?.riskLevel && (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel] ?
-            this.translateService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
+            this.i18nService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
             '—'
         },
         filter: {
@@ -1714,7 +1714,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     url: `outbreaks/${ this.selectedOutbreak.id }/contacts/daily-followup-form/export`,
                     async: false,
                     method: ExportDataMethod.GET,
-                    fileName: this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
+                    fileName: this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
                     queryBuilder: qb,
                     allow: {
                       types: [ExportDataExtension.PDF]
@@ -2610,7 +2610,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   url: `outbreaks/${ this.selectedOutbreak.id }/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${ this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
+                  fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
                   queryBuilder: qb,
                   allow: {
                     types: [

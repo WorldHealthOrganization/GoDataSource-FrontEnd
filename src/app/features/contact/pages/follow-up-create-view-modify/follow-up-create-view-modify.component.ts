@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -42,6 +41,7 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -73,7 +73,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   constructor(
     protected router: Router,
     protected activatedRoute: ActivatedRoute,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected toastV2Service: ToastV2Service,
     protected dialogV2Service: DialogV2Service,
     protected followUpsDataService: FollowUpsDataService,
@@ -309,7 +309,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE', {
             dateFormatted: moment(this.itemData.date).format('YYYY-MM-DD')
           }
@@ -319,7 +319,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_FOLLOW_UP_TITLE', {
             dateFormatted: moment(this.itemData.date).format('YYYY-MM-DD')
           }
@@ -380,8 +380,8 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL', {
               name: moment(this.itemData.date).format('YYYY-MM-DD')
             }
@@ -486,7 +486,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.translateService.instant('LNG_PAGE_MODIFY_FOLLOW_UP_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.i18nService.instant('LNG_PAGE_MODIFY_FOLLOW_UP_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -700,7 +700,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
             // determine forms
             const forms: V2ColumnStatusForm[] = FollowUpModel.getStatusForms({
               item,
-              translateService: this.translateService,
+              i18nService: this.i18nService,
               dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
             });
 
