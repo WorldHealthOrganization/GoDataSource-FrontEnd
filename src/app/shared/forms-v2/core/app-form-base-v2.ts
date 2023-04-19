@@ -1,10 +1,10 @@
 import { AbstractControl, ControlContainer, ControlValueAccessor, UntypedFormGroup, NgForm, NgModelGroup } from '@angular/forms';
 import { noop } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorStateMatcherV2 } from './app-form-base-error-state-matcher-v2';
 import { AppFormBaseErrorMsgV2, AppFormBaseErrorMsgV2Type } from './app-form-base-error-msg-v2';
 import { ChangeDetectorRef, Directive, EventEmitter, Input, Output } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Input handler
@@ -120,7 +120,7 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
    */
   constructor(
     protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
     // on submit - do validation
@@ -187,7 +187,7 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
         this.errorsString =
           (this.errorsString ? this.errorsString + AppFormBaseErrorMsgV2.SEPARATOR : '') +
           AppFormBaseErrorMsgV2.msg(
-            this.translateService,
+            this.i18nService,
             prop as AppFormBaseErrorMsgV2Type,
             this.previousErrorsObject[prop]
           );
