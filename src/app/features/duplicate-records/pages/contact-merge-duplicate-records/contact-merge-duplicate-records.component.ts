@@ -15,7 +15,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { TranslateService } from '@ngx-translate/core';
 import { UserModel } from '../../../../core/models/user.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -23,6 +22,7 @@ import { TeamModel } from '../../../../core/models/team.model';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-contact-merge-duplicate-records',
@@ -64,7 +64,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -189,14 +189,14 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
             questionnaireAnswers: mergeRecords
               .filter((item) => (item.model as ContactModel).questionnaireAnswers && Object.keys((item.model as ContactModel).questionnaireAnswers).length > 0)
               .map((item, index) => ({
-                label: `${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
+                label: `${ this.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
                 value: index,
                 data: (item.model as ContactModel).questionnaireAnswers
               })),
             questionnaireHistoryAnswers: mergeRecords
               .filter((item) => (item.model as ContactModel).questionnaireAnswersCase && Object.keys((item.model as ContactModel).questionnaireAnswersCase).length > 0)
               .map((item, index) => ({
-                label: `${ this.translateService.instant(EntityType.CASE) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE').toLowerCase() } ${ index + 1 }`,
+                label: `${ this.i18nService.instant(EntityType.CASE) } ${ this.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE').toLowerCase() } ${ index + 1 }`,
                 value: index,
                 data: (item.model as ContactModel).questionnaireAnswersCase
               })),
@@ -636,7 +636,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'visualId',
               placeholder: () => 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.translateService.instant(
+              description: () => this.i18nService.instant(
                 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this.selectedOutbreak.contactIdMask
               ),
@@ -662,7 +662,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -813,7 +813,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
             },
             replace: {
               condition: () => !TeamModel.canList(this.authUser),
-              html: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
+              html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -868,7 +868,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: '_selectedQuestionnaireHistoryAnswers',
-              placeholder: () => `${ this.translateService.instant(EntityType.CASE) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE').toLowerCase() }`,
+              placeholder: () => `${ this.i18nService.instant(EntityType.CASE) } ${ this.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE').toLowerCase() }`,
               options: this._uniqueOptions.questionnaireHistoryAnswers,
               value: {
                 get: () => this._selectedQuestionnaireHistoryAnswers as any,
@@ -983,7 +983,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: 'questionnaire_as_case',
-      label: `${ this.translateService.instant(EntityType.CASE) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE').toLowerCase() }`,
+      label: `${ this.i18nService.instant(EntityType.CASE) } ${ this.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE').toLowerCase() }`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersCase',
@@ -1012,8 +1012,8 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
         mergeRecords,
-        this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-        this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
       );
       case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);
