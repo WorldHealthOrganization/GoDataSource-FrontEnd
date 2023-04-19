@@ -21,7 +21,7 @@ import { DialogV2Service } from './dialog-v2.service';
 import { ToastV2Service } from './toast-v2.service';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from './i18n.service';
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +34,7 @@ export class EntityLabResultService {
     private dialogV2Service: DialogV2Service,
     private labResultDataService: LabResultDataService,
     private toastV2Service: ToastV2Service,
-    private translateService: TranslateService
+    private i18nService: I18nService
   ) {}
 
   /**
@@ -338,7 +338,7 @@ export class EntityLabResultService {
         ],
         forms: (_column, data: LabResultModel): V2ColumnStatusForm[] => LabResultModel.getStatusForms({
           item: data,
-          translateService: this.translateService
+          i18nService: this.i18nService
         })
       },
       {

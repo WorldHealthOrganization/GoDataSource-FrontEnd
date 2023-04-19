@@ -15,14 +15,21 @@ import { of } from 'rxjs/internal/observable/of';
 
 @Injectable()
 export class I18nService {
+  // default language
   private defaultLanguageId = 'english_us';
 
+  // events
   private languageLoadedEvent = new EventEmitter<void>();
   public languageChangedEvent = new EventEmitter<void>();
 
+  // used to determine if language was loaded
+  get currentLang(): string {
+    return this.translateService.currentLang;
+  }
+
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private translateService: TranslateService,
     private storageService: StorageService,

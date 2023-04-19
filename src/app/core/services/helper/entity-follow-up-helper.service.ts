@@ -21,7 +21,6 @@ import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-resp
 import { TeamModel } from '../../models/team.model';
 import { Constants } from '../../models/constants';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { TranslateService } from '@ngx-translate/core';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { OutbreakModel } from '../../models/outbreak.model';
@@ -30,6 +29,7 @@ import { LocationModel } from '../../models/location.model';
 import { LocationDataService } from '../data/location.data.service';
 import * as moment from 'moment';
 import { ReferenceDataEntryModel } from '../../models/reference-data.model';
+import { I18nService } from './i18n.service';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +42,7 @@ export class EntityFollowUpHelperService {
     private dialogV2Service: DialogV2Service,
     private followUpsDataService: FollowUpsDataService,
     private toastV2Service: ToastV2Service,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private locationDataService: LocationDataService
   ) {}
 
@@ -567,7 +567,7 @@ export class EntityFollowUpHelperService {
         ],
         forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
           item: data,
-          translateService: this.translateService,
+          i18nService: this.i18nService,
           dailyFollowUpStatus: definitions.dailyFollowUpStatus
         })
       },
@@ -578,8 +578,8 @@ export class EntityFollowUpHelperService {
         format: {
           type: (item: FollowUpModel) => {
             return item && item.id && item.targeted ?
-              this.translateService.instant('LNG_COMMON_LABEL_YES') :
-              this.translateService.instant('LNG_COMMON_LABEL_NO');
+              this.i18nService.instant('LNG_COMMON_LABEL_YES') :
+              this.i18nService.instant('LNG_COMMON_LABEL_NO');
           }
         },
         filter: {

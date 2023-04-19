@@ -49,7 +49,6 @@ import {
 } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { UserModel } from '../../models/user.model';
 import { SavedFiltersService } from '../data/saved-filters.data.service';
-import { TranslateService } from '@ngx-translate/core';
 import { AnswerModel, QuestionModel } from '../../models/question.model';
 import { AddressModel } from '../../models/address.model';
 import { IV2DateRange } from '../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
@@ -58,6 +57,7 @@ import { BaseModel } from '../../models/base.model';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
 import { AppFormSelectGroupsV2Component } from '../../../shared/forms-v2/components/app-form-select-groups-v2/app-form-select-groups-v2.component';
 import { ErrorModel } from '../../models/error.model';
+import { I18nService } from './i18n.service';
 
 @Injectable()
 export class DialogV2Service {
@@ -92,7 +92,7 @@ export class DialogV2Service {
     private matBottomSheet: MatBottomSheet,
     private toastV2Service: ToastV2Service,
     private savedFiltersService: SavedFiltersService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private authDataService: AuthDataService
   ) {}
 
@@ -1175,7 +1175,7 @@ export class DialogV2Service {
           (prefixOrder + '.') :
           ''
       ) + question.order;
-      const label: string = `${orderLabel} ${this.translateService.instant(question.text)}`;
+      const label: string = `${orderLabel} ${this.i18nService.instant(question.text)}`;
 
       // create option
       const options = {
@@ -2089,7 +2089,7 @@ export class DialogV2Service {
                 // set info icons - readonly
                 if (item.readOnly) {
                   option.infos.push({
-                    label: this.translateService.instant(
+                    label: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL', {
                         name: item.createdByUser?.name ?
                           item.createdByUser?.name :
@@ -2103,7 +2103,7 @@ export class DialogV2Service {
                 // updated at
                 if (item.updatedAt) {
                   option.infos.push({
-                    label: this.translateService.instant(
+                    label: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
                         datetime: moment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
                       }
