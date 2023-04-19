@@ -4,9 +4,9 @@ import { QuestionModel } from '../../../../core/models/question.model';
 import { Constants } from '../../../../core/models/constants';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TranslateService } from '@ngx-translate/core';
 import { ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
 import { IV2SideDialogConfigInputFilterListFilter } from '../../app-side-dialog-v2/models/side-dialog-config.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Advanced filter type
@@ -451,7 +451,7 @@ interface IV2AdvancedFilterGroupsSelect extends IV2AdvancedFilterBase {
   defaultValue?: string[];
   groupOptionFormatMethod?: (
     sanitized: DomSanitizer,
-    i18nService: TranslateService,
+    i18nService: I18nService,
     groupsMap: ISelectGroupMap<any>,
     optionsMap: ISelectGroupOptionMap<any>,
     option: any
