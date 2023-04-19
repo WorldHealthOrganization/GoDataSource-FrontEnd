@@ -15,11 +15,11 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { CaseModel } from '../../../../core/models/case.model';
-import { TranslateService } from '@ngx-translate/core';
 import { MetricNewCasesWithContactsModel } from '../../../../core/models/metric-new-cases-contacts.model';
 import { MetricCasesTransmissionChainsModel } from '../../../../core/models/metrics/metric-cases-transmission-chains.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { AppKpiDashletComponent } from '../app-kpi-dashlet/app-kpi-dashlet.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -39,7 +39,7 @@ export class AppCasesKpiDashletComponent
     private caseDataService: CaseDataService,
     private relationshipDataService: RelationshipDataService,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private listFilterDataService: ListFilterDataService,
     authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
@@ -159,7 +159,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE_DESCRIPTION')
       },
 
       // Cases hospitalised
@@ -242,7 +242,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE_DESCRIPTION')
       },
 
       // Cases with Less than x Contacts
@@ -347,7 +347,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE_DESCRIPTION')
       },
 
       // New cases detected in the previous x days among contacts
@@ -458,7 +458,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE_DESCRIPTION')
       },
 
       // Cases refusing to be transferred to a treatment unit
@@ -549,7 +549,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE_DESCRIPTION')
       },
 
       // New cases in previous x days in known transmission chains
@@ -659,7 +659,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_BEFORE_VALUE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_BEFORE_VALUE_DESCRIPTION')
       },
 
       // Suspect Cases where the lab result is pending
@@ -750,7 +750,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT_DESCRIPTION')
       },
 
       // Number of cases who are not identified though known contact list
@@ -837,7 +837,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS_DESCRIPTION')
       }
     ];
 

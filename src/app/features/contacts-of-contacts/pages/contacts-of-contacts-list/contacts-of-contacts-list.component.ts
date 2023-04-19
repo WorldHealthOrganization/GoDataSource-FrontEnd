@@ -32,8 +32,8 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import * as moment from 'moment';
-import { TranslateService } from '@ngx-translate/core';
 import { IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputMultiDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -114,7 +114,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     private contactsOfContactsDataService: ContactsOfContactsDataService,
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private locationDataService: LocationDataService,
     private dialogV2Service: DialogV2Service,
     private activatedRoute: ActivatedRoute,
@@ -497,7 +497,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         ],
         forms: (_column, data: ContactOfContactModel): V2ColumnStatusForm[] => ContactOfContactModel.getStatusForms({
           item: data,
-          translateService: this.translateService,
+          i18nService: this.i18nService,
           risk: this.activatedRoute.snapshot.data.risk
         })
       },
@@ -1005,7 +1005,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   url: `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/dossier`,
                   async: false,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.translateService.instant(
+                  fileName: `${this.i18nService.instant(
                     'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE'
                   )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                   extraFormData: {
@@ -1184,7 +1184,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               values = values.sort((item1, item2) => {
                 // if same order, compare labels
                 if (item1.order === item2.order) {
-                  return this.translateService.instant(item1.label).localeCompare(this.translateService.instant(item2.label));
+                  return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
                 }
 
                 // format order
@@ -1262,7 +1262,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                 url: `/outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 queryBuilder: qb,
                 allow: {
                   types: [
@@ -1431,7 +1431,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [

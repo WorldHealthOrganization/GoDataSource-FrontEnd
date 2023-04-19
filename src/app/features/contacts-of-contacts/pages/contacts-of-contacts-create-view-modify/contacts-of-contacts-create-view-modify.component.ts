@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, of, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -54,6 +53,7 @@ import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates
 import { Subscription } from 'rxjs/internal/Subscription';
 import { CaseModel } from '../../../../core/models/case.model';
 import { Location } from '@angular/common';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -97,7 +97,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     protected activatedRoute: ActivatedRoute,
     protected contactsOfContactsDataService: ContactsOfContactsDataService,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected dialogV2Service: DialogV2Service,
     protected entityHelperService: EntityHelperService,
     protected systemSettingsDataService: SystemSettingsDataService,
@@ -278,7 +278,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE', {
             name: this.itemData.name
           }
@@ -288,7 +288,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE', {
             name: this.itemData.name
           }
@@ -321,8 +321,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -529,7 +529,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
               type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
               name: 'visualId',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.translateService.instant(
+              description: () => this.i18nService.instant(
                 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this._cocVisualIDMask
               ),
@@ -600,7 +600,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -1432,9 +1432,9 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
                   name: `actionsLink[${item.model.id}]`,
                   placeholder: (index + 1) + '. ' + EntityModel.getDuplicatePersonDetails(
                     item,
-                    this.translateService.instant(item.model.type),
-                    this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                    this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                    this.i18nService.instant(item.model.type),
+                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
                   link: () => ['/contacts-of-contacts', item.model.id, 'view'],
                   actions: {
@@ -1573,7 +1573,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             // determine forms
             const forms: V2ColumnStatusForm[] = ContactOfContactModel.getStatusForms({
               item,
-              translateService: this.translateService,
+              i18nService: this.i18nService,
               risk: this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>
             });
 
@@ -1683,7 +1683,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
     this.toastV2Service.notice(
-      this.translateService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DUPLICATE_PERSONS') +
+      this.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DUPLICATE_PERSONS') +
       ' ' +
       this._personDuplicates
         .map((item) => {
@@ -1700,7 +1700,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
               !ContactOfContactModel.canView(this.authUser)
             )
           ) {
-            return `${item.model.name} (${this.translateService.instant(item.type)})`;
+            return `${item.model.name} (${this.i18nService.instant(item.type)})`;
           }
 
           // create url
@@ -1719,7 +1719,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           const url =  `${entityPath}/${item.model.id}/view`;
 
           // finished
-          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.translateService.instant(item.model.type)})</span></a>`;
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.i18nService.instant(item.model.type)})</span></a>`;
         })
         .join(', '),
       undefined,

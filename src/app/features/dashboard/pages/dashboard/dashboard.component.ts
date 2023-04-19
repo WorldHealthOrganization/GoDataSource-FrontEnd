@@ -17,7 +17,6 @@ import { ExportDataExtension, ExportDataMethod } from '../../../../core/services
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { TranslateService } from '@ngx-translate/core';
 import * as momentOriginal from 'moment';
 import { ConvertHtmlToPDFStep, DomService } from '../../../../core/services/helper/dom.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -37,6 +36,7 @@ import { EpiCurveOutcomeDashletComponent } from '../../components/epi-curve-outc
 import { EpiCurveReportingDashletComponent } from '../../components/epi-curve-reporting-dashlet/epi-curve-reporting-dashlet.component';
 import { ContactFollowUpOverviewDashletComponent } from '../../components/contact-follow-up-overview-dashlet/contact-follow-up-overview-dashlet.component';
 import { CasesBasedOnContactStatusDashletComponent } from '../../components/cases-based-on-contact-status-dashlet/cases-based-on-contact-status-dashlet.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -255,7 +255,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private dialogV2Service: DialogV2Service,
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private domService: DomService,
     private toastV2Service: ToastV2Service,
     authDataService: AuthDataService
@@ -432,7 +432,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   url: `/outbreaks/${this._selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.translateService.instant('LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -500,7 +500,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   url: `/outbreaks/${this._selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.translateService.instant('LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -590,7 +590,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               this.domService
                 .convertHTML2PDF(
                   this._kpiSection.nativeElement,
-                  `${this.translateService.instant('LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL')}.pdf`, {
+                  `${this.i18nService.instant('LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL')}.pdf`, {
                     onclone: (_document, element) => {
                       // disable box shadow - otherwise export doesn't look good
                       (element.querySelectorAll('.gd-dashlet-kpi') || [])
@@ -726,7 +726,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // display warning
       this.toastV2Service.notice(
         'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG',
-        { fileName: this.translateService.instant(fileName) }
+        { fileName: this.i18nService.instant(fileName) }
       );
 
       // finished
@@ -790,7 +790,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.domService
         .convertHTML2PDF(
           document.querySelector(elementSelector),
-          `${this.translateService.instant(fileName)} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}.pdf`, {
+          `${this.i18nService.instant(fileName)} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}.pdf`, {
             splitType: exportAsSinglePage ?
               'grid' :
               'auto',
