@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -24,6 +23,7 @@ import { UserRoleDataService } from '../../../../core/services/data/user-role.da
 import { PERMISSION, PermissionModel } from '../../../../core/models/permission.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -42,7 +42,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected userRoleDataService: UserRoleDataService,
@@ -167,7 +167,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_USER_ROLES_TITLE', {
             name: this.itemData.name
           }
@@ -177,7 +177,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_USER_ROLES_TITLE', {
             name: this.itemData.name
           }
@@ -201,8 +201,8 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -311,13 +311,13 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
               requiredWithoutDefaultValues: true,
               groupOptionFormatMethod: this.isView ? undefined : (
                 sanitized,
-                translateService,
+                i18nService,
                 optionsMap,
                 option
               ) => {
                 return UserRoleHelper.groupOptionFormatMethod(
                   sanitized,
-                  translateService,
+                  i18nService,
                   optionsMap,
                   option
                 );
@@ -325,14 +325,14 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
               groupSelectionChanged: (data) => {
                 UserRoleHelper.groupSelectionChanged(
                   data,
-                  this.translateService,
+                  this.i18nService,
                   this.dialogV2Service
                 );
               },
               groupOptionCheckStateChanged: (data) => {
                 UserRoleHelper.groupOptionCheckStateChanged(
                   data,
-                  this.translateService,
+                  this.i18nService,
                   this.dialogV2Service
                 );
               },
