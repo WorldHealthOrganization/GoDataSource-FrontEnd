@@ -2,7 +2,6 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -39,6 +38,7 @@ import {
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { UserSettings } from '../../../../core/models/user.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -68,7 +68,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     protected router: Router,
     private labResultDataService: LabResultDataService,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     private domSanitizer: DomSanitizer,
     authDataService: AuthDataService,
@@ -255,7 +255,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       ) {
         this.breadcrumbs.push(
           {
-            label: `${this.translateService.instant(this.entityData.name)} ${this.translateService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
+            label: `${this.i18nService.instant(this.entityData.name)} ${this.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
             action: this.entityData.deleted ? null : {
               link: [`/lab-results/contacts/${this.entityData.id}`]
             }
@@ -267,7 +267,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       ) {
         this.breadcrumbs.push(
           {
-            label: `${this.translateService.instant(this.entityData.name)} ${this.translateService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
+            label: `${this.i18nService.instant(this.entityData.name)} ${this.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
             action: this.entityData.deleted ? null : {
               link: [`/lab-results/cases/${this.entityData.id}`]
             }
@@ -287,7 +287,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     } else if (this.isModify) {
       this.breadcrumbs.push(
         {
-          label: this.translateService.instant(
+          label: this.i18nService.instant(
             'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
             {
               sampleIdentifier: this.itemData.sampleIdentifier ?
@@ -302,7 +302,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       // view
       this.breadcrumbs.push(
         {
-          label: this.translateService.instant(
+          label: this.i18nService.instant(
             'LNG_PAGE_VIEW_LAB_RESULT_TITLE',
             {
               sampleIdentifier: this.itemData.sampleIdentifier ?
@@ -367,8 +367,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.entityData
           )
@@ -927,7 +927,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
             // determine forms
             const forms: V2ColumnStatusForm[] = LabResultModel.getStatusForms({
               item,
-              translateService: this.translateService
+              i18nService: this.i18nService
             });
 
             // create html

@@ -19,7 +19,7 @@ import { Constants } from '../../../../core/models/constants';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-lab-results-bulk-modify',
@@ -40,7 +40,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
     protected activatedRoute: ActivatedRoute,
     protected labResultDataService: LabResultDataService,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -293,7 +293,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
                 label: result.labName ?
                   `${
                     (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName] ?
-                      this.translateService.instant((this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName].value) :
+                      this.i18nService.instant((this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName].value) :
                       '—'
                   } (${result.dateSampleTaken ? moment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '—'})` :
                   (

@@ -28,7 +28,7 @@ import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatu
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { Constants } from '../../../../core/models/constants';
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-lab-results',
@@ -73,7 +73,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private labResultDataService: LabResultDataService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service
   ) {
@@ -441,14 +441,14 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         ],
         forms: (_column, data: LabResultModel): V2ColumnStatusForm[] => LabResultModel.getStatusForms({
           item: data,
-          translateService: this.translateService
+          i18nService: this.i18nService
         })
       },
       {
         field: 'classification',
         format: {
           type: (item) => item.person && item.person.classification ?
-            this.translateService.instant(item.person.classification) :
+            this.i18nService.instant(item.person.classification) :
             ''
         },
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
@@ -1106,7 +1106,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                 url: `/outbreaks/${ this.selectedOutbreak.id }/lab-results/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${ this.translateService.instant('LNG_PAGE_LIST_LAB_RESULTS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
+                fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
                 queryBuilder: qb,
                 allow: {
                   types: [

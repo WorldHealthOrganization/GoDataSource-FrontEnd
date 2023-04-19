@@ -12,9 +12,9 @@ import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateView
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { takeUntil } from 'rxjs/operators';
-import { TranslateService } from '@ngx-translate/core';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-view-help-item',
@@ -36,7 +36,7 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
     private helpDataService: HelpDataService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -90,7 +90,7 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
         .subscribe((helpItemData) => {
           // process data
           this._helpItemTitle = helpItemData?.title ?? '';
-          this._helpItemContent = this.translateService.instant(helpItemData?.content) ?? '';
+          this._helpItemContent = this.i18nService.instant(helpItemData?.content) ?? '';
 
           // finish
           subscriber.next(null);
@@ -196,7 +196,7 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
       type: CreateViewModifyV2ExpandColumnType.TEXT,
       link: (item: HelpItemModel) => ['/help/categories', item.categoryId, 'items', item.id, 'view-global'],
       get: {
-        text: (item: HelpItemModel) => this.translateService.instant(item.title)
+        text: (item: HelpItemModel) => this.i18nService.instant(item.title)
       }
     };
   }
