@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Host, HostListener, Input, OnDestroy, Optional, SkipSelf, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { Constants } from '../../../../core/models/constants';
@@ -25,6 +24,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import * as _ from 'lodash';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 import { IV2BottomDialogConfigButtonType } from '../../../components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Flatten type
@@ -130,7 +130,7 @@ export class AppFormEditQuestionnaireV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef,
     protected dialogV2Service: DialogV2Service,
     protected activatedRoute: ActivatedRoute,
@@ -139,7 +139,7 @@ export class AppFormEditQuestionnaireV2Component
     // parent
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
 
@@ -169,14 +169,14 @@ export class AppFormEditQuestionnaireV2Component
       questions.forEach((question) => {
         // translate
         question.text = question.text ?
-          this.translateService.instant(question.text) :
+          this.i18nService.instant(question.text) :
           question.text;
 
         // translate answers
         (question.answers || []).forEach((answer) => {
           // translate
           answer.label = answer.label ?
-            this.translateService.instant(answer.label) :
+            this.i18nService.instant(answer.label) :
             answer.label;
 
           // translate sub questions
@@ -545,7 +545,7 @@ export class AppFormEditQuestionnaireV2Component
         type: V2SideDialogConfigInputType.HTML,
         name: 'details',
         cssClasses: 'gd-form-edit-questionnaire-v2-details',
-        placeholder: this.translateService.instant(
+        placeholder: this.i18nService.instant(
           'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_DETAILS', {
             details: parent ?
               parent.label :
@@ -1018,7 +1018,7 @@ export class AppFormEditQuestionnaireV2Component
         type: V2SideDialogConfigInputType.HTML,
         name: 'details',
         cssClasses: 'gd-form-edit-questionnaire-v2-details',
-        placeholder: this.translateService.instant(
+        placeholder: this.i18nService.instant(
           'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_DETAILS', {
             details: parent ?
               parent.text :
@@ -1256,9 +1256,9 @@ export class AppFormEditQuestionnaireV2Component
         type: V2SideDialogConfigInputType.HTML,
         name: 'details',
         cssClasses: 'gd-form-edit-questionnaire-v2-details',
-        placeholder: this.translateService.instant(
+        placeholder: this.i18nService.instant(
           'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CLONING', {
-            type: this.translateService.instant(
+            type: this.i18nService.instant(
               item.data instanceof QuestionModel ?
                 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TYPE_QUESTION' :
                 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TYPE_ANSWER'
@@ -1369,7 +1369,7 @@ export class AppFormEditQuestionnaireV2Component
             {
               type: V2SideDialogConfigInputType.TEXT,
               name: `${question.variable}[text]`,
-              placeholder: `${this.translateService.instant('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT')} ${questionNo}`,
+              placeholder: `${this.i18nService.instant('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT')} ${questionNo}`,
               value: question.text,
               validators: {
                 required: () => true
@@ -1427,7 +1427,7 @@ export class AppFormEditQuestionnaireV2Component
           {
             type: V2SideDialogConfigInputType.TEXT,
             name: 'answer[label]',
-            placeholder: this.translateService.instant('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL'),
+            placeholder: this.i18nService.instant('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL'),
             value: item.data.label,
             validators: {
               required: () => true

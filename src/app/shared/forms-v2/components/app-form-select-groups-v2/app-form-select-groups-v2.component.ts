@@ -8,7 +8,6 @@ import {
   SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { MAT_SELECT_CONFIG, MatSelect } from '@angular/material/select';
 import { GroupEventDataAction, IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from './models/select-group.model';
@@ -16,6 +15,7 @@ import * as _ from 'lodash';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { v4 as uuid } from 'uuid';
 import { MatOptionSelectionChange } from '@angular/material/core';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-select-groups-v2',
@@ -149,7 +149,7 @@ export class AppFormSelectGroupsV2Component
   // used to format group options labels / tooltips.. ( add extra information )
   @Input() groupOptionFormatMethod: (
     sanitized: DomSanitizer,
-    i18nService: TranslateService,
+    i18nService: I18nService,
     optionsMap: ISelectGroupOptionMap<any>,
     option: any
   ) => ISelectGroupOptionFormatResponse;
@@ -202,13 +202,13 @@ export class AppFormSelectGroupsV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef,
     protected sanitized: DomSanitizer
   ) {
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }
@@ -340,7 +340,7 @@ export class AppFormSelectGroupsV2Component
           // determine label & tooltip
           const formatResponse = this.groupOptionFormatMethod(
             this.sanitized,
-            this.translateService,
+            this.i18nService,
             this.optionsMap,
             option
           );
@@ -357,12 +357,12 @@ export class AppFormSelectGroupsV2Component
         } else {
           // label
           if (this.groupOptionLabelKey) {
-            this.labelTranslations[option[this.groupOptionLabelKey]] = this.translateService.instant(option[this.groupOptionLabelKey]);
+            this.labelTranslations[option[this.groupOptionLabelKey]] = this.i18nService.instant(option[this.groupOptionLabelKey]);
           }
 
           // tooltip
           if (this.groupOptionTooltipKey) {
-            this.tooltipTranslations[option[this.groupOptionTooltipKey]] = this.translateService.instant(option[this.groupOptionTooltipKey]);
+            this.tooltipTranslations[option[this.groupOptionTooltipKey]] = this.i18nService.instant(option[this.groupOptionTooltipKey]);
           }
         }
       });
@@ -398,8 +398,8 @@ export class AppFormSelectGroupsV2Component
         // determine option label
         labels.push(
           this.groupsMap[selectedOptionValue] ?
-            `${this.translateService.instant(this.groupAllLabel)} ${this.translateService.instant(this.groupsMap[selectedOptionValue][this.groupLabelKey])}` :
-            `${!this.optionsMap[selectedOptionValue] ? '' : this.translateService.instant(this.optionsMap[selectedOptionValue].option[this.groupOptionLabelKey])}`
+            `${this.i18nService.instant(this.groupAllLabel)} ${this.i18nService.instant(this.groupsMap[selectedOptionValue][this.groupLabelKey])}` :
+            `${!this.optionsMap[selectedOptionValue] ? '' : this.i18nService.instant(this.optionsMap[selectedOptionValue].option[this.groupOptionLabelKey])}`
         );
       });
 
@@ -594,7 +594,7 @@ export class AppFormSelectGroupsV2Component
             // add name to the list of selected child options
             this.partialOptions[value] = this.partialOptions[value] +
               (this.partialOptions[value] ? ', ' : ' - ') +
-              this.translateService.instant(this.optionsMap[selectedValue].option[this.groupOptionLabelKey]);
+              this.i18nService.instant(this.optionsMap[selectedValue].option[this.groupOptionLabelKey]);
 
             // already added to the list ?
             if (values.indexOf(selectedValue) < 0) {

@@ -1,6 +1,19 @@
-import { ChangeDetectorRef, Component, EventEmitter, forwardRef, Host, Input, OnDestroy, Optional, Output, SkipSelf, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  forwardRef,
+  Host,
+  Input,
+  OnDestroy,
+  Optional,
+  Output,
+  SkipSelf,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { AnswerModel, IAnswerData, QuestionModel } from '../../../../core/models/question.model';
 import { Constants } from '../../../../core/models/constants';
@@ -21,6 +34,7 @@ import { ReplaySubject, throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import * as FileSaver from 'file-saver';
 import { v4 as uuid } from 'uuid';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Flatten type
@@ -171,7 +185,8 @@ interface IFlattenNodeCategory {
     useExisting: forwardRef(() => AppFormFillQuestionnaireV2Component),
     multi: true
   }],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormFillQuestionnaireV2Component
   extends AppFormBaseV2<{
@@ -262,7 +277,7 @@ export class AppFormFillQuestionnaireV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef,
     protected dialogV2Service: DialogV2Service,
     protected authDataService: AuthDataService,
@@ -273,7 +288,7 @@ export class AppFormFillQuestionnaireV2Component
     // parent
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }
@@ -449,7 +464,7 @@ export class AppFormFillQuestionnaireV2Component
 
       // translate
       question.text = question.text ?
-        this.translateService.instant(question.text) :
+        this.i18nService.instant(question.text) :
         question.text;
 
       // flatten
@@ -490,7 +505,7 @@ export class AppFormFillQuestionnaireV2Component
             question.answers.forEach((answer) => {
               // translate
               answer.label = answer.label ?
-                this.translateService.instant(answer.label) :
+                this.i18nService.instant(answer.label) :
                 answer.label;
 
               // determine if children have questions
@@ -1245,7 +1260,7 @@ export class AppFormFillQuestionnaireV2Component
     // construct errors html
     let errorsString: string = '';
     errors.forEach((error) => {
-      errorsString += `<br/>- ${this.translateService.instant('LNG_COMMON_LABEL_ROW')} ${error.no}`;
+      errorsString += `<br/>- ${this.i18nService.instant('LNG_COMMON_LABEL_ROW')} ${error.no}`;
     });
 
     // make sure we update control

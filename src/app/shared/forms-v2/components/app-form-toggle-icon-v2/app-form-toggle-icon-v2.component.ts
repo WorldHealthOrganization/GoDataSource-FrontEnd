@@ -8,8 +8,8 @@ import {
   SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-toggle-icon-v2',
@@ -36,12 +36,12 @@ export class AppFormToggleIconV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }

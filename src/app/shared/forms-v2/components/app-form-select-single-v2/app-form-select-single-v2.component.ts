@@ -8,12 +8,12 @@ import {
   SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 import { MAT_SELECT_CONFIG, MatSelect } from '@angular/material/select';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-select-single-v2',
@@ -71,7 +71,7 @@ export class AppFormSelectSingleV2Component
 
     // translate tooltip
     const tooltipTranslated = this._tooltip ?
-      this.translateService.instant(this._tooltip) :
+      this.i18nService.instant(this._tooltip) :
       this._tooltip;
 
     // add / remove tooltip icon
@@ -101,7 +101,7 @@ export class AppFormSelectSingleV2Component
       this.allOptions
         .forEach((item) => {
           item.label = item.label ?
-            this.translateService.instant(item.label) :
+            this.i18nService.instant(item.label) :
             item.label;
         });
 
@@ -116,8 +116,8 @@ export class AppFormSelectSingleV2Component
             ) {
               // equal ?
               if (item1.order === item2.order) {
-                return (item1.label ? this.translateService.instant(item1.label) : '')
-                  .localeCompare((item2.label ? this.translateService.instant(item2.label) : ''));
+                return (item1.label ? this.i18nService.instant(item1.label) : '')
+                  .localeCompare((item2.label ? this.i18nService.instant(item2.label) : ''));
               }
 
               // finished
@@ -135,8 +135,8 @@ export class AppFormSelectSingleV2Component
             }
 
             // finished
-            return (item1.label ? this.translateService.instant(item1.label) : '')
-              .localeCompare((item2.label ? this.translateService.instant(item2.label) : ''));
+            return (item1.label ? this.i18nService.instant(item1.label) : '')
+              .localeCompare((item2.label ? this.i18nService.instant(item2.label) : ''));
           });
       }
     }
@@ -188,12 +188,12 @@ export class AppFormSelectSingleV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }

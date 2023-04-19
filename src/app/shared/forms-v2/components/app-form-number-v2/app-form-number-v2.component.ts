@@ -8,10 +8,10 @@ import {
   SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 import { MatInput } from '@angular/material/input';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-number-v2',
@@ -54,7 +54,7 @@ export class AppFormNumberV2Component
 
     // translate tooltip
     this.tooltipTranslated = this._tooltip ?
-      this.translateService.instant(this._tooltip) :
+      this.i18nService.instant(this._tooltip) :
       this._tooltip;
 
     // add / remove tooltip icon
@@ -92,12 +92,12 @@ export class AppFormNumberV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }
