@@ -35,8 +35,8 @@ import { CaseModel } from './case.model';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from './reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
 import { SafeHtml } from '@angular/platform-browser';
+import { I18nService } from '../services/helper/i18n.service';
 
 export interface IFollowUpHistory {
   startDate: string;
@@ -415,7 +415,7 @@ export class ContactModel
     info: {
       // required
       item: ContactModel,
-      translateService: TranslateService,
+      i18nService: I18nService,
       risk: IResolverV2ResponseModel<ReferenceDataEntryModel>
     }
   ): V2ColumnStatusForm[] {
@@ -430,7 +430,7 @@ export class ContactModel
       forms.push({
         type: IV2ColumnStatusFormType.TRIANGLE,
         color: info.risk.map[info.item.riskLevel].getColorCode(),
-        tooltip: info.translateService.instant(info.item.riskLevel)
+        tooltip: info.i18nService.instant(info.item.riskLevel)
       });
     }
 
@@ -442,7 +442,7 @@ export class ContactModel
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
         color: 'var(--gd-status-follow-up-not-started)',
-        tooltip: info.translateService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED')
+        tooltip: info.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED')
       });
     } else if (
       info.item.followUp?.startDate &&
@@ -457,7 +457,7 @@ export class ContactModel
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
         color: 'var(--gd-status-under-follow-up)',
-        tooltip: info.translateService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP')
+        tooltip: info.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP')
       });
     } else if (
       info.item.followUp?.endDate &&
@@ -466,7 +466,7 @@ export class ContactModel
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
         color: 'var(--gd-status-follow-up-ended)',
-        tooltip: info.translateService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP')
+        tooltip: info.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP')
       });
     }
 
@@ -475,7 +475,7 @@ export class ContactModel
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     }
 

@@ -25,7 +25,6 @@ import { IsActiveMatchOptions, NavigationEnd, Router } from '@angular/router';
 import { PERMISSION } from '../../models/permission.model';
 import { HelpDataService } from '../../services/data/help.data.service';
 import { HelpItemModel } from '../../models/help-item.model';
-import { TranslateService } from '@ngx-translate/core';
 import {
   RequestQueryBuilder,
   RequestSortDirection
@@ -179,10 +178,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
     private helpDataService: HelpDataService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private globalEntitySearchDataService: GlobalEntitySearchDataService,
     private redirectService: RedirectService,
-    private i18nService: I18nService,
     private languageDataService: LanguageDataService
   ) {
     // update render mode
@@ -902,7 +900,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
       helpInputs.push({
         type: V2SideDialogConfigInputType.ROW,
         name: `row-${helpItem.id}`,
-        placeholder: `${this.translateService.instant(helpItem.title)} - ${helpItem.category?.name ? this.translateService.instant(helpItem.category?.name) : ''}`,
+        placeholder: `${this.i18nService.instant(helpItem.title)} - ${helpItem.category?.name ? this.i18nService.instant(helpItem.category?.name) : ''}`,
         inputs: [{
           type: V2SideDialogConfigInputType.GROUP,
           name: `group-${helpItem.id}`,

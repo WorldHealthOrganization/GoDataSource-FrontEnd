@@ -52,10 +52,13 @@ implements
         IPermissionBasic,
         IPermissionExportable,
         IPermissionImportable {
+  // required
   id: string;
   name: string;
-  description: string;
   entries: ReferenceDataEntryModel[];
+
+  // optional
+  description?: string;
 
   /**
      * Static Permissions - IPermissionBasic
