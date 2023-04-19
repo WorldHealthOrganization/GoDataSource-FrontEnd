@@ -11,9 +11,9 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { IResolverV2ResponseModel } from '../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-case-quick',
@@ -91,7 +91,7 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
     @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private outbreakDataService: OutbreakDataService
   ) {
     super(controlContainer, validators, asyncValidators);
@@ -120,7 +120,7 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
         this.selectedOutbreak = selectedOutbreak;
 
         // set visual ID translate data
-        this.visualIDTooltip = this.translateService.instant(
+        this.visualIDTooltip = this.i18nService.instant(
           'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION', {
             mask: CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
           }

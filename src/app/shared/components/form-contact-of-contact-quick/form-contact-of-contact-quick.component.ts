@@ -13,7 +13,7 @@ import { IResolverV2ResponseModel } from '../../../core/services/resolvers/data/
 import { ActivatedRoute } from '@angular/router';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-contact-of-contact-quick',
@@ -90,7 +90,7 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
     private outbreakDataService: OutbreakDataService,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService
+    private i18nService: I18nService
   ) {
     super(controlContainer, validators, asyncValidators);
   }
@@ -116,7 +116,7 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
         this.selectedOutbreak = selectedOutbreak;
 
         // set visual ID translate data
-        this.visualIDTooltip = this.translateService.instant(
+        this.visualIDTooltip = this.i18nService.instant(
           'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION', {
             mask: ContactOfContactModel.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask)
           }
