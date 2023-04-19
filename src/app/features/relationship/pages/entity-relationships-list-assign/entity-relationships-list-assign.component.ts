@@ -21,10 +21,10 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { TranslateService } from '@ngx-translate/core';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-entity-relationships-list-assign',
@@ -53,7 +53,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
     protected entityHelperService: EntityHelperService,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     private toastV2Service: ToastV2Service,
     private genericDataService: GenericDataService
   ) {
@@ -180,7 +180,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
-              tooltip: this.translateService.instant(data.type)
+              tooltip: this.i18nService.instant(data.type)
             });
           }
 

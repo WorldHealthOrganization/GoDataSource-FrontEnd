@@ -1,6 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Params } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
 import { takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -13,6 +12,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-report-cases-date-onset-list',
@@ -25,7 +25,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCases
   constructor(
     protected listHelperService: ListHelperService,
     private relationshipDataService: RelationshipDataService,
-    private translateService: TranslateService
+    private i18nService: I18nService
   ) {
     super(
       listHelperService,
@@ -221,41 +221,41 @@ export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCases
     this.tableColumns = [
       {
         field: 'primaryCase.firstName',
-        label: `${this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY')} ${this.translateService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME')}`
+        label: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY')} ${this.i18nService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME')}`
       },
       {
         field: 'primaryCase.lastName',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`
+        label: `${ this.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.i18nService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`
       },
       {
         field: 'primaryCase.dateOfOnset',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET') }`,
+        label: `${ this.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET') }`,
         format: {
           type: V2ColumnFormat.DATE
         }
       },
       {
         field: 'primaryCase.classification',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`
+        label: `${ this.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.i18nService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`
       },
       {
         field: 'secondaryCase.firstName',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME') }`
+        label: `${ this.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.i18nService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME') }`
       },
       {
         field: 'secondaryCase.lastName',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`
+        label: `${ this.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.i18nService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`
       },
       {
         field: 'secondaryCase.dateOfOnset',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET') }`,
+        label: `${ this.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET') }`,
         format: {
           type: V2ColumnFormat.DATE
         }
       },
       {
         field: 'secondaryCase.classification',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`
+        label: `${ this.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.i18nService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`
       }
     ];
   }

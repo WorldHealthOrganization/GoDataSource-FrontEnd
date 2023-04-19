@@ -12,7 +12,6 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -53,7 +52,6 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
     protected activatedRoute: ActivatedRoute,
     protected relationshipDataService: RelationshipDataService,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected entityHelperService: EntityHelperService

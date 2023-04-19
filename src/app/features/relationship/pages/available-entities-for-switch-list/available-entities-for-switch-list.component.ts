@@ -25,12 +25,12 @@ import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatu
 import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { TranslateService } from '@ngx-translate/core';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-available-entities-for-switch-list',
@@ -58,7 +58,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
     protected entityHelperService: EntityHelperService,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     private toastV2Service: ToastV2Service,
     private relationshipDataService: RelationshipDataService,
     private genericDataService: GenericDataService,
@@ -195,7 +195,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
-              tooltip: this.translateService.instant(data.type)
+              tooltip: this.i18nService.instant(data.type)
             });
           }
 

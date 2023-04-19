@@ -3,7 +3,6 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { forkJoin, Observable, throwError } from 'rxjs';
@@ -38,6 +37,7 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Location } from '@angular/common';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -89,7 +89,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected relationshipDataService: RelationshipDataService,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected toastV2Service: ToastV2Service,
     protected entityHelperService: EntityHelperService,
     protected dialogV2Service: DialogV2Service,
@@ -263,7 +263,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE', {
             name: this.itemData.relatedEntity(this._entity.id)?.model?.name || ''
           }
@@ -273,7 +273,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_RELATIONSHIP_TITLE', {
             name: this.itemData.relatedEntity(this._entity.id)?.model?.name || ''
           }
@@ -297,8 +297,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             {
               name: this._entity.name
@@ -981,7 +981,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
                 !CaseModel.canView(this.authUser)
               )
             ) {
-              return `${item.name} (${this.translateService.instant(item.type)})`;
+              return `${item.name} (${this.i18nService.instant(item.type)})`;
             }
 
             // create url
@@ -989,11 +989,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
             // finished
             const additionalInfo = this.isCreate && this.relationshipType === RelationshipType.EXPOSURE ?
-              this.translateService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
+              this.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
               '';
 
             // return entity as a link
-            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)}) ${additionalInfo}</span></a>`;
+            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.i18nService.instant(item.type)}) ${additionalInfo}</span></a>`;
           })
             .join(', ')
         },
