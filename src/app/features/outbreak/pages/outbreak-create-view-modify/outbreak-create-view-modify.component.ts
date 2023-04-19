@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType, CreateViewModifyV2TabInput,
@@ -53,7 +52,6 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   constructor(
     protected outbreakDataService: OutbreakDataService,
     protected activatedRoute: ActivatedRoute,
-    protected translateService: TranslateService,
     protected i18nService: I18nService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
@@ -178,7 +176,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY', {
             name: this.itemData.name
           }
@@ -188,7 +186,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_OUTBREAK_TITLE', {
             name: this.itemData.name
           }
@@ -221,8 +219,8 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )

@@ -2,7 +2,6 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -43,7 +42,6 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   constructor(
     private outbreakTemplateDataService: OutbreakTemplateDataService,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
     private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     private router: Router,
@@ -150,7 +148,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TITLE', {
             name: this.itemData.name
           }
@@ -160,7 +158,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_OUTBREAK_TEMPLATE_TITLE', {
             name: this.itemData.name
           }
@@ -190,8 +188,8 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_ACTION_CREATE_OUTBREAK_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_ACTION_CREATE_OUTBREAK_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )

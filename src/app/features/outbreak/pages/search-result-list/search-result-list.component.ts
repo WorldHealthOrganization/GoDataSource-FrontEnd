@@ -18,12 +18,12 @@ import * as _ from 'lodash';
 import { IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-search-result-list',
@@ -41,7 +41,7 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
     private globalEntitySearchDataService: GlobalEntitySearchDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private entityHelperService: EntityHelperService
   ) {
     // parent
@@ -165,7 +165,7 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type].getColorCode(),
-              tooltip: this.translateService.instant(data.type)
+              tooltip: this.i18nService.instant(data.type)
             });
           }
 
