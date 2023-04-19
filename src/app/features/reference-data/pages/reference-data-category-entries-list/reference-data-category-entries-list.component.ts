@@ -14,12 +14,12 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
-import { TranslateService } from '@ngx-translate/core';
 import { IconModel } from '../../../../core/models/icon.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
@@ -38,7 +38,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
-    private translateService: TranslateService
+    private i18nService: I18nService
   ) {
     super(
       listHelperService,
@@ -130,7 +130,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
                         data: () => ({
-                          name: `${ this.translateService.instant(item.value) }`
+                          name: `${ this.i18nService.instant(item.value) }`
                         })
                       },
                       message: {
@@ -586,8 +586,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
                 ) {
                   // equal ?
                   if (item1.order === item2.order) {
-                    return (item1.value ? this.translateService.instant(item1.value) : '')
-                      .localeCompare((item2.value ? this.translateService.instant(item2.value) : ''));
+                    return (item1.value ? this.i18nService.instant(item1.value) : '')
+                      .localeCompare((item2.value ? this.i18nService.instant(item2.value) : ''));
                   }
 
                   // finished
@@ -605,8 +605,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
                 }
 
                 // finished
-                return (item1.value ? this.translateService.instant(item1.value) : '')
-                  .localeCompare((item2.value ? this.translateService.instant(item2.value) : ''));
+                return (item1.value ? this.i18nService.instant(item1.value) : '')
+                  .localeCompare((item2.value ? this.i18nService.instant(item2.value) : ''));
               });
 
               // create list of items that we need to sort
