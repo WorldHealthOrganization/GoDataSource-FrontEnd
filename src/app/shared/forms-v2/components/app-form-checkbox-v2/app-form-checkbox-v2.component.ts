@@ -51,6 +51,9 @@ export class AppFormCheckboxV2Component
     return this._tooltip;
   }
 
+  // highlight text
+  @Input() highlightPlaceholder: string;
+
   /**
    * Constructor
    */

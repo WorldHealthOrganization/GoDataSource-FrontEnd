@@ -23,7 +23,9 @@ import { RequestFilterGenerator } from '../../../../core/helperClasses/request-q
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { ITreeEditorDataCategory } from '../../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
+import { IconModel } from '../../../../core/models/icon.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 /**
  * Component
@@ -35,6 +37,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends CreateViewModifyComponent<ReferenceDataEntryModel> implements OnDestroy {
   // category
   category: ReferenceDataCategoryModel;
+  private _diseaseSpecificReferenceData: ITreeEditorDataCategory[];
 
   /**
    * Constructor
@@ -46,6 +49,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     protected router: Router,
     protected referenceDataDataService: ReferenceDataDataService,
     protected dialogV2Service: DialogV2Service,
+    protected referenceDataHelperService: ReferenceDataHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -93,7 +97,35 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
   /**
    * Data initialized
    */
-  protected initializedData(): void {}
+  protected initializedData(): void {
+    // nothing to do ?
+    if (this.category.id !== ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE) {
+      return;
+    }
+
+    // format reference data per disease to expected tree format
+    const diseaseSpecificCategories: ReferenceDataCategoryModel[] = this.activatedRoute.snapshot.data.diseaseSpecificCategories;
+    this._diseaseSpecificReferenceData = diseaseSpecificCategories.map((item) => {
+      return {
+        id: item.id,
+        label: item.name,
+        children: {
+          // all items
+          options: item.entries.map((entry) => {
+            return {
+              id: entry.id,
+              label: entry.value,
+              disabled: !entry.active,
+              colorCode: entry.colorCode
+            };
+          }),
+
+          // selected
+          selected: {}
+        }
+      };
+    });
+  }
 
   /**
    * Initialize page title
@@ -327,7 +359,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
               name: 'iconId',
               placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON',
               description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<OutbreakModel>).options,
+              options: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<IconModel>).options,
               value: {
                 get: () => this.itemData.iconId,
                 set: (value) => {
@@ -397,7 +429,30 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR,
-        name: 'allowedDiseaseIds'
+        name: 'allowedDiseaseIds',
+        value: {
+          get: () => this._diseaseSpecificReferenceData,
+          set: (value) => {
+            this._diseaseSpecificReferenceData = value;
+          }
+        },
+        addNewItem: (data) => {
+          this.referenceDataHelperService
+            .showNewItemDialog(
+              {
+                icon: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<IconModel>).options
+              },
+              data.category.id,
+              (item) => {
+                data.finish({
+                  id: item.id,
+                  label: item.value,
+                  disabled: !item.active,
+                  colorCode: item.colorCode
+                });
+              }
+            );
+        }
       },
       visible: () => {
         return this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE;

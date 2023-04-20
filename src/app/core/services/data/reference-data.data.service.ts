@@ -18,8 +18,8 @@ export class ReferenceDataDataService {
   referenceDataListMap$: Observable<any>;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private http: HttpClient,
     private modelHelper: ModelHelperService,
@@ -65,9 +65,8 @@ export class ReferenceDataDataService {
   }
 
   /**
-     * Retrieve the list of Reference Data Categories
-     * @returns {Observable<ReferenceDataCategoryModel[]>}
-     */
+   * Retrieve the list of Reference Data Categories
+   */
   getCategoriesList(): Observable<ReferenceDataCategoryModel[]> {
     return this.modelHelper.mapObservableListToModel(
       this.categoriesList$,
@@ -76,9 +75,8 @@ export class ReferenceDataDataService {
   }
 
   /**
-     * Retrieve the list of Reference Data Entries, grouped by categories
-     * @returns {Observable<ReferenceDataCategoryModel[]>}
-     */
+   * Retrieve the list of Reference Data Entries, grouped by categories
+   */
   getReferenceData(): Observable<ReferenceDataCategoryModel[]> {
     // get reference data from cache
     const referenceDataCache = this.cacheService.get(CacheKey.REFERENCE_DATA);
@@ -91,10 +89,8 @@ export class ReferenceDataDataService {
   }
 
   /**
-     * Retrieve the list of Reference Data Entries for a specific Category
-     * @param {string} categoryId
-     * @returns {Observable<ReferenceDataCategoryModel>}
-     */
+   * Retrieve the list of Reference Data Entries for a specific Category
+   */
   getReferenceDataByCategory(categoryId: string): Observable<ReferenceDataCategoryModel> {
     // get reference data entries
     return this.getReferenceData()
@@ -107,8 +103,8 @@ export class ReferenceDataDataService {
   }
 
   /**
-     * Retrieve reference data entries
-     */
+   * Retrieve reference data entries
+   */
   getEntries(
     queryBuilder: RequestQueryBuilder
   ): Observable<ReferenceDataEntryModel[]> {
@@ -136,11 +132,8 @@ export class ReferenceDataDataService {
   }
 
   /**
-     * Retrieve a Reference Data entry
-     * @param {string} entryId
-     * @param {boolean} retrieveCreatedUpdatedBy
-     * @returns {Observable<ReferenceDataEntryModel>}
-     */
+   * Retrieve a Reference Data entry
+   */
   getEntry(
     entryId: string,
     retrieveCreatedUpdatedBy?: boolean
@@ -152,27 +145,24 @@ export class ReferenceDataDataService {
   }
 
   /**
-     * Create a new Reference Data entry
-     * @param entry
-     * @returns {Observable<any>}
-     */
-  createEntry(entry): Observable<any> {
-    return this.http.post('reference-data', entry)
-      .pipe(
-        tap(() => {
-          // invalidate list cache
-          this.clearReferenceDataCache();
-        })
-      );
+   * Create a new Reference Data entry
+   */
+  createEntry(entry): Observable<ReferenceDataEntryModel> {
+    return this.modelHelper.mapObservableToModel(
+      this.http.post('reference-data', entry)
+        .pipe(
+          tap(() => {
+            // invalidate list cache
+            this.clearReferenceDataCache();
+          })
+        ),
+      ReferenceDataEntryModel
+    );
   }
 
   /**
-     * Modify an existing Reference Data entry
-     * @param {string} entryId
-     * @param entryData
-     * @param {boolean} retrieveCreatedUpdatedBy
-     * @returns {Observable<ReferenceDataEntryModel>}
-     */
+   * Modify an existing Reference Data entry
+   */
   modifyEntry(
     entryId: string,
     entryData,
@@ -191,10 +181,8 @@ export class ReferenceDataDataService {
   }
 
   /**
-     * Delete an existing Reference Data entry
-     * @param {string} entryId
-     * @returns {Observable<any>}
-     */
+   * Delete an existing Reference Data entry
+   */
   deleteEntry(entryId: string): Observable<any> {
     return this.http.delete(`reference-data/${entryId}`)
       .pipe(
@@ -206,25 +194,23 @@ export class ReferenceDataDataService {
   }
 
   /**
-     * Clear reference data cache
-     */
+   * Clear reference data cache
+   */
   clearReferenceDataCache() {
     this.cacheService.remove(CacheKey.REFERENCE_DATA);
   }
 
   /**
-     * Retrieve the number of reference data items
-     * @param {RequestQueryBuilder} queryBuilder
-     */
+   * Retrieve the number of reference data items
+   */
   getReferenceDataItemsCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
     const whereFilter = queryBuilder.filter.generateCondition(true);
     return this.http.get(`reference-data/count?where=${whereFilter}`);
   }
 
   /**
-     * Check if code of reference data item is unique
-     * @returns {Observable<boolean | IGeneralAsyncValidatorResponse>}
-     */
+   * Check if code of reference data item is unique
+   */
   checkCodeUniqueness(
     code: string,
     id?: string
@@ -256,6 +242,44 @@ export class ReferenceDataDataService {
               isValid: false,
               errMsg: 'LNG_FORM_VALIDATION_ERROR_REF_DATA_ITEM_CODE_NOT_UNIQUE'
             };
+        })
+      );
+  }
+
+  /**
+   * Retrieve reference data items for per disease categories
+   */
+  getReferenceDataItemsPerDisease(): Observable<ReferenceDataCategoryModel[]> {
+    return this.http
+      .get('reference-data/available-categories-per-disease')
+      .pipe(
+        mergeMap((categories: ReferenceDataCategoryModel[]) => {
+          // retrieve only the items from our categories
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'categoryId',
+            categories.map((item) => item.id),
+            false,
+            null
+          );
+
+          // retrieve data
+          return this.getEntries(qb)
+            .pipe(
+              map((referenceData: ReferenceDataEntryModel[]) => {
+                // map entries by category id
+                const entriesMap = _.groupBy(referenceData, 'categoryId');
+                categories.forEach((category) => {
+                  // find all entries for current category
+                  category.entries = entriesMap[category.id] ?
+                    entriesMap[category.id] :
+                    [];
+                });
+
+                // finished
+                return categories;
+              })
+            );
         })
       );
   }

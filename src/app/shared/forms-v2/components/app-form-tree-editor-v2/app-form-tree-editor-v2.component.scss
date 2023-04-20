@@ -1,0 +1,77 @@
+@import 'mixins';
+
+/* Tree Editor */
+.gd-form-tree-editor-v2 {
+  height: 100%;
+
+  /* Editor List */
+  .gd-form-tree-editor-v2-list {
+    // #TODO 5.6rem => filter input height
+    height: calc(100% - 3.9rem - 5.6rem);
+
+    // #TODO 5.6rem => filter input height
+    @include breakpoint('xxs') {
+      height: calc(100% - 6.1rem - 5.6rem);
+    }
+
+    .gd-create-view-modify-view & {
+      height: 100%;
+    }
+
+    .cdk-virtual-scroll-viewport {
+      height: 100%;
+      overflow-y: overlay;
+      overflow-x: hidden;
+
+      .gd-form-tree-editor-v2-list-item {
+        height: 2.6rem;
+
+        &.gd-form-tree-editor-v2-list-item-child {
+          padding-left: 2.5rem;
+        }
+
+        .gd-form-tree-editor-v2-list-category-item {
+          .gd-form-tree-editor-v2-list-category-item-color {
+            left: -0.4rem;
+            top: 0.5rem;
+            @include border-radius(0.4rem);
+            display: block;
+            height: 2rem;
+            margin-right: 0.8rem;
+            width: 2rem;
+          }
+        }
+      }
+    }
+  }
+
+  /* Editor Legend Section */
+  .gd-form-tree-editor-v2-legend {
+    border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 0.8rem 0;
+
+    .gd-form-tree-editor-v2-legend-title {
+      color: var(--gd-secondary);
+      font-size: 1.2rem;
+      margin-left: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .gd-form-tree-editor-v2-legend-items {
+      .gd-form-tree-editor-v2-legend-items-item {
+        @include flex_align_items(center);
+        @include flex(flex);
+        @include flex_direction(row);
+        font-size: 1.2rem;
+        margin-left: 0.8rem;
+
+        .mat-icon {
+          font-size: 2.4rem;
+          height: 2.2rem;
+          margin-right: 0.4rem;
+          width: 2.2rem;
+        }
+      }
+    }
+  }
+}

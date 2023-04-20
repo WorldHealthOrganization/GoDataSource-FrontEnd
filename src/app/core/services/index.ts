@@ -142,6 +142,8 @@ import { EventCategoryDataResolver } from './resolvers/data/event-category.resol
 import { FollowUpGroupByDataResolver } from './resolvers/data/follow-up-group-by.resolver';
 import { FontResolver } from './resolvers/font-resolver';
 import { ImageResolver } from './resolvers/image-resolver';
+import { ReferenceDataDiseaseSpecificCategoriesResolver } from './resolvers/data/reference-data-disease-specific-categories.resolver';
+import { ReferenceDataHelperService } from './helper/reference-data-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -211,6 +213,7 @@ export const services: any[] = [
   QuestionnaireAnswerTypeDataResolver,
   QuestionnaireQuestionCategoryDataResolver,
   ReferenceDataCategoryDataResolver,
+  ReferenceDataDiseaseSpecificCategoriesResolver,
   RelationshipPersonDataResolver,
   RiskDataResolver,
   SavedImportMappingDataResolver,
@@ -295,5 +298,6 @@ export const services: any[] = [
   EntityHelperService,
   ListHelperService,
   RedirectService,
+  ReferenceDataHelperService,
   ToastV2Service
 ];

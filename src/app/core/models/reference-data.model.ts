@@ -61,8 +61,8 @@ implements
   description?: string;
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Static Permissions - IPermissionBasic
+   */
   static canView(): boolean { return false; }
   static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_LIST) : false; }
   static canCreate(): boolean { return false; }
@@ -70,18 +70,18 @@ implements
   static canDelete(): boolean { return false; }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_EXPORT) : false; }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_IMPORT) : false; }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
@@ -90,8 +90,8 @@ implements
   }
 
   /**
-     * Permissions - IPermissionBasic
-     */
+   * Permissions - IPermissionBasic
+   */
   canView(): boolean { return ReferenceDataCategoryModel.canView(); }
   canList(user: UserModel): boolean { return ReferenceDataCategoryModel.canList(user); }
   canCreate(): boolean { return ReferenceDataCategoryModel.canCreate(); }
@@ -99,13 +99,13 @@ implements
   canDelete(): boolean { return ReferenceDataCategoryModel.canDelete(); }
 
   /**
-     * Permissions - IPermissionExportable
-     */
+   * Permissions - IPermissionExportable
+   */
   canExport(user: UserModel): boolean { return ReferenceDataCategoryModel.canExport(user); }
 
   /**
-     * Permissions - IPermissionImportable
-     */
+   * Permissions - IPermissionImportable
+   */
   canImport(user: UserModel): boolean { return ReferenceDataCategoryModel.canImport(user); }
 }
 
@@ -138,8 +138,8 @@ export class ReferenceDataEntryModel
   }
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Static Permissions - IPermissionBasic
+   */
   static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_VIEW) : false; }
   static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_LIST) : false; }
   static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_CREATE) : false; }
@@ -147,8 +147,8 @@ export class ReferenceDataEntryModel
   static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_DELETE) : false; }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 
@@ -172,8 +172,8 @@ export class ReferenceDataEntryModel
   }
 
   /**
-     * Permissions - IPermissionBasic
-     */
+   * Permissions - IPermissionBasic
+   */
   canView(user: UserModel): boolean { return ReferenceDataEntryModel.canView(user); }
   canList(user: UserModel): boolean { return ReferenceDataEntryModel.canList(user); }
   canCreate(user: UserModel): boolean { return ReferenceDataEntryModel.canCreate(user); }
@@ -181,8 +181,8 @@ export class ReferenceDataEntryModel
   canDelete(user: UserModel): boolean { return ReferenceDataEntryModel.canDelete(user); }
 
   /**
-     * Return color code / default color
-     */
+   * Return color code / default color
+   */
   getColorCode(): string {
     return this.colorCode ?
       this.colorCode :
