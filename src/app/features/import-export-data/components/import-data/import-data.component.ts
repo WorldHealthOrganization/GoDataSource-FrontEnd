@@ -749,7 +749,10 @@ export class ImportDataComponent
         // display error
         this.displayError(
           'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE',
-          true
+          true,
+          {
+            error: e.message
+          }
         );
       }
     };
@@ -786,7 +789,8 @@ export class ImportDataComponent
         // display success
         this.toastV2Service.success(
           this.importSuccessMessage,
-          this.translationData
+          this.translationData,
+          AppMessages.APP_MESSAGE_IMPORT_DATA_SUCCESSFUL
         );
 
         // emit finished event - event should handle redirect
@@ -815,6 +819,9 @@ export class ImportDataComponent
 
     // initialize pagination
     this.initPaginator();
+
+    // hide toast
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_IMPORT_DATA_SUCCESSFUL);
   }
 
   /**
@@ -2137,7 +2144,8 @@ export class ImportDataComponent
                         // display success
                         this.toastV2Service.success(
                           this.importSuccessMessage,
-                          this.translationData
+                          this.translationData,
+                          AppMessages.APP_MESSAGE_IMPORT_DATA_SUCCESSFUL
                         );
 
                         // hide loading
@@ -2192,7 +2200,8 @@ export class ImportDataComponent
                 // display success
                 this.toastV2Service.success(
                   this.importSuccessMessage,
-                  this.translationData
+                  this.translationData,
+                  AppMessages.APP_MESSAGE_IMPORT_DATA_SUCCESSFUL
                 );
 
                 // hide loading

@@ -620,11 +620,14 @@ export class SystemSyncLogsComponent
         hideInputFilter: true,
 
         // inputs
+        width: '65rem',
         inputs: [
           {
             type: V2SideDialogConfigInputType.HTML,
             name: 'error',
-            placeholder: `<code><pre>${ JSON.stringify(errJson, null, 1) }</pre></code>`
+            placeholder: errJson ?
+              `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>` :
+              `<code>${error}</code>`
           }
         ],
 
