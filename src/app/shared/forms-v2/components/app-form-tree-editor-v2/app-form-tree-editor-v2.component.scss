@@ -32,11 +32,10 @@
 
         .gd-form-tree-editor-v2-list-category-item {
           .gd-form-tree-editor-v2-list-category-item-color {
-            left: -0.4rem;
-            top: 0.5rem;
             @include border-radius(0.4rem);
             display: block;
             height: 2rem;
+            margin-top: 0.2rem;
             margin-right: 0.8rem;
             width: 2rem;
           }
