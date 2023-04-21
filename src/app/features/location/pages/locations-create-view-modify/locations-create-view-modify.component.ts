@@ -27,6 +27,7 @@ import { LocationIdentifierModel } from '../../../../core/models/location-identi
 import * as _ from 'lodash';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 
 /**
  * Component
@@ -581,6 +582,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
             .getLocationUsageCount(this.itemData.id)
             .pipe(
               catchError((err) => {
+                // clear cache
+                AppFormLocationBaseV2.CACHE = {};
+
                 // show error
                 finished(err, undefined);
 
@@ -590,6 +594,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
             )
             .subscribe((usedEntitiesCount) => {
               if (!usedEntitiesCount?.count) {
+                // clear cache
+                AppFormLocationBaseV2.CACHE = {};
+
                 // finished with success
                 finished(undefined, item);
 
@@ -612,6 +619,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                 .subscribe((response) => {
                   // canceled ?
                   if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // clear cache
+                    AppFormLocationBaseV2.CACHE = {};
+
                     // finished with success
                     finished(undefined, item);
 
@@ -624,6 +634,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                     .propagateGeoLocation(this.itemData.id)
                     .pipe(
                       catchError((err) => {
+                        // clear cache
+                        AppFormLocationBaseV2.CACHE = {};
+
                         // show error
                         finished(err, undefined);
 
@@ -632,6 +645,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                       })
                     )
                     .subscribe(() => {
+                      // clear cache
+                      AppFormLocationBaseV2.CACHE = {};
+
                       // finished with success
                       finished(undefined, item);
 
@@ -641,6 +657,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                 });
             });
         } else {
+          // clear cache
+          AppFormLocationBaseV2.CACHE = {};
+
           // finished with success
           finished(undefined, item);
         }

@@ -2,7 +2,11 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, throwError } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
+import {
+  catchError,
+  switchMap,
+  takeUntil
+} from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { BackupModel } from '../../../../core/models/backup.model';
 import { Constants } from '../../../../core/models/constants';
@@ -34,6 +38,9 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 
 @Component({
   selector: 'app-backups',
@@ -54,7 +61,8 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
     private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
-    private formHelperService: FormHelperService
+    private formHelperService: FormHelperService,
+    private referenceDataDataService: ReferenceDataDataService
   ) {
     // parent
     super(listHelperService);
@@ -601,6 +609,11 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
       this.systemBackupDataService
         .restoreBackup(item.id)
         .pipe(
+          switchMap(() => {
+            // reload all translations
+            return this.i18nService
+              .loadUserLanguage(true);
+          }),
           catchError((err) => {
             // hide loading
             loading.close();
@@ -613,6 +626,13 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         .subscribe(() => {
           // display success message
           this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_BACKUP_RESTORE_SUCCESS_MESSAGE');
+
+          // clear cache
+          this.referenceDataDataService.clearReferenceDataCache();
+          AppFormLocationBaseV2.CACHE = {};
+
+          // refresh list of top nav outbreaks
+          TopnavComponent.REFRESH_OUTBREAK_LIST();
 
           // hide loading
           loading.close();
