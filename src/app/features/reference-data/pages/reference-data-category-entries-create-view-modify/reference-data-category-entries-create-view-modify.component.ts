@@ -466,7 +466,8 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
                   id: item.id,
                   label: item.value,
                   disabled: !item.active,
-                  colorCode: item.colorCode
+                  colorCode: item.colorCode,
+                  global: !!item.isSystemWide
                 });
               }
             );

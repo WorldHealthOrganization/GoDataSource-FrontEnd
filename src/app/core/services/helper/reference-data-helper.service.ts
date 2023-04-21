@@ -100,11 +100,6 @@ export class ReferenceDataHelperService {
           tooltip: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER_DESCRIPTION',
           value: undefined
         }, {
-          type: V2SideDialogConfigInputType.TEXTAREA,
-          name: 'description',
-          placeholder: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION',
-          value: undefined
-        }, {
           type: V2SideDialogConfigInputType.COLOR,
           name: 'colorCode',
           placeholder: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR',
@@ -116,6 +111,17 @@ export class ReferenceDataHelperService {
           placeholder: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON',
           tooltip: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON_DESCRIPTION',
           options: options.icon,
+          value: undefined
+        }, {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: 'isSystemWide',
+          placeholder: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE',
+          tooltip: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE_DESCRIPTION',
+          value: false
+        }, {
+          type: V2SideDialogConfigInputType.TEXTAREA,
+          name: 'description',
+          placeholder: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION',
           value: undefined
         }],
         bottomButtons: [{
