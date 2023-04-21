@@ -611,7 +611,6 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
               .loadUserLanguage(true);
           }),
           catchError((err) => {
-            console.log('intra1');
             // hide loading
             loading.close();
 
