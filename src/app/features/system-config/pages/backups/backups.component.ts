@@ -608,19 +608,16 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           switchMap(() => {
             // reload all translations
             return this.i18nService
-              .loadUserLanguage(true)
-              .pipe(
-                catchError((err) => {
-                  // error
-                  this.toastV2Service.error(err);
+              .loadUserLanguage(true);
+          }),
+          catchError((err) => {
+            console.log('intra1');
+            // hide loading
+            loading.close();
 
-                  // hide loading
-                  loading.close();
-
-                  // send further
-                  return throwError(err);
-                })
-              );
+            // error
+            this.toastV2Service.error(err);
+            return throwError(err);
           })
         )
         .subscribe(() => {
