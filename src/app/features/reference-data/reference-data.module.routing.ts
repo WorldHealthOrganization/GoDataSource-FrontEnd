@@ -33,7 +33,10 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.REFERENCE_DATA_LIST
-      ]
+      ],
+      diseaseSpecificCategoriesConf: {
+        excludeEntries: true
+      }
     },
     resolve: {
       yesNoAll: YesNoAllDataResolver,
@@ -48,7 +51,10 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_LIST
-      ]
+      ],
+      diseaseSpecificCategoriesConf: {
+        excludeEntries: true
+      }
     },
     resolve: {
       yesNoAll: YesNoAllDataResolver,

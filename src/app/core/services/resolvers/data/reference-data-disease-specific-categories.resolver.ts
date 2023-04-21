@@ -25,8 +25,10 @@ export class ReferenceDataDiseaseSpecificCategoriesResolver implements IMapResol
   resolve(activatedRoute): Observable<IResolverV2ResponseModel<ReferenceDataCategoryModel>> {
     // execute only if we need this data
     // create / view / modify - outbreak, outbreak template and reference data item only if disease category
-    const retrieveEntries: boolean = !activatedRoute.params?.categoryId ||
-      activatedRoute.params.categoryId === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE;
+    const retrieveEntries: boolean = !activatedRoute?.data?.diseaseSpecificCategoriesConf?.excludeEntries && (
+      !activatedRoute.params?.categoryId ||
+      activatedRoute.params.categoryId === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE
+    );
 
     // retrieve category info
     return this.referenceDataDataService
