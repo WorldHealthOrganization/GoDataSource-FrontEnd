@@ -12,6 +12,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-import-sync-package',
@@ -84,6 +85,9 @@ export class ImportSyncPackageComponent {
   finished() {
     // show loading
     const loading = this.dialogV2Service.showLoadingDialog();
+
+    // refresh list of top nav outbreaks
+    TopnavComponent.REFRESH_OUTBREAK_LIST();
 
     // reload all translations
     this.i18nService

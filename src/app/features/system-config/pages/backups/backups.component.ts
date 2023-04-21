@@ -38,6 +38,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-backups',
@@ -622,6 +623,9 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         .subscribe(() => {
           // display success message
           this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_BACKUP_RESTORE_SUCCESS_MESSAGE');
+
+          // refresh list of top nav outbreaks
+          TopnavComponent.REFRESH_OUTBREAK_LIST();
 
           // hide loading
           loading.close();
