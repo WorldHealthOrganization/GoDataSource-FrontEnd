@@ -13,6 +13,8 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 
 @Component({
   selector: 'app-import-sync-package',
@@ -39,7 +41,8 @@ export class ImportSyncPackageComponent {
     private redirectService: RedirectService,
     private i18nService: I18nService,
     private toastV2Service: ToastV2Service,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private referenceDataDataService: ReferenceDataDataService
   ) {
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
@@ -107,6 +110,10 @@ export class ImportSyncPackageComponent {
       .subscribe(() => {
         // hide loading
         loading.close();
+
+        // clear cache
+        this.referenceDataDataService.clearReferenceDataCache();
+        AppFormLocationBaseV2.CACHE = {};
 
         // redirect
         if (SystemSyncLogModel.canList(this.authUser)) {
