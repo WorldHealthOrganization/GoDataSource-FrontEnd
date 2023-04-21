@@ -693,6 +693,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.gender',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER',
+        sortable: true,
         format: {
           type: (item) => item.person?.gender && (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender] ?
             this.i18nService.instant((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender].value) :
@@ -708,6 +709,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.occupation',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION',
+        sortable: true,
         format: {
           type: (item) => item.person?.occupation && (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation] ?
             this.i18nService.instant((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation].value) :
