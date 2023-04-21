@@ -2,7 +2,11 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, throwError } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
+import {
+  catchError,
+  switchMap,
+  takeUntil
+} from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { BackupModel } from '../../../../core/models/backup.model';
 import { Constants } from '../../../../core/models/constants';
@@ -608,6 +612,23 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             // error
             this.toastV2Service.error(err);
             return throwError(err);
+          }),
+          switchMap(() => {
+            // reload all tokens
+            return this.i18nService
+              .loadUserLanguage(true)
+              .pipe(
+                catchError((err) => {
+                  // error
+                  this.toastV2Service.error(err);
+
+                  // hide loading
+                  loading.close();
+
+                  // send further
+                  return throwError(err);
+                })
+              );
           })
         )
         .subscribe(() => {

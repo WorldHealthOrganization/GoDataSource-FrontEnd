@@ -181,12 +181,17 @@ export class I18nService {
      * Note: If user is NOT authenticated, or doesn't have a language selected, use the default language (english_us)
      * @returns {Observable<void>}
      */
-  loadUserLanguage(): Observable<void> {
+  loadUserLanguage(clearLastUpdate?: boolean): Observable<void> {
     // get the selected language ID
     const langId = this.getSelectedLanguageId();
 
     // save the selected language to local storage
     this.storageService.set(StorageKey.SELECTED_LANGUAGE_ID, langId);
+
+    // reload all tokens ?
+    if (clearLastUpdate) {
+      this.storageService.remove(StorageKey.LANGUAGE_UPDATE_LAST);
+    }
 
     // retrieve the language data
     return this.languageDataService
