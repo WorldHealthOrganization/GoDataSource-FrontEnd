@@ -10,7 +10,8 @@
 
   <!-- Records -->
   <div
-    class="gd-form-tree-editor-v2-list">
+    class="gd-form-tree-editor-v2-list"
+    [class.gd-form-tree-editor-v2-list-copy-value]="copyCheckbox !== undefined">
     <cdk-virtual-scroll-viewport
       #cdkViewport
       [minBufferPx]="1024"
@@ -84,7 +85,9 @@
             [placeholder]="item.data.label"
             [disabled]="item.data.disabled"
             [highlightPlaceholder]="searchValue"
-            (ngModelChange)="selectedChanged(item)"></app-form-checkbox-v2>
+            (ngModelChange)="selectedChanged(item)"
+            (mousedown)="copyCheckboxMouseDown($event, item)"
+            (mouseenter)="copyCheckboxMouseEnter($event, item)"></app-form-checkbox-v2>
 
         </div>
 

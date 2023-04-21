@@ -1,14 +1,17 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component, EventEmitter,
+  Component,
+  EventEmitter,
   forwardRef,
   Host,
   Input,
   OnDestroy,
-  Optional, Output,
+  Optional,
+  Output,
   SkipSelf,
-  ViewChild
+  ViewChild,
+  ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
@@ -80,7 +83,8 @@ interface IFlattenNodeCategory {
     useExisting: forwardRef(() => AppFormTreeEditorV2Component),
     multi: true
   }],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class AppFormTreeEditorV2Component
   extends AppFormBaseV2<ITreeEditorDataCategory[]> implements OnDestroy {
@@ -115,8 +119,19 @@ export class AppFormTreeEditorV2Component
   // filter
   searchValue: string;
 
+  // copy checkbox value on drag
+  copyCheckbox: boolean;
+
+  // timers
+  private _startCopyTimer: any;
+
   // constants
   FlattenType = FlattenType;
+
+  // arrow callbacks
+  copyCheckboxMouseUpArrow: () => void = () => {
+    this.copyCheckboxMouseUp();
+  };
 
   /**
    * Constructor
@@ -135,6 +150,12 @@ export class AppFormTreeEditorV2Component
 
     // subscribe to language change
     this.initializeLanguageChangeListener();
+
+    // attach events
+    document.addEventListener(
+      'mouseup',
+      this.copyCheckboxMouseUpArrow
+    );
   }
 
   /**
@@ -146,6 +167,15 @@ export class AppFormTreeEditorV2Component
 
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
+
+    // stop copy timer
+    this.stopStartCopyTimer();
+
+    // remove events
+    document.removeEventListener(
+      'mouseup',
+      this.copyCheckboxMouseUpArrow
+    );
   }
 
   /**
@@ -454,5 +484,94 @@ export class AppFormTreeEditorV2Component
         this.nonFlatToFlat();
       }
     });
+  }
+
+  /**
+   * Stop copy timer
+   */
+  stopStartCopyTimer(): void {
+    if (this._startCopyTimer) {
+      clearTimeout(this._startCopyTimer);
+      this._startCopyTimer = undefined;
+    }
+  }
+
+  /**
+   * Copy value from one checkbox to others - mouse down
+   */
+  copyCheckboxMouseDown(
+    event,
+    item: IFlattenNodeCategoryItem
+  ): void {
+    // no point in continuing if mouse not down
+    // - or option is disabled
+    if (
+      event.buttons !== 1 ||
+      item.data.disabled
+    ) {
+      return;
+    }
+
+    // stop copy timer
+    this.stopStartCopyTimer();
+
+    // start copy timer
+    this._startCopyTimer = setTimeout(() => {
+      // reset
+      this._startCopyTimer = undefined;
+
+      // set copy value
+      this.copyCheckbox = !!item.parent.data.children.selected[item.data.id];
+
+      // update ui
+      this.detectChanges();
+    }, 300);
+  }
+
+  /**
+   * Copy value from one checkbox to others - mouse up
+   */
+  copyCheckboxMouseUp(): void {
+    // stop copy timer
+    this.stopStartCopyTimer();
+
+    // nothing to do ?
+    if (this.copyCheckbox === undefined) {
+      return;
+    }
+
+    // reset
+    this.copyCheckbox = undefined;
+
+    // update ui
+    this.detectChanges();
+  }
+
+  /**
+   * Copy value from one checkbox to others - mouse enter
+   */
+  copyCheckboxMouseEnter(
+    event: MouseEvent,
+    item: IFlattenNodeCategoryItem
+  ): void {
+    // no point in continuing if mouse not down
+    // - or option is disabled
+    if (
+      event.buttons !== 1 ||
+      item.data.disabled ||
+      this.copyCheckbox === undefined
+    ) {
+      return;
+    }
+
+    // copy value
+    if (this.copyCheckbox) {
+      item.parent.data.children.selected[item.data.id] = true;
+    } else {
+      delete item.parent.data.children.selected[item.data.id];
+    }
+
+    // update
+    this.selectedChanged(item);
   }
 }
