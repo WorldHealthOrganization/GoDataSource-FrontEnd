@@ -827,12 +827,12 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           // Record details
           {
             type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_COMMON_LABEL_DETAILS',
+            label: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
             action: {
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
-                  'LNG_COMMON_LABEL_DETAILS',
+                  'LNG_PAGE_MODIFY_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user
                 );
