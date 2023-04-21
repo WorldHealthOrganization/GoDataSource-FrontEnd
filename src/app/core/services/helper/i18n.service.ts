@@ -188,7 +188,7 @@ export class I18nService {
     // save the selected language to local storage
     this.storageService.set(StorageKey.SELECTED_LANGUAGE_ID, langId);
 
-    // reload all tokens ?
+    // reload all translations ?
     if (clearLastUpdate) {
       this.storageService.remove(StorageKey.LANGUAGE_UPDATE_LAST);
     }

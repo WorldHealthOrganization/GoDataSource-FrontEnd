@@ -76,7 +76,7 @@ export class ImportSyncPackageComponent {
      * Finished import
      */
   finished() {
-    // reload translations
+    // reload all translations
     this.i18nService
       .loadUserLanguage(true)
       .subscribe(() => {

@@ -614,7 +614,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             return throwError(err);
           }),
           switchMap(() => {
-            // reload all tokens
+            // reload all translations
             return this.i18nService
               .loadUserLanguage(true)
               .pipe(
