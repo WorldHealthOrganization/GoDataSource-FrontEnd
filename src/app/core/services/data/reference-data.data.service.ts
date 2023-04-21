@@ -317,4 +317,17 @@ export class ReferenceDataDataService {
         })
       );
   }
+
+  /**
+   * Update disease allowed reference data entries
+   */
+  modifyDiseaseAllowedRefData(entriesData: {
+    diseaseId: string,
+    data: {
+      categoryId: string,
+      items: string[]
+    }[]
+  }): Observable<void> {
+    return this.http.post<void>('reference-data/disease-allowed-ref-data', [entriesData]);
+  }
 }

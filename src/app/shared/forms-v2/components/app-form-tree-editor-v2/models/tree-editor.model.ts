@@ -9,6 +9,7 @@ export interface ITreeEditorDataCategoryItem {
   // optional
   disabled?: boolean;
   colorCode?: string;
+  global?: boolean;
 }
 
 /**

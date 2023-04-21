@@ -725,6 +725,7 @@ interface ICreateViewModifyV2TabTableTree {
   type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR;
   name: string;
   value: ICreateViewModifyV2TabInputValue<ITreeEditorDataCategory[]>;
+  displayGlobal: boolean;
   addNewItem: (data: ICreateViewModifyV2TabTableTreeAddNewItem) => void;
 }
 

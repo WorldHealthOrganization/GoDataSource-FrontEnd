@@ -107,6 +107,10 @@ export class AppFormTreeEditorV2Component
   // view only
   @Input() viewOnly: boolean;
 
+  // display global
+  @Input() displayGlobal: boolean;
+
+  // add new item
   @Output() addNewItem: EventEmitter<ICreateViewModifyV2TabTableTreeAddNewItem> = new EventEmitter<ICreateViewModifyV2TabTableTreeAddNewItem>();
 
   // language handler
@@ -435,7 +439,17 @@ export class AppFormTreeEditorV2Component
   /**
    * Selected item changed
    */
-  selectedChanged(item: IFlattenNodeCategoryItem): void {
+  selectedChanged(
+    item: IFlattenNodeCategoryItem,
+    checked: boolean
+  ): void {
+    // update value
+    if (checked) {
+      item.parent.data.children.selected[item.data.id] = true;
+    } else {
+      delete item.parent.data.children.selected[item.data.id];
+    }
+
     // reset value
     item.parent.data.checked = 0;
     item.parent.data.children.options.forEach((option) => {
@@ -507,7 +521,8 @@ export class AppFormTreeEditorV2Component
     // - or option is disabled
     if (
       event.buttons !== 1 ||
-      item.data.disabled
+      item.data.disabled ||
+      item.data.global
     ) {
       return;
     }
@@ -570,19 +585,16 @@ export class AppFormTreeEditorV2Component
     if (
       event.buttons !== 1 ||
       item.data.disabled ||
+      item.data.global ||
       this.copyCheckbox === undefined
     ) {
       return;
     }
 
-    // copy value
-    if (this.copyCheckbox) {
-      item.parent.data.children.selected[item.data.id] = true;
-    } else {
-      delete item.parent.data.children.selected[item.data.id];
-    }
-
     // update
-    this.selectedChanged(item);
+    this.selectedChanged(
+      item,
+      this.copyCheckbox
+    );
   }
 }

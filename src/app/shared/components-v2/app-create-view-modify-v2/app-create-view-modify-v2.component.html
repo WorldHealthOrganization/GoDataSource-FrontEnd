@@ -539,6 +539,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [viewOnly]="isView || !input.value.set"
                     [selectedTab]="selectedTab === tab"
+                    [displayGlobal]="input.displayGlobal"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"
                     (addNewItem)="input.addNewItem($event)"></app-form-tree-editor-v2>
 

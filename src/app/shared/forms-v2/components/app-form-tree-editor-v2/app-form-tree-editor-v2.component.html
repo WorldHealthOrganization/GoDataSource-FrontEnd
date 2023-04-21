@@ -73,6 +73,11 @@
           class="gd-form-tree-editor-v2-list-category-item"
           fxLayout="row" fxLayoutAlign="none center">
 
+          <!-- Global -->
+          <mat-icon
+            [style.visibility]="displayGlobal && item.data.global ? 'visible' : 'hidden'"
+            [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate">public</mat-icon>
+
           <!-- Color -->
           <div
             class="gd-form-tree-editor-v2-list-category-item-color"
@@ -80,12 +85,12 @@
 
           <!-- Checkbox + label -->
           <app-form-checkbox-v2
-            [(ngModel)]="item.parent.data.children.selected[item.data.id]"
+            [ngModel]="(item.data.global && !item.data.disabled) || item.parent.data.children.selected[item.data.id]"
             [name]="item.data.id"
             [placeholder]="item.data.label"
-            [disabled]="item.data.disabled"
+            [disabled]="item.data.disabled || item.data.global"
             [highlightPlaceholder]="searchValue"
-            (ngModelChange)="selectedChanged(item)"
+            (ngModelChange)="selectedChanged(item, $event)"
             (mousedown)="copyCheckboxMouseDown($event, item)"
             (mouseenter)="copyCheckboxMouseEnter($event, item)"
             (mouseleave)="copyCheckboxMouseLeave()"></app-form-checkbox-v2>
@@ -118,7 +123,16 @@
     <div
       class="gd-form-tree-editor-v2-legend-items"
       fxLayout="row wrap" fxLayoutAlign="start center">
-      <!-- bla bla -->
+
+      <!-- System-wide -->
+      <div
+        *ngIf="displayGlobal"
+        class="gd-form-tree-editor-v2-legend-items-item">
+        <mat-icon>public</mat-icon>
+        <span>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate}}</span>
+      </div>
+
+      <!-- Add entry -->
       <div
         class="gd-form-tree-editor-v2-legend-items-item">
         <mat-icon>playlist_add</mat-icon>
