@@ -56,6 +56,7 @@ implements
   id: string;
   name: string;
   entries: ReferenceDataEntryModel[];
+  systemWideCount: number;
 
   // optional
   description?: string;
@@ -124,6 +125,7 @@ export class ReferenceDataEntryModel
   colorCode: string;
   order: number;
   geoLocation: { lat: number, lng: number };
+  isSystemWide: boolean;
 
   private _iconId: string;
   iconUrl: string;
@@ -163,6 +165,7 @@ export class ReferenceDataEntryModel
     this.iconId = _.get(data, 'iconId');
     this.order = _.get(data, 'order');
     this.geoLocation = _.get(data, 'geoLocation', {});
+    this.isSystemWide = _.get(data, 'isSystemWide', false);
 
     // add category
     const categoryData = _.get(data, 'category');

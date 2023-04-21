@@ -286,6 +286,7 @@ interface ICreateViewModifyV2TabInputToggleCheckbox extends Omit<ICreateViewModi
 
   // optional
   suffixIconButtons?: IAppFormIconButtonV2[];
+  visible?: () => boolean;
 }
 
 /**

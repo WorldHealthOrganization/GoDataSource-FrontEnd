@@ -37,7 +37,10 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends CreateViewModifyComponent<ReferenceDataEntryModel> implements OnDestroy {
   // category
   category: ReferenceDataCategoryModel;
+
+  // per disease
   private _diseaseSpecificReferenceData: ITreeEditorDataCategory[];
+  private _diseaseSpecificCategories: IResolverV2ResponseModel<ReferenceDataCategoryModel>;
 
   /**
    * Constructor
@@ -63,8 +66,9 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       authDataService
     );
 
-    // retrieve category
+    // retrieve
     this.category = this.activatedRoute.snapshot.data.category;
+    this._diseaseSpecificCategories = this.activatedRoute.snapshot.data.diseaseSpecificCategories;
   }
 
   /**
@@ -104,8 +108,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     }
 
     // format reference data per disease to expected tree format
-    const diseaseSpecificCategories: ReferenceDataCategoryModel[] = this.activatedRoute.snapshot.data.diseaseSpecificCategories;
-    this._diseaseSpecificReferenceData = diseaseSpecificCategories.map((item) => {
+    this._diseaseSpecificReferenceData = this._diseaseSpecificCategories.list.map((item) => {
       return {
         id: item.id,
         label: item.name,
@@ -329,20 +332,6 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
                 }
               }
             }, {
-              type: CreateViewModifyV2TabInputType.TEXTAREA,
-              name: 'description',
-              placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION',
-              description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
-              value: {
-                get: () => this.itemData.description ?
-                  this.i18nService.instant(this.itemData.description) :
-                  this.itemData.description,
-                set: (value) => {
-                  // set data
-                  this.itemData.description = value;
-                }
-              }
-            }, {
               type: CreateViewModifyV2TabInputType.COLOR,
               name: 'colorCode',
               placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR',
@@ -365,6 +354,33 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
                 set: (value) => {
                   // set data
                   this.itemData.iconId = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'isSystemWide',
+              placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE',
+              description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.isSystemWide,
+                set: (value) => {
+                  // set data
+                  this.itemData.isSystemWide = value;
+                }
+              },
+              visible: () => !!this._diseaseSpecificCategories?.map[this.category.id]
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'description',
+              placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION',
+              description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+              value: {
+                get: () => this.itemData.description ?
+                  this.i18nService.instant(this.itemData.description) :
+                  this.itemData.description,
+                set: (value) => {
+                  // set data
+                  this.itemData.description = value;
                 }
               }
             }
@@ -539,6 +555,13 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
           data
         )
       ).pipe(
+        // refresh language
+        switchMap((item) => {
+          // re-load language tokens
+          return this.i18nService.loadUserLanguage()
+            .pipe(map(() => item));
+        }),
+
         // handle error
         catchError((err) => {
           // show error
@@ -546,20 +569,6 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
 
           // finished
           return throwError(err);
-        }),
-        switchMap((item) => {
-          // re-load language tokens
-          return this.i18nService.loadUserLanguage()
-            .pipe(
-              catchError((err) => {
-                // show error
-                finished(err, undefined);
-
-                // finished
-                return throwError(err);
-              }),
-              map(() => item)
-            );
         }),
 
         // should be the last pipe

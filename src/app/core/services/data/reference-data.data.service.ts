@@ -45,13 +45,42 @@ export class ReferenceDataDataService {
             .pipe(
               map((referenceData: ReferenceDataEntryModel[]) => {
                 // map entries by category id
-                const entriesMap = _.groupBy(referenceData, 'categoryId');
+                const entriesMap: {
+                  [categoryId: string]: {
+                    entries: ReferenceDataEntryModel[],
+                    systemWideCount: number
+                  }
+                } = {};
+                referenceData.forEach((entry) => {
+                  // not initialized ?
+                  if (!entriesMap[entry.categoryId]) {
+                    entriesMap[entry.categoryId] = {
+                      entries: [],
+                      systemWideCount: 0
+                    };
+                  }
+
+                  // add it to the lis
+                  entriesMap[entry.categoryId].entries.push(entry);
+
+                  // count system wides
+                  if (entry.isSystemWide) {
+                    entriesMap[entry.categoryId].systemWideCount++;
+                  }
+                });
 
                 // group entries by category
                 return _.map(categories, (category: ReferenceDataCategoryModel) => {
                   // find all entries for current category
-                  category.entries = entriesMap[category.id];
+                  if (entriesMap[category.id]) {
+                    category.entries = entriesMap[category.id].entries;
+                    category.systemWideCount = entriesMap[category.id].systemWideCount;
+                  } else {
+                    category.entries = [];
+                    category.systemWideCount = 0;
+                  }
 
+                  // finished
                   return category;
                 });
               }),
@@ -249,11 +278,16 @@ export class ReferenceDataDataService {
   /**
    * Retrieve reference data items for per disease categories
    */
-  getReferenceDataItemsPerDisease(): Observable<ReferenceDataCategoryModel[]> {
+  getReferenceDataItemsPerDisease(retrieveEntries: boolean): Observable<ReferenceDataCategoryModel[]> {
     return this.http
       .get('reference-data/available-categories-per-disease')
       .pipe(
         mergeMap((categories: ReferenceDataCategoryModel[]) => {
+          // no need to retrieve entries ?
+          if (!retrieveEntries) {
+            return of(categories);
+          }
+
           // retrieve only the items from our categories
           const qb = new RequestQueryBuilder();
           qb.filter.bySelect(

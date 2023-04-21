@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { ToastV2Service } from '../../helper/toast-v2.service';
-import { ReferenceDataCategory, ReferenceDataCategoryModel } from '../../../models/reference-data.model';
-import { Resolve } from '@angular/router';
+import {
+  ReferenceDataCategory,
+  ReferenceDataCategoryModel,
+} from '../../../models/reference-data.model';
 import { ReferenceDataDataService } from '../../data/reference-data.data.service';
+import { IMapResolverV2, IResolverV2ResponseModel } from './models/resolver-response.model';
 
 @Injectable()
-export class ReferenceDataDiseaseSpecificCategoriesResolver implements Resolve<ReferenceDataCategoryModel[]> {
+export class ReferenceDataDiseaseSpecificCategoriesResolver implements IMapResolverV2<ReferenceDataCategoryModel> {
   /**
    * Constructor
    */
@@ -19,20 +22,39 @@ export class ReferenceDataDiseaseSpecificCategoriesResolver implements Resolve<R
   /**
    * Retrieve data
    */
-  resolve(activatedRoute): Observable<ReferenceDataCategoryModel[]> {
+  resolve(activatedRoute): Observable<IResolverV2ResponseModel<ReferenceDataCategoryModel>> {
     // execute only if we need this data
     // create / view / modify - outbreak, outbreak template and reference data item only if disease category
-    if (
-      activatedRoute.params?.categoryId &&
-      activatedRoute.params.categoryId !== ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE
-    ) {
-      return;
-    }
+    const retrieveEntries: boolean = !activatedRoute.params?.categoryId ||
+      activatedRoute.params.categoryId === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE;
 
     // retrieve category info
     return this.referenceDataDataService
-      .getReferenceDataItemsPerDisease()
+      .getReferenceDataItemsPerDisease(retrieveEntries)
       .pipe(
+        map((data) => {
+          // construct map
+          const response: IResolverV2ResponseModel<ReferenceDataCategoryModel> = {
+            list: data,
+            map: {},
+            options: []
+          };
+          data.forEach((item) => {
+            // map
+            response.map[item.id] = item;
+
+            // add option
+            response.options.push({
+              label: item.name,
+              value: item.id,
+              data: item
+            });
+          });
+
+          // finished
+          return response;
+        }),
+
         // should be last one
         catchError((err) => {
           // display error

@@ -96,6 +96,13 @@ export class ReferenceDataCategoriesListComponent
         pinned: IV2ColumnPinned.LEFT
       },
       {
+        field: 'entriesCount',
+        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES_COUNT',
+        format: {
+          type: (item: ReferenceDataCategoryModel) => `${item.systemWideCount ? item.systemWideCount : 0} / ${item.entries?.length ? item.entries.length : 0}`
+        }
+      },
+      {
         field: 'entries',
         label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES',
         format: {
@@ -110,16 +117,8 @@ export class ReferenceDataCategoriesListComponent
                 null
             };
           }) :
-          []
-      },
-      {
-        field: 'entriesCount',
-        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES_COUNT',
-        format: {
-          type: (item: ReferenceDataCategoryModel) => item.entries?.length ?
-            item.entries.length.toString() :
-            '0'
-        }
+          [],
+        width: 700
       }
     ];
   }
