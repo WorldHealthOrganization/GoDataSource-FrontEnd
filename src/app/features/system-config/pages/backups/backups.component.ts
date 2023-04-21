@@ -605,14 +605,6 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
       this.systemBackupDataService
         .restoreBackup(item.id)
         .pipe(
-          catchError((err) => {
-            // hide loading
-            loading.close();
-
-            // error
-            this.toastV2Service.error(err);
-            return throwError(err);
-          }),
           switchMap(() => {
             // reload all translations
             return this.i18nService

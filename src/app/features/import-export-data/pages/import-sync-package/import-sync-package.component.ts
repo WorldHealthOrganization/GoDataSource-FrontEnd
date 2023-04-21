@@ -8,6 +8,10 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-import-sync-package',
@@ -32,7 +36,9 @@ export class ImportSyncPackageComponent {
     private router: Router,
     private authDataService: AuthDataService,
     private redirectService: RedirectService,
-    private i18nService: I18nService
+    private i18nService: I18nService,
+    private toastV2Service: ToastV2Service,
+    private dialogV2Service: DialogV2Service
   ) {
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
@@ -76,10 +82,28 @@ export class ImportSyncPackageComponent {
      * Finished import
      */
   finished() {
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
+
     // reload all translations
     this.i18nService
       .loadUserLanguage(true)
+      .pipe(
+        catchError((err) => {
+          // show err
+          this.toastV2Service.error(err);
+
+          // hide loading
+          loading.close();
+
+          // send further
+          return throwError(err);
+        })
+      )
       .subscribe(() => {
+        // hide loading
+        loading.close();
+
         // redirect
         if (SystemSyncLogModel.canList(this.authUser)) {
           this.router.navigate(['/system-config/sync-logs']);
