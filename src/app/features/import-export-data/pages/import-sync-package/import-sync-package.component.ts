@@ -7,7 +7,7 @@ import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.mode
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { I18nService } from "../../../../core/services/helper/i18n.service";
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-import-sync-package',
