@@ -52,7 +52,8 @@ const routes: Routes = [
     resolve: {
       yesNoAll: YesNoAllDataResolver,
       user: UserDataResolver,
-      category: ReferenceDataCategoryDataResolver
+      category: ReferenceDataCategoryDataResolver,
+      diseaseSpecificCategories: ReferenceDataDiseaseSpecificCategoriesResolver
     }
   },
   // Create new Reference Data entry

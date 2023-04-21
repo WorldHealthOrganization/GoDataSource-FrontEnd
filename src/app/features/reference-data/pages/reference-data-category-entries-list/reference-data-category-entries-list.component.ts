@@ -20,6 +20,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
@@ -199,7 +201,12 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       },
       {
         field: 'code',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE'
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'description',
@@ -230,8 +237,35 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE',
         format: {
           type: V2ColumnFormat.BOOLEAN
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
-      },
+      }
+    ];
+
+    // add system-wide column ?
+    if ((this.activatedRoute.snapshot.data.diseaseSpecificCategories as IResolverV2ResponseModel<ReferenceDataCategoryModel>)?.map[this.category.id]) {
+      this.tableColumns.push({
+        field: 'isSystemWide',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE',
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      });
+    }
+
+    // add remaining columns
+    this.tableColumns.push(
       {
         field: 'readonly',
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE',
@@ -291,7 +325,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
           type: V2ColumnFormat.DATETIME
         }
       }
-    ];
+    );
 
     // add lat & lng for specific categories
     if (
@@ -440,7 +474,23 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'categoryId',
+      'value',
+      'code',
+      'description',
+      'iconUrl',
+      'colorCode',
+      'order',
+      'active',
+      'isSystemWide',
+      'readonly',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
+    ];
   }
 
   /**
