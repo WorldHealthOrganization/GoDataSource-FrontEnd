@@ -529,6 +529,17 @@ export class AppFormTreeEditorV2Component
   }
 
   /**
+   * Copy value from one checkbox to others - mouse leave
+   */
+  copyCheckboxMouseLeave(): void {
+    // stop copy if we didn't wait for it to start
+    if (this.copyCheckbox === undefined) {
+      // stop copy timer
+      this.stopStartCopyTimer();
+    }
+  }
+
+  /**
    * Copy value from one checkbox to others - mouse up
    */
   copyCheckboxMouseUp(): void {

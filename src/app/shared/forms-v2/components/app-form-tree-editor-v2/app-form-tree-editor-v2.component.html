@@ -87,7 +87,8 @@
             [highlightPlaceholder]="searchValue"
             (ngModelChange)="selectedChanged(item)"
             (mousedown)="copyCheckboxMouseDown($event, item)"
-            (mouseenter)="copyCheckboxMouseEnter($event, item)"></app-form-checkbox-v2>
+            (mouseenter)="copyCheckboxMouseEnter($event, item)"
+            (mouseleave)="copyCheckboxMouseLeave()"></app-form-checkbox-v2>
 
         </div>
 
