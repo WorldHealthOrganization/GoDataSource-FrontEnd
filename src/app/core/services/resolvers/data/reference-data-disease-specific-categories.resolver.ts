@@ -4,7 +4,7 @@ import { catchError, map } from 'rxjs/operators';
 import { ToastV2Service } from '../../helper/toast-v2.service';
 import {
   ReferenceDataCategory,
-  ReferenceDataCategoryModel,
+  ReferenceDataCategoryModel
 } from '../../../models/reference-data.model';
 import { ReferenceDataDataService } from '../../data/reference-data.data.service';
 import { IMapResolverV2, IResolverV2ResponseModel } from './models/resolver-response.model';
