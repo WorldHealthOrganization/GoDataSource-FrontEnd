@@ -36,7 +36,8 @@ const routes: Routes = [
       ]
     },
     resolve: {
-      yesNoAll: YesNoAllDataResolver
+      yesNoAll: YesNoAllDataResolver,
+      diseaseSpecificCategories: ReferenceDataDiseaseSpecificCategoriesResolver
     }
   },
   // View Reference Data Category Entries List
