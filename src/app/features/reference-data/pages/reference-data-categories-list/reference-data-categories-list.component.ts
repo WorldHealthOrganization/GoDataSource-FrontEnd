@@ -100,7 +100,7 @@ export class ReferenceDataCategoriesListComponent
       },
       {
         field: 'entriesCount',
-        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES_COUNT',
+        label: 'LNG_REFERENCE_DATA_CATEGORY_LABEL_ENTRIES_COUNT',
         format: {
           type: (item: ReferenceDataCategoryModel) => (this.activatedRoute.snapshot.data.diseaseSpecificCategories as IResolverV2ResponseModel<ReferenceDataCategoryModel>)?.map[item.id] ?
             `${item.systemWideCount ? item.systemWideCount : 0} / ${item.entries?.length ? item.entries.length : 0}` :

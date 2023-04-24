@@ -437,6 +437,24 @@ export class AppFormTreeEditorV2Component
   }
 
   /**
+   * Collapse / Expand questions and Answers
+   */
+  collapseExpandAll(collapsed: boolean): void {
+    // nothing to collapse ?
+    if (!this.value?.length) {
+      return;
+    }
+
+    // go through categories and collapse / expand them
+    this.value.forEach((item) => {
+      item.collapsed = collapsed;
+    });
+
+    // refresh
+    this.nonFlatToFlat();
+  }
+
+  /**
    * Selected item changed
    */
   selectedChanged(

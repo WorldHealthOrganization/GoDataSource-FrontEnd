@@ -1,12 +1,38 @@
 <form
   class="gd-form-tree-editor-v2">
 
-  <!-- Filter -->
-  <app-form-input-v2
-    ngModel
-    name="filterValue"
-    placeholder="LNG_COMMON_LABEL_SEARCH"
-    (ngModelChange)="filter($event)"></app-form-input-v2>
+  <!-- Top -->
+  <div
+    class="gd-form-tree-editor-v2-top"
+    fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0.8rem">
+
+    <!-- Filter -->
+    <app-form-input-v2
+      fxFlex
+      ngModel
+      name="filterValue"
+      placeholder="LNG_COMMON_LABEL_SEARCH"
+      (ngModelChange)="filter($event)"></app-form-input-v2>
+
+    <!-- Expand All -->
+    <button
+      type="button"
+      mat-flat-button
+      color="text"
+      (click)="collapseExpandAll(false)">
+      {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_EXPAND_ALL' | translate}}
+    </button>
+
+    <!-- Collapse All -->
+    <button
+      type="button"
+      mat-flat-button
+      color="text"
+      (click)="collapseExpandAll(true)">
+      {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL' | translate}}
+    </button>
+
+  </div>
 
   <!-- Records -->
   <div
