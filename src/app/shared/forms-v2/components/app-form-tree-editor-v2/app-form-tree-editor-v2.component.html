@@ -119,7 +119,7 @@
               [ngModel]="(item.data.isSystemWide && !item.data.disabled) || item.parent.data.children.selected[item.data.id]"
               [name]="item.data.id"
               [placeholder]="item.data.label"
-              [disabled]="item.data.disabled || item.data.isSystemWide"
+              [disabled]="viewOnly || item.data.disabled || item.data.isSystemWide"
               [highlightPlaceholder]="searchValue"
               (ngModelChange)="selectedChanged(item, $event)"
               (mousedown)="copyCheckboxMouseDown($event, item)"
