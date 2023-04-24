@@ -1,5 +1,6 @@
 @import 'mixins';
 
+// #TODO - move animation somewhere global to be able to use it on other components too
 @keyframes gd-flash {
   0%, 50%, 100% {
     opacity: 1;
