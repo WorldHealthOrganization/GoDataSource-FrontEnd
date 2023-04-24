@@ -107,8 +107,8 @@ export class AppFormTreeEditorV2Component
   // view only
   @Input() viewOnly: boolean;
 
-  // display global
-  @Input() displayGlobal: boolean;
+  // display system wide
+  @Input() displaySystemWide: boolean;
 
   // add new item
   @Output() addNewItem: EventEmitter<ICreateViewModifyV2TabTableTreeAddNewItem> = new EventEmitter<ICreateViewModifyV2TabTableTreeAddNewItem>();
@@ -318,7 +318,8 @@ export class AppFormTreeEditorV2Component
         // if view only - display only selected
         if (
           this.viewOnly &&
-          !category.children.selected[item.id]
+          !category.children.selected[item.id] &&
+          !item.isSystemWide
         ) {
           return;
         }
@@ -597,7 +598,7 @@ export class AppFormTreeEditorV2Component
     if (
       event.buttons !== 1 ||
       item.data.disabled ||
-      item.data.global
+      item.data.isSystemWide
     ) {
       return;
     }
@@ -660,7 +661,7 @@ export class AppFormTreeEditorV2Component
     if (
       event.buttons !== 1 ||
       item.data.disabled ||
-      item.data.global ||
+      item.data.isSystemWide ||
       this.copyCheckbox === undefined
     ) {
       return;

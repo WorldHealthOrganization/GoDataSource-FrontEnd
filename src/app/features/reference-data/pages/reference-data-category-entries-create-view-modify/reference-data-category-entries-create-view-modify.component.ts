@@ -120,7 +120,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
               label: entry.value,
               disabled: !entry.active,
               colorCode: entry.colorCode,
-              global: !!entry.isSystemWide
+              isSystemWide: !!entry.isSystemWide
             };
           }),
 
@@ -447,7 +447,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR,
         name: 'diseaseAllowedRefData',
-        displayGlobal: true,
+        displaySystemWide: true,
         value: {
           get: () => this._diseaseSpecificReferenceData,
           set: (value) => {
@@ -466,13 +466,15 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
                 addAnother
               ) => {
                 data.finish(
-                  {
-                    id: item.id,
-                    label: item.value,
-                    disabled: !item.active,
-                    colorCode: item.colorCode,
-                    global: !!item.isSystemWide
-                  },
+                  item ?
+                    {
+                      id: item.id,
+                      label: item.value,
+                      disabled: !item.active,
+                      colorCode: item.colorCode,
+                      isSystemWide: !!item.isSystemWide
+                    } :
+                    null,
                   addAnother
                 );
               }
