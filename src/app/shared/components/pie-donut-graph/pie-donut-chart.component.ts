@@ -189,7 +189,7 @@ implements OnInit, OnDestroy {
   @Output() clickItem = new EventEmitter<PieDonutChartData>();
 
   // job handler
-  private _periodicChecker: number;
+  private _periodicChecker: any;
 
   // graph internal elements
   _graph: {

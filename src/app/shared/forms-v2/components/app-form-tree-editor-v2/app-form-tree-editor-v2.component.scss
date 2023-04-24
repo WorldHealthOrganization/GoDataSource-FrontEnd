@@ -1,5 +1,14 @@
 @import 'mixins';
 
+@keyframes gd-flash {
+  0%, 50%, 100% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0;
+  }
+}
+
 /* Tree Editor */
 .gd-form-tree-editor-v2 {
   height: 100%;
@@ -55,6 +64,16 @@
         }
 
         .gd-form-tree-editor-v2-list-category-item {
+          /* Flash when new item is added */
+          /* #TODO: Implement the same flash effect as on bulk create/edit to be consistent ? */
+          &.gd-form-tree-editor-v2-list-category-item-flash {
+            -webkit-animation-duration: 2s;
+            animation-duration: 2s;
+            -webkit-animation-fill-mode: both;
+            animation-fill-mode: both;
+            animation-name: gd-flash;
+          }
+
           .gd-form-tree-editor-v2-list-category-item-color {
             @include border-radius(0.4rem);
             display: block;

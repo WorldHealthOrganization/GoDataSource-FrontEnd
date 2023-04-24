@@ -9,7 +9,7 @@
     <!-- Filter -->
     <app-form-input-v2
       fxFlex
-      ngModel
+      [ngModel]="searchValue"
       name="filterValue"
       placeholder="LNG_COMMON_LABEL_SEARCH"
       (ngModelChange)="filter($event)"></app-form-input-v2>
@@ -41,7 +41,7 @@
 
     <!-- Records -->
     <ng-container
-      *ngIf="flattenedCategories?.length; else noCategories">
+      *ngIf="flattenedData?.length; else noCategories">
       <cdk-virtual-scroll-viewport
         #cdkViewport
         [minBufferPx]="1024"
@@ -49,7 +49,7 @@
         [itemSize]="26">
         <!-- Item -->
         <div
-          *cdkVirtualFor="let item of flattenedCategories; templateCacheSize: 0"
+          *cdkVirtualFor="let item of flattenedData; templateCacheSize: 0"
           class="gd-form-tree-editor-v2-list-item"
           [class.gd-form-tree-editor-v2-list-item-child]="item.type !== FlattenType.CATEGORY"
           [ngSwitch]="item.type">
@@ -101,6 +101,7 @@
           <div
             *ngSwitchCase="FlattenType.CATEGORY_ITEM"
             class="gd-form-tree-editor-v2-list-category-item"
+            [class.gd-form-tree-editor-v2-list-category-item-flash]="item.data.flash"
             fxLayout="row" fxLayoutAlign="none center">
 
             <!-- Global -->

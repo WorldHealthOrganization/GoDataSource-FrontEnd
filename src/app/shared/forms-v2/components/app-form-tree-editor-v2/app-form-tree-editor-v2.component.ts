@@ -117,8 +117,8 @@ export class AppFormTreeEditorV2Component
   private _languageSubscription: Subscription;
 
   // flattened data
-  private _allFlattenedCategories: (IFlattenNodeCategory | IFlattenNodeCategoryItem | IFlattenNodeInfo)[] = [];
-  flattenedCategories: (IFlattenNodeCategory | IFlattenNodeCategoryItem | IFlattenNodeInfo)[] = [];
+  private _allFlattenedData: (IFlattenNodeCategory | IFlattenNodeCategoryItem | IFlattenNodeInfo)[] = [];
+  flattenedData: (IFlattenNodeCategory | IFlattenNodeCategoryItem | IFlattenNodeInfo)[] = [];
 
   // filter
   searchValue: string;
@@ -128,6 +128,9 @@ export class AppFormTreeEditorV2Component
 
   // timers
   private _startCopyTimer: any;
+  private _newItemFlashTimers: {
+    [id: string]: any
+  } = {};
 
   // constants
   FlattenType = FlattenType;
@@ -174,6 +177,12 @@ export class AppFormTreeEditorV2Component
 
     // stop copy timer
     this.stopStartCopyTimer();
+
+    // stop item flash timers
+    Object.keys(this._newItemFlashTimers).forEach((id) => {
+      clearTimeout(this._newItemFlashTimers[id]);
+      delete this._newItemFlashTimers[id];
+    });
 
     // remove events
     document.removeEventListener(
@@ -284,7 +293,7 @@ export class AppFormTreeEditorV2Component
    */
   private flatten(): void {
     // reset
-    this._allFlattenedCategories = [];
+    this._allFlattenedData = [];
 
     // nothing to do ?
     if (!this.value?.length) {
@@ -301,7 +310,7 @@ export class AppFormTreeEditorV2Component
           '—',
         data: category
       };
-      this._allFlattenedCategories.push(categoryNode);
+      this._allFlattenedData.push(categoryNode);
 
       // push items
       category.checked = 0;
@@ -320,7 +329,7 @@ export class AppFormTreeEditorV2Component
         }
 
         // add item
-        this._allFlattenedCategories.push({
+        this._allFlattenedData.push({
           type: FlattenType.CATEGORY_ITEM,
           parent: categoryNode,
           data: item
@@ -332,7 +341,7 @@ export class AppFormTreeEditorV2Component
         this.viewOnly &&
         category.checked < 1
       ) {
-        this._allFlattenedCategories.push({
+        this._allFlattenedData.push({
           type: FlattenType.INFO,
           text: this.i18nService.instant('LNG_COMMON_LABEL_NOTHING_SELECTED'),
           parent: categoryNode,
@@ -352,9 +361,9 @@ export class AppFormTreeEditorV2Component
     this.searchValue = searchValue;
 
     // nothing to filter ?
-    if (!this._allFlattenedCategories?.length) {
+    if (!this._allFlattenedData?.length) {
       // empty list
-      this.flattenedCategories = [];
+      this.flattenedData = [];
 
       // update ui
       this.detectChanges();
@@ -371,7 +380,7 @@ export class AppFormTreeEditorV2Component
     const visibleIds: {
       [id: string]: VisibleCause
     } = {};
-    this._allFlattenedCategories.forEach((item): void => {
+    this._allFlattenedData.forEach((item): void => {
       if (
         !byValue ||
         (
@@ -415,7 +424,7 @@ export class AppFormTreeEditorV2Component
     });
 
     // filter
-    this.flattenedCategories = this._allFlattenedCategories.filter((item): boolean => !!visibleIds[item.data.id] && (item.type === FlattenType.CATEGORY || !item.parent.data.collapsed));
+    this.flattenedData = this._allFlattenedData.filter((item): boolean => !!visibleIds[item.data.id] && (item.type === FlattenType.CATEGORY || !item.parent.data.collapsed));
 
     // update ui
     this.detectChanges();
@@ -497,24 +506,52 @@ export class AppFormTreeEditorV2Component
   add(category: IFlattenNodeCategory): void {
     this.addNewItem.emit({
       category: category.data,
-      finish: (item) => {
+      finish: (catItem) => {
         // something went wrong ?
-        if (!item?.id) {
+        if (!catItem?.id) {
           return;
         }
 
         // append item
-        category.data.children.options.push(item);
+        category.data.children.options.push(catItem);
 
         // select it, otherwise why did we add it ?
-        category.data.children.selected[item.id] = true;
+        category.data.children.selected[catItem.id] = true;
 
         // sort values using the new translations
         this.sortValues();
 
+        // reset filter
+        this.searchValue = undefined;
+
+        // make sure parent is expanded to see the new item
+        category.data.collapsed = false;
+
         // redraw
         // - detect changes is triggered by this.nonFlatToFlat function
         this.nonFlatToFlat();
+
+        // scroll item into view and make it flash / stand out
+        if (this.cdkViewport) {
+          const itemIndex: number = this.flattenedData.findIndex((item) => item.data.id === catItem.id);
+          if (itemIndex > -1) {
+            // visible
+            this.cdkViewport.scrollToIndex(itemIndex);
+
+            // make it flash
+            catItem.flash = true;
+            this._newItemFlashTimers[catItem.id] = setTimeout(() => {
+              // clear
+              delete this._newItemFlashTimers[catItem.id];
+
+              // remove class
+              catItem.flash = false;
+
+              // redraw
+              // #TODO
+            }, 2000);
+          }
+        }
       }
     });
   }

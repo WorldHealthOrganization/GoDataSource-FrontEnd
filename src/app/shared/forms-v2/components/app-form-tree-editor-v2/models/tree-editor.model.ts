@@ -10,6 +10,9 @@ export interface ITreeEditorDataCategoryItem {
   disabled?: boolean;
   colorCode?: string;
   global?: boolean;
+
+  // used by ui
+  flash?: boolean;
 }
 
 /**
