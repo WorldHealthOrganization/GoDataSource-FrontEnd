@@ -16,7 +16,8 @@ export const EnglishUsLang = {
     'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE_DESCRIPTION': 'Visible on all outbreak if checked',
     'LNG_REFERENCE_DATA_CATEGORY_LABEL_ENTRIES_COUNT': 'System-wide',
     'LNG_REFERENCE_DATA_CATEGORY_LABEL_EXPAND_ALL': 'Expand all',
-    'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL': 'Collapse all'
+    'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL': 'Collapse all',
+    'LNG_REFERENCE_DATA_CATEGORY_LABEL_EDIT_NO_CATEGORIES': 'No categories or category items matched the search criteria'
 
 
 

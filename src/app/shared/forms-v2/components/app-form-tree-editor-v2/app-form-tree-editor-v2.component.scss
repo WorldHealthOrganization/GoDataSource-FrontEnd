@@ -107,4 +107,33 @@
       }
     }
   }
+
+  /* Empty */
+  .gd-form-tree-editor-v2-list-empty {
+    height: 100%;
+
+    .gd-form-tree-editor-v2-list-empty-image {
+      background-image: url(../../../../../assets/images/nothing-found.svg);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 25rem;
+      width: 25rem;
+
+      @include breakpoint('xs') {
+        height: 15rem;
+        width: 15rem;
+      }
+    }
+
+    .gd-form-tree-editor-v2-list-empty-text {
+      color: var(--gd-secondary);
+      font-size: 1.6rem;
+      margin-top: 2rem;
+
+      @include breakpoint('xs') {
+        font-size: 1.4rem;
+      }
+    }
+  }
 }
