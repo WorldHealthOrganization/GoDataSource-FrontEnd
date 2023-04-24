@@ -22,7 +22,7 @@ import { LocationIdentifierModel } from '../../../../core/models/location-identi
 import { IV2SideDialogData, V2SideDialogConfigInput } from '../../app-side-dialog-v2/models/side-dialog-config.model';
 import {
   ITreeEditorDataCategory,
-  ITreeEditorDataCategoryItem
+  ITreeEditorDataCategoryItem, ITreeEditorDataValue
 } from '../../../forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 
@@ -727,7 +727,8 @@ interface ICreateViewModifyV2TabTableTree {
   // required
   type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR;
   name: string;
-  value: ICreateViewModifyV2TabInputValue<ITreeEditorDataCategory[]>;
+  value: ICreateViewModifyV2TabInputValue<ITreeEditorDataValue>;
+  options: ITreeEditorDataCategory[];
   displaySystemWide: boolean;
   addNewItem: (data: ICreateViewModifyV2TabTableTreeAddNewItem) => void;
 }

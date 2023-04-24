@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
-import { ITreeEditorDataCategory, ITreeEditorDataCategoryItem } from './models/tree-editor.model';
+import { ITreeEditorDataCategory, ITreeEditorDataCategoryItem, ITreeEditorDataValue } from './models/tree-editor.model';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { Subscription } from 'rxjs';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -87,7 +87,7 @@ interface IFlattenNodeCategory {
   encapsulation: ViewEncapsulation.None
 })
 export class AppFormTreeEditorV2Component
-  extends AppFormBaseV2<ITreeEditorDataCategory[]> implements OnDestroy {
+  extends AppFormBaseV2<ITreeEditorDataValue> implements OnDestroy {
 
   // viewport
   @ViewChild('cdkViewport') cdkViewport: CdkVirtualScrollViewport;
@@ -109,6 +109,23 @@ export class AppFormTreeEditorV2Component
 
   // display system wide
   @Input() displaySystemWide: boolean;
+
+  // options
+  private _options: ITreeEditorDataCategory[];
+  @Input() set options(options: ITreeEditorDataCategory[]) {
+    // set data
+    this._options = options;
+
+    // sort values
+    this.sortValues();
+
+    // flatten & start collapsed
+    // - detect changes is triggered by this.collapseExpandAll => this.nonFlatToFlat function
+    this.collapseExpandAll(true);
+  }
+  get options(): ITreeEditorDataCategory[] {
+    return this._options;
+  }
 
   // add new item
   @Output() addNewItem: EventEmitter<ICreateViewModifyV2TabTableTreeAddNewItem> = new EventEmitter<ICreateViewModifyV2TabTableTreeAddNewItem>();
@@ -194,21 +211,23 @@ export class AppFormTreeEditorV2Component
   /**
    * Write value and construct questionnaire
    */
-  writeValue(value: ITreeEditorDataCategory[]): void {
+  writeValue(value: ITreeEditorDataValue): void {
     // // initialize value if necessary
+    const previousValue = this.value;
     if (!value) {
-      value = [];
+      value = {};
     }
 
     // set value
     super.writeValue(value);
 
-    // sort values
-    this.sortValues();
+    // no need to re-render because it is teh same value ?
+    if (JSON.stringify(this.value) === JSON.stringify(previousValue)) {
+      return;
+    }
 
-    // flatten & start collapsed
-    // - detect changes is triggered by this.collapseExpandAll => this.nonFlatToFlat function
-    this.collapseExpandAll(true);
+    // update selected
+    this.nonFlatToFlat();
   }
 
   /**
@@ -253,24 +272,24 @@ export class AppFormTreeEditorV2Component
    */
   private sortValues(): void {
     // nothing to do ?
-    if (!this.value?.length) {
+    if (!this.options?.length) {
       return;
     }
 
     // sort categories
-    this.value.sort((c1, c2): number => {
+    this.options.sort((c1, c2): number => {
       return (c1.label ? this.i18nService.instant(c1.label) : '').localeCompare(c2.label ? this.i18nService.instant(c2.label) : '');
     });
 
     // sort categories items
-    this.value.forEach((category) => {
+    this.options.forEach((category) => {
       // nothing to do ?
-      if (!category.children.options?.length) {
+      if (!category.children?.length) {
         return;
       }
 
       // sort
-      category.children.options.sort((i1, i2): number => {
+      category.children.sort((i1, i2): number => {
         return (i1.label ? this.i18nService.instant(i1.label) : '').localeCompare(i2.label ? this.i18nService.instant(i2.label) : '');
       });
     });
@@ -296,12 +315,15 @@ export class AppFormTreeEditorV2Component
     this._allFlattenedData = [];
 
     // nothing to do ?
-    if (!this.value?.length) {
+    if (
+      !this.options?.length ||
+      !this.value
+    ) {
       return;
     }
 
     // go through categories
-    this.value.forEach((category) => {
+    this.options.forEach((category) => {
       // add category
       const categoryNode: IFlattenNodeCategory = {
         type: FlattenType.CATEGORY,
@@ -314,21 +336,24 @@ export class AppFormTreeEditorV2Component
 
       // push items
       category.checked = 0;
-      category.children?.options?.forEach((item) => {
+      category.children?.forEach((item) => {
         // fix for when an item was selected before being made a system-wide item
         if (
           item.isSystemWide &&
-          category.children.selected[item.id]
+          this.value[category.id] &&
+          this.value[category.id][item.id]
         ) {
-          delete category.children.selected[item.id];
+          delete this.value[category.id][item.id];
         }
 
         // if view only - display only selected & system-wide
         if (this.viewOnly) {
           // not selected, and not system-wide
           if (
-            !category.children.selected[item.id] &&
-            !item.isSystemWide
+            !item.isSystemWide && (
+              !this.value[category.id] ||
+              !this.value[category.id][item.id]
+            )
           ) {
             return;
           }
@@ -344,7 +369,10 @@ export class AppFormTreeEditorV2Component
 
         // count checked
         if (
-          category.children.selected[item.id] || (
+          (
+            this.value[category.id] &&
+            this.value[category.id][item.id]
+          ) || (
             item.isSystemWide &&
             !item.disabled
           )
@@ -486,12 +514,12 @@ export class AppFormTreeEditorV2Component
    */
   collapseExpandAll(collapsed: boolean): void {
     // nothing to collapse ?
-    if (!this.value?.length) {
+    if (!this.options?.length) {
       return;
     }
 
     // go through categories and collapse / expand them
-    this.value.forEach((item) => {
+    this.options.forEach((item) => {
       item.collapsed = collapsed;
     });
 
@@ -511,18 +539,28 @@ export class AppFormTreeEditorV2Component
       checked &&
       !item.data.isSystemWide
     ) {
-      item.parent.data.children.selected[item.data.id] = true;
+      // initialize category ?
+      if (!this.value[item.parent.data.id]) {
+        this.value[item.parent.data.id] = {};
+      }
+
+      // check item
+      this.value[item.parent.data.id][item.data.id] = true;
     } else {
-      delete item.parent.data.children.selected[item.data.id];
+      if (this.value[item.parent.data.id]) {
+        delete this.value[item.parent.data.id][item.data.id];
+      }
     }
 
     // reset value
     item.parent.data.checked = 0;
-    item.parent.data.children.options.forEach((option) => {
+    item.parent.data.children.forEach((option) => {
       // not selected, and not system-wide
       if (
-        !item.parent.data.children.selected[option.id] &&
-        !option.isSystemWide
+        !option.isSystemWide && (
+          !this.value[item.parent.data.id] ||
+          !this.value[item.parent.data.id][option.id]
+        )
       ) {
         return;
       }
@@ -565,12 +603,18 @@ export class AppFormTreeEditorV2Component
         }
 
         // append item
-        category.data.children.options.push(catItem);
+        category.data.children.push(catItem);
 
         // select it, otherwise why did we add it ?
         // - system-wide are selected by default, there is no need to select them
         if (!catItem.isSystemWide) {
-          category.data.children.selected[catItem.id] = true;
+          // initialize category ?
+          if (!this.value[category.data.id]) {
+            this.value[category.data.id] = {};
+          }
+
+          // check item
+          this.value[category.data.id][catItem.id] = true;
         }
 
         // sort values using the new translations
@@ -653,7 +697,7 @@ export class AppFormTreeEditorV2Component
       this._startCopyTimer = undefined;
 
       // set copy value
-      this.copyCheckbox = !!item.parent.data.children.selected[item.data.id];
+      this.copyCheckbox = this.value[item.parent.data.id] && !!this.value[item.parent.data.id][item.data.id];
 
       // update ui
       this.detectChanges();

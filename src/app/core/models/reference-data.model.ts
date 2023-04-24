@@ -5,6 +5,9 @@ import { BaseModel } from './base.model';
 import { IPermissionBasic, IPermissionExportable, IPermissionImportable } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import {
+  ITreeEditorDataValue
+} from '../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 
 export enum ReferenceDataCategory {
   LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION = 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION',
@@ -126,6 +129,7 @@ export class ReferenceDataEntryModel
   order: number;
   geoLocation: { lat: number, lng: number };
   isSystemWide: boolean;
+  allowedRefDataItems: ITreeEditorDataValue;
 
   private _iconId: string;
   iconUrl: string;
@@ -166,6 +170,7 @@ export class ReferenceDataEntryModel
     this.order = _.get(data, 'order');
     this.geoLocation = _.get(data, 'geoLocation', {});
     this.isSystemWide = _.get(data, 'isSystemWide', false);
+    this.allowedRefDataItems = _.get(data, 'allowedRefDataItems');
 
     // add category
     const categoryData = _.get(data, 'category');

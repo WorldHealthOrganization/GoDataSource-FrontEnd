@@ -112,21 +112,15 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       return {
         id: item.id,
         label: item.name,
-        children: {
-          // all items
-          options: item.entries.map((entry) => {
-            return {
-              id: entry.id,
-              label: entry.value,
-              disabled: !entry.active,
-              colorCode: entry.colorCode,
-              isSystemWide: !!entry.isSystemWide
-            };
-          }),
-
-          // selected
-          selected: {}
-        }
+        children: item.entries.map((entry) => {
+          return {
+            id: entry.id,
+            label: entry.value,
+            disabled: !entry.active,
+            colorCode: entry.colorCode,
+            isSystemWide: !!entry.isSystemWide
+          };
+        })
       };
     });
   }
@@ -446,12 +440,13 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR,
-        name: 'diseaseAllowedRefData',
+        name: 'allowedRefDataItems',
         displaySystemWide: true,
+        options: this._diseaseSpecificReferenceData,
         value: {
-          get: () => this._diseaseSpecificReferenceData,
+          get: () => this.itemData.allowedRefDataItems,
           set: (value) => {
-            this._diseaseSpecificReferenceData = value;
+            this.itemData.allowedRefDataItems = value;
           }
         },
         addNewItem: (data) => {
@@ -551,25 +546,47 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       _loading,
       _forms
     ) => {
-      // do we have ref data per disease ?
-      let diseaseAllowedRefData: ITreeEditorDataCategory[];
-      if (data.diseaseAllowedRefData) {
-        // use data only if category is disease
-        if (this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE) {
-          diseaseAllowedRefData = data.diseaseAllowedRefData;
-        }
-
-        // cleanup
-        delete data.diseaseAllowedRefData;
-      }
-
       // set category ID for the new entry
       if (type === CreateViewModifyV2ActionType.CREATE) {
         data.categoryId = this.category.id;
       }
 
       // finished
-      const localFinished = (item: ReferenceDataEntryModel) => {
+      (type === CreateViewModifyV2ActionType.CREATE ?
+        this.referenceDataDataService.createEntry(
+          data
+        ) :
+        this.referenceDataDataService.modifyEntry(
+          this.itemData.id,
+          data
+        )
+      ).pipe(
+        // handle error
+        catchError((err) => {
+          // show error
+          finished(err, undefined);
+
+          // finished
+          return throwError(err);
+        }),
+        switchMap((item) => {
+          // re-load language tokens
+          return this.i18nService.loadUserLanguage()
+            .pipe(
+              catchError((err) => {
+                // show error
+                finished(err, undefined);
+
+                // finished
+                return throwError(err);
+              }),
+              map(() => item)
+            );
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).subscribe((item) => {
         // success creating / updating event
         this.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
@@ -579,89 +596,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
 
         // finished with success
         finished(undefined, item);
-      };
-
-      // update disease ref entries
-      const updateDiseaseRefEntries = (diseaseFinished: () => void) => {
-        this.referenceDataDataService
-          .modifyDiseaseAllowedRefData({
-            diseaseId: this.itemData.id,
-            data: diseaseAllowedRefData.map((cat) => {
-              return {
-                categoryId: cat.id,
-                items: Object.keys(cat.children.selected)
-              };
-            })
-          })
-          .pipe(
-            // handle error
-            catchError((err) => {
-              // show error
-              finished(err, undefined);
-
-              // finished
-              return throwError(err);
-            })
-          )
-          .subscribe(() => {
-            diseaseFinished();
-          });
-      };
-
-      // create / update ref data
-      const createUpdateRefEntry = () => {
-        // create / update
-        (type === CreateViewModifyV2ActionType.CREATE ?
-          this.referenceDataDataService.createEntry(
-            data
-          ) :
-          this.referenceDataDataService.modifyEntry(
-            this.itemData.id,
-            data
-          )
-        ).pipe(
-          // refresh language
-          switchMap((item) => {
-            // re-load language tokens
-            return this.i18nService.loadUserLanguage()
-              .pipe(map(() => item));
-          }),
-
-          // handle error
-          catchError((err) => {
-            // show error
-            finished(err, undefined);
-
-            // finished
-            return throwError(err);
-          }),
-
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        ).subscribe((item) => {
-          if (diseaseAllowedRefData) {
-            updateDiseaseRefEntries(() => {
-              localFinished(item);
-            });
-          } else {
-            localFinished(item);
-          }
-        });
-      };
-
-      // nothing to save related to ref data entry, only disease ref data ?
-      if (
-        type === CreateViewModifyV2ActionType.UPDATE && (
-          !data ||
-          Object.keys(data).length < 1
-        )
-      ) {
-        updateDiseaseRefEntries(() => {
-          localFinished(this.itemData);
-        });
-      } else {
-        createUpdateRefEntry();
-      }
+      });
     };
   }
 

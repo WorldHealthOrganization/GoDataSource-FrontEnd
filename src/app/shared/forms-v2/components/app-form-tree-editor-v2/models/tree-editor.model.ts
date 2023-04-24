@@ -1,4 +1,14 @@
 /**
+ * Tree accepted value format
+ */
+export interface ITreeEditorDataValue {
+  // categoryId => allowed ref data items
+  [categoryId: string]: {
+    [itemId: string]: true
+  };
+}
+
+/**
  * Used for input data - category item
  */
 export interface ITreeEditorDataCategoryItem {
@@ -22,12 +32,7 @@ export interface ITreeEditorDataCategory {
   // required
   id: string;
   label: string;
-  children: {
-    options: ITreeEditorDataCategoryItem[],
-    selected: {
-      [id: string]: true
-    }
-  };
+  children: ITreeEditorDataCategoryItem[];
 
   // used by ui
   collapsed?: boolean;

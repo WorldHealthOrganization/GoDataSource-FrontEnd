@@ -62,7 +62,7 @@
 
             <!-- Collapse / Expand -->
             <mat-icon
-              [style.visibility]="(viewOnly && item.data.checked > 0) || (!viewOnly && item.data.children.options.length > 0) ? 'visible' : 'hidden'"
+              [style.visibility]="(viewOnly && item.data.checked > 0) || (!viewOnly && item.data.children.length > 0) ? 'visible' : 'hidden'"
               (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
 
             <!-- Label -->
@@ -75,7 +75,7 @@
             <div
               class="gd-form-tree-editor-v2-list-category-checked-no"
               fxGrow="0">
-              {{item.data.checked}}/{{item.data.children.options.length}}
+              {{item.data.checked}}/{{item.data.children.length}}
             </div>
 
             <!-- Buttons -->
@@ -116,7 +116,7 @@
 
             <!-- Checkbox + label -->
             <app-form-checkbox-v2
-              [ngModel]="(item.data.isSystemWide && !item.data.disabled) || item.parent.data.children.selected[item.data.id]"
+              [ngModel]="(item.data.isSystemWide && !item.data.disabled) || (value && value[item.parent.data.id] && value[item.parent.data.id][item.data.id])"
               [name]="item.data.id"
               [placeholder]="item.data.label"
               [disabled]="viewOnly || item.data.disabled || item.data.isSystemWide"
