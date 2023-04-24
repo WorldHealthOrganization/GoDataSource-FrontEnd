@@ -197,9 +197,9 @@ export class AppFormTreeEditorV2Component
     // sort values
     this.sortValues();
 
-    // flatten
-    // - detect changes is triggered by this.nonFlatToFlat function
-    this.nonFlatToFlat();
+    // flatten & start collapsed
+    // - detect changes is triggered by this.collapseExpandAll => this.nonFlatToFlat function
+    this.collapseExpandAll(true);
   }
 
   /**
