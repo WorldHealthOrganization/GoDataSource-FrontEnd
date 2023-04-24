@@ -315,17 +315,40 @@ export class AppFormTreeEditorV2Component
       // push items
       category.checked = 0;
       category.children?.options?.forEach((item) => {
-        // if view only - display only selected
+        // fix for when an item was selected before being made a system-wide item
         if (
-          this.viewOnly &&
-          !category.children.selected[item.id] &&
-          !item.isSystemWide
+          item.isSystemWide &&
+          category.children.selected[item.id]
         ) {
-          return;
+          delete category.children.selected[item.id];
+        }
+
+        // if view only - display only selected & system-wide
+        if (this.viewOnly) {
+          // not selected, and not system-wide
+          if (
+            !category.children.selected[item.id] &&
+            !item.isSystemWide
+          ) {
+            return;
+          }
+
+          // system-wide, but disabled
+          if (
+            item.isSystemWide &&
+            item.disabled
+          ) {
+            return;
+          }
         }
 
         // count checked
-        if (category.children.selected[item.id]) {
+        if (
+          category.children.selected[item.id] || (
+            item.isSystemWide &&
+            !item.disabled
+          )
+        ) {
           category.checked++;
         }
 
@@ -484,7 +507,10 @@ export class AppFormTreeEditorV2Component
     checked: boolean
   ): void {
     // update value
-    if (checked) {
+    if (
+      checked &&
+      !item.data.isSystemWide
+    ) {
       item.parent.data.children.selected[item.data.id] = true;
     } else {
       delete item.parent.data.children.selected[item.data.id];
@@ -493,8 +519,19 @@ export class AppFormTreeEditorV2Component
     // reset value
     item.parent.data.checked = 0;
     item.parent.data.children.options.forEach((option) => {
-      // not selected ?
-      if (!item.parent.data.children.selected[option.id]) {
+      // not selected, and not system-wide
+      if (
+        !item.parent.data.children.selected[option.id] &&
+        !option.isSystemWide
+      ) {
+        return;
+      }
+
+      // system-wide, but disabled
+      if (
+        option.isSystemWide &&
+        option.disabled
+      ) {
         return;
       }
 
@@ -531,7 +568,10 @@ export class AppFormTreeEditorV2Component
         category.data.children.options.push(catItem);
 
         // select it, otherwise why did we add it ?
-        category.data.children.selected[catItem.id] = true;
+        // - system-wide are selected by default, there is no need to select them
+        if (!catItem.isSystemWide) {
+          category.data.children.selected[catItem.id] = true;
+        }
 
         // sort values using the new translations
         this.sortValues();

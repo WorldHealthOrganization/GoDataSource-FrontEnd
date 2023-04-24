@@ -62,7 +62,7 @@
 
             <!-- Collapse / Expand -->
             <mat-icon
-              [style.visibility]="viewOnly && item.data.children.checked > 0 || !viewOnly && item.data.children.options.length > 0 ? 'visible' : 'hidden'"
+              [style.visibility]="(viewOnly && item.data.checked > 0) || (!viewOnly && item.data.children.options.length > 0) ? 'visible' : 'hidden'"
               (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
 
             <!-- Label -->
