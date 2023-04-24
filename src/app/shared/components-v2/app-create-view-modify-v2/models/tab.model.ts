@@ -99,7 +99,10 @@ interface ICreateViewModifyV2TabInputActionButton {
 export interface ICreateViewModifyV2TabTableTreeAddNewItem {
   // required
   category: ITreeEditorDataCategory;
-  finish: (item: ITreeEditorDataCategoryItem) => void;
+  finish: (
+    item: ITreeEditorDataCategoryItem,
+    addAnother: boolean
+  ) => void;
 }
 
 /**

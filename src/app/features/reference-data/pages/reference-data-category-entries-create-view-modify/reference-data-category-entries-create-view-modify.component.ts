@@ -461,14 +461,20 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
                 icon: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<IconModel>).options
               },
               data.category,
-              (item) => {
-                data.finish({
-                  id: item.id,
-                  label: item.value,
-                  disabled: !item.active,
-                  colorCode: item.colorCode,
-                  global: !!item.isSystemWide
-                });
+              (
+                item,
+                addAnother
+              ) => {
+                data.finish(
+                  {
+                    id: item.id,
+                    label: item.value,
+                    disabled: !item.active,
+                    colorCode: item.colorCode,
+                    global: !!item.isSystemWide
+                  },
+                  addAnother
+                );
               }
             );
         }

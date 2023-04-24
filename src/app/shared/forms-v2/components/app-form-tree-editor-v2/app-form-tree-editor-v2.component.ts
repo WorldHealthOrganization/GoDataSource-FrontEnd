@@ -506,7 +506,10 @@ export class AppFormTreeEditorV2Component
   add(category: IFlattenNodeCategory): void {
     this.addNewItem.emit({
       category: category.data,
-      finish: (catItem) => {
+      finish: (
+        catItem,
+        addAnother
+      ) => {
         // something went wrong ?
         if (!catItem?.id) {
           return;
@@ -551,6 +554,11 @@ export class AppFormTreeEditorV2Component
               // - no need to refresh ui (this.detectChanges()) since it flashes just once and it will be removed on next refresh anyway
             }, 2000);
           }
+        }
+
+        // add another ?
+        if (addAnother) {
+          this.add(category);
         }
       }
     });

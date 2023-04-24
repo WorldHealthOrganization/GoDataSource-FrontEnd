@@ -18,7 +18,8 @@ export const EnglishUsLang = {
     'LNG_REFERENCE_DATA_CATEGORY_LABEL_EXPAND_ALL': 'Expand all',
     'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL': 'Collapse all',
     'LNG_REFERENCE_DATA_CATEGORY_LABEL_EDIT_NO_CATEGORIES': 'No categories or category items matched the search criteria',
-    'LNG_REFERENCE_DATA_CATEGORY_LABEL_ADD_NEW_ITEM_UNDER': 'Add new item under "{{category}}"'
+    'LNG_REFERENCE_DATA_CATEGORY_LABEL_ADD_NEW_ITEM_UNDER': 'Add new item under "{{category}}"',
+    'LNG_COMMON_BUTTON_ADD_ANOTHER': 'Add item followed by adding one more'
 
 
 

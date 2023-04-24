@@ -39,7 +39,10 @@ export class ReferenceDataHelperService {
       id: string,
       label: string
     },
-    finish: (item: ReferenceDataEntryModel) => void
+    finish: (
+      item: ReferenceDataEntryModel,
+      addAnother: boolean
+    ) => void
   ): void  {
     // check code uniqueness
     let code: string;
@@ -139,6 +142,14 @@ export class ReferenceDataHelperService {
             return !handler.form || handler.form.invalid || handler.form.pending;
           }
         }, {
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_ADD_ANOTHER',
+          color: 'primary',
+          key: 'add-another',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid || handler.form.pending;
+          }
+        }, {
           type: IV2SideDialogConfigButtonType.CANCEL,
           label: 'LNG_COMMON_BUTTON_CANCEL',
           color: 'text'
@@ -173,7 +184,10 @@ export class ReferenceDataHelperService {
                     response.handler.hide();
 
                     // err
-                    finish(null);
+                    finish(
+                      null,
+                      false
+                    );
 
                     // finished
                     return throwError(err);
@@ -191,7 +205,10 @@ export class ReferenceDataHelperService {
               response.handler.hide();
 
               // err
-              finish(null);
+              finish(
+                null,
+                false
+              );
 
               // finished
               return throwError(err);
@@ -205,7 +222,10 @@ export class ReferenceDataHelperService {
             response.handler.hide();
 
             // finish
-            finish(item);
+            finish(
+              item,
+              response.button.key === 'add-another'
+            );
           });
       });
   }
