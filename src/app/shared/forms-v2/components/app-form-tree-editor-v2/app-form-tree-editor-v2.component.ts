@@ -341,6 +341,7 @@ export class AppFormTreeEditorV2Component
         this.viewOnly &&
         category.checked < 1
       ) {
+        // add nothing info text
         this._allFlattenedData.push({
           type: FlattenType.INFO,
           text: this.i18nService.instant('LNG_COMMON_LABEL_NOTHING_SELECTED'),
@@ -381,6 +382,7 @@ export class AppFormTreeEditorV2Component
       [id: string]: VisibleCause
     } = {};
     this._allFlattenedData.forEach((item): void => {
+      // filter
       if (
         !byValue ||
         (
@@ -420,6 +422,15 @@ export class AppFormTreeEditorV2Component
             item.parent.data.collapsed = false;
           }
         }
+      }
+
+      // since expand / collapse functionality is disabled due to having only "nothing" child item
+      // we need to expand it by default, otherwise option won't be visible
+      if (
+        this.viewOnly &&
+        item.type === FlattenType.INFO
+      ) {
+        item.parent.data.collapsed = false;
       }
     });
 
