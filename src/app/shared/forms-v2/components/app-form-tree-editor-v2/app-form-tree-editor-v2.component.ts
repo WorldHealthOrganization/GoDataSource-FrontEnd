@@ -373,27 +373,22 @@ export class AppFormTreeEditorV2Component
     } = {};
     this._allFlattenedCategories.forEach((item): void => {
       if (
+        !byValue ||
         (
-          item.type === FlattenType.CATEGORY ||
-          !item.parent.data.collapsed
-        ) && (
-          !byValue ||
-          (
-            item.type === FlattenType.CATEGORY &&
+          item.type === FlattenType.CATEGORY &&
+          item.text.toLowerCase().indexOf(byValue) > -1
+        ) || (
+          item.type === FlattenType.CATEGORY_ITEM && (
+            visibleIds[item.parent.data.id] === VisibleCause.SEARCH || (
+              item.data.label &&
+              this.i18nService.instant(item.data.label) &&
+              this.i18nService.instant(item.data.label).toLowerCase().indexOf(byValue) > -1
+            )
+          )
+        ) || (
+          item.type === FlattenType.INFO && (
+            visibleIds[item.parent.data.id] === VisibleCause.SEARCH ||
             item.text.toLowerCase().indexOf(byValue) > -1
-          ) || (
-            item.type === FlattenType.CATEGORY_ITEM && (
-              visibleIds[item.parent.data.id] === VisibleCause.SEARCH || (
-                item.data.label &&
-                this.i18nService.instant(item.data.label) &&
-                this.i18nService.instant(item.data.label).toLowerCase().indexOf(byValue) > -1
-              )
-            )
-          ) || (
-            item.type === FlattenType.INFO && (
-              visibleIds[item.parent.data.id] === VisibleCause.SEARCH ||
-              item.text.toLowerCase().indexOf(byValue) > -1
-            )
           )
         )
       ) {
@@ -408,13 +403,19 @@ export class AppFormTreeEditorV2Component
           ) &&
           !visibleIds[item.parent.data.id]
         ) {
+          // make parent visible
           visibleIds[item.parent.data.id] = VisibleCause.CHILD;
+
+          // expand since a child matched the search criteria
+          if (byValue) {
+            item.parent.data.collapsed = false;
+          }
         }
       }
     });
 
     // filter
-    this.flattenedCategories = this._allFlattenedCategories.filter((item): boolean => !!visibleIds[item.data.id]);
+    this.flattenedCategories = this._allFlattenedCategories.filter((item): boolean => !!visibleIds[item.data.id] && (item.type === FlattenType.CATEGORY || !item.parent.data.collapsed));
 
     // update ui
     this.detectChanges();
