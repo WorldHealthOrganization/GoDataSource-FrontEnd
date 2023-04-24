@@ -35,7 +35,10 @@ export class ReferenceDataHelperService {
     options: {
       icon: ILabelValuePairModel[]
     },
-    categoryId: string,
+    category: {
+      id: string,
+      label: string
+    },
     finish: (item: ReferenceDataEntryModel) => void
   ): void  {
     // check code uniqueness
@@ -61,11 +64,14 @@ export class ReferenceDataHelperService {
     this.dialogV2Service
       .showSideDialog({
         title: {
-          get: () => 'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE'
+          get: () => 'LNG_REFERENCE_DATA_CATEGORY_LABEL_ADD_NEW_ITEM_UNDER',
+          data: () => ({
+            category: this.i18nService.instant(category.label)
+          })
         },
         hideInputFilter: true,
         dontCloseOnBackdrop: true,
-        width: '55rem',
+        width: '60rem',
         inputs: [{
           type: V2SideDialogConfigInputType.TEXT,
           name: 'value',
@@ -152,7 +158,7 @@ export class ReferenceDataHelperService {
         response.handler.loading.show();
 
         // set category ID for the new entry
-        formData.categoryId = categoryId;
+        formData.categoryId = category.id;
 
         // create record
         this.referenceDataDataService

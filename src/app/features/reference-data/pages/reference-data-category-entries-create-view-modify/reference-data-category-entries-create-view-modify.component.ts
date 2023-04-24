@@ -460,7 +460,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
               {
                 icon: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<IconModel>).options
               },
-              data.category.id,
+              data.category,
               (item) => {
                 data.finish({
                   id: item.id,
