@@ -636,6 +636,7 @@ export class AppFormTreeEditorV2Component
     // no point in continuing if mouse not down
     // - or option is disabled
     if (
+      this.viewOnly ||
       event.buttons !== 1 ||
       item.data.disabled ||
       item.data.isSystemWide
@@ -699,6 +700,7 @@ export class AppFormTreeEditorV2Component
     // no point in continuing if mouse not down
     // - or option is disabled
     if (
+      this.viewOnly ||
       event.buttons !== 1 ||
       item.data.disabled ||
       item.data.isSystemWide ||
