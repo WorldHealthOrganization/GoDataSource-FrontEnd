@@ -7,7 +7,7 @@ import { Moment } from 'moment';
 @Injectable()
 export class BulkCacheHelperService {
   // selected key prefix
-  private keySelectedPrefix: string = 'bulk_selected_';
+  private _keySelectedPrefix: string = 'bulk_selected_';
 
   /**
    * Constructor
@@ -31,7 +31,7 @@ export class BulkCacheHelperService {
    */
   storeBulkSelected(selected: string[]): string {
     // store
-    const cacheKey: string = `${this.keySelectedPrefix}${uuid()}`;
+    const cacheKey: string = `${this._keySelectedPrefix}${uuid()}`;
     this.storageService.setAny(
       cacheKey, {
         created: moment(),
@@ -79,7 +79,7 @@ export class BulkCacheHelperService {
    */
   clearBulkSelected(): void {
     // determine keys
-    const bulkSelectedDataKeys: string[] = this.storageService.retrieveKeys().filter((key) => key.startsWith(this.keySelectedPrefix));
+    const bulkSelectedDataKeys: string[] = this.storageService.retrieveKeys().filter((key) => key.startsWith(this._keySelectedPrefix));
     bulkSelectedDataKeys.forEach((cacheKey) => {
       // retrieve data
       const cacheData = this.getCachedData(cacheKey);
