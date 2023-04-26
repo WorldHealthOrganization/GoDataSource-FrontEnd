@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
       });
 
     // clear expired cache data
-    this.bulkCacheHelperService.clearBulkSelected();
+    this.bulkCacheHelperService.clearBulkSelected(true);
   }
 
   /**

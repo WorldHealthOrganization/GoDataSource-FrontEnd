@@ -77,13 +77,14 @@ export class BulkCacheHelperService {
   /**
    * Remove older cache, so we don't remain out of space
    */
-  clearBulkSelected(): void {
+  clearBulkSelected(onlyExpired: boolean): void {
     // determine keys
     const bulkSelectedDataKeys: string[] = this.storageService.retrieveKeys().filter((key) => key.startsWith(this._keySelectedPrefix));
     bulkSelectedDataKeys.forEach((cacheKey) => {
       // retrieve data
       const cacheData = this.getCachedData(cacheKey);
       if (
+        !onlyExpired ||
         !cacheData?.created ||
         !cacheData.selected?.length ||
         moment(cacheData.created) < moment().add(-1, 'days')
