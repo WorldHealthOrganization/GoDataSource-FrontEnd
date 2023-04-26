@@ -564,6 +564,16 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
                     fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
                     allow: {
                       types: [ExportDataExtension.JSON]
+                    },
+                    inputs: {
+                      append: [
+                        {
+                          type: V2SideDialogConfigInputType.CHECKBOX,
+                          placeholder: 'LNG_PAGE_LIST_LOCATIONS_EXPORT_DELETED_INFORMATION',
+                          name: 'includeDeletedLocations',
+                          checked: false
+                        }
+                      ]
                     }
                   }
                 });

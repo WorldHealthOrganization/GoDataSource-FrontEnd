@@ -184,6 +184,15 @@ export class ImportExportDataService {
       delete data.retrieveOldestExposure;
     }
 
+    // add flag includeDeletedLocations
+    if (!_.isUndefined(data.includeDeletedLocations)) {
+      queryBuilder.filter.flag(
+        'includeDeletedLocations',
+        data.includeDeletedLocations
+      );
+      delete data.includeDeletedLocations;
+    }
+
     // add other custom fields caused by API inconsistencies...
     _.each(data, (value: any, key: string) => {
       completeURL += `&${key}=` + (_.isString(value) || _.isNumber(value) ? value : JSON.stringify(value));
@@ -341,6 +350,15 @@ export class ImportExportDataService {
         data.retrieveOldestExposure
       );
       delete data.retrieveOldestExposure;
+    }
+
+    // add flag includeDeletedLocations
+    if (!_.isUndefined(data.includeDeletedLocations)) {
+      queryBuilder.filter.flag(
+        'includeDeletedLocations',
+        data.includeDeletedLocations
+      );
+      delete data.includeDeletedLocations;
     }
 
     // filter ?
