@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -44,6 +44,7 @@ import {
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import * as moment from 'moment';
 import { TranslateService } from '@ngx-translate/core';
+import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 
 @Component({
   selector: 'app-contacts-list',
@@ -140,7 +141,9 @@ export class ContactsListComponent
     private dialogV2Service: DialogV2Service,
     private genericDataService: GenericDataService,
     private translateService: TranslateService,
-    private entityHelperService: EntityHelperService
+    private entityHelperService: EntityHelperService,
+    protected bulkCacheHelperService: BulkCacheHelperService,
+    private router: Router
   ) {
     super(listHelperService);
   }
@@ -1607,13 +1610,19 @@ export class ContactsListComponent
             get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS'
           },
           action: {
-            link: (): string[] => {
-              return ['/contacts', 'modify-bulk'];
-            },
-            linkQueryParams: (selected: string[]): Params => {
-              return {
-                contactIds: JSON.stringify(selected)
-              };
+            click: (selected: string[]) => {
+              // set data into local storage since query url might be too long for hundreds of ids
+              const cacheKey: string = this.bulkCacheHelperService.storeBulkSelected(selected);
+
+              // redirect
+              this.router.navigate(
+                ['/contacts', 'modify-bulk'],
+                {
+                  queryParams: {
+                    cacheKey
+                  }
+                }
+              );
             }
           },
           visible: (): boolean => {

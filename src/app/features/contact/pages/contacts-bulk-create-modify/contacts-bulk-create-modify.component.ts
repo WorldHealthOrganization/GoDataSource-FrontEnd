@@ -29,6 +29,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 
 @Component({
   selector: 'app-contacts-bulk-create-modify',
@@ -85,7 +86,8 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     protected contactDataService: ContactDataService,
     protected dialogV2Service: DialogV2Service,
     protected toastV2Service: ToastV2Service,
-    protected router: Router
+    protected router: Router,
+    protected bulkCacheHelperService: BulkCacheHelperService
   ) {
     // parent
     super(
@@ -110,6 +112,9 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
 
     // remove global notifications
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+
+    // clear bulk cache
+    this.clearBulkCache();
   }
 
   /**
@@ -670,7 +675,20 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     }
 
     // retrieve data
-    const contactIds = this.activatedRoute.snapshot.queryParams.contactIds ? JSON.parse(this.activatedRoute.snapshot.queryParams.contactIds) : [];
+    const contactIds: string[] = this.bulkCacheHelperService.getBulkSelected(this.activatedRoute.snapshot.queryParams.cacheKey);
+    if (!contactIds?.length) {
+      // invalid data provide
+      // - show warning and redirect back to list page
+      this.toastV2Service.notice('LNG_GENERIC_WARNING_BULK_CACHE_EXPIRED');
+
+      // redirect
+      this.disableDirtyConfirm();
+      if (ContactModel.canList(this.authUser)) {
+        this.router.navigate(['/contacts']);
+      } else {
+        this.router.navigate(['/']);
+      }
+    }
 
     // create search query builder to retrieve our contacts
     const qb = new RequestQueryBuilder();
@@ -686,7 +704,8 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     this.records$ = this.contactDataService
       .getContactsList(
         this.selectedOutbreak.id,
-        qb
+        qb,
+        true
       )
       .pipe(
         // transform
@@ -1115,5 +1134,13 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
           this.router.navigate(['/']);
         }
       });
+  }
+
+  /**
+   * Clear bulk cache
+   */
+  private clearBulkCache(): void {
+    // clear bulk cache
+    this.bulkCacheHelperService.removeBulkSelected(this.activatedRoute.snapshot.queryParams.cacheKey);
   }
 }
