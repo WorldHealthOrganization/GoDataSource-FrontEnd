@@ -51,6 +51,7 @@ import { CdkContextMenuTrigger } from '@angular/cdk/menu';
 import { AppSpreadsheetEditorV2CellRowNoRendererModel } from './models/app-spreadsheet-editor-v2-cell-row-no-renderer.model';
 import { AppSpreadsheetEditorV2CellBasicHeaderModel } from './models/app-spreadsheet-editor-v2-cell-basic-header.model';
 import { AppSpreadsheetEditorV2CellBasicHeaderPivotComponent } from './components/header-pivot/app-spreadsheet-editor-v2-cell-basic-header-pivot.component';
+import { AppMessages } from '../../../core/enums/app-messages.enum';
 
 /**
  * Component
@@ -150,9 +151,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
   // is mac ?
   isMac: boolean = determineIfMacDevice();
-
-  // paste from context menu doesn't work if clipboard.readtext doesn't exist (only ctrl+v has a chance that it could work)
-  showPasteMenuOption: boolean = !!navigator.clipboard?.readText;
 
   // form dirty ?
   private _formDirty: boolean = false;
@@ -454,6 +452,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // stop paste timer
     this.stopPasteTimer();
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_PASTE_WARNING);
   }
 
   /**
@@ -3601,9 +3602,32 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Context menu option - paste
    */
-  cellPaste(): void {
+  cellPaste(calledFromContextMenu: boolean): void {
     // nothing to do ?
     if (this.editor.selection.selected.ranges.length !== 1) {
+      return;
+    }
+
+    // check if we can use context menu paste
+    if (
+      calledFromContextMenu &&
+      // paste from context menu doesn't work if clipboard.readtext doesn't exist (only ctrl+v has a chance that it could work)
+      // on https websites it should work or on localhost
+      !navigator.clipboard?.readText
+    ) {
+      // show message that user must use
+      // just as google sheets, docs etc does if it doesn't have access by using its own plugin
+      this.toastV2Service.notice(
+        'LNG_GENERIC_WARNING_NO_PASTE_USING_CONTEXT_MENU',
+        {
+          shortcut: this.isMac ?
+            '⌘+V' :
+            'Ctrl+V'
+        },
+        AppMessages.APP_MESSAGE_PASTE_WARNING
+      );
+
+      // finished
       return;
     }
 
@@ -4190,7 +4214,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       }
 
       // paste
-      this.cellPaste();
+      this.cellPaste(false);
 
       // block caller
       return true;
