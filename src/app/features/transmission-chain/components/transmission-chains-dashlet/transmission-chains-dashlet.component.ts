@@ -2602,6 +2602,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       if (!usedMap['genderLNG_ENTITY_FIELD_LABEL_GENDER']) {
         this.snapshotFilters.gender = undefined;
       }
+      if (!usedMap['clusterIdLNG_ENTITY_FIELD_LABEL_CLUSTER']) {
+        this.snapshotFilters.cluster = undefined;
+      }
       if (!usedMap['ageLNG_ENTITY_FIELD_LABEL_AGE']) {
         this.snapshotFilters.age = undefined;
       }
