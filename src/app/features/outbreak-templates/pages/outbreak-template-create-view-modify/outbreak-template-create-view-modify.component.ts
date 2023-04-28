@@ -27,6 +27,11 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { QuestionModel } from '../../../../core/models/question.model';
+import {
+  ITreeEditorDataCategory
+} from '../../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { IconModel } from '../../../../core/models/icon.model';
 
 /**
  * Component
@@ -36,6 +41,9 @@ import { QuestionModel } from '../../../../core/models/question.model';
   templateUrl: './outbreak-template-create-view-modify.component.html'
 })
 export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyComponent<OutbreakTemplateModel> implements OnDestroy {
+  // per disease
+  private _diseaseSpecificReferenceData: ITreeEditorDataCategory[];
+
   /**
    * Constructor
    */
@@ -45,6 +53,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
     private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     private router: Router,
+    protected referenceDataHelperService: ReferenceDataHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -90,7 +99,25 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   /**
    * Data initialized
    */
-  protected initializedData(): void { }
+  protected initializedData(): void {
+    // format reference data per disease to expected tree format
+    this._diseaseSpecificReferenceData = this.activatedRoute.snapshot.data.diseaseSpecificCategories.list.map((item) => {
+      return {
+        id: item.id,
+        label: item.name,
+        children: item.entries.map((entry) => {
+          return {
+            id: entry.id,
+            label: entry.value,
+            disabled: !entry.active,
+            colorCode: entry.colorCode,
+            isSystemWide: !!entry.isSystemWide,
+            iconUrl: entry.iconUrl
+          };
+        })
+      };
+    });
+  }
 
   /**
    * Initialize page title
@@ -177,6 +204,9 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       tabs: [
         // Details
         this.initializeTabsDetails(),
+
+        // Reference Data Per Outbreak Template
+        this.initializeTabsReferenceDataPerOutbreakTemplate(),
 
         // Questionnaires
         this.initializeTabsQuestionnaireCase(),
@@ -556,6 +586,59 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
           ]
         }
       ]
+    };
+  }
+
+  /**
+   * Initialize tabs - Reference data per outbreak template
+   */
+  private initializeTabsReferenceDataPerOutbreakTemplate(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'ref_data_per_outbreak_template',
+      label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR,
+        name: 'allowedRefDataItems',
+        displaySystemWide: true,
+        options: this._diseaseSpecificReferenceData,
+        value: {
+          get: () => this.itemData.allowedRefDataItems,
+          set: (value) => {
+            this.itemData.allowedRefDataItems = value;
+          }
+        },
+        add: {
+          callback: (data) => {
+            this.referenceDataHelperService
+              .showNewItemDialog(
+                {
+                  icon: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<IconModel>).options
+                },
+                data.category,
+                (
+                  item,
+                  addAnother
+                ) => {
+                  data.finish(
+                    item ?
+                      {
+                        id: item.id,
+                        label: item.value,
+                        disabled: !item.active,
+                        colorCode: item.colorCode,
+                        isSystemWide: !!item.isSystemWide,
+                        iconUrl: item.iconUrl
+                      } :
+                      null,
+                    addAnother
+                  );
+                }
+              );
+          },
+          visible: () => ReferenceDataEntryModel.canCreate(this.authUser)
+        }
+      }
     };
   }
 

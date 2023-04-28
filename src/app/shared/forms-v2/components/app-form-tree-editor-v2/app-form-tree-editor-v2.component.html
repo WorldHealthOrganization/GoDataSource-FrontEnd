@@ -80,7 +80,7 @@
 
             <!-- Buttons -->
             <div
-              *ngIf="!viewOnly"
+              *ngIf="!viewOnly && addNewItemVisible"
               class="gd-form-tree-editor-v2-list-category-buttons"
               fxGrow="0">
 
@@ -192,6 +192,7 @@
 
       <!-- Add entry -->
       <div
+        *ngIf="addNewItemVisible"
         class="gd-form-tree-editor-v2-legend-items-item">
         <mat-icon>playlist_add</mat-icon>
         <span>{{'LNG_COMMON_BUTTON_ADD' | translate}}</span>

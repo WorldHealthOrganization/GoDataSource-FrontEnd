@@ -128,6 +128,7 @@ export class AppFormTreeEditorV2Component
   }
 
   // add new item
+  @Input() addNewItemVisible: boolean = false;
   @Output() addNewItem: EventEmitter<ICreateViewModifyV2TabTableTreeAddNewItem> = new EventEmitter<ICreateViewModifyV2TabTableTreeAddNewItem>();
 
   // language handler

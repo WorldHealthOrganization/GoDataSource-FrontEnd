@@ -730,7 +730,12 @@ interface ICreateViewModifyV2TabTableTree {
   value: ICreateViewModifyV2TabInputValue<ITreeEditorDataValue>;
   options: ITreeEditorDataCategory[];
   displaySystemWide: boolean;
-  addNewItem: (data: ICreateViewModifyV2TabTableTreeAddNewItem) => void;
+
+  // optional
+  add?: {
+    callback: (data: ICreateViewModifyV2TabTableTreeAddNewItem) => void,
+    visible?: () => boolean
+  };
 }
 
 /**

@@ -21,6 +21,10 @@ import {
 } from '../../core/services/resolvers/data/questionnaire-answer-display.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import {
+  ReferenceDataDiseaseSpecificCategoriesResolver
+} from '../../core/services/resolvers/data/reference-data-disease-specific-categories.resolver';
+import { IconDataResolver } from '../../core/services/resolvers/data/icon.resolver';
 
 // conf
 const createViewModifyFoundation: Route = {
@@ -33,7 +37,9 @@ const createViewModifyFoundation: Route = {
     questionnaireAnswerType: QuestionnaireAnswerTypeDataResolver,
     questionnaireQuestionCategory: QuestionnaireQuestionCategoryDataResolver,
     questionnaireAnswerDisplay: QuestionnaireAnswerDisplayDataResolver,
-    user: UserDataResolver
+    user: UserDataResolver,
+    diseaseSpecificCategories: ReferenceDataDiseaseSpecificCategoriesResolver,
+    icon: IconDataResolver
   }
 };
 

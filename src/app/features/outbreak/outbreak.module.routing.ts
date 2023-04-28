@@ -20,6 +20,10 @@ import { OutbreakTemplateDataResolver } from '../../core/services/resolvers/data
 import { QuestionnaireAnswerTypeDataResolver } from '../../core/services/resolvers/data/questionnaire-answer-type.resolver';
 import { QuestionnaireQuestionCategoryDataResolver } from '../../core/services/resolvers/data/questionnaire-question-category.resolver';
 import { QuestionnaireAnswerDisplayDataResolver } from '../../core/services/resolvers/data/questionnaire-answer-display.resolver';
+import {
+  ReferenceDataDiseaseSpecificCategoriesResolver
+} from '../../core/services/resolvers/data/reference-data-disease-specific-categories.resolver';
+import { IconDataResolver } from '../../core/services/resolvers/data/icon.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -36,7 +40,9 @@ const createViewModifyFoundation: Route = {
     outbreakTemplate: OutbreakTemplateDataResolver,
     questionnaireAnswerType: QuestionnaireAnswerTypeDataResolver,
     questionnaireQuestionCategory: QuestionnaireQuestionCategoryDataResolver,
-    questionnaireAnswerDisplay: QuestionnaireAnswerDisplayDataResolver
+    questionnaireAnswerDisplay: QuestionnaireAnswerDisplayDataResolver,
+    diseaseSpecificCategories: ReferenceDataDiseaseSpecificCategoriesResolver,
+    icon: IconDataResolver
   }
 };
 

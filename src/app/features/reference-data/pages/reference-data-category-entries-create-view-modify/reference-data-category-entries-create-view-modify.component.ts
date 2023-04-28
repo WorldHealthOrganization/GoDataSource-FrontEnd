@@ -450,32 +450,35 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
             this.itemData.allowedRefDataItems = value;
           }
         },
-        addNewItem: (data) => {
-          this.referenceDataHelperService
-            .showNewItemDialog(
-              {
-                icon: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<IconModel>).options
-              },
-              data.category,
-              (
-                item,
-                addAnother
-              ) => {
-                data.finish(
-                  item ?
-                    {
-                      id: item.id,
-                      label: item.value,
-                      disabled: !item.active,
-                      colorCode: item.colorCode,
-                      isSystemWide: !!item.isSystemWide,
-                      iconUrl: item.iconUrl
-                    } :
-                    null,
+        add: {
+          callback: (data) => {
+            this.referenceDataHelperService
+              .showNewItemDialog(
+                {
+                  icon: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<IconModel>).options
+                },
+                data.category,
+                (
+                  item,
                   addAnother
-                );
-              }
-            );
+                ) => {
+                  data.finish(
+                    item ?
+                      {
+                        id: item.id,
+                        label: item.value,
+                        disabled: !item.active,
+                        colorCode: item.colorCode,
+                        isSystemWide: !!item.isSystemWide,
+                        iconUrl: item.iconUrl
+                      } :
+                      null,
+                    addAnother
+                  );
+                }
+              );
+          },
+          visible: () => ReferenceDataEntryModel.canCreate(this.authUser)
         }
       },
       visible: () => {

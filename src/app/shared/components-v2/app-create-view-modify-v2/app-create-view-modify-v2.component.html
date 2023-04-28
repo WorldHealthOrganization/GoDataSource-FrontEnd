@@ -541,8 +541,9 @@
                     [selectedTab]="selectedTab === tab"
                     [options]="input.options"
                     [displaySystemWide]="input.displaySystemWide"
+                    [addNewItemVisible]="input.add && (!input.add.visible || input.add.visible())"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"
-                    (addNewItem)="input.addNewItem($event)"></app-form-tree-editor-v2>
+                    (addNewItem)="input.add ? input.add.callback($event) : undefined"></app-form-tree-editor-v2>
 
                   <!-- Text -->
                   <app-form-input-v2
