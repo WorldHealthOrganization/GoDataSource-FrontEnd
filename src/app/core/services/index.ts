@@ -144,6 +144,7 @@ import { FontResolver } from './resolvers/font-resolver';
 import { ImageResolver } from './resolvers/image-resolver';
 import { ReferenceDataDiseaseSpecificCategoriesResolver } from './resolvers/data/reference-data-disease-specific-categories.resolver';
 import { ReferenceDataHelperService } from './helper/reference-data-helper.service';
+import { BulkCacheHelperService } from './helper/bulk-cache-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -154,6 +155,7 @@ export const services: any[] = [
   BackupModuleDataResolver,
   BackupStatusDataResolver,
   BackupTypesDataResolver,
+  BulkCacheHelperService,
   CertaintyLevelDataResolver,
   ClassificationDataResolver,
   ClusterDataResolver,

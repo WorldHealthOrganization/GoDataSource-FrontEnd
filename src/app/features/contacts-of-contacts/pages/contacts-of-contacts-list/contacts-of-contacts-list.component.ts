@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -34,6 +34,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import * as moment from 'moment';
 import { IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputMultiDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -118,7 +119,9 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     private locationDataService: LocationDataService,
     private dialogV2Service: DialogV2Service,
     private activatedRoute: ActivatedRoute,
-    private entityHelperService: EntityHelperService
+    private entityHelperService: EntityHelperService,
+    private router: Router,
+    protected bulkCacheHelperService: BulkCacheHelperService
   ) {
     super(listHelperService);
   }
@@ -1066,13 +1069,19 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS'
           },
           action: {
-            link: (): string[] => {
-              return ['/contacts-of-contacts', 'modify-bulk'];
-            },
-            linkQueryParams: (selected: string[]): Params => {
-              return {
-                contactOfContactIds: JSON.stringify(selected)
-              };
+            click: (selected: string[]) => {
+              // set data into local storage since query url might be too long for hundreds of ids
+              const cacheKey: string = this.bulkCacheHelperService.storeBulkSelected(selected);
+
+              // redirect
+              this.router.navigate(
+                ['/contacts-of-contacts', 'modify-bulk'],
+                {
+                  queryParams: {
+                    cacheKey
+                  }
+                }
+              );
             }
           },
           visible: (): boolean => {

@@ -73,12 +73,11 @@
     <!-- Paste -->
     <!-- (click) doesn't work on MacOS Safari -->
     <button
-      *ngIf="showPasteMenuOption"
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length !== 1"
-      (mouseup)="cellPaste()">
+      (mouseup)="cellPaste(true)">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
