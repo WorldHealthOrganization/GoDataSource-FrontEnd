@@ -114,6 +114,14 @@
               class="gd-form-tree-editor-v2-list-category-item-color"
               [style.backgroundColor]="item.data.colorCode"></div>
 
+            <!-- Icon -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-item-icon">
+              <img
+                *ngIf="item.data.iconUrl"
+                [src]="item.data.iconUrl" />
+            </div>
+
             <!-- Checkbox + label -->
             <app-form-checkbox-v2
               [ngModel]="(item.data.isSystemWide && !item.data.disabled) || (value && value[item.parent.data.id] && value[item.parent.data.id][item.data.id])"

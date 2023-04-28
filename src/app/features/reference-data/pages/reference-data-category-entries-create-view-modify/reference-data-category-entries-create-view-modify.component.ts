@@ -118,7 +118,8 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
             label: entry.value,
             disabled: !entry.active,
             colorCode: entry.colorCode,
-            isSystemWide: !!entry.isSystemWide
+            isSystemWide: !!entry.isSystemWide,
+            iconUrl: entry.iconUrl
           };
         })
       };
@@ -467,7 +468,8 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
                       label: item.value,
                       disabled: !item.active,
                       colorCode: item.colorCode,
-                      isSystemWide: !!item.isSystemWide
+                      isSystemWide: !!item.isSystemWide,
+                      iconUrl: item.iconUrl
                     } :
                     null,
                   addAnother

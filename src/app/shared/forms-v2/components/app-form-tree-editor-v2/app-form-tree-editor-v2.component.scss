@@ -83,6 +83,20 @@
             margin-right: 0.8rem;
             width: 2rem;
           }
+
+          .gd-form-tree-editor-v2-list-category-item-icon {
+            display: block;
+            height: 2rem;
+            margin-top: 0.2rem;
+            margin-right: 0.8rem;
+            width: 2rem;
+
+            > img {
+              display: inline-block;
+              height: 2rem;
+              vertical-align: middle;
+            }
+          }
         }
       }
     }

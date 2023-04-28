@@ -697,7 +697,7 @@ export class AppFormTreeEditorV2Component
       this._startCopyTimer = undefined;
 
       // set copy value
-      this.copyCheckbox = this.value[item.parent.data.id] && !!this.value[item.parent.data.id][item.data.id];
+      this.copyCheckbox = !!this.value[item.parent.data.id] && !!this.value[item.parent.data.id][item.data.id];
 
       // update ui
       this.detectChanges();
