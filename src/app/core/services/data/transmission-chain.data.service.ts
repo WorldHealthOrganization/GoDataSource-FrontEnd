@@ -391,14 +391,14 @@ export class TransmissionChainDataService {
             nodeData.model.dateOfReporting && (
               (
                 !snapshotFiltersDate.startDate &&
-                moment(nodeData.model.dateOfReporting).isBefore(snapshotFiltersDate.endDate)
+                moment(nodeData.model.dateOfReporting).isSameOrBefore(snapshotFiltersDate.endDate)
               ) || (
                 !snapshotFiltersDate.endDate &&
-                moment(nodeData.model.dateOfReporting).isAfter(snapshotFiltersDate.startDate)
+                moment(nodeData.model.dateOfReporting).isSameOrAfter(snapshotFiltersDate.startDate)
               ) || (
                 snapshotFiltersDate.startDate &&
                 snapshotFiltersDate.endDate &&
-                moment(nodeData.model.dateOfReporting).isBetween(snapshotFiltersDate.startDate, snapshotFiltersDate.endDate)
+                moment(nodeData.model.dateOfReporting).isBetween(snapshotFiltersDate.startDate, snapshotFiltersDate.endDate, undefined, '[]')
               )
             )
           )
