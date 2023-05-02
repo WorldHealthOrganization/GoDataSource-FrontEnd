@@ -302,22 +302,6 @@ export class AppFormSelectSingleV2Component
   }
 
   /**
-   * Click button
-   */
-  iconButtonClick(
-    event,
-    iconB: IAppFormIconButtonV2
-  ): void {
-    // prevent propagation
-    event.stopPropagation();
-
-    // execute click action
-    if (iconB.clickAction) {
-      iconB.clickAction(this);
-    }
-  }
-
-  /**
    * Timer - open
    */
   private stopOpenTimer(): void {

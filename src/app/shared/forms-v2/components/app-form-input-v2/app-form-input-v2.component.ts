@@ -87,20 +87,4 @@ export class AppFormInputV2Component
   ngOnDestroy(): void {
     super.onDestroy();
   }
-
-  /**
-   * Click button
-   */
-  iconButtonClick(
-    event,
-    iconB: IAppFormIconButtonV2
-  ): void {
-    // prevent propagation
-    event.stopPropagation();
-
-    // execute click action
-    if (iconB.clickAction) {
-      iconB.clickAction(this);
-    }
-  }
 }

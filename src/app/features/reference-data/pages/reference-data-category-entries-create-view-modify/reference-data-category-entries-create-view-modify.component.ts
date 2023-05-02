@@ -108,22 +108,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     }
 
     // format reference data per disease to expected tree format
-    this._diseaseSpecificReferenceData = this._diseaseSpecificCategories.list.map((item) => {
-      return {
-        id: item.id,
-        label: item.name,
-        children: item.entries.map((entry) => {
-          return {
-            id: entry.id,
-            label: entry.value,
-            disabled: !entry.active,
-            colorCode: entry.colorCode,
-            isSystemWide: !!entry.isSystemWide,
-            iconUrl: entry.iconUrl
-          };
-        })
-      };
-    });
+    this._diseaseSpecificReferenceData = this.referenceDataHelperService.convertRefCategoriesToTreeCategories(this._diseaseSpecificCategories.list);
   }
 
   /**

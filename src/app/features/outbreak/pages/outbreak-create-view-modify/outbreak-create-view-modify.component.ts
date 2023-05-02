@@ -33,10 +33,16 @@ import { QuestionModel } from '../../../../core/models/question.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import {
-  ITreeEditorDataCategory
+  ITreeEditorDataCategory, ITreeEditorDataValue
 } from '../../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { IconModel } from '../../../../core/models/icon.model';
+import {
+  AppFormSelectSingleV2Component
+} from '../../../../shared/forms-v2/components/app-form-select-single-v2/app-form-select-single-v2.component';
+import {
+  IV2BottomDialogConfigButtonType
+} from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
  * Component
@@ -129,22 +135,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     }
 
     // format reference data per disease to expected tree format
-    this._diseaseSpecificReferenceData = this.activatedRoute.snapshot.data.diseaseSpecificCategories.list.map((item) => {
-      return {
-        id: item.id,
-        label: item.name,
-        children: item.entries.map((entry) => {
-          return {
-            id: entry.id,
-            label: entry.value,
-            disabled: !entry.active,
-            colorCode: entry.colorCode,
-            isSystemWide: !!entry.isSystemWide,
-            iconUrl: entry.iconUrl
-          };
-        })
-      };
-    });
+    this._diseaseSpecificReferenceData = this.referenceDataHelperService.convertRefCategoriesToTreeCategories(this.activatedRoute.snapshot.data.diseaseSpecificCategories.list);
   }
 
   /**
@@ -347,7 +338,55 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                 set: (value) => {
                   this.itemData.disease = value;
                 }
-              }
+              },
+              suffixIconButtons: [
+                {
+                  icon: 'file_copy',
+                  tooltip: 'LNG_PAGE_CREATE_OUTBREAK_COPY_REF_FROM_DISEASE_TOOLTIP',
+                  disabled: (input: AppFormSelectSingleV2Component) => {
+                    // check if we have anything to copy
+                    const allowedRefDataItems: ITreeEditorDataValue = (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[input.value]?.allowedRefDataItems;
+                    if (
+                      !allowedRefDataItems ||
+                      Object.keys(allowedRefDataItems).length < 1
+                    ) {
+                      return true;
+                    }
+
+                    // allow
+                    return false;
+                  },
+                  clickAction: (input: AppFormSelectSingleV2Component) => {
+                    // ask for confirmation before overwriting
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+                        },
+                        message: {
+                          get: () => 'LNG_PAGE_CREATE_OUTBREAK_COPY_REF_FROM_DISEASE_DIALOG',
+                          data: () => ({
+                            disease: this.i18nService.instant(input.value)
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // overwrite
+                      const allowedRefDataItems: ITreeEditorDataValue = (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[input.value]?.allowedRefDataItems;
+                      this.itemData.allowedRefDataItems = _.cloneDeep(allowedRefDataItems);
+
+                      // mark as dirty
+                      input.control?.markAsDirty();
+                    });
+                  }
+                }
+              ]
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_MULTIPLE,
               name: 'countries',

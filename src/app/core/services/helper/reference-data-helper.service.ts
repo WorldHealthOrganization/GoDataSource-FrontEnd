@@ -11,9 +11,12 @@ import {
 import { FormHelperService } from './form-helper.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { ToastV2Service } from './toast-v2.service';
-import { ReferenceDataEntryModel } from '../../models/reference-data.model';
+import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { I18nService } from './i18n.service';
+import {
+  ITreeEditorDataCategory
+} from '../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 
 @Injectable()
 export class ReferenceDataHelperService {
@@ -27,6 +30,28 @@ export class ReferenceDataHelperService {
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService
   ) {}
+
+  /**
+   * Convert reference data categories to tree categories
+   */
+  convertRefCategoriesToTreeCategories(categories: ReferenceDataCategoryModel[]): ITreeEditorDataCategory[] {
+    return categories.map((item) => {
+      return {
+        id: item.id,
+        label: item.name,
+        children: item.entries.map((entry) => {
+          return {
+            id: entry.id,
+            label: entry.value,
+            disabled: !entry.active,
+            colorCode: entry.colorCode,
+            isSystemWide: !!entry.isSystemWide,
+            iconUrl: entry.iconUrl
+          };
+        })
+      };
+    });
+  }
 
   /**
    * Entity dialog
