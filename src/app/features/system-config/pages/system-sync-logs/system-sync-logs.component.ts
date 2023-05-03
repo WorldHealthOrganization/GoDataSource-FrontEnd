@@ -761,7 +761,6 @@ export class SystemSyncLogsComponent
         async: false,
         method: ExportDataMethod.GET,
         fileName: `${ this.i18nService.instant('LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE') } - ${ moment().format('YYYY-MM-DD') }`,
-        queryBuilder: this.queryBuilder,
         allow: {
           types: [ExportDataExtension.ZIP],
           encrypt: false
