@@ -813,7 +813,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   type: IV2ColumnStatusFormType.CIRCLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           },
@@ -826,7 +827,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 type: IV2ColumnStatusFormType.STAR,
                 color: 'var(--gd-danger)'
               },
-              label: ' '
+              label: ' ',
+              order: undefined
             }]
           }
         ],

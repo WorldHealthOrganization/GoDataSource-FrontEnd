@@ -11,12 +11,16 @@ import {
 import { FormHelperService } from './form-helper.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { ToastV2Service } from './toast-v2.service';
-import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
+import {
+  ReferenceDataCategoryModel,
+  ReferenceDataEntryModel
+} from '../../models/reference-data.model';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { I18nService } from './i18n.service';
 import {
   ITreeEditorDataCategory
 } from '../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
+import { OutbreakModel } from '../../models/outbreak.model';
 
 @Injectable()
 export class ReferenceDataHelperService {
@@ -253,5 +257,37 @@ export class ReferenceDataHelperService {
             );
           });
       });
+  }
+
+  /**
+   * Filter reference data based on outbreak configurations
+   */
+  filterPerOutbreak(
+    outbreak: OutbreakModel,
+    items: ReferenceDataEntryModel[]
+  ): ReferenceDataEntryModel[] {
+    return items.filter((item) =>
+      item.isSystemWide ||
+      !outbreak?.allowedRefDataItems ||
+      !outbreak.allowedRefDataItems[item.categoryId] ||
+      outbreak.allowedRefDataItems[item.categoryId][item.id]
+    );
+  }
+
+  /**
+   * Filter reference data options based on outbreak configurations
+   */
+  filterPerOutbreakOptions(
+    outbreak: OutbreakModel,
+    // #TODO item.data..nu putem garanta ca e ce tb..poate e mai bine sa primim ca input ReferenceDataEntryModel[] si sa facem o lista noua de ILabelValuePairModel[]
+    // #TODO dar atunci care mai e rostul sa avem options in resolver !?
+    options: ILabelValuePairModel[]
+  ): ILabelValuePairModel[] {
+    return options.filter((item) =>
+      item.data.isSystemWide ||
+      !outbreak?.allowedRefDataItems ||
+      !outbreak.allowedRefDataItems[item.data.categoryId] ||
+      outbreak.allowedRefDataItems[item.data.categoryId][item.value]
+    );
   }
 }

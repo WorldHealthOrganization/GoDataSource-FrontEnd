@@ -970,7 +970,8 @@ export class ContactsListComponent
                   type: IV2ColumnStatusFormType.TRIANGLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           },
@@ -983,21 +984,24 @@ export class ContactsListComponent
                 type: IV2ColumnStatusFormType.SQUARE,
                 color: 'var(--gd-status-follow-up-not-started)'
               },
-              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED'
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED',
+              order: undefined
             },
             {
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
                 color: 'var(--gd-status-under-follow-up)'
               },
-              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP'
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP',
+              order: undefined
             },
             {
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
                 color: 'var(--gd-status-follow-up-ended)'
               },
-              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP'
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP',
+              order: undefined
             }]
           },
 
@@ -1009,7 +1013,8 @@ export class ContactsListComponent
                 type: IV2ColumnStatusFormType.STAR,
                 color: 'var(--gd-danger)'
               },
-              label: ' '
+              label: ' ',
+              order: undefined
             }]
           }
         ],
@@ -1741,11 +1746,13 @@ export class ContactsListComponent
                 // format order
                 let order1: number = Number.MAX_SAFE_INTEGER;
                 try {
-                  order1 = parseInt(item1.order, 10);
+                  order1 = typeof item1.order === 'number' ? item1.order : parseInt(item1.order, 10);
+                  order1 = isNaN(order1) ? Number.MAX_SAFE_INTEGER : order1;
                 } catch (e) {}
                 let order2: number = Number.MAX_SAFE_INTEGER;
                 try {
-                  order2 = parseInt(item2.order, 10);
+                  order2 = typeof item2.order === 'number' ? item2.order : parseInt(item2.order, 10);
+                  order2 = isNaN(order2) ? Number.MAX_SAFE_INTEGER : order2;
                 } catch (e) {}
 
                 // compare order

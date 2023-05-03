@@ -332,7 +332,8 @@ export class EntityLabResultService {
                 type: IV2ColumnStatusFormType.STAR,
                 color: 'var(--gd-danger)'
               },
-              label: ' '
+              label: ' ',
+              order: undefined
             }]
           }
         ],

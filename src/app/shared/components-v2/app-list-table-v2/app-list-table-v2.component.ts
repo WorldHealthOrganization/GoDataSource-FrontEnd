@@ -1084,11 +1084,35 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(legend.title)}</span><span class="gd-list-table-bottom-left-legend-items">`;
 
           // render legend
-          legend.items.forEach((legendItem) => {
-            html += `<span class="gd-list-table-bottom-left-legend-items-item">
-              ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.i18nService.instant(legendItem.label)}
-            </span>`;
-          });
+          legend.items
+            .sort((item1, item2) => {
+              // if same order, compare labels
+              if (item1.order === item2.order) {
+                return this.i18nService
+                  .instant(item1.label)
+                  .localeCompare(this.i18nService.instant(item2.label));
+              }
+
+              // format order
+              let order1: number = Number.MAX_SAFE_INTEGER;
+              try {
+                order1 = typeof item1.order === 'number' ? item1.order : parseInt(item1.order, 10);
+                order1 = isNaN(order1) ? Number.MAX_SAFE_INTEGER : order1;
+              } catch (e) {}
+              let order2: number = Number.MAX_SAFE_INTEGER;
+              try {
+                order2 = typeof item2.order === 'number' ? item2.order : parseInt(item2.order, 10);
+                order2 = isNaN(order2) ? Number.MAX_SAFE_INTEGER : order2;
+              } catch (e) {}
+
+              // compare order
+              return order1 - order2;
+            })
+            .forEach((legendItem) => {
+              html += `<span class="gd-list-table-bottom-left-legend-items-item">
+                ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.i18nService.instant(legendItem.label)}
+              </span>`;
+            });
 
           // close items list
           html += '</span>';

@@ -435,7 +435,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                 type: IV2ColumnStatusFormType.STAR,
                 color: 'var(--gd-danger)'
               },
-              label: ' '
+              label: ' ',
+              order: undefined
             }]
           }
         ],

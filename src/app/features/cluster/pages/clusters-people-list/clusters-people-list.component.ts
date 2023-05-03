@@ -266,7 +266,8 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
                   type: IV2ColumnStatusFormType.CIRCLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           }

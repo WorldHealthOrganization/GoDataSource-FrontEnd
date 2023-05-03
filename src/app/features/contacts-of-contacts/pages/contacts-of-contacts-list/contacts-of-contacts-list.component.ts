@@ -493,7 +493,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   type: IV2ColumnStatusFormType.TRIANGLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           }
@@ -1198,9 +1199,15 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
 
                 // format order
                 let order1: number = Number.MAX_SAFE_INTEGER;
-                try { order1 = parseInt(item1.order, 10); } catch (e) {}
+                try {
+                  order1 = typeof item1.order === 'number' ? item1.order : parseInt(item1.order, 10);
+                  order1 = isNaN(order1) ? Number.MAX_SAFE_INTEGER : order1;
+                } catch (e) {}
                 let order2: number = Number.MAX_SAFE_INTEGER;
-                try { order2 = parseInt(item2.order, 10); } catch (e) {}
+                try {
+                  order2 = typeof item2.order === 'number' ? item2.order : parseInt(item2.order, 10);
+                  order2 = isNaN(order2) ? Number.MAX_SAFE_INTEGER : order2;
+                } catch (e) {}
 
                 // compare order
                 return order1 - order2;

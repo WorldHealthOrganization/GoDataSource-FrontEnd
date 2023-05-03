@@ -246,6 +246,7 @@ interface IV2ColumnLegendStatusItem {
   // required
   form: V2ColumnStatusForm;
   label: string;
+  order: number | undefined;
 }
 
 /**

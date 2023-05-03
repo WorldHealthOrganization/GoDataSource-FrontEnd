@@ -40,6 +40,7 @@ import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterTy
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-cases-list',
@@ -139,7 +140,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     private i18nService: I18nService,
     private entityHelperService: EntityHelperService,
     private redirectService: RedirectService,
-    private clusterDataService: ClusterDataService
+    private clusterDataService: ClusterDataService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     super(listHelperService);
   }
@@ -158,6 +160,13 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
   selectedOutbreakChanged(): void {
     // initialize pagination
     this.initPaginator();
+
+    // re-init columns so they take in account the new outbreak
+    // #TODO - find better way, because this triggers update columns 2 and we need to wait for bind to update table size..to take in account legend
+    this.initializeTableColumns();
+    setTimeout(() => {
+      this.tableV2Component.resizeTable();
+    });
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
@@ -805,13 +814,17 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           // classification
           {
             title: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-            items: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+            items: this.referenceDataHelperService.filterPerOutbreak(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).list
+            ).map((item) => {
               return {
                 form: {
                   type: IV2ColumnStatusFormType.CIRCLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           },
@@ -819,13 +832,17 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           // outcome
           {
             title: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-            items: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+            items: this.referenceDataHelperService.filterPerOutbreak(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).list
+            ).map((item) => {
               return {
                 form: {
                   type: IV2ColumnStatusFormType.TRIANGLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           },
@@ -838,7 +855,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                 type: IV2ColumnStatusFormType.STAR,
                 color: 'var(--gd-danger)'
               },
-              label: ' '
+              label: ' ',
+              order: undefined
             }]
           }
         ],
@@ -855,7 +873,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          ),
           search: (column: IV2Column) => {
             // create condition
             const values: string[] = (column.filter as IV2FilterMultipleSelect).value;
@@ -1924,9 +1945,15 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
 
                 // format order
                 let order1: number = Number.MAX_SAFE_INTEGER;
-                try { order1 = parseInt(item1.order, 10); } catch (e) {}
+                try {
+                  order1 = typeof item1.order === 'number' ? item1.order : parseInt(item1.order, 10);
+                  order1 = isNaN(order1) ? Number.MAX_SAFE_INTEGER : order1;
+                } catch (e) {}
                 let order2: number = Number.MAX_SAFE_INTEGER;
-                try { order2 = parseInt(item2.order, 10); } catch (e) {}
+                try {
+                  order2 = typeof item2.order === 'number' ? item2.order : parseInt(item2.order, 10);
+                  order2 = isNaN(order2) ? Number.MAX_SAFE_INTEGER : order2;
+                } catch (e) {}
 
                 // compare order
                 return order1 - order2;
