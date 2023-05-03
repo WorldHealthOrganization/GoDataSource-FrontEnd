@@ -572,6 +572,12 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
                           placeholder: 'LNG_PAGE_LIST_LOCATIONS_EXPORT_DELETED_INFORMATION',
                           name: 'includeDeletedLocations',
                           checked: false
+                        },
+                        {
+                          type: V2SideDialogConfigInputType.CHECKBOX,
+                          placeholder: 'LNG_PAGE_LIST_LOCATIONS_EXPORT_REPLACE_UPDATED_AT_AS_CURRENT_DATE',
+                          name: 'replaceUpdatedAtAsCurrentDate',
+                          checked: false
                         }
                       ]
                     }
