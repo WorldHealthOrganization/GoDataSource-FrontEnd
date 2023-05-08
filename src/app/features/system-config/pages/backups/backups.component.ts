@@ -50,6 +50,9 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   // used to determine when a backup has finished, so we can start the restore process...
   private _waitForBackupIdToBeReady: string;
 
+  // timers
+  private _backupCheckForReadyTimer: number;
+
   /**
    * Constructor
    */
@@ -74,6 +77,9 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+
+    // stop timers
+    this.stopBackupCheckForReady();
   }
 
   /**
@@ -600,6 +606,16 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   }
 
   /**
+   * Stop timer
+   */
+  private stopBackupCheckForReady(): void {
+    if (this._backupCheckForReadyTimer) {
+      clearTimeout(this._backupCheckForReadyTimer);
+      this._backupCheckForReadyTimer = undefined;
+    }
+  }
+
+  /**
   * Restore system data to a previous state from a data backup
   */
   restoreBackup(item: BackupModel) {
@@ -644,8 +660,15 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
 
     // start restore process when backup is ready
     const backupCheckForReady = (loading: IV2LoadingDialogHandler) => {
-      setTimeout(
+      // stop previous
+      this.stopBackupCheckForReady();
+
+      // call
+      this._backupCheckForReadyTimer = setTimeout(
         () => {
+          // reset
+          this._backupCheckForReadyTimer = undefined;
+
           // check if backup is ready
           this.systemBackupDataService
             .getBackup(this._waitForBackupIdToBeReady)

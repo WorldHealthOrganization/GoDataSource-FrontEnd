@@ -181,7 +181,8 @@ export class AppFormSelectSingleV2Component
   }
 
   // timers
-  private _openTimer: any;
+  private _openTimer: number;
+  private _firstOptionTimer: number;
 
   /**
    * Constructor
@@ -207,6 +208,7 @@ export class AppFormSelectSingleV2Component
 
     // timers
     this.stopOpenTimer();
+    this.stopFirstOptionTimer();
   }
 
   /**
@@ -312,6 +314,16 @@ export class AppFormSelectSingleV2Component
   }
 
   /**
+   * Stop timer
+   */
+  private stopFirstOptionTimer(): void {
+    if (this._firstOptionTimer) {
+      clearTimeout(this._firstOptionTimer);
+      this._firstOptionTimer = undefined;
+    }
+  }
+
+  /**
    * Open select
    */
   open(startSearch?: string): void {
@@ -337,7 +349,15 @@ export class AppFormSelectSingleV2Component
 
           // make active first one
           if (this.filteredOptions.length) {
-            setTimeout(() => {
+            // stop previous
+            this.stopFirstOptionTimer();
+
+            // trigger
+            this._firstOptionTimer = setTimeout(() => {
+              // reset
+              this._firstOptionTimer = undefined;
+
+              // update
               this.input._keyManager.setFirstItemActive();
             });
           }

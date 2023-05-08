@@ -114,8 +114,14 @@ export class AppFormSelectGroupsV2Component
     // set groups
     this._groups = groups;
 
+    // stop previous
+    this.stopGroupsTimer();
+
     // wait for binding to take place
-    setTimeout(() => {
+    this._groupsTimer = setTimeout(() => {
+      // reset
+      this._groupsTimer = undefined;
+
       // initialize groups
       this.initializeGroups();
 
@@ -170,15 +176,20 @@ export class AppFormSelectGroupsV2Component
   // valueChanged method triggered
   private _valueChangedTriggered: boolean = false;
 
-  /**
-   * Triggered when a group option is checked / unchecked
-   */
+  // triggered when a group option is checked / unchecked
   @Output() groupSelectionChanged = new EventEmitter<IGroupEventData>();
 
-  /**
-   * Triggered when a group child option is checked / unchecked
-   */
+  // triggered when a group child option is checked / unchecked
   @Output() groupOptionCheckStateChanged = new EventEmitter<IGroupOptionEventData>();
+
+  // timers
+  private _groupsTimer: number;
+  private _valueChangedTimer: number;
+  private _openedChangeTimer: number;
+  private _internalAddValuesTimer: number;
+  private _uncheckOthersTimer: number;
+  private _showPanelTimer: number;
+  private _checkedChildOptionTimer: number;
 
   /**
    * Process options to be applied on filters
@@ -217,7 +228,17 @@ export class AppFormSelectGroupsV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // timers
+    this.stopGroupsTimer();
+    this.stopValueChangedTimer();
+    this.stopOpenedChangeTimer();
+    this.stopInternalAddValuesTimer();
+    this.stopUncheckOthersTimer();
+    this.stopShowPanelTimer();
+    this.stopCheckedChildOptionTimer();
   }
 
   /**
@@ -607,6 +628,16 @@ export class AppFormSelectGroupsV2Component
   }
 
   /**
+   * Stop timer
+   */
+  private stopValueChangedTimer(): void {
+    if (this._valueChangedTimer) {
+      clearTimeout(this._valueChangedTimer);
+      this._valueChangedTimer = undefined;
+    }
+  }
+
+  /**
    * Add partial ids
    */
   valueChanged(
@@ -627,10 +658,27 @@ export class AppFormSelectGroupsV2Component
       // announce that value changes was triggered
       this._valueChangedTriggered = true;
 
+      // stop previous
+      this.stopValueChangedTimer();
+
       // determine group keys
-      setTimeout(() => {
+      this._valueChangedTimer = setTimeout(() => {
+        // reset
+        this._valueChangedTimer = undefined;
+
+        // update
         this.selectGroupKeys();
       });
+    }
+  }
+
+  /**
+   * Timer
+   */
+  private stopOpenedChangeTimer(): void {
+    if (this._openedChangeTimer) {
+      clearTimeout(this._openedChangeTimer);
+      this._openedChangeTimer = undefined;
     }
   }
 
@@ -660,8 +708,15 @@ export class AppFormSelectGroupsV2Component
         // reset change trigger
         this._valueChangedTriggered = false;
 
+        // stop previous
+        this.stopOpenedChangeTimer();
+
         // emit event after binding is done
-        setTimeout(() => {
+        this._openedChangeTimer = setTimeout(() => {
+          // reset
+          this._openedChangeTimer = undefined;
+
+          // emit
           this.optionChanged.emit(
             AppFormSelectGroupsV2Component.processValuesForFilter(
               this.value,
@@ -671,6 +726,16 @@ export class AppFormSelectGroupsV2Component
           );
         });
       }
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopInternalAddValuesTimer(): void {
+    if (this._internalAddValuesTimer) {
+      clearTimeout(this._internalAddValuesTimer);
+      this._internalAddValuesTimer = undefined;
     }
   }
 
@@ -752,15 +817,42 @@ export class AppFormSelectGroupsV2Component
       // update
       this.valueChangedTrigger();
 
+      // stop previous
+      this.stopInternalAddValuesTimer();
+
       // force partial refresh keys
       // fix for when jumping from 'None' to 'Partial' group checkbox
-      setTimeout(() => {
+      this._internalAddValuesTimer = setTimeout(() => {
+        // reset
+        this._internalAddValuesTimer = undefined;
+
+        // refresh
         this.refreshPartialKeys(this.value);
       });
     }
 
     // finished
     return [...this.value];
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopUncheckOthersTimer(): void {
+    if (this._uncheckOthersTimer) {
+      clearTimeout(this._uncheckOthersTimer);
+      this._uncheckOthersTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopShowPanelTimer(): void {
+    if (this._showPanelTimer) {
+      clearTimeout(this._showPanelTimer);
+      this._showPanelTimer = undefined;
+    }
   }
 
   /**
@@ -772,8 +864,14 @@ export class AppFormSelectGroupsV2Component
       // keep reference to previous value
       const previousValue: string[] = this.value ? [...this.value] : [];
 
+      // stop previous
+      this.stopUncheckOthersTimer();
+
       // wait for data to bind
-      setTimeout(() => {
+      this._uncheckOthersTimer = setTimeout(() => {
+        // reset
+        this._uncheckOthersTimer = undefined;
+
         // handle group option checked & unchecked
         if (
           changed.source.active &&
@@ -906,8 +1004,16 @@ export class AppFormSelectGroupsV2Component
                 self.selectItem.close();
               },
               showPanel(): void {
+                // stop previous
+                self.stopShowPanelTimer();
+
+                // open
                 self.selectItem.open();
-                setTimeout(() => {
+                self._showPanelTimer = setTimeout(() => {
+                  // reset
+                  self._showPanelTimer = undefined;
+
+                  // set
                   self.selectItem.panel.nativeElement.scrollTop = scrollPosition;
                 });
               }
@@ -915,6 +1021,16 @@ export class AppFormSelectGroupsV2Component
           }
         }
       });
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopCheckedChildOptionTimer(): void {
+    if (this._checkedChildOptionTimer) {
+      clearTimeout(this._checkedChildOptionTimer);
+      this._checkedChildOptionTimer = undefined;
     }
   }
 
@@ -929,8 +1045,14 @@ export class AppFormSelectGroupsV2Component
         this.optionsMap[changed.source.value] &&
         this.value.indexOf(this.optionsMap[changed.source.value].groupValue) > -1;
 
+      // stop previous
+      this.stopCheckedChildOptionTimer();
+
       // wait for data bind
-      setTimeout(() => {
+      this._checkedChildOptionTimer = setTimeout(() => {
+        // reset
+        this._checkedChildOptionTimer = undefined;
+
         // selected option
         if (changed.source.value) {
           // retrieve selected option
@@ -962,8 +1084,16 @@ export class AppFormSelectGroupsV2Component
                   self.selectItem.close();
                 },
                 showPanel(): void {
+                  // stop previous
+                  self.stopShowPanelTimer();
+
+                  // open
                   self.selectItem.open();
-                  setTimeout(() => {
+                  self._showPanelTimer = setTimeout(() => {
+                    // reset
+                    self._showPanelTimer = undefined;
+
+                    // set
                     self.selectItem.panel.nativeElement.scrollTop = scrollPosition;
                   });
                 }
@@ -1021,5 +1151,15 @@ export class AppFormSelectGroupsV2Component
 
     // render options
     this.valueChangedTrigger();
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopGroupsTimer(): void {
+    if (this._groupsTimer) {
+      clearTimeout(this._groupsTimer);
+      this._groupsTimer = undefined;
+    }
   }
 }

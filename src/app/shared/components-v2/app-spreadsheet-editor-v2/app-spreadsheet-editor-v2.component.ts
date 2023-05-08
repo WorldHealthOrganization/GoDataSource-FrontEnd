@@ -390,10 +390,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   };
 
   // timers
-  private _timerCellSelectFocused: any;
-  private _waitForAsyncToFinish: any;
-  private _scrollTimer: any;
-  private _pasteTimer: any;
+  private _timerCellSelectFocused: number;
+  private _waitForAsyncToFinish: number;
+  private _scrollTimer: number;
+  private _pasteTimer: number;
+  private _languageChangeTimer: number;
 
   // constants
   AppSpreadsheetEditorV2LoadingComponent = AppSpreadsheetEditorV2LoadingComponent;
@@ -435,23 +436,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // stop async request
     this.stopAsyncRequests();
 
-    // stop timers - cellSelectFocused
-    if (this._timerCellSelectFocused) {
-      clearTimeout(this._timerCellSelectFocused);
-      this._timerCellSelectFocused = undefined;
-    }
-
-    // stop timers - waitForAsyncToFinish
-    this.stopWaitForAsyncToFinish();
-
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
 
-    // stop scroll timer
+    // stop timers
     this.stopScrollTimer();
-
-    // stop paste timer
     this.stopPasteTimer();
+    this.stopLanguageChangeTimer();
+    this.stopTimerCellSelectFocused();
+    this.stopWaitForAsyncToFinish();
 
     // remove global notifications
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_PASTE_WARNING);
@@ -462,6 +455,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   detectChanges(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopTimerCellSelectFocused(): void {
+    // stop timers - cellSelectFocused
+    if (this._timerCellSelectFocused) {
+      clearTimeout(this._timerCellSelectFocused);
+      this._timerCellSelectFocused = undefined;
+    }
   }
 
   /**
@@ -480,8 +484,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // update ui
         this.changeDetectorRef.detectChanges();
 
+        // stop previous
+        this.stopLanguageChangeTimer();
+
         // wait for column bind to take effect
-        setTimeout(() => {
+        this._languageChangeTimer = setTimeout(() => {
+          // reset
+          this._languageChangeTimer = undefined;
+
           // redraw
           this._agTable.api.refreshCells({
             force: true,
@@ -4087,11 +4097,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     ) {
       // allow bubble
 
+      // stop previous
+      this.stopTimerCellSelectFocused();
+
       // update focused selection after focused cell is changed by ag-grid (return false)
       this._timerCellSelectFocused = setTimeout(() => {
+        // reset
+        this._timerCellSelectFocused = undefined;
+
         // update focused selection
         this.cellSelectFocused();
-        this._timerCellSelectFocused = undefined;
       });
 
       // don't block caller
@@ -4646,6 +4661,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     if (this._pasteTimer) {
       clearTimeout(this._pasteTimer);
       this._pasteTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopLanguageChangeTimer(): void {
+    if (this._languageChangeTimer) {
+      clearTimeout(this._languageChangeTimer);
+      this._languageChangeTimer = undefined;
     }
   }
 }

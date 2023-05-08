@@ -147,7 +147,7 @@ export class AppFormTreeEditorV2Component
   // timers
   private _startCopyTimer: any;
   private _newItemFlashTimers: {
-    [id: string]: any
+    [id: string]: number
   } = {};
 
   // constants
@@ -637,6 +637,12 @@ export class AppFormTreeEditorV2Component
           if (itemIndex > -1) {
             // visible
             this.cdkViewport.scrollToIndex(itemIndex);
+
+            // stop previous
+            if (this._newItemFlashTimers[catItem.id]) {
+              clearTimeout(this._newItemFlashTimers[catItem.id]);
+              delete this._newItemFlashTimers[catItem.id];
+            }
 
             // make it flash
             catItem.flash = true;

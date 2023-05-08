@@ -112,6 +112,9 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     DebounceTimeCallerType.DONT_RESET_AND_WAIT
   );
 
+  // timers
+  private _tokenExpireTimer: any;
+
   /**
    * Constructor
    */
@@ -264,6 +267,9 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       this.tokenCheckIfLoggedOutCaller = null;
     }
 
+    // stop timers
+    this.stopTokenExpireTimer();
+
     // remove idle handlers
     if (this.documentKeyUp) {
       document.removeEventListener('keyup', this.documentKeyUp);
@@ -308,6 +314,16 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop expire timer
+   */
+  private stopTokenExpireTimer(): void {
+    if (this._tokenExpireTimer) {
+      clearTimeout(this._tokenExpireTimer);
+      this._tokenExpireTimer = undefined;
+    }
+  }
+
+  /**
    * Handler for token expire
    */
   private initializeTokenExpireHandler() {
@@ -337,9 +353,15 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
             this.tokenInfo.approximatedExpireInSeconds > -1 &&
             this.tokenInfo.approximatedExpireInSeconds < AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS
           ) {
+            // stop previous
+            this.stopTokenExpireTimer();
+
             // popup visible
             this.tokenExpirePopupIsVisible = true;
-            setTimeout(() => {
+            this._tokenExpireTimer = setTimeout(() => {
+              // reset
+              this._tokenExpireTimer = undefined;
+
               // display popup
               this.confirmDialog = this.dialogV2Service
                 .showBottomDialogBare({
@@ -497,6 +519,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     ConfirmOnFormChanges.disableAllDirtyConfirm();
 
     // close dialogs in case any are visible
+    // - IMPORTANT: no need to cancel timer on ngOnDestroy
     setTimeout(() => {
       PageChangeConfirmationGuard.closeVisibleDirtyDialog();
     });

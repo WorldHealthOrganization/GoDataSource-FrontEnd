@@ -689,7 +689,7 @@ export interface ICreateViewModifyV2TabTableRecordsList {
   queryBuilder?: RequestQueryBuilder;
   applyHasMoreLimit?: boolean;
   pageCount?: IBasicCount;
-  previousRefreshRequest?: any;
+  previousRefreshRequest?: number;
 }
 
 /**

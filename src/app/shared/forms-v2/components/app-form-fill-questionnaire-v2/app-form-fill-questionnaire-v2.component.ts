@@ -234,7 +234,7 @@ export class AppFormFillQuestionnaireV2Component
   }
 
   // handlers
-  private _nonFlatToFlatWait: any;
+  private _nonFlatToFlatWait: number;
 
   // previous category rendered
   // used to not render the same category multiple times
@@ -300,11 +300,8 @@ export class AppFormFillQuestionnaireV2Component
     // parent
     super.onDestroy();
 
-    // stop previous timeout
-    if (this._nonFlatToFlatWait) {
-      clearTimeout(this._nonFlatToFlatWait);
-      this._nonFlatToFlatWait = undefined;
-    }
+    // stop timers
+    this.stopNonFlatToFlatWait();
 
     // unsubscribe other requests
     this.destroyed$.next(true);
@@ -339,6 +336,16 @@ export class AppFormFillQuestionnaireV2Component
   }
 
   /**
+   * Stop timer
+   */
+  private stopNonFlatToFlatWait(): void {
+    if (this._nonFlatToFlatWait) {
+      clearTimeout(this._nonFlatToFlatWait);
+      this._nonFlatToFlatWait = undefined;
+    }
+  }
+
+  /**
    * Convert non flat value to flat value
    */
   private nonFlatToFlat(
@@ -356,10 +363,7 @@ export class AppFormFillQuestionnaireV2Component
     // wait so we don't execute multiple times
     if (!waited) {
       // stop previous timeout
-      if (this._nonFlatToFlatWait) {
-        clearTimeout(this._nonFlatToFlatWait);
-        this._nonFlatToFlatWait = undefined;
-      }
+      this.stopNonFlatToFlatWait();
 
       // wait
       this._nonFlatToFlatWait = setTimeout(() => {

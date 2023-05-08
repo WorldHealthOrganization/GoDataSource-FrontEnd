@@ -279,6 +279,7 @@ export class ReferenceDataHelperService {
    */
   filterPerOutbreakOptions(
     outbreak: OutbreakModel,
+    // #TODO
     // #TODO item.data..nu putem garanta ca e ce tb..poate e mai bine sa primim ca input ReferenceDataEntryModel[] si sa facem o lista noua de ILabelValuePairModel[]
     // #TODO dar atunci care mai e rostul sa avem options in resolver !?
     options: ILabelValuePairModel[]

@@ -694,6 +694,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       // call again
       this._displayOnceGeoLocationChangeTimeout = setTimeout(
         () => {
+          // reset
+          this._displayOnceGeoLocationChangeTimeout = undefined;
+
+          // call
           this.displayOnceGeoLocationChange(false);
         },
         300

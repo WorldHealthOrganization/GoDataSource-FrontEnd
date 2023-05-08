@@ -83,6 +83,10 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   // new contact model
   newContact = new ContactModel();
 
+  // timers
+  private _scrollToEditModeTimer: number;
+  private _scrollToRelatioshipDetailsTimer: number;
+
   // provide constants to template
   Constants = Constants;
   EntityType = EntityType;
@@ -159,14 +163,18 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // outbreak subscriber
     if (this.outbreakSubscriber) {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+
+    // stop timers
+    this.stopScrollToEditModeTimer();
+    this.stopScrollToRelatioshipDetailsTimer();
   }
 
   /**
@@ -179,6 +187,16 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     if (!editMode) {
       // reset selected nodes
       this.resetNodes();
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopScrollToEditModeTimer(): void {
+    if (this._scrollToEditModeTimer) {
+      clearTimeout(this._scrollToEditModeTimer);
+      this._scrollToEditModeTimer = undefined;
     }
   }
 
@@ -235,8 +253,15 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                 // check if we can swap nodes
                 this.canSwapRelationshipPersons = this.canSwapSelectedNodes();
 
+                // stop previous
+                this.stopScrollToEditModeTimer();
+
                 // focus boxes
-                setTimeout(() => {
+                this._scrollToEditModeTimer = setTimeout(() => {
+                  // reset
+                  this._scrollToEditModeTimer = undefined;
+
+                  // scroll
                   this.domService.scrollItemIntoView(
                     '.transmission-chain-edit-mode'
                   );
@@ -272,8 +297,15 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             // add node to selected persons list
             this.selectedNodes.addNode(entityData);
 
+            // stop previous
+            this.stopScrollToEditModeTimer();
+
             // focus boxes
-            setTimeout(() => {
+            this._scrollToEditModeTimer = setTimeout(() => {
+              // reset
+              this._scrollToEditModeTimer = undefined;
+
+              // scroll
               this.domService.scrollItemIntoView(
                 '.transmission-chain-edit-mode'
               );
@@ -293,6 +325,16 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           }
         }
       });
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopScrollToRelatioshipDetailsTimer(): void {
+    if (this._scrollToRelatioshipDetailsTimer) {
+      clearTimeout(this._scrollToRelatioshipDetailsTimer);
+      this._scrollToRelatioshipDetailsTimer = undefined;
+    }
   }
 
   /**
@@ -323,8 +365,15 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
 
           this.selectedRelationship = relationshipData;
 
+          // stop previous
+          this.stopScrollToRelatioshipDetailsTimer();
+
           // focus box
-          setTimeout(() => {
+          this._scrollToRelatioshipDetailsTimer = setTimeout(() => {
+            // reset
+            this._scrollToRelatioshipDetailsTimer = undefined;
+
+            // scroll
             this.domService.scrollItemIntoView(
               '.selected-relationship-details'
             );

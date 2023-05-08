@@ -45,6 +45,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-contacts-list',
@@ -142,7 +143,8 @@ export class ContactsListComponent
     private genericDataService: GenericDataService,
     private i18nService: I18nService,
     private entityHelperService: EntityHelperService,
-    protected bulkCacheHelperService: BulkCacheHelperService,
+    private bulkCacheHelperService: BulkCacheHelperService,
+    private referenceDataHelperService: ReferenceDataHelperService,
     private router: Router
   ) {
     super(listHelperService);
@@ -162,6 +164,13 @@ export class ContactsListComponent
   selectedOutbreakChanged(): void {
     // initialize pagination
     this.initPaginator();
+
+    // re-init columns so they take in account the new outbreak
+    // #TODO - find better way, because this triggers update columns 2 and we need to wait for bind to update table size..to take in account legend
+    this.initializeTableColumns();
+    setTimeout(() => {
+      this.tableV2Component.resizeTable();
+    });
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
@@ -964,7 +973,10 @@ export class ContactsListComponent
           // risk
           {
             title: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
-            items: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+            items: this.referenceDataHelperService.filterPerOutbreak(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list
+            ).map((item) => {
               return {
                 form: {
                   type: IV2ColumnStatusFormType.TRIANGLE,

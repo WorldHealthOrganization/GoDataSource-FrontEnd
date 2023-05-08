@@ -31,23 +31,24 @@
                   <div class="table-header-cell">
                     <div
                       *ngIf="hasMergePermission(group)">
-                      <app-form-checkbox
+                      <app-form-checkbox-v2
+                        #checkAllControl
                         class="table-checkbox"
                         name="checkAll"
                         ngModel
-                        (optionChanged)="checkAllToggle(tableForm)">
-                      </app-form-checkbox>
+                        (ngModelChange)="checkAllToggle(checkAllControl)">
+                      </app-form-checkbox-v2>
                     </div>
                   </div>
                 </mat-header-cell>
                 <mat-cell *matCellDef="let item;" fxFlex="6rem">
-                  <app-form-checkbox
+                  <app-form-checkbox-v2
                     *ngIf="hasMergePermission(group)"
                     [name]="'recordCheck[' + item + ']'"
                     class="table-checkbox"
                     ngModel
-                    (optionChanged)="checkOneToggle(tableForm)">
-                  </app-form-checkbox>
+                    (ngModelChange)="checkOneToggle(tableForm)">
+                  </app-form-checkbox-v2>
                 </mat-cell>
               </ng-container>
 

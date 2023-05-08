@@ -162,6 +162,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     this.initPaginator();
 
     // re-init columns so they take in account the new outbreak
+    // #TODO
     // #TODO - find better way, because this triggers update columns 2 and we need to wait for bind to update table size..to take in account legend
     this.initializeTableColumns();
     setTimeout(() => {
@@ -873,6 +874,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
+          // #TODO - what about older values that were used but not associated anymore with outbreak ?
           options: this.referenceDataHelperService.filterPerOutbreakOptions(
             this.selectedOutbreak,
             (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options

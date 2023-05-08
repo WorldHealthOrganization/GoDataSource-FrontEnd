@@ -21,6 +21,9 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
   // List Filter Query Builder
   protected appliedListFilterQueryBuilder: RequestQueryBuilder;
 
+  // timers
+  private _applyListFiltersTimer: any;
+
   /**
    * Constructor
    */
@@ -37,6 +40,14 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
       queryBuilderChangedCallback,
       refreshCallback
     );
+  }
+
+  /**
+   * Release resources
+   */
+  onDestroy(): void {
+    // stop timers
+    this.stopApplyListFiltersTimer();
   }
 
   /**
@@ -970,6 +981,16 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
   }
 
   /**
+   * Stop timer
+   */
+  private stopApplyListFiltersTimer(): void {
+    if (this._applyListFiltersTimer) {
+      clearTimeout(this._applyListFiltersTimer);
+      this._applyListFiltersTimer = undefined;
+    }
+  }
+
+  /**
    * Check if list filter applies
    */
   protected checkListFilters() {
@@ -983,8 +1004,14 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
     // do we need to wait for list filter to be initialized ?
     this.appliedListFilterLoading = !_.isEmpty(this.appliedListFilter);
 
+    // stop previous
+    this.stopApplyListFiltersTimer();
+
     // wait for component initialization, since this method is called from constructor
-    setTimeout(() => {
+    this._applyListFiltersTimer = setTimeout(() => {
+      // reset
+      this._applyListFiltersTimer = undefined;
+
       // do we have query params to apply ?
       if (_.isEmpty(queryParams)) {
         return;

@@ -498,6 +498,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   private _updateSnapshotsSubscription: Subscription;
   private _updateSnapshotsTimer: any;
 
+  // timers
+  private _renderGraphTimer: number;
+  private _updateViewTimer: number;
+
   // show snapshot filters
   showSnapshotFilters: boolean = false;
   snapshotFilters: {
@@ -859,6 +863,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // release cyto
     this.destroyCytoscape();
+
+    // stop timers
+    this.stopUpdateViewTimer();
   }
 
   /**
@@ -1318,6 +1325,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Release resources
      */
   destroyCytoscape() {
+    // stop timer
+    if (this._renderGraphTimer) {
+      clearTimeout(this._renderGraphTimer);
+      this._renderGraphTimer = undefined;
+    }
+
     // release cyto
     if (this.cy) {
       this.cy.destroy();
@@ -1365,11 +1378,15 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.configureGraphViewType();
 
     // release cyto
+    // - this stops this._renderGraphTimer timer too
     this.destroyCytoscape();
 
     // display loading
     const loadingDialog = this.dialogV2Service.showLoadingDialog();
-    setTimeout(() => {
+    this._renderGraphTimer = setTimeout(() => {
+      // reset
+      this._renderGraphTimer = undefined;
+
       // initialize the cytoscape object
       this.cy = cytoscape(Object.assign(
         {
@@ -1601,11 +1618,27 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop timer
+   */
+  private stopUpdateViewTimer(): void {
+    if (this._updateViewTimer) {
+      clearTimeout(this._updateViewTimer);
+      this._updateViewTimer = undefined;
+    }
+  }
+
+  /**
      * re-render the layout on view type change
      */
   updateView() {
+    // stop previous
+    this.stopUpdateViewTimer();
+
     // wait for binding
-    setTimeout(() => {
+    this._updateViewTimer = setTimeout(() => {
+      // reset
+      this._updateViewTimer = undefined;
+
       // refresh chain to load the new criteria
       this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
         this.chainGroup,
@@ -2391,6 +2424,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // update
     this._updateSnapshotsTimer = setTimeout(() => {
+      // reset
+      this._updateSnapshotsTimer = undefined;
+
+      // update
       this.updateSnapshotsInProgress(finishedCallback);
     }, 3000);
   }

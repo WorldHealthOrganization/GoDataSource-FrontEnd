@@ -66,6 +66,7 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
     }
 
     // hack to redo buttons visibility
+    // #TODO - better way to do it...same as for cases, contacts...etc
     const oldTableColumns = this.tableColumns;
     this.tableColumns = [];
     setTimeout(() => {

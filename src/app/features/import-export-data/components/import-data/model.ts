@@ -85,6 +85,7 @@ export class ImportableFileModel {
     [modelProperty: string]: {
       id: string;
       label: string;
+      value: string;
     }[]
   } = {};
   readonly modelPropertyValuesMapChildMap: {

@@ -511,6 +511,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     }
   }
 
+  // timers
+  private _resizeTableTimer: any;
+
   // constants
   AppListTableV2LoadingComponent = AppListTableV2LoadingComponent;
   AppListTableV2NoDataComponent = AppListTableV2NoDataComponent;
@@ -704,6 +707,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
+
+    // stop previous
+    this.stopResizeTableTimer();
   }
 
   /**
@@ -1766,6 +1772,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop resize table timer
+   */
+  private stopResizeTableTimer(): void {
+    if (this._resizeTableTimer) {
+      clearTimeout(this._resizeTableTimer);
+      this._resizeTableTimer = undefined;
+    }
+  }
+
+  /**
    * Should update height of table
    */
   resizeTable(): void {
@@ -2292,8 +2308,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // this.detectChanges / this.resizeTable() are called by resize layout by updateColumnDefinitions
       this.updateColumnDefinitions();
 
+      // stop previous
+      this.stopResizeTableTimer();
+
       // wait for html to be rendered since isSmallScreenMode was changed
-      setTimeout(() => {
+      this._resizeTableTimer = setTimeout(() => {
+        // reset
+        this._resizeTableTimer = undefined;
+
+        // update
         this.resizeTable();
       });
     } else {

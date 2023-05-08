@@ -51,6 +51,9 @@ export class FontResolver implements Resolve<any>, OnDestroy {
 
     // start
     this._checkTimeout = setTimeout(() => {
+      // reset
+      this._checkTimeout = undefined;
+
       // determine if required fonts were loaded
       let fontsLoaded: boolean = true;
       document.fonts.forEach((font) => {
@@ -68,9 +71,6 @@ export class FontResolver implements Resolve<any>, OnDestroy {
           }
         }
       });
-
-      // clear
-      this._checkTimeout = undefined;
 
       // finished ?
       if (fontsLoaded) {

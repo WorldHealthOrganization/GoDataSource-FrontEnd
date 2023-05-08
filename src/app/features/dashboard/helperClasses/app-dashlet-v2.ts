@@ -30,6 +30,9 @@ export abstract class AppDashletV2 {
   // authenticated user
   protected authUser: UserModel;
 
+  // timers
+  private _initializeDashletTimer: any;
+
   /**
    * Initialize
    */
@@ -62,7 +65,10 @@ export abstract class AppDashletV2 {
 
         // trigger outbreak selection changed
         // - wait for binding
-        setTimeout(() => {
+        this._initializeDashletTimer = setTimeout(() => {
+          // reset
+          this._initializeDashletTimer = undefined;
+
           // init dashlet
           this.initializeDashlet();
         });
@@ -78,10 +84,23 @@ export abstract class AppDashletV2 {
       this._selectedOutbreakSubscription.unsubscribe();
       this._selectedOutbreakSubscription = undefined;
     }
+
+    // stop timers
+    this.stopInitializeDashletTimer();
   }
 
   /**
    * Initialize dashlet
    */
   protected abstract initializeDashlet(): void;
+
+  /**
+   * Stop timer
+   */
+  private stopInitializeDashletTimer(): void {
+    if (this._initializeDashletTimer) {
+      clearTimeout(this._initializeDashletTimer);
+      this._initializeDashletTimer = undefined;
+    }
+  }
 }

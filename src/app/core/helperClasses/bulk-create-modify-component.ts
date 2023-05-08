@@ -115,6 +115,9 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
 
+        // timer - records
+        this.stopInitializeRecordsTimer();
+
         // trigger outbreak selection changed
         // - wait for binding
         this._initializeRecordsTimer = setTimeout(() => {
@@ -176,6 +179,17 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
   abstract save(event: IV2SpreadsheetEditorEventSave);
 
   /**
+   * Stop timer
+   */
+  private stopInitializeRecordsTimer(): void {
+    // timer - records
+    if (this._initializeRecordsTimer) {
+      clearTimeout(this._initializeRecordsTimer);
+      this._initializeRecordsTimer = undefined;
+    }
+  }
+
+  /**
    * Release subscribers
    */
   private releaseSubscribers() {
@@ -192,9 +206,6 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
     }
 
     // timer - records
-    if (this._initializeRecordsTimer) {
-      clearTimeout(this._initializeRecordsTimer);
-      this._initializeRecordsTimer = undefined;
-    }
+    this.stopInitializeRecordsTimer();
   }
 }

@@ -391,9 +391,14 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   groupDataDialogHandler: IV2SideDialogHandler;
   groupDataDialogHandlerLoading: boolean = false;
 
+  // timers
+  private _updateSizeTimer: any;
+  private _initializeMapTimer: any;
+  private _displayChoseFromGroupDialogTimer: any;
+
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
@@ -440,6 +445,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+
+    // stop timers
+    this.stopUpdateSizeTimer();
+    this.stopInitializeMapTimer();
+    this.stopDisplayChoseFromGroupDialogTimer();
 
     // not full screen anymore
     AuthenticatedComponent.FULL_SCREEN = false;
@@ -747,6 +757,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
     // schedule update
     this.clusterUpdatePending = setTimeout(() => {
+      // reset
+      this.clusterUpdatePending = undefined;
+
       // used to easily determine the cluster group later
       const clusterFeaturesMap: {
         [markerId: string]: IClusterFeatureGroup
@@ -1012,6 +1025,16 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop timer - initialize map
+   */
+  private stopInitializeMapTimer(): void {
+    if (this._initializeMapTimer) {
+      clearTimeout(this._initializeMapTimer);
+      this._initializeMapTimer = undefined;
+    }
+  }
+
+  /**
    * Initialize World Map
    */
   initializeMap() {
@@ -1034,8 +1057,14 @@ export class WorldMapComponent implements OnInit, OnDestroy {
       }
     }
 
-    // wait for data to be binded so we can see the map dom element
-    setTimeout(() => {
+    // release previous
+    this.stopInitializeMapTimer();
+
+    // wait for data to be binded, so we can see the map dom element
+    this._initializeMapTimer = setTimeout(() => {
+      // reset
+      this._initializeMapTimer = undefined;
+
       // initialize map elements
       this.mapView = new View({
         center: [0, 0],
@@ -1213,8 +1242,18 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Update map size
-     */
+   * Stop timer - update size
+   */
+  private stopUpdateSizeTimer(): void {
+    if (this._updateSizeTimer) {
+      clearTimeout(this._updateSizeTimer);
+      this._updateSizeTimer = undefined;
+    }
+  }
+
+  /**
+   * Update map size
+   */
   public updateMapSize() {
     // check if map was initialized
     if (_.isEmpty(this.map)) {
@@ -1222,13 +1261,19 @@ export class WorldMapComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // cancel previous
+    this.stopUpdateSizeTimer();
+
     // update map size
-    setTimeout(() => {
+    this._updateSizeTimer = setTimeout(() => {
+      // reset
+      this._updateSizeTimer = undefined;
+
+      // update size
       if (this.map) {
         this.map.updateSize();
       }
     });
-
   }
 
   /**
@@ -1262,8 +1307,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Print map to blob
-     */
+   * Print map to blob
+   */
   printToBlob(): Observable<Blob> {
     return new Observable((observer: Subscriber<Blob>) => {
       // map initialized
@@ -1315,14 +1360,30 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Display dialog to choose from list of items from a group
-     * @param items
-     */
+   * Stop timer - display..
+   */
+  private stopDisplayChoseFromGroupDialogTimer(): void {
+    if (this._displayChoseFromGroupDialogTimer) {
+      clearTimeout(this._displayChoseFromGroupDialogTimer);
+      this._displayChoseFromGroupDialogTimer = undefined;
+    }
+  }
+
+  /**
+   * Display dialog to choose from list of items from a group
+   */
   private displayChoseFromGroupDialog(items: (WorldMapPath | WorldMapMarker)[]) {
     // wait for dialog to load ?
     if (this.groupDataDialogHandlerLoading) {
+      // stop previous
+      this.stopDisplayChoseFromGroupDialogTimer();
+
       // call later
-      setTimeout(() => {
+      this._displayChoseFromGroupDialogTimer = setTimeout(() => {
+        // reset
+        this._displayChoseFromGroupDialogTimer = undefined;
+
+        // call
         this.displayChoseFromGroupDialog(items);
       }, 200);
 

@@ -7,7 +7,7 @@ export enum DebounceTimeCallerType {
 
 export class DebounceTimeCaller {
   // The ID value of the timer
-  protected refreshTimeoutID: any = null;
+  protected refreshTimeoutID: any;
 
   // initialize
   constructor(
@@ -22,7 +22,7 @@ export class DebounceTimeCaller {
   protected clearRefreshTimeout() {
     if (this.refreshTimeoutID) {
       clearTimeout(this.refreshTimeoutID);
-      this.refreshTimeoutID = null;
+      this.refreshTimeoutID = undefined;
     }
   }
 
@@ -65,13 +65,13 @@ export class DebounceTimeCaller {
       // wait for debounce time
       // make new request
       this.refreshTimeoutID = setTimeout(() => {
+        // reset
+        this.refreshTimeoutID = undefined;
+
         // no subscriber ?
         if (!this.subscriber) {
           return;
         }
-
-        // timeout executed - clear
-        this.refreshTimeoutID = null;
 
         // call
         this.subscriber();

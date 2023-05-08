@@ -99,6 +99,9 @@ export class AppFormEditQuestionnaireV2Component
   // invalid drag zone
   private _isInvalidDragEvent: boolean = true;
 
+  // timers
+  private _scrollToItemTimer: number;
+
   // constants
   FlattenType = FlattenType;
   RenderMode = RenderMode;
@@ -151,7 +154,11 @@ export class AppFormEditQuestionnaireV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // stop timers
+    this.stopScrollToItemTimer();
   }
 
   /**
@@ -471,16 +478,32 @@ export class AppFormEditQuestionnaireV2Component
   }
 
   /**
+   * Stop timer
+   */
+  private stopScrollToItemTimer(): void {
+    if (this._scrollToItemTimer) {
+      clearTimeout(this._scrollToItemTimer);
+      this._scrollToItemTimer = undefined;
+    }
+  }
+
+  /**
    * Make sure our item is visible
    */
   private scrollToItem(scrollToItem: QuestionModel | AnswerModel): void {
+    // stop previous
+    this.stopScrollToItemTimer();
+
     // not valid ?
     if (!scrollToItem) {
       return;
     }
 
     // scroll
-    setTimeout(() => {
+    this._scrollToItemTimer = setTimeout(() => {
+      // reset
+      this._scrollToItemTimer = undefined;
+
       // determine index
       const indexOfMovedItem: number = this.flattenedQuestions.findIndex((item) => item.data === scrollToItem);
       if (

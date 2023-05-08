@@ -138,6 +138,12 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     return this._disableFilterCaching;
   }
 
+  // timers
+  private _initializeTimer: any;
+  private _outbreakChangedTimer: any;
+  private _browserLocationTimer: any;
+  private _forLoadingFiltersTimer: any;
+
   // refresh only after we finish changing data
   private triggerListCountRefresh = new DebounceTimeCaller(() => {
     // disabled ?
@@ -239,7 +245,10 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     this.authUser = this.listHelperService.authDataService.getAuthenticatedUser();
 
     // wait for binding so some things get processed
-    setTimeout(() => {
+    this._initializeTimer = setTimeout(() => {
+      // reset
+      this._initializeTimer = undefined;
+
       // initialize breadcrumbs
       this.initializeBreadcrumbs();
 
@@ -300,9 +309,16 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
 
+        // stop previous
+        this.stopOutbreakChangedTimer();
+
         // trigger outbreak selection changed
         // - wait for binding
-        setTimeout(() => {
+        this._outbreakChangedTimer = setTimeout(() => {
+          // reset
+          this._outbreakChangedTimer = undefined;
+
+          // call
           this.selectedOutbreakChanged();
         });
       });
@@ -328,7 +344,14 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // listen for back / forward buttons
     ListComponent.locationSubscription = this.listHelperService.location
       .subscribe(() => {
-        setTimeout(() => {
+        // stop previous
+        this.stopBrowserLocationTimer();
+
+        // location changed
+        this._browserLocationTimer = setTimeout(() => {
+          // reset
+          this._browserLocationTimer = undefined;
+
           // check if subscription was closed
           if (
             !ListComponent.locationSubscription ||
@@ -369,8 +392,17 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Release resources
    */
   onDestroy(): void {
+    // call
+    super.onDestroy();
+
     // release subscribers
     this.releaseSubscribers();
+
+    // stop timers
+    this.stopInitializeTimer();
+    this.stopOutbreakChangedTimer();
+    this.stopBrowserLocationTimer();
+    this.stopForLoadingFiltersTimer();
 
     // unsubscribe other requests
     this.destroyed$.next(true);
@@ -492,8 +524,48 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Tell list that we need to refresh list
-     */
+   * Stop timer
+   */
+  private stopInitializeTimer(): void {
+    if (this._initializeTimer) {
+      clearTimeout(this._initializeTimer);
+      this._initializeTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopOutbreakChangedTimer(): void {
+    if (this._outbreakChangedTimer) {
+      clearTimeout(this._outbreakChangedTimer);
+      this._outbreakChangedTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopBrowserLocationTimer(): void {
+    if (this._browserLocationTimer) {
+      clearTimeout(this._browserLocationTimer);
+      this._browserLocationTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopForLoadingFiltersTimer(): void {
+    if (this._forLoadingFiltersTimer) {
+      clearTimeout(this._forLoadingFiltersTimer);
+      this._forLoadingFiltersTimer = undefined;
+    }
+  }
+
+  /**
+   * Tell list that we need to refresh list
+   */
   public needsRefreshList(
     instant: boolean = false,
     resetPagination: boolean = true,
@@ -770,7 +842,15 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         ) {
           // display only if we're loading data, for save it doesn't matter since we will overwrite it
           if (forLoadingFilters) {
-            setTimeout(() => {
+            // stop previous
+            this.stopForLoadingFiltersTimer();
+
+            // call
+            this._forLoadingFiltersTimer = setTimeout(() => {
+              // reset
+              this._forLoadingFiltersTimer = undefined;
+
+              // show error
               this.listHelperService.toastV2Service.error('LNG_COMMON_LABEL_INVALID_URL_FILTERS');
             });
           }

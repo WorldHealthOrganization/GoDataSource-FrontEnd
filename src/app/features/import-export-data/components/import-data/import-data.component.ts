@@ -2251,11 +2251,11 @@ export class ImportDataComponent
      */
   setSourceDestinationValueAndDetermineOptions(
     item: ImportableMapField,
-    property: string,
-    value: any
+    property: 'sourceField' | 'destinationField',
+    value: string
   ) {
     // set value
-    item[property] = value ? value.value : value;
+    item[property] = value;
 
     // 1 - prepare data need to determine what options we can add
     this.validateData();
@@ -2661,12 +2661,12 @@ export class ImportDataComponent
   setDestinationLevel(
     item: ImportableMapField,
     levelIndex: number,
-    value: any
+    value: number
   ): void {
     // set level
     item.setSourceDestinationLevel(
       levelIndex,
-      value ? value.value : value
+      value
     );
 
     // prepare data
@@ -2679,13 +2679,13 @@ export class ImportDataComponent
   setMapOptionValue(
     mappedOpt: IMappedOption,
     source: boolean,
-    data: ImportableLabelValuePair | ILabelValuePairModel
+    value: string
   ): void {
     // set source option
     if (source) {
-      mappedOpt.sourceOption = data ? data.value : data;
+      mappedOpt.sourceOption = value;
     } else {
-      mappedOpt.destinationOption = data ? data.value : data;
+      mappedOpt.destinationOption = value;
     }
 
     // prepare data
