@@ -41,6 +41,7 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
     protected activatedRoute: ActivatedRoute,
     protected i18nService: I18nService
   ) {
+    // parent
     super(listHelperService);
 
     // get location for which we need to retrieve usages
@@ -65,13 +66,8 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
       return;
     }
 
-    // hack to redo buttons visibility
-    // #TODO - better way to do it...same as for cases, contacts...etc
-    const oldTableColumns = this.tableColumns;
-    this.tableColumns = [];
-    setTimeout(() => {
-      this.tableColumns = oldTableColumns;
-    });
+    // redo buttons visibility
+    this.tableV2Component.agTable?.api.redrawRows();
   }
 
   /**

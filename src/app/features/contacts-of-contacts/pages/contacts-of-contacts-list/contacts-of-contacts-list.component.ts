@@ -125,7 +125,11 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     private bulkCacheHelperService: BulkCacheHelperService,
     private referenceDataHelperService: ReferenceDataHelperService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        initializeTableColumnsAfterSelectedOutbreakChanged: true
+      }
+    );
   }
 
   /**
@@ -142,14 +146,6 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
   selectedOutbreakChanged(): void {
     // initialize pagination
     this.initPaginator();
-
-    // re-init columns so they take in account the new outbreak
-    // #TODO
-    // #TODO - find better way, because this triggers update columns 2 and we need to wait for bind to update table size..to take in account legend
-    this.initializeTableColumns();
-    setTimeout(() => {
-      this.tableV2Component.resizeTable();
-    });
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);

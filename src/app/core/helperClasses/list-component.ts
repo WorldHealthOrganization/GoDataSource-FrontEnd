@@ -143,6 +143,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   private _outbreakChangedTimer: number;
   private _browserLocationTimer: number;
   private _forLoadingFiltersTimer: number;
+  private _refreshTableUITimer: number;
 
   // refresh only after we finish changing data
   private triggerListCountRefresh = new DebounceTimeCaller(() => {
@@ -216,7 +217,8 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     protected listHelperService: ListHelperService,
     config?: {
       // optional
-      disableFilterCaching?: boolean
+      disableFilterCaching?: boolean,
+      initializeTableColumnsAfterSelectedOutbreakChanged?: boolean
     }
   ) {
     // parent constructor
@@ -259,7 +261,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       this.initializeTableColumnActions();
 
       // initialize table columns
-      this.initializeTableColumns();
+      if (!config?.initializeTableColumnsAfterSelectedOutbreakChanged) {
+        this.initializeTableColumns();
+      }
 
       // initialize process data
       this.initializeProcessSelectedData();
@@ -321,8 +325,35 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
           // reset
           this._outbreakChangedTimer = undefined;
 
+          // refresh table ui ?
+          let refreshTableUI: boolean = false;
+
+          // initialize table columns
+          if (config?.initializeTableColumnsAfterSelectedOutbreakChanged) {
+            // init
+            this.initializeTableColumns();
+
+            // we need to refresh table ui
+            refreshTableUI = true;
+          }
+
           // call
           this.selectedOutbreakChanged();
+
+          // update table ui ?
+          if (refreshTableUI) {
+            // stop previous
+            this.stopRefreshTableUITimer();
+
+            // wait for column binding to take effect
+            this._refreshTableUITimer = setTimeout(() => {
+              // reset
+              this._refreshTableUITimer = undefined;
+
+              // resize
+              this.tableV2Component.resizeTable();
+            });
+          }
         });
       });
 
@@ -406,6 +437,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     this.stopOutbreakChangedTimer();
     this.stopBrowserLocationTimer();
     this.stopForLoadingFiltersTimer();
+    this.stopRefreshTableUITimer();
 
     // unsubscribe other requests
     this.destroyed$.next(true);
@@ -543,6 +575,16 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     if (this._outbreakChangedTimer) {
       clearTimeout(this._outbreakChangedTimer);
       this._outbreakChangedTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopRefreshTableUITimer(): void {
+    if (this._refreshTableUITimer) {
+      clearTimeout(this._refreshTableUITimer);
+      this._refreshTableUITimer = undefined;
     }
   }
 
