@@ -6,7 +6,6 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { AngularMaterialModule } from '../angular-material/angular-material.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
-import { components } from './components';
 import { validatorDirectives } from './validators';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { NgxPopperjsModule } from 'ngx-popperjs';
@@ -23,7 +22,6 @@ import { NgxPopperjsModule } from 'ngx-popperjs';
     ScrollingModule
   ],
   declarations: [
-    ...components,
     ...validatorDirectives
   ],
   providers: [],
@@ -34,7 +32,6 @@ import { NgxPopperjsModule } from 'ngx-popperjs';
     AngularMaterialModule,
     NgxPopperjsModule,
     ScrollingModule,
-    ...components,
     ...validatorDirectives
   ]
 })
