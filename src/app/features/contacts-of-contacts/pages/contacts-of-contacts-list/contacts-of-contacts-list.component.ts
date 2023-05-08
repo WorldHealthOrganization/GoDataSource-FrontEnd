@@ -109,8 +109,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
   ];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
@@ -129,8 +129,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
