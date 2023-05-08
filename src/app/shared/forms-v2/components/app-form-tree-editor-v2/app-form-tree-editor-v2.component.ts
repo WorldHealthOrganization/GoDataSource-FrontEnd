@@ -222,7 +222,7 @@ export class AppFormTreeEditorV2Component
     // set value
     super.writeValue(value);
 
-    // no need to re-render because it is teh same value ?
+    // no need to re-render because it is the same value ?
     if (JSON.stringify(this.value) === JSON.stringify(previousValue)) {
       return;
     }

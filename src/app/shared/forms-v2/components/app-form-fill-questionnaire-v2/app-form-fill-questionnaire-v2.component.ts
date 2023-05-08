@@ -124,7 +124,7 @@ interface IFlattenNodeAnswer {
   collapsed: boolean;
 
   // might need this information if definition is FILE
-  // we need them here otherwise teh same uploader is used by multiple answers if question is multianswer per date
+  // we need them here otherwise the same uploader is used by multiple answers if question is multianswer per date
   uploader?: FileUploader;
   uploading?: boolean;
 }

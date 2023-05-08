@@ -656,7 +656,7 @@ export class ImportDataComponent
       this.savedMappings = activatedRoute.snapshot.data.savedImportMapping;
     }
 
-    // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
+    // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload the files
     if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
       (FileLikeObject.prototype as any)._createFromObjectPrev = FileLikeObject.prototype._createFromObject;
       FileLikeObject.prototype._createFromObject = (file: File) => {

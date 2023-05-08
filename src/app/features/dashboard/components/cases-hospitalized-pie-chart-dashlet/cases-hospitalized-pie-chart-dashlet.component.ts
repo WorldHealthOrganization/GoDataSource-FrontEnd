@@ -220,7 +220,7 @@ implements OnInit, OnDestroy {
       this.globalFilterDate
     );
 
-    // make teh request to count hospitalized, isolated ...
+    // make the request to count hospitalized, isolated ...
     this.getData$ = this.caseDataService
       .getCasesHospitalized(
         this._outbreakId,
