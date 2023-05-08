@@ -88,7 +88,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
   private _today: Moment = moment();
 
   // check for duplicate
-  private _duplicateCheckingTimeout: any;
+  private _duplicateCheckingTimeout: number;
   private _duplicateCheckingSubscription: Subscription;
   private _personDuplicates: EntityModel[] = [];
   private _previousChecked: {

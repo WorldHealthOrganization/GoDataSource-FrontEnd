@@ -37,7 +37,7 @@ export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
 
   maxTickCulling: number = 1;
 
-  timeoutCall: any;
+  timeoutCall: number;
 
   ngOnInit() {
     // render bb object

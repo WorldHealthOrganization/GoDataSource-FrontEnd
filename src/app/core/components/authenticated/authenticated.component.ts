@@ -113,7 +113,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   );
 
   // timers
-  private _tokenExpireTimer: any;
+  private _tokenExpireTimer: number;
 
   /**
    * Constructor

@@ -28,7 +28,7 @@ export class AppFormTimepickerV2Component
   extends AppFormBaseV2<string> implements OnDestroy {
 
   // timers
-  private _attachClassTimer: any = null;
+  private _attachClassTimer: number;
 
   // tooltip
   tooltipButton: IAppFormIconButtonV2;

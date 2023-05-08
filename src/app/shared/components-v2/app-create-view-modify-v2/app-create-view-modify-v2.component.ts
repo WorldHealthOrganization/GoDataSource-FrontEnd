@@ -230,7 +230,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // search
   expandListSearchValue: string;
-  expandListSearchValueTimeout: any;
+  expandListSearchValueTimeout: number;
   expandListSearchSuffixButtons: IAppFormIconButtonV2[] = [
     {
       icon: 'clear',

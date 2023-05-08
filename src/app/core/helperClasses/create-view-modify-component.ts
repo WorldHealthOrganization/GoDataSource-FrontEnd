@@ -96,8 +96,8 @@ export abstract class CreateViewModifyComponent<T>
   private _clickListener: () => void;
 
   // timers
-  private _createNewItemTimer: any;
-  private _retrieveItemTimer: any;
+  private _createNewItemTimer: number;
+  private _retrieveItemTimer: number;
 
   // constants
   Constants = Constants;

@@ -156,9 +156,9 @@ export class AppFormDateV2Component
   }
 
   // timers
-  private _focusTimer: any;
-  private _openTimer: any;
-  private _setStartingValueTimer: any;
+  private _focusTimer: number;
+  private _openTimer: number;
+  private _setStartingValueTimer: number;
 
   /**
    * Constructor

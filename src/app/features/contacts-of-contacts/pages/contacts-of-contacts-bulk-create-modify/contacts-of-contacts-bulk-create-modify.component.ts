@@ -37,7 +37,7 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
   private _entity: ContactModel;
 
   // used to keep timer id
-  private _displayOnceGeoLocationChangeTimeout: any;
+  private _displayOnceGeoLocationChangeTimeout: number;
 
   // keep data used to copy geolocation
   private _geoData: {

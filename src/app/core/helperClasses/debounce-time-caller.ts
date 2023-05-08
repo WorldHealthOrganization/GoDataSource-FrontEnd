@@ -7,7 +7,7 @@ export enum DebounceTimeCallerType {
 
 export class DebounceTimeCaller {
   // The ID value of the timer
-  protected refreshTimeoutID: any;
+  protected refreshTimeoutID: number;
 
   // initialize
   constructor(

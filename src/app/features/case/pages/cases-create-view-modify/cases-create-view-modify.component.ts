@@ -86,7 +86,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private _today: Moment = moment();
 
   // check for duplicate
-  private _duplicateCheckingTimeout: any;
+  private _duplicateCheckingTimeout: number;
   private _duplicateCheckingSubscription: Subscription;
   private _personDuplicates: EntityModel[] = [];
   private _previousChecked: {

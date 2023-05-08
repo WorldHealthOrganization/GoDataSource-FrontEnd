@@ -42,8 +42,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
 
   // current active main menu
   private _activeMainMenuId: string;
-  private _menuPositionTimer: any;
-  private _menuCloseTimer: any;
+  private _menuPositionTimer: number;
+  private _menuCloseTimer: number;
 
   // check if this is a touch device
   isTouchDevice: boolean = determineIfTouchDevice();

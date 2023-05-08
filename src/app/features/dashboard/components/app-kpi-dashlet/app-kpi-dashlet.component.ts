@@ -136,7 +136,7 @@ implements OnDestroy {
   }
 
   // timeout
-  private _waitAndRefreshNecessary: any;
+  private _waitAndRefreshNecessary: number;
 
   // authenticated user data
   private _authUser: UserModel;

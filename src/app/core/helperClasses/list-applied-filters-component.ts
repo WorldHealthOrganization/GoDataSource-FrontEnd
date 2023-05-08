@@ -22,7 +22,7 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
   protected appliedListFilterQueryBuilder: RequestQueryBuilder;
 
   // timers
-  private _applyListFiltersTimer: any;
+  private _applyListFiltersTimer: number;
 
   /**
    * Constructor

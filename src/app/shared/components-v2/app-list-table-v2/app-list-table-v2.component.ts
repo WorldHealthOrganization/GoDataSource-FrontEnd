@@ -512,7 +512,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   }
 
   // timers
-  private _resizeTableTimer: any;
+  private _resizeTableTimer: number;
 
   // constants
   AppListTableV2LoadingComponent = AppListTableV2LoadingComponent;

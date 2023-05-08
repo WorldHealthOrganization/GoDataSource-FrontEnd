@@ -31,7 +31,7 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
   maxTickCulling: number = 1;
 
   // timers
-  private _zoomTimer: any;
+  private _zoomTimer: number;
 
   ngOnInit() {
     // render bb object

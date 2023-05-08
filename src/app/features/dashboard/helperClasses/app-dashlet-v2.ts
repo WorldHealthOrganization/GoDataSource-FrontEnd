@@ -31,7 +31,7 @@ export abstract class AppDashletV2 {
   protected authUser: UserModel;
 
   // timers
-  private _initializeDashletTimer: any;
+  private _initializeDashletTimer: number;
 
   /**
    * Initialize

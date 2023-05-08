@@ -6,7 +6,7 @@ import { DialogV2Service } from '../helper/dialog-v2.service';
 @Injectable()
 export class FontResolver implements Resolve<any>, OnDestroy {
   // timeout
-  private _checkTimeout: any;
+  private _checkTimeout: number;
 
   // required fonts
   private _loadingKey: string = 'font';

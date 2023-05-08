@@ -40,7 +40,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
   private _entity: EventModel | CaseModel;
 
   // used to keep timer id
-  private _displayOnceGeoLocationChangeTimeout: any;
+  private _displayOnceGeoLocationChangeTimeout: number;
 
   // keep data used to copy geolocation
   private _geoData: {

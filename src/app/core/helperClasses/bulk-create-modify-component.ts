@@ -54,8 +54,8 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
   pageTitle: string;
 
   // timers
-  private _initializeTimer: any;
-  private _initializeRecordsTimer: any;
+  private _initializeTimer: number;
+  private _initializeRecordsTimer: number;
 
   /**
    * Constructor

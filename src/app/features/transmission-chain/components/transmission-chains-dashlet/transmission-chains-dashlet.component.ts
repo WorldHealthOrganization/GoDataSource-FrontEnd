@@ -496,7 +496,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
   // keep snapshot update subscription
   private _updateSnapshotsSubscription: Subscription;
-  private _updateSnapshotsTimer: any;
+  private _updateSnapshotsTimer: number;
 
   // timers
   private _renderGraphTimer: number;

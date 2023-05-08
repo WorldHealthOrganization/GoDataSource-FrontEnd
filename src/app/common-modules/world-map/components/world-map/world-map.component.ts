@@ -392,9 +392,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   groupDataDialogHandlerLoading: boolean = false;
 
   // timers
-  private _updateSizeTimer: any;
-  private _initializeMapTimer: any;
-  private _displayChoseFromGroupDialogTimer: any;
+  private _updateSizeTimer: number;
+  private _initializeMapTimer: number;
+  private _displayChoseFromGroupDialogTimer: number;
 
   /**
    * Constructor

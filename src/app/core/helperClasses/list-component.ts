@@ -139,10 +139,10 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   }
 
   // timers
-  private _initializeTimer: any;
-  private _outbreakChangedTimer: any;
-  private _browserLocationTimer: any;
-  private _forLoadingFiltersTimer: any;
+  private _initializeTimer: number;
+  private _outbreakChangedTimer: number;
+  private _browserLocationTimer: number;
+  private _forLoadingFiltersTimer: number;
 
   // refresh only after we finish changing data
   private triggerListCountRefresh = new DebounceTimeCaller(() => {

@@ -52,7 +52,7 @@ export interface IDashletValue {
   value?: string;
   status?: DashletValueStatus;
   subscription?: Subscription;
-  reload?: any;
+  reload?: number;
   inputValue?: number;
   link?: string[];
   linkQueryParams?: Params;

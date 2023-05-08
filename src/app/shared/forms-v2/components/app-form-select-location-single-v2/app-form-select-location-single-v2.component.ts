@@ -67,7 +67,7 @@ export class AppFormSelectLocationSingleV2Component
   }
 
   // timers
-  private _openTimer: any;
+  private _openTimer: number;
 
   /**
    * Constructor

@@ -145,7 +145,7 @@ export class AppFormTreeEditorV2Component
   copyCheckbox: boolean;
 
   // timers
-  private _startCopyTimer: any;
+  private _startCopyTimer: number;
   private _newItemFlashTimers: {
     [id: string]: number
   } = {};

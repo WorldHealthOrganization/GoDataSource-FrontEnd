@@ -85,7 +85,7 @@ export class AppFormNumberV2Component
   }
 
   // timers
-  private _focusTimer: any;
+  private _focusTimer: number;
 
   /**
    * Constructor
