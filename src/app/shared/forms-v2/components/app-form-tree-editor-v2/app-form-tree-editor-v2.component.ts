@@ -145,6 +145,7 @@ export class AppFormTreeEditorV2Component
   copyCheckbox: boolean;
 
   // timers
+  private _filterTimer: number;
   private _startCopyTimer: number;
   private _newItemFlashTimers: {
     [id: string]: number
@@ -193,8 +194,9 @@ export class AppFormTreeEditorV2Component
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
 
-    // stop copy timer
+    // stop timers
     this.stopStartCopyTimer();
+    this.stopFilterTimer();
 
     // stop item flash timers
     Object.keys(this._newItemFlashTimers).forEach((id) => {
@@ -310,7 +312,10 @@ export class AppFormTreeEditorV2Component
 
     // update visible
     // - detect changes is triggered by this.filter function
-    this.filter(this.searchValue);
+    this.filter(
+      this.searchValue,
+      false
+    );
   }
 
   /**
@@ -413,9 +418,43 @@ export class AppFormTreeEditorV2Component
   }
 
   /**
+   * Stop timer
+   */
+  private stopFilterTimer(): void {
+    if (this._filterTimer) {
+      clearTimeout(this._filterTimer);
+      this._filterTimer = undefined;
+    }
+  }
+
+  /**
    * Filter
    */
-  filter(searchValue: string): void {
+  filter(
+    searchValue: string,
+    delay: boolean
+  ): void {
+    // delay ?
+    if (delay) {
+      // stop previous
+      this.stopFilterTimer();
+
+      // wait
+      this._filterTimer = setTimeout(() => {
+        // reset
+        this._filterTimer = undefined;
+
+        // filter
+        this.filter(
+          searchValue,
+          false
+        );
+      }, 500);
+
+      // finished
+      return;
+    }
+
     // update filter value
     this.searchValue = searchValue;
 
@@ -467,10 +506,8 @@ export class AppFormTreeEditorV2Component
         // make parent visible if necessary
         if (
           (
-            item.type === FlattenType.INFO || (
-              item.type === FlattenType.CATEGORY_ITEM &&
-              !!byValue
-            )
+            item.type === FlattenType.CATEGORY_ITEM ||
+            item.type === FlattenType.INFO
           ) &&
           !visibleIds[item.parent.data.id]
         ) {
@@ -481,6 +518,12 @@ export class AppFormTreeEditorV2Component
           if (byValue) {
             item.parent.data.collapsed = false;
           }
+        } else if (
+          byValue &&
+          item.type === FlattenType.CATEGORY
+        ) {
+          // expand since parent matched
+          item.data.collapsed = false;
         }
       }
 
