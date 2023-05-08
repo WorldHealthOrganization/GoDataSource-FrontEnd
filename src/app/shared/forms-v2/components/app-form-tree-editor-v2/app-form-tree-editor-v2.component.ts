@@ -227,6 +227,11 @@ export class AppFormTreeEditorV2Component
       return;
     }
 
+    // reset collapse
+    this.options?.forEach((category) => {
+      category.collapsed = true;
+    });
+
     // update selected
     this.nonFlatToFlat();
   }
@@ -462,8 +467,10 @@ export class AppFormTreeEditorV2Component
         // make parent visible if necessary
         if (
           (
-            item.type === FlattenType.CATEGORY_ITEM ||
-            item.type === FlattenType.INFO
+            item.type === FlattenType.INFO || (
+              item.type === FlattenType.CATEGORY_ITEM &&
+              !!byValue
+            )
           ) &&
           !visibleIds[item.parent.data.id]
         ) {
