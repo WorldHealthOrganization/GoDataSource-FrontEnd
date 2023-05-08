@@ -40,8 +40,9 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // get data

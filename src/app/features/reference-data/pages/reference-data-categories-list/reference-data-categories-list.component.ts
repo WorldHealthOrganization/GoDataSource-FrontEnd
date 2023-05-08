@@ -36,8 +36,9 @@ export class ReferenceDataCategoriesListComponent
     private activatedRoute: ActivatedRoute
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
   }
 

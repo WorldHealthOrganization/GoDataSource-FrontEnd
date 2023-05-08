@@ -80,8 +80,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // disable select outbreak

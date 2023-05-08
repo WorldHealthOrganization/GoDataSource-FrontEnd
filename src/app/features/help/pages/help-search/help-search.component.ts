@@ -38,8 +38,9 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
     private dialogV2Service: DialogV2Service
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
   }
 

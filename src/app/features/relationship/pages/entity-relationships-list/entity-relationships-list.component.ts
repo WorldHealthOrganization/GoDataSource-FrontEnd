@@ -58,8 +58,9 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // disable select outbreak

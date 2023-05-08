@@ -123,8 +123,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     private dialogV2Service: DialogV2Service
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // from team/user workload ?

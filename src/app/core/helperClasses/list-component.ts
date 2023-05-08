@@ -214,7 +214,10 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    */
   protected constructor(
     protected listHelperService: ListHelperService,
-    disableFilterCaching: boolean = false
+    config?: {
+      // optional
+      disableFilterCaching?: boolean
+    }
   ) {
     // parent constructor
     super(
@@ -325,7 +328,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
 
     // disable filter caching ?
-    this._disableFilterCaching = disableFilterCaching;
+    this._disableFilterCaching = !!config?.disableFilterCaching;
 
     // check filters
     this.checkListFilters();

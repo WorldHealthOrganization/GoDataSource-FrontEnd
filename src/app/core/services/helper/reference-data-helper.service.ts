@@ -279,18 +279,17 @@ export class ReferenceDataHelperService {
    */
   filterPerOutbreakOptions(
     outbreak: OutbreakModel,
-    // #TODO
-    // #TODO item.data..nu putem garanta ca e ce tb..poate e mai bine sa primim ca input ReferenceDataEntryModel[] si sa facem o lista noua de ILabelValuePairModel[]
-    // #TODO dar atunci care mai e rostul sa avem options in resolver !?
     options: ILabelValuePairModel[],
-    value: string
+    selectedValue: string | undefined
   ): ILabelValuePairModel[] {
     return options.filter((item) =>
       item.data.isSystemWide ||
       !outbreak?.allowedRefDataItems ||
       !outbreak.allowedRefDataItems[item.data.categoryId] ||
-      outbreak.allowedRefDataItems[item.data.categoryId][item.value] ||
-      outbreak.allowedRefDataItems[item.data.categoryId][value]
+      outbreak.allowedRefDataItems[item.data.categoryId][item.value] || (
+        selectedValue &&
+        item.value === selectedValue
+      )
     );
   }
 }

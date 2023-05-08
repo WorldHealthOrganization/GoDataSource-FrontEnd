@@ -86,8 +86,9 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // disable select outbreak

@@ -55,8 +55,9 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // disable select outbreak

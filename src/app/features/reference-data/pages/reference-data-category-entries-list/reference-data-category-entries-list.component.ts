@@ -43,8 +43,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     private i18nService: I18nService
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // retrieve category

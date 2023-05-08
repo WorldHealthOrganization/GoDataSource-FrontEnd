@@ -64,6 +64,7 @@ import { AppListTableV2Component } from '../../../../shared/components-v2/app-li
 import { DomSanitizer } from '@angular/platform-browser';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 /**
  * Component
@@ -124,6 +125,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected entityLabResultService: EntityLabResultService,
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
     protected domSanitizer: DomSanitizer,
+    protected referenceDataHelperService: ReferenceDataHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -807,7 +809,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             name: 'classification',
             placeholder: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
             description: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              this.itemData.classification
+            ),
             value: {
               get: () => this.itemData.classification,
               set: (value) => {

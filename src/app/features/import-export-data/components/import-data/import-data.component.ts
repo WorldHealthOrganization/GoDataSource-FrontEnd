@@ -645,8 +645,9 @@ export class ImportDataComponent
   ) {
     // list parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // retrieve import mappings if we have any

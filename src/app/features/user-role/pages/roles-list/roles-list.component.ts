@@ -35,8 +35,9 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
     private i18nService: I18nService
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
   }
 

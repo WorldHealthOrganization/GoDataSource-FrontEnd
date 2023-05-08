@@ -28,8 +28,9 @@ export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCases
     private i18nService: I18nService
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
   }
 

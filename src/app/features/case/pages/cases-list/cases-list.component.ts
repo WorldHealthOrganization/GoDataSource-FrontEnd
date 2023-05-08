@@ -874,10 +874,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          // #TODO - what about older values that were used but not associated anymore with outbreak ?
           options: this.referenceDataHelperService.filterPerOutbreakOptions(
             this.selectedOutbreak,
-            (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+            (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
           ),
           search: (column: IV2Column) => {
             // create condition
