@@ -39,6 +39,7 @@ import {
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { UserSettings } from '../../../../core/models/user.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 /**
  * Component
@@ -71,6 +72,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     private domSanitizer: DomSanitizer,
+    private referenceDataHelperService: ReferenceDataHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -508,7 +510,11 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
               name: 'labName',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                this.itemData.labName
+              ),
               value: {
                 get: () => this.itemData.labName,
                 set: (value) => {
@@ -521,7 +527,11 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
               name: 'sampleType',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                this.itemData.sampleType
+              ),
               value: {
                 get: () => this.itemData.sampleType,
                 set: (value) => {
@@ -534,7 +544,11 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
               name: 'testType',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                this.itemData.testType
+              ),
               value: {
                 get: () => this.itemData.testType,
                 set: (value) => {
@@ -547,7 +561,11 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
               name: 'result',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                this.itemData.result
+              ),
               value: {
                 get: () => this.itemData.result,
                 set: (value) => {
@@ -655,7 +673,11 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
               name: 'sequence[labId]',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                this.itemData.sequence?.labId
+              ),
               value: {
                 get: () => this.itemData.sequence.labId,
                 set: (value) => {
@@ -682,7 +704,11 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
               name: 'sequence[resultId]',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                this.itemData.sequence?.resultId
+              ),
               value: {
                 get: () => this.itemData.sequence.resultId,
                 set: (value) => {
@@ -973,10 +999,26 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     this.expandListAdvancedFilters = LabResultModel.generateAdvancedFilters({
       selectedOutbreak: () => this.selectedOutbreak,
       options: {
-        labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestType: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        labName: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }
