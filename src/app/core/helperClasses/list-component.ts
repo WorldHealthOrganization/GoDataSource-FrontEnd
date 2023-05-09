@@ -290,10 +290,17 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       this.initializeGroupedData();
 
       // load saved filters
-      this.loadCachedFilters();
+      if (
+        !config?.initializeTableColumnsAfterSelectedOutbreakChanged &&
+        !config?.initializeTableAdvancedFiltersAfterSelectedOutbreakChanged
+      ) {
+        this.loadCachedFilters();
+      }
 
       // apply table column filters
-      this.applyTableColumnFilters();
+      if (!config?.initializeTableColumnsAfterSelectedOutbreakChanged) {
+        this.applyTableColumnFilters();
+      }
 
       // component initialized
       this.initialized();
@@ -347,6 +354,19 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
             // we need to refresh table ui
             refreshTableUI = true;
+          }
+
+          // load saved filters
+          if (
+            config?.initializeTableColumnsAfterSelectedOutbreakChanged ||
+            config?.initializeTableAdvancedFiltersAfterSelectedOutbreakChanged
+          ) {
+            this.loadCachedFilters();
+          }
+
+          // apply table column filters
+          if (config?.initializeTableColumnsAfterSelectedOutbreakChanged) {
+            this.applyTableColumnFilters();
           }
 
           // call
@@ -421,6 +441,12 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
           // re-init breadcrumbs
           this.initializeBreadcrumbs();
+
+          // initialize table columns
+          this.initializeTableColumns();
+
+          // initialize advanced filters
+          this.initializeTableAdvancedFilters();
 
           // load cached filters if necessary
           this.loadCachedFiltersIfNecessary();
@@ -1185,7 +1211,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   }
 
   /**
-   * Check if we need to load cached filters if necessary depending if we already loaded for this route or not
+   * Check if we need to load cached filters if necessary depending on if we already loaded for this route or not
    */
   private loadCachedFiltersIfNecessary(): void {
     // if we loaded cached filters for this page then we don't need to load it again
