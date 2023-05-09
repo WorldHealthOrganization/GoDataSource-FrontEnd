@@ -127,7 +127,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
   ) {
     super(
       listHelperService, {
-        initializeTableColumnsAfterSelectedOutbreakChanged: true
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
       }
     );
   }

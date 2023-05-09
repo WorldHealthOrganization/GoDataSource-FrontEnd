@@ -218,7 +218,8 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     config?: {
       // optional
       disableFilterCaching?: boolean,
-      initializeTableColumnsAfterSelectedOutbreakChanged?: boolean
+      initializeTableColumnsAfterSelectedOutbreakChanged?: boolean,
+      initializeTableAdvancedFiltersAfterSelectedOutbreakChanged?: boolean
     }
   ) {
     // parent constructor
@@ -272,7 +273,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       this.initializeTableInfos();
 
       // initialize advanced filters
-      this.initializeTableAdvancedFilters();
+      if (!config?.initializeTableAdvancedFiltersAfterSelectedOutbreakChanged) {
+        this.initializeTableAdvancedFilters();
+      }
 
       // initialize table quick actions
       this.initializeQuickActions();
@@ -332,6 +335,15 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
           if (config?.initializeTableColumnsAfterSelectedOutbreakChanged) {
             // init
             this.initializeTableColumns();
+
+            // we need to refresh table ui
+            refreshTableUI = true;
+          }
+
+          // initialize advanced filters
+          if (config?.initializeTableAdvancedFiltersAfterSelectedOutbreakChanged) {
+            // init
+            this.initializeTableAdvancedFilters();
 
             // we need to refresh table ui
             refreshTableUI = true;

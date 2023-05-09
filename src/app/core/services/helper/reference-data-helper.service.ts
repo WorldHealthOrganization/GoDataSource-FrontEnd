@@ -280,16 +280,38 @@ export class ReferenceDataHelperService {
   filterPerOutbreakOptions(
     outbreak: OutbreakModel,
     options: ILabelValuePairModel[],
-    selectedValue: string | undefined
+    selectedValue: string | string[] | undefined
   ): ILabelValuePairModel[] {
+    // if array we need to map it
+    const selectedValueMap: {
+      [id: string]: true
+    } = {};
+    if (selectedValue) {
+      if (Array.isArray(selectedValue)) {
+        selectedValue.forEach((id) => {
+          // not used
+          if (
+            !id ||
+            typeof id !== 'string'
+          ) {
+            return;
+          }
+
+          // map
+          selectedValueMap[id] = true;
+        });
+      } else {
+        selectedValueMap[selectedValue] = true;
+      }
+    }
+
+    // filter
     return options.filter((item) =>
       item.data.isSystemWide ||
       !outbreak?.allowedRefDataItems ||
       !outbreak.allowedRefDataItems[item.data.categoryId] ||
-      outbreak.allowedRefDataItems[item.data.categoryId][item.value] || (
-        selectedValue &&
-        item.value === selectedValue
-      )
+      outbreak.allowedRefDataItems[item.data.categoryId][item.value] ||
+      selectedValueMap[item.value]
     );
   }
 }

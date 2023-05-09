@@ -149,7 +149,8 @@ export class ContactsListComponent
   ) {
     super(
       listHelperService, {
-        initializeTableColumnsAfterSelectedOutbreakChanged: true
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
       }
     );
   }
