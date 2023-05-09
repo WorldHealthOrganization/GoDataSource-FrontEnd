@@ -704,7 +704,7 @@ export class AppFormTreeEditorV2Component
               catItem.flash = false;
 
               // refresh - to remove class from DOM
-              // - no need to refresh ui (this.detectChanges()) since it flashes just once and it will be removed on next refresh anyway
+              // - no need to refresh ui (this.detectChanges()) since it flashes just once, and it will be removed on next refresh anyway
             }, 2000);
           }
         }
