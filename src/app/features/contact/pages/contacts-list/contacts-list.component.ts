@@ -905,7 +905,11 @@ export class ContactsListComponent
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           includeNoValue: true
         }
       },
@@ -1237,11 +1241,23 @@ export class ContactsListComponent
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
-        occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         followUpStatus: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         pregnancyStatus: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        vaccineStatus: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        vaccine: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        vaccineStatus: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
