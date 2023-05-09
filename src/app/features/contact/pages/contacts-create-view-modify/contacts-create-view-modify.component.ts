@@ -1150,7 +1150,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             options: this.referenceDataHelperService.filterPerOutbreakOptions(
               this.selectedOutbreak,
               (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this._relationship.exposureTypeId
+              this._relationship?.exposureTypeId
             ),
             value: {
               get: () => this._relationship.exposureTypeId,
@@ -1166,7 +1166,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             options: this.referenceDataHelperService.filterPerOutbreakOptions(
               this.selectedOutbreak,
               (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this._relationship.exposureFrequencyId
+              this._relationship?.exposureFrequencyId
             ),
             value: {
               get: () => this._relationship.exposureFrequencyId,
@@ -1182,7 +1182,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             options: this.referenceDataHelperService.filterPerOutbreakOptions(
               this.selectedOutbreak,
               (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this._relationship.exposureDurationId
+              this._relationship?.exposureDurationId
             ),
             value: {
               get: () => this._relationship.exposureDurationId,
@@ -1198,7 +1198,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             options: this.referenceDataHelperService.filterPerOutbreakOptions(
               this.selectedOutbreak,
               (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this._relationship.socialRelationshipTypeId
+              this._relationship?.socialRelationshipTypeId
             ),
             value: {
               get: () => this._relationship.socialRelationshipTypeId,

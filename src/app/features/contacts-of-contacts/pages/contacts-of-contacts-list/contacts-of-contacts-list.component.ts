@@ -672,7 +672,11 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           includeNoValue: true
         }
       },
@@ -836,7 +840,11 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     this.advancedFilters = ContactOfContactModel.generateAdvancedFilters({
       authUser: this.authUser,
       options: {
-        occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
