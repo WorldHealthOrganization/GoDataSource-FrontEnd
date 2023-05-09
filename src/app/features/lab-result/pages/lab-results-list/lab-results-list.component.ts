@@ -29,6 +29,7 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-lab-results',
@@ -75,9 +76,15 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
     private labResultDataService: LabResultDataService,
     private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
+    );
   }
 
   /**
@@ -456,7 +463,11 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           relationshipKey: 'person'
         }
       },
@@ -508,7 +519,11 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
@@ -517,7 +532,11 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
@@ -526,7 +545,11 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
@@ -535,7 +558,11 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
@@ -591,7 +618,11 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
@@ -614,7 +645,11 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
@@ -746,10 +781,26 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
     this.advancedFilters = LabResultModel.generateAdvancedFilters({
       selectedOutbreak: () => this.selectedOutbreak,
       options: {
-        labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestType: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        labName: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }
