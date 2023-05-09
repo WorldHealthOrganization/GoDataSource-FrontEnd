@@ -11,7 +11,11 @@ import { UserModel, UserSettings } from '../models/user.model';
 import * as LzString from 'lz-string';
 import { applyResetOnAllFilters, applySortBy } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel, IV2GroupActions } from '../../shared/components-v2/app-list-table-v2/models/action.model';
+import {
+  IV2ActionIconLabel,
+  IV2ActionMenuLabel,
+  IV2GroupActions
+} from '../../shared/components-v2/app-list-table-v2/models/action.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IBasicCount } from '../models/basic-count.interface';
@@ -1164,6 +1168,27 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
           // get value
           column.filter.address.geoLocationAccurate = value;
+
+          // finished
+          break;
+
+        case V2FilterType.MULTIPLE_SELECT:
+          // map
+          const selectMap: {
+            [id: string]: true
+          } = {};
+          column.filter.options?.forEach((option) => {
+            selectMap[option.value] = true;
+          });
+
+          // get value
+          column.filter.value = Array.isArray(value) ?
+            value.filter((item) =>
+              typeof item !== 'string' ||
+              !column.filter.options ||
+              selectMap[item]
+            ) :
+            value;
 
           // finished
           break;
