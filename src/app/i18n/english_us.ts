@@ -12,6 +12,8 @@ export const EnglishUsLang = {
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
     'LNG_COMMON_LABEL_NOTHING_SELECTED': 'Nothing selected',
+    'LNG_COMMON_BUTTON_CHECK_ALL': 'Check all',
+    'LNG_COMMON_BUTTON_UNCHECK_ALL': 'Uncheck all',
     'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE': 'System-wide',
     'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE_DESCRIPTION': 'Visible on all outbreak if checked',
     'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ALLOWED_REF_DATA_ITEMS': 'Allowed reference data', // used on api

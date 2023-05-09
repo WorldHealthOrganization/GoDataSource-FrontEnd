@@ -816,4 +816,63 @@ export class AppFormTreeEditorV2Component
       this.copyCheckbox
     );
   }
+
+  /**
+   * Check / Uncheck all items from a category
+   */
+  checkUncheckAll(
+    item: IFlattenNodeCategory,
+    checked: boolean
+  ): void {
+    // reset value
+    item.data.checked = 0;
+
+    // uncheck ?
+    if (!checked) {
+      // delete
+      delete this.value[item.data.id];
+
+      // count system options
+      item.data.children?.forEach((option) => {
+        // ignore
+        if (
+          option.disabled ||
+          !option.isSystemWide
+        ) {
+          return;
+        }
+
+        // count
+        item.data.checked++;
+      });
+    } else {
+      // initialize if necessary
+      this.value[item.data.id] = this.value[item.data.id] || {};
+
+      // check children
+      item.data.children?.forEach((option) => {
+        // ignore inactive options
+        if (option.disabled) {
+          return;
+        }
+
+        // check only if necessary
+        if (!option.isSystemWide) {
+          this.value[item.data.id][option.id] = true;
+        }
+
+        // count
+        item.data.checked++;
+      });
+    }
+
+    // trigger on change
+    this.onChange(this.value);
+
+    // mark dirty
+    this.control?.markAsDirty();
+
+    // update ui
+    this.detectChanges();
+  }
 }
