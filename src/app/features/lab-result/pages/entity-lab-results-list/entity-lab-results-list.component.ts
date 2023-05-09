@@ -29,6 +29,7 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-entity-lab-results-list',
@@ -82,12 +83,15 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
     private entityLabResultService: EntityLabResultService,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
-    private caseDataService: CaseDataService
+    private caseDataService: CaseDataService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
       }
     );
 
@@ -145,13 +149,37 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
       authUser: this.authUser,
       user: this.activatedRoute.snapshot.data.user,
       options: {
-        labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestType: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labName: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        labSequenceLaboratory: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }
@@ -173,13 +201,37 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
     this.advancedFilters = this.entityLabResultService.generateAdvancedFilters({
       labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
       options: {
-        labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestType: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labName: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        labSequenceLaboratory: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
       }
     });
@@ -535,7 +587,11 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
             placeholder: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
-            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              (this.entityData as CaseModel).classification
+            ),
             value: (this.entityData as CaseModel).classification,
             name: 'classification',
             validators: {
