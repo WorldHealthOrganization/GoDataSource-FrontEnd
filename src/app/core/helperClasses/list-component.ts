@@ -23,7 +23,10 @@ import { AuthenticatedComponent } from '../components/authenticated/authenticate
 import { ICachedFilter, ICachedFilterItems, ICachedInputsValues, ICachedSortItem } from './models/cache.model';
 import { ListAppliedFiltersComponent } from './list-applied-filters-component';
 import { V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import {
+  V2AdvancedFilter,
+  V2AdvancedFilterType
+} from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { Directive, ViewChild } from '@angular/core';
 import { AppListTableV2Component } from '../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { SavedFilterData } from '../models/saved-filters.model';
@@ -1230,6 +1233,39 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     ) {
       return;
     }
+
+    // filter outbreak specific data
+    currentUserCacheForCurrentPath.sideFilters?.appliedFilters?.forEach((applied) => {
+      // nothing to look for ?
+      if (!applied.filter?.uniqueKey) {
+        return;
+      }
+
+      // find filter
+      const filter = this.advancedFilters?.find((advancedFilter) => `${advancedFilter.field}${advancedFilter.label}` === applied.filter.uniqueKey);
+
+      // only multi-selects are of interest
+      // - IMPORTANT: for now we don't need to handle single selects since they are used only for yes/no dropdowns and follow-ups status
+      if (filter.type === V2AdvancedFilterType.MULTISELECT) {
+        // filter out values
+        if (Array.isArray(applied.value)) {
+          // map
+          const selectMap: {
+            [id: string]: true
+          } = {};
+          filter.options?.forEach((option) => {
+            selectMap[option.value] = true;
+          });
+
+          // get value
+          applied.value = applied.value.filter((item) =>
+            typeof item !== 'string' ||
+            !filter.options ||
+            selectMap[item]
+          );
+        }
+      }
+    });
 
     // load side filters
     this.tableV2Component.generateFiltersFromFilterData(new SavedFilterData(currentUserCacheForCurrentPath.sideFilters));
