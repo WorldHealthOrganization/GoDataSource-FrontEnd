@@ -37,6 +37,7 @@ import { EpiCurveReportingDashletComponent } from '../../components/epi-curve-re
 import { ContactFollowUpOverviewDashletComponent } from '../../components/contact-follow-up-overview-dashlet/contact-follow-up-overview-dashlet.component';
 import { CasesBasedOnContactStatusDashletComponent } from '../../components/cases-based-on-contact-status-dashlet/cases-based-on-contact-status-dashlet.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -258,6 +259,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private i18nService: I18nService,
     private domService: DomService,
     private toastV2Service: ToastV2Service,
+    private referenceDataHelperService: ReferenceDataHelperService,
     authDataService: AuthDataService
   ) {
     // update render mode
@@ -681,7 +683,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
             type: V2AdvancedFilterType.MULTISELECT,
             field: 'classificationId',
             label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION',
-            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this._selectedOutbreak,
+              (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
             optional: true,
             allowedComparators: [
               _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
