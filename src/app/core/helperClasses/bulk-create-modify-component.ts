@@ -59,6 +59,9 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
   // page title
   pageTitle: string;
 
+  // initialize table columns after outbreak changed ?
+  private _initializeTableColumnAfterOutbreakSelected: boolean = false;
+
   // timers
   private _initializeTimer: number;
   private _initializeRecordsTimer: number;
@@ -125,6 +128,12 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
 
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
+
+        // initialize table columns after outbreak changed ?
+        if (this._initializeTableColumnAfterOutbreakSelected) {
+          this.initializeTableColumns();
+          this._initializeTableColumnAfterOutbreakSelected = false;
+        }
 
         // timer - records
         this.stopInitializeRecordsTimer();
@@ -226,7 +235,13 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
   recordsInitialized(): void {
     // initialize table columns
     if (this._config.initializeTableColumnsAfterRecordsInitialized) {
-      this.initializeTableColumns();
+      // outbreak initialized ?
+      if (this.selectedOutbreak?.id) {
+        this.initializeTableColumns();
+      } else {
+        // wait for outbreak to initialize
+        this._initializeTableColumnAfterOutbreakSelected = true;
+      }
     }
   }
 }

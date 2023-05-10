@@ -7,5 +7,6 @@
   [columns]="tableColumns"
   [saveIgnoreGroups]="saveIgnoreGroups"
   [saveFieldReplace]="saveFieldReplace"
+  (recordsInitialized)="recordsInitialized()"
   (save)="save($event)">
 </app-spreadsheet-editor-v2>
