@@ -113,7 +113,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
   // columns
   private _locationColumns: string[];
-  private _columns: V2SpreadsheetEditorColumn[];
+  private _columns: V2SpreadsheetEditorColumn[] = [];
   @Input() set columns(columns: V2SpreadsheetEditorColumn[]) {
     // set data
     this._columns = (columns || [])
@@ -706,7 +706,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // - fix for first render issue (necessary to render css properly from this.validateAllRows)
         if (
           this.action === CreateViewModifyV2Action.MODIFY &&
-          data.length > 0
+          data.length > 0 &&
+          this.columns?.length
         ) {
           // start edit
           this._agTable.api.startEditingCell({
@@ -770,7 +771,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     delete this._callWhenReady.updateColumnDefinitions;
 
     // nothing to do ?
-    if (!this._columns) {
+    if (!this.columns?.length) {
       // reset
       this._agTable.api.setColumnDefs(undefined);
 
@@ -807,7 +808,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }];
 
     // process columns in default order
-    this._columns.forEach((column, index) => {
+    this.columns.forEach((column, index) => {
       // column key
       const columnKey: string = column.field;
 
