@@ -636,7 +636,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: 'ref_data_per_outbreak_template',
-      label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
+      label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_ALLOWED_REF_DATA_ITEMS',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR,
         name: 'allowedRefDataItems',

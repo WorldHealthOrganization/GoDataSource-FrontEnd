@@ -11,24 +11,6 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_COMMON_LABEL_NOTHING_SELECTED': 'Nothing selected',
-    'LNG_COMMON_BUTTON_CHECK_ALL': 'Check all',
-    'LNG_COMMON_BUTTON_UNCHECK_ALL': 'Uncheck all',
-    'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE': 'System-wide',
-    'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE_DESCRIPTION': 'Visible on all outbreak if checked',
-    'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ALLOWED_REF_DATA_ITEMS': 'Allowed reference data', // used on api
-    'LNG_REFERENCE_DATA_CATEGORY_LABEL_ENTRIES_COUNT': 'System-wide',
-    'LNG_REFERENCE_DATA_CATEGORY_LABEL_EXPAND_ALL': 'Expand all',
-    'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL': 'Collapse all',
-    'LNG_REFERENCE_DATA_CATEGORY_LABEL_EDIT_NO_CATEGORIES': 'No categories or category items matched the search criteria',
-    'LNG_REFERENCE_DATA_CATEGORY_LABEL_ADD_NEW_ITEM_UNDER': 'Add new item under "{{category}}"',
-    'LNG_COMMON_BUTTON_ADD_ANOTHER': 'Add item followed by adding one more',
-    'LNG_OUTBREAK_FIELD_LABEL_LABEL_ALLOWED_REF_DATA_ITEMS': 'Allowed reference data', // used on api
-    'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_ALLOWED_REF_DATA_ITEMS': 'Allowed reference data', // used on api
-    'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_COPY_REF_FROM_DISEASE_TOOLTIP': 'Overwrite outbreak template allowed reference data with those from disease',
-    'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_COPY_REF_FROM_DISEASE_DIALOG': 'Are you sure you want to overwrite outbreak template allowed reference data with those from "{{disease}}"',
-    'LNG_PAGE_CREATE_OUTBREAK_COPY_REF_FROM_DISEASE_TOOLTIP': 'Overwrite outbreak allowed reference data with those from disease',
-    'LNG_PAGE_CREATE_OUTBREAK_COPY_REF_FROM_DISEASE_DIALOG': 'Are you sure you want to overwrite outbreak allowed reference data with those from "{{disease}}"'
 
 
 
