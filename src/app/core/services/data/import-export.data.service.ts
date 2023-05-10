@@ -193,6 +193,15 @@ export class ImportExportDataService {
       delete data.includeDeletedLocations;
     }
 
+    // add flag replaceUpdatedAtAsCurrentDate
+    if (!_.isUndefined(data.replaceUpdatedAtAsCurrentDate)) {
+      queryBuilder.filter.flag(
+        'replaceUpdatedAtAsCurrentDate',
+        data.replaceUpdatedAtAsCurrentDate
+      );
+      delete data.replaceUpdatedAtAsCurrentDate;
+    }
+
     // add other custom fields caused by API inconsistencies...
     _.each(data, (value: any, key: string) => {
       completeURL += `&${key}=` + (_.isString(value) || _.isNumber(value) ? value : JSON.stringify(value));
@@ -359,6 +368,15 @@ export class ImportExportDataService {
         data.includeDeletedLocations
       );
       delete data.includeDeletedLocations;
+    }
+
+    // add flag replaceUpdatedAtAsCurrentDate
+    if (!_.isUndefined(data.replaceUpdatedAtAsCurrentDate)) {
+      queryBuilder.filter.flag(
+        'replaceUpdatedAtAsCurrentDate',
+        data.replaceUpdatedAtAsCurrentDate
+      );
+      delete data.replaceUpdatedAtAsCurrentDate;
     }
 
     // filter ?
