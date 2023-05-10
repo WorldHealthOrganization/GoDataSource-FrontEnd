@@ -1,7 +1,7 @@
 import { Observable, Subscription } from 'rxjs';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { OutbreakModel } from '../models/outbreak.model';
-import { Directive } from '@angular/core';
+import { Directive, ViewChild } from '@angular/core';
 import { OutbreakDataService } from '../services/data/outbreak.data.service';
 import { UserModel } from '../models/user.model';
 import { AuthDataService } from '../services/data/auth.data.service';
@@ -10,6 +10,9 @@ import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-
 import { IV2SpreadsheetEditorEventSave } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/event.model';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
+import {
+  AppSpreadsheetEditorV2Component
+} from '../../shared/components-v2/app-spreadsheet-editor-v2/app-spreadsheet-editor-v2.component';
 
 /**
  * Bulk create / modify component
@@ -40,6 +43,9 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
   // records
   records$: Observable<T[]>;
 
+  // retrieve table handler
+  @ViewChild(AppSpreadsheetEditorV2Component, { static: true }) spreadsheetEditorV2Component: AppSpreadsheetEditorV2Component;
+
   // page type
   // - determined from route data
   readonly action: CreateViewModifyV2Action.CREATE | CreateViewModifyV2Action.MODIFY;
@@ -63,7 +69,10 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
   protected constructor(
     protected activatedRoute: ActivatedRoute,
     protected authDataService: AuthDataService,
-    protected outbreakDataService: OutbreakDataService
+    protected outbreakDataService: OutbreakDataService,
+    private _config: {
+      initializeTableColumnsAfterRecordsInitialized: boolean
+    }
   ) {
     // parent
     super();
@@ -86,7 +95,9 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
       this.initializeBreadcrumbs();
 
       // initialize table columns
-      this.initializeTableColumns();
+      if (!this._config.initializeTableColumnsAfterRecordsInitialized) {
+        this.initializeTableColumns();
+      }
 
       // initialize ignore groups
       this.initializeSaveIgnoreGroups();
@@ -207,5 +218,15 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
 
     // timer - records
     this.stopInitializeRecordsTimer();
+  }
+
+  /**
+   * Records initialized
+   */
+  recordsInitialized(): void {
+    // initialize table columns
+    if (this._config.initializeTableColumnsAfterRecordsInitialized) {
+      this.initializeTableColumns();
+    }
   }
 }

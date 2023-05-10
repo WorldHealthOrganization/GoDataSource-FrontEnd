@@ -306,12 +306,37 @@ export class ReferenceDataHelperService {
     }
 
     // filter
-    return options.filter((item) =>
-      item.data.isSystemWide ||
-      !outbreak?.allowedRefDataItems ||
-      !outbreak.allowedRefDataItems[item.data.categoryId] ||
-      outbreak.allowedRefDataItems[item.data.categoryId][item.value] ||
-      selectedValueMap[item.value]
-    );
+    const filteredOptions: ILabelValuePairModel[] = [];
+    options.forEach((item) => {
+      // determine if allowed
+      const isAllowed: boolean = item.data.isSystemWide ||
+        !outbreak?.allowedRefDataItems ||
+        !outbreak.allowedRefDataItems[item.data.categoryId] ||
+        outbreak.allowedRefDataItems[item.data.categoryId][item.value];
+
+      // allowed ?
+      if (isAllowed) {
+        // add it
+        filteredOptions.push(item);
+
+        // finished
+        return;
+      }
+
+      // not allowed ?
+      if (!selectedValueMap[item.value]) {
+        return;
+      }
+
+      // disable those that aren't associated with outbreak, but they are allowed
+      const lvShallowClone: ILabelValuePairModel = {
+        ...item,
+        disabled: true
+      };
+      filteredOptions.push(lvShallowClone);
+    });
+
+    // finished
+    return filteredOptions;
   }
 }

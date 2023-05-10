@@ -149,6 +149,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // save
   @Output() save: EventEmitter<IV2SpreadsheetEditorEventSave> = new EventEmitter<IV2SpreadsheetEditorEventSave>();
 
+  // records initialized
+  @Output() recordsInitialized: EventEmitter<void> = new EventEmitter<void>();
+
   // is mac ?
   isMac: boolean = determineIfMacDevice();
 
@@ -695,6 +698,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // unselect everything
         this._agTable.api.deselectAll();
+
+        // records initialized
+        this.recordsInitialized.emit();
 
         // re-render page
         this.detectChanges();
@@ -4673,5 +4679,20 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       clearTimeout(this._languageChangeTimer);
       this._languageChangeTimer = undefined;
     }
+  }
+
+  /**
+   * Retrieve all rows data
+   */
+  getRecords<T>(): T[] {
+    // get visible rows
+    const rowsNo = this._agTable?.api?.getDisplayedRowCount() || 0;
+    const rowsData: T[] = [];
+    for (let rowIndex = 0; rowIndex < rowsNo; rowIndex++) {
+      rowsData.push(this._agTable.api.getDisplayedRowAtIndex(rowIndex).data);
+    }
+
+    // finished
+    return rowsData;
   }
 }
