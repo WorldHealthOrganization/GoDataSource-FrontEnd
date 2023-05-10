@@ -33,9 +33,6 @@ import {
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { IconModel } from '../../../../core/models/icon.model';
 import {
-  AppFormSelectSingleV2Component
-} from '../../../../shared/forms-v2/components/app-form-select-single-v2/app-form-select-single-v2.component';
-import {
   IV2BottomDialogConfigButtonType
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import * as _ from 'lodash';
@@ -48,6 +45,9 @@ import * as _ from 'lodash';
   templateUrl: './outbreak-template-create-view-modify.component.html'
 })
 export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyComponent<OutbreakTemplateModel> implements OnDestroy {
+  // static
+  private static readonly TAB_NAMES_REF_DATA: string = 'ref_data_per_outbreak_template';
+
   // per disease
   private _diseaseSpecificReferenceData: ITreeEditorDataCategory[];
 
@@ -306,16 +306,31 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
               value: {
                 get: () => this.itemData.disease,
                 set: (value) => {
+                  // set value
                   this.itemData.disease = value;
+
+                  // nothing to do ?
+                  if (
+                    !value ||
+                    !(this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[value] ||
+                    _.isEmpty((this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[value].allowedRefDataItems)
+                  ) {
+                    return;
+                  }
+
+                  // replace existing ref data per outbreak with the ones from the disease ?
+                  this.showCopyDiseaseAllowedRefDataConfirmation();
                 }
               },
               suffixIconButtons: [
                 {
                   icon: 'file_copy',
                   tooltip: 'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_COPY_REF_FROM_DISEASE_TOOLTIP',
-                  disabled: (input: AppFormSelectSingleV2Component) => {
+                  disabled: () => {
                     // check if we have anything to copy
-                    const allowedRefDataItems: ITreeEditorDataValue = (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[input.value]?.allowedRefDataItems;
+                    const allowedRefDataItems: ITreeEditorDataValue = this.itemData.disease ?
+                      (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[this.itemData.disease]?.allowedRefDataItems :
+                      undefined;
                     if (
                       !allowedRefDataItems ||
                       Object.keys(allowedRefDataItems).length < 1
@@ -326,34 +341,8 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                     // allow
                     return false;
                   },
-                  clickAction: (input: AppFormSelectSingleV2Component) => {
-                    // ask for confirmation before overwriting
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
-                        },
-                        message: {
-                          get: () => 'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_COPY_REF_FROM_DISEASE_DIALOG',
-                          data: () => ({
-                            disease: this.i18nService.instant(input.value)
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // overwrite
-                      const allowedRefDataItems: ITreeEditorDataValue = (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[input.value]?.allowedRefDataItems;
-                      this.itemData.allowedRefDataItems = _.cloneDeep(allowedRefDataItems);
-
-                      // mark as dirty
-                      input.control?.markAsDirty();
-                    });
+                  clickAction: () => {
+                    this.showCopyDiseaseAllowedRefDataConfirmation();
                   }
                 }
               ]
@@ -635,7 +624,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   private initializeTabsReferenceDataPerOutbreakTemplate(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'ref_data_per_outbreak_template',
+      name: OutbreakTemplateCreateViewModifyComponent.TAB_NAMES_REF_DATA,
       label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_ALLOWED_REF_DATA_ITEMS',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR,
@@ -1007,5 +996,43 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
+  }
+
+  /**
+   * Copy disease allowed ref data to outbreak template
+   */
+  private showCopyDiseaseAllowedRefDataConfirmation(): void {
+    // ask for confirmation before overwriting
+    this.dialogV2Service.showConfirmDialog({
+      config: {
+        title: {
+          get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+        },
+        message: {
+          get: () => 'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_COPY_REF_FROM_DISEASE_DIALOG',
+          data: () => ({
+            disease: this.i18nService.instant(this.itemData.disease)
+          })
+        }
+      },
+      cancelLabel: 'LNG_COMMON_LABEL_NO'
+    }).subscribe((response) => {
+      // canceled ?
+      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+        // finished
+        return;
+      }
+
+      // overwrite
+      const allowedRefDataItems: ITreeEditorDataValue = (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[this.itemData.disease]?.allowedRefDataItems;
+      this.itemData.allowedRefDataItems = _.cloneDeep(allowedRefDataItems);
+
+      // mark dirty the reference data input and not the current input
+      this.createViewModifyComponent.tabData.tabs
+        .find((tab) => tab.name === OutbreakTemplateCreateViewModifyComponent.TAB_NAMES_REF_DATA)
+        ?.form
+        ?.controls
+        ?.allowedRefDataItems?.markAsDirty();
+    });
   }
 }
