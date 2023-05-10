@@ -15,6 +15,7 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-epi-curve-outcome-dashlet',
@@ -84,7 +85,7 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
   }
 
   // outbreak
-  outbreakId: string;
+  private _selectedOutbreak: OutbreakModel;
 
   // subscribers
   outbreakSubscriber: Subscription;
@@ -113,6 +114,7 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
     private outbreakDataService: OutbreakDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
+    private referenceDataHelperService: ReferenceDataHelperService,
     activatedRoute: ActivatedRoute
   ) {
     this.epiCurveWeekTypesOptions = (activatedRoute.snapshot.data.epiCurveWeekTypes as IResolverV2ResponseModel<ILabelValuePairModel>).options;
@@ -122,33 +124,49 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
      * Component initialized
      */
   ngOnInit() {
-    // retrieve ref data
+    // outbreak
     this.displayLoading = true;
-    this.refdataSubscriber = this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OUTCOME)
-      .subscribe((outcome) => {
-        // map classifications to translation and color
-        this.mapOutcomes = {};
-        _.forEach(outcome.entries, (outcomeItem) => {
-          this.mapOutcomes[outcomeItem.value] = {};
-          this.mapOutcomes[outcomeItem.value].valueTranslated = this.i18nService.instant(outcomeItem.value);
-          this.mapOutcomes[outcomeItem.value].colorCode = outcomeItem.colorCode;
-        });
+    this.outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        // reset
+        this.outbreakSubscriber = null;
 
-        // outbreak subscriber
-        if (this.outbreakSubscriber) {
-          this.outbreakSubscriber.unsubscribe();
-          this.outbreakSubscriber = null;
+        // nothing to do
+        if (!selectedOutbreak?.id) {
+          return;
         }
 
-        // outbreak
-        this.outbreakSubscriber = this.outbreakDataService
-          .getSelectedOutbreakSubject()
-          .subscribe((selectedOutbreak: OutbreakModel) => {
-            if (selectedOutbreak) {
-              this.outbreakId = selectedOutbreak.id;
-              this.refreshDataCaller.call();
-            }
+        // set outbreak
+        this._selectedOutbreak = selectedOutbreak;
+
+        // stop ref data
+        this.stopRefDataSubscriber();
+
+        // retrieve ref data
+        this.displayLoading = true;
+        this.refdataSubscriber = this.referenceDataDataService
+          .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OUTCOME)
+          .subscribe((outcome) => {
+            // reset
+            this.refdataSubscriber = null;
+
+            // determine outbreak specific entries
+            const entries = this.referenceDataHelperService.filterPerOutbreak(
+              this._selectedOutbreak,
+              outcome.entries
+            );
+
+            // map classifications to translation and color
+            this.mapOutcomes = {};
+            _.forEach(entries, (outcomeItem) => {
+              this.mapOutcomes[outcomeItem.value] = {};
+              this.mapOutcomes[outcomeItem.value].valueTranslated = this.i18nService.instant(outcomeItem.value);
+              this.mapOutcomes[outcomeItem.value].colorCode = outcomeItem.colorCode;
+            });
+
+            // refresh data
+            this.refreshDataCaller.call();
           });
       });
   }
@@ -169,16 +187,24 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
       this.previousSubscriber = null;
     }
 
-    // ref data
-    if (this.refdataSubscriber) {
-      this.refdataSubscriber.unsubscribe();
-      this.refdataSubscriber = null;
-    }
+    // stop ref data
+    this.stopRefDataSubscriber();
 
     // debounce caller
     if (this.refreshDataCaller) {
       this.refreshDataCaller.unsubscribe();
       this.refreshDataCaller = null;
+    }
+  }
+
+  /**
+   * Stop ref data subscriber
+   */
+  private stopRefDataSubscriber(): void {
+    // ref data
+    if (this.refdataSubscriber) {
+      this.refdataSubscriber.unsubscribe();
+      this.refdataSubscriber = null;
     }
   }
 
@@ -262,7 +288,7 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
     }
 
     if (
-      this.outbreakId &&
+      this._selectedOutbreak?.id &&
       !_.isEmpty(this.mapOutcomes)
     ) {
       // release previous subscriber
@@ -332,7 +358,7 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
       this.displayLoading = true;
       this.detectChanges.emit();
       this.previousSubscriber = this.caseDataService
-        .getCasesStratifiedByOutcomeOverTime(this.outbreakId, qb)
+        .getCasesStratifiedByOutcomeOverTime(this._selectedOutbreak.id, qb)
         .subscribe((results) => {
           // convert data to chart data format
           this.chartData = [];
