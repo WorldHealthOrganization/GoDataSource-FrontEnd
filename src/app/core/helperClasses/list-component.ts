@@ -1246,7 +1246,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
       // only multi-selects are of interest
       // - IMPORTANT: for now we don't need to handle single selects since they are used only for yes/no dropdowns and follow-ups status
-      if (filter.type === V2AdvancedFilterType.MULTISELECT) {
+      if (filter?.type === V2AdvancedFilterType.MULTISELECT) {
         // filter out values
         if (Array.isArray(applied.value)) {
           // map
