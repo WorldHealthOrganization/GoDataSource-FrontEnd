@@ -68,6 +68,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { IV2NumberRange } from '../../../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -546,7 +547,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private importExportDataService: ImportExportDataService,
     private elementRef: ElementRef,
     private entityHelperService: EntityHelperService,
-    private relationshipDataService: RelationshipDataService
+    private relationshipDataService: RelationshipDataService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     // update render mode
     this.updateRenderMode();
@@ -3081,19 +3083,31 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
                     name: 'classificationId',
                     placeholder: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-                    options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                    options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                      this.selectedOutbreak,
+                      (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                      undefined
+                    ),
                     values: this.filters.classificationId
                   }, {
                     type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
                     name: 'occupation',
                     placeholder: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-                    options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                    options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                      this.selectedOutbreak,
+                      (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                      undefined
+                    ),
                     values: this.filters.occupation
                   }, {
                     type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
                     name: 'outcomeId',
                     placeholder: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-                    options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                    options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                      this.selectedOutbreak,
+                      (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                      undefined
+                    ),
                     values: this.filters.outcomeId
                   }, {
                     type: V2SideDialogConfigInputType.TEXT,
@@ -3294,7 +3308,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'labSeqResult',
           label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL',
-          options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           allowedComparators: [
             _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
           ],
@@ -3310,7 +3328,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'classification',
           label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           allowedComparators: [
             _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
           ],
@@ -3326,7 +3348,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'occupation',
           label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-          options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           allowedComparators: [
             _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
           ],
@@ -3342,7 +3368,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'outcomeId',
           label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-          options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           allowedComparators: [
             _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
           ],
