@@ -993,7 +993,8 @@ export class ImportDataComponent
       fileType,
       this.fieldsWithoutTokens,
       this.extraDataUsedToFormatData,
-      this.formatDataBeforeUse
+      this.formatDataBeforeUse,
+      this.selectedOutbreak
     );
 
     // we should have at least the headers of the file
