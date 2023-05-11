@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { ActivatedRoute } from '@angular/router';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataHelperService } from '../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-form-relationship-quick',
@@ -51,16 +52,13 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
     private clusterDataService: ClusterDataService,
     private outbreakDataService: OutbreakDataService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     super(controlContainer, validators, asyncValidators);
 
     // data
     this.certaintyLevelOptions = (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
-    this.exposureTypeOptions = (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
-    this.exposureFrequencyOptions = (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
-    this.exposureDurationOptions = (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
-    this.socialRelationshipOptions = (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
   }
 
   /**
@@ -76,6 +74,9 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
         if (this.selectedOutbreak) {
+          // refresh ref data options
+          this.refreshReferenceData();
+
           this.getMinimumDate();
           this.clusterDataService
             .getClusterList(this.selectedOutbreak.id)
@@ -100,6 +101,16 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
   ngAfterViewInit() {
     // call parent
     super.ngAfterViewInit();
+  }
+
+  /**
+   * Write value
+   */
+  writeValue(value: RelationshipModel) {
+    super.writeValue(value);
+
+    // refresh ref data options
+    this.refreshReferenceData();
   }
 
   /**
@@ -132,5 +143,32 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
       }
     });
     return dirtyControls;
+  }
+
+  /**
+   * Refresh ref data options
+   */
+  private refreshReferenceData(): void {
+    // reference data
+    this.exposureTypeOptions = this.referenceDataHelperService.filterPerOutbreakOptions(
+      this.selectedOutbreak,
+      (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      this.relationship?.exposureTypeId
+    );
+    this.exposureFrequencyOptions = this.referenceDataHelperService.filterPerOutbreakOptions(
+      this.selectedOutbreak,
+      (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      this.relationship?.exposureFrequencyId
+    );
+    this.exposureDurationOptions = this.referenceDataHelperService.filterPerOutbreakOptions(
+      this.selectedOutbreak,
+      (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      this.relationship?.exposureDurationId
+    );
+    this.socialRelationshipOptions = this.referenceDataHelperService.filterPerOutbreakOptions(
+      this.selectedOutbreak,
+      (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      this.relationship?.socialRelationshipTypeId
+    );
   }
 }
