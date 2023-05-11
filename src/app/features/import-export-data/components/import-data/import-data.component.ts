@@ -2721,8 +2721,8 @@ export class ImportDataComponent
   }
 
   /**
-     * Retrieve distinct values used to map fields
-     */
+   * Retrieve distinct values used to map fields
+   */
   retrieveDistinctValues(
     loadingDialog?: IV2LoadingDialogHandler,
     importMapping?: SavedImportMappingModel
@@ -2743,11 +2743,11 @@ export class ImportDataComponent
       // or already retrieved
       if (
         !field.destinationField ||
-                !field.sourceFieldWithoutIndexes || (
+        !field.sourceFieldWithoutIndexes || (
           !this.importableObject.modelPropertyValuesMap[field.destinationField] &&
-                    !this.addressFields[field.destinationField]
+          !this.addressFields[field.destinationField]
         ) ||
-                this.distinctValuesCache[field.sourceFieldWithoutIndexes]
+        this.distinctValuesCache[field.sourceFieldWithoutIndexes]
       ) {
         return;
       }
@@ -2801,7 +2801,7 @@ export class ImportDataComponent
         // there is no point in mapping if we don't have everything we need
         if (
           !savedImportField.source ||
-                    !savedImportField.destination
+          !savedImportField.destination
         ) {
           return;
         }
@@ -2821,7 +2821,7 @@ export class ImportDataComponent
           // no point in continuing ?
           if (
             !savedImportOption.source ||
-                        !savedImportOption.destination
+            !savedImportOption.destination
           ) {
             return;
           }
@@ -2897,8 +2897,8 @@ export class ImportDataComponent
             // add items to cache
             if (
               response.distinctFileColumnValues &&
-                            response.distinctFileColumnValues[key] &&
-                            response.distinctFileColumnValues[key].length > 0
+              response.distinctFileColumnValues[key] &&
+              response.distinctFileColumnValues[key].length > 0
             ) {
               response.distinctFileColumnValues[key].forEach((fileUniqueValue) => {
                 // ignore empty values
@@ -2938,7 +2938,7 @@ export class ImportDataComponent
           _.each(mustRetrieveLocations, (_N, key: string) => {
             if (
               this.distinctValuesCache[key] &&
-                            this.distinctValuesCache[key].length > 0
+              this.distinctValuesCache[key].length > 0
             ) {
               // go through distinct values
               this.distinctValuesCache[key].forEach((data) => {
@@ -2946,7 +2946,7 @@ export class ImportDataComponent
                 if (
                   !data.label || (
                     typeof data.label === 'string' &&
-                                        data.label.toLowerCase() === 'null'
+                    data.label.toLowerCase() === 'null'
                   )
                 ) {
                   return;
@@ -2962,7 +2962,7 @@ export class ImportDataComponent
                   // do we have field source & destination, otherwise there is no point in continuing
                   if (
                     !locationField.sourceField ||
-                                        !locationField.destinationField
+                    !locationField.destinationField
                   ) {
                     return;
                   }
@@ -2970,7 +2970,7 @@ export class ImportDataComponent
                   // go through each saved sub-option destination and make sure we retrieve that location too
                   if (
                     importMappingFieldSubOptionsMap[locationField.sourceField] &&
-                                        importMappingFieldSubOptionsMap[locationField.sourceField][locationField.destinationField]
+                    importMappingFieldSubOptionsMap[locationField.sourceField][locationField.destinationField]
                   ) {
                     _.each(importMappingFieldSubOptionsMap[locationField.sourceField][locationField.destinationField], (destinationOptions: string[]) => {
                       destinationOptions.forEach((locationId: string) => {
@@ -2991,7 +2991,7 @@ export class ImportDataComponent
           } else {
             // retrieve locations
             const retrieveLocationsData = (locations: string[]): Observable<LocationModel[]> => {
-              // construct regular expression for case insensitive search for names
+              // construct regular expression for case-insensitive search for names
               let nameRegex: string = '';
               locations.forEach((location) => {
                 nameRegex = `${nameRegex}${nameRegex ? '|' : ''}(${RequestFilterGenerator.escapeStringForRegex(location)})`;
@@ -3197,8 +3197,8 @@ export class ImportDataComponent
                   field,
                   true,
                   importMappingFieldSubOptionsMap && field.sourceField && field.destinationField &&
-                                        importMappingFieldSubOptionsMap[field.sourceField] && importMappingFieldSubOptionsMap[field.sourceField][field.destinationField] ?
-                  // fieldOptionSource => fieldOptionDestination[]
+                  importMappingFieldSubOptionsMap[field.sourceField] && importMappingFieldSubOptionsMap[field.sourceField][field.destinationField] ?
+                    // fieldOptionSource => fieldOptionDestination[]
                     importMappingFieldSubOptionsMap[field.sourceField][field.destinationField] :
                     null
                 );
@@ -3259,8 +3259,8 @@ export class ImportDataComponent
   }
 
   /**
-     * Mapped field option location changed handler
-     */
+   * Mapped field option location changed handler
+   */
   mappedOptionsLocationChanged(
     mappedOpt: IMappedOption,
     locationAutoItem: ILocation
@@ -3280,7 +3280,7 @@ export class ImportDataComponent
     // cache location if necessary
     if (
       !this.locationCache[locationAutoItem.id] ||
-            !this.locationCache[locationAutoItem.id].parentsLoaded
+      !this.locationCache[locationAutoItem.id].parentsLoaded
     ) {
       // retrieve parents labels
       let parentNames: string = '';

@@ -132,10 +132,8 @@ export class QuestionModel {
   }
 
   /**
-     * Used to format questionnaire properties before we use them to map and import data
-     * @param modelProperties
-     * @param modelPropertyValues
-     */
+   * Used to format questionnaire properties before we use them to map and import data
+   */
   static formatQuestionnaireImportDefs(
     modelProperties: ImportableFilePropertiesModel,
     modelPropertyValues: ImportableFilePropertyValuesModel,
