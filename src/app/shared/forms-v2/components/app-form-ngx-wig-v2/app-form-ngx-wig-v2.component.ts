@@ -8,11 +8,11 @@ import {
   SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { BUTTONS, NgxWigComponent } from 'ngx-wig';
 import * as _ from 'lodash';
 import { AppFormInputV2LibraryButtons } from '../app-form-input-v2/definitions/app-form-input-v2-library-buttons';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-ngx-wig-v2',
@@ -63,13 +63,13 @@ export class AppFormNgxWigV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef,
     protected renderer2: Renderer2
   ) {
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }

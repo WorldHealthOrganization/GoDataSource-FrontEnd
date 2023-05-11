@@ -19,7 +19,8 @@ import { Constants } from '../../../../core/models/constants';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-lab-results-bulk-modify',
@@ -40,7 +41,8 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
     protected activatedRoute: ActivatedRoute,
     protected labResultDataService: LabResultDataService,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
+    protected referenceDataHelperService: ReferenceDataHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -293,7 +295,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
                 label: result.labName ?
                   `${
                     (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName] ?
-                      this.translateService.instant((this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName].value) :
+                      this.i18nService.instant((this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName].value) :
                       '—'
                   } (${result.dateSampleTaken ? moment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '—'})` :
                   (
@@ -325,7 +327,11 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
               name: 'labName',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                undefined
+              ),
               value: {
                 get: () => null,
                 set: () => null
@@ -336,7 +342,11 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
               name: 'result',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                undefined
+              ),
               value: {
                 get: () => null,
                 set: () => null
@@ -410,7 +420,11 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
               name: 'sequence[labId]',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                undefined
+              ),
               value: {
                 get: () => this.itemData.sequence.labId,
                 set: (value) => {
@@ -437,7 +451,11 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
               name: 'sequence[resultId]',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                undefined
+              ),
               value: {
                 get: () => this.itemData.sequence.resultId,
                 set: (value) => {

@@ -21,7 +21,7 @@ export class DocumentTypeDataResolver implements IMapResolverV2<ReferenceDataEnt
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.DOCUMENT_TYPE)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE)
       .pipe(
         map((data) => {
           // construct map

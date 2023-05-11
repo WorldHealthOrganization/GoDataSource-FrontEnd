@@ -5,14 +5,13 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
@@ -24,7 +23,9 @@ import { RequestFilterGenerator } from '../../../../core/helperClasses/request-q
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { ITreeEditorDataCategory } from '../../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
+import { IconModel } from '../../../../core/models/icon.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 /**
  * Component
@@ -37,17 +38,21 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
   // category
   category: ReferenceDataCategoryModel;
 
+  // per disease
+  private _diseaseSpecificReferenceData: ITreeEditorDataCategory[];
+  private _diseaseSpecificCategories: IResolverV2ResponseModel<ReferenceDataCategoryModel>;
+
   /**
    * Constructor
    */
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
     protected i18nService: I18nService,
     protected router: Router,
     protected referenceDataDataService: ReferenceDataDataService,
     protected dialogV2Service: DialogV2Service,
+    protected referenceDataHelperService: ReferenceDataHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -61,8 +66,9 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       authDataService
     );
 
-    // retrieve category
+    // retrieve
     this.category = this.activatedRoute.snapshot.data.category;
+    this._diseaseSpecificCategories = this.activatedRoute.snapshot.data.diseaseSpecificCategories;
   }
 
   /**
@@ -95,7 +101,15 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
   /**
    * Data initialized
    */
-  protected initializedData(): void {}
+  protected initializedData(): void {
+    // nothing to do ?
+    if (this.category.id !== ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE) {
+      return;
+    }
+
+    // format reference data per disease to expected tree format
+    this._diseaseSpecificReferenceData = this.referenceDataHelperService.convertRefCategoriesToTreeCategories(this._diseaseSpecificCategories.list);
+  }
 
   /**
    * Initialize page title
@@ -143,13 +157,13 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     // add info accordingly to page type
     if (this.isCreate) {
       this.breadcrumbs.push({
-        label: this.translateService.instant('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE'),
+        label: this.i18nService.instant('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE'),
         action: null
       });
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(this.itemData.value),
+        label: this.i18nService.instant(this.itemData.value),
         action: null
       });
     }
@@ -162,19 +176,22 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     this.tabData = {
       // tabs
       tabs: [
-        // Personal
-        this.initializeTabsDetails()
+        // Details
+        this.initializeTabsDetails(),
+
+        // Reference Data Per Disease
+        this.initializeTabsReferenceDataPerDisease()
       ],
 
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_COMMON_BUTTON_SAVE'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_COMMON_BUTTON_SAVE'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             {
               name: this.itemData.value ?
-                this.translateService.instant(this.itemData.value) :
+                this.i18nService.instant(this.itemData.value) :
                 ''
             }
           )
@@ -227,7 +244,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
               description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION',
               value: {
                 get: () => this.itemData.value ?
-                  this.translateService.instant(this.itemData.value) :
+                  this.i18nService.instant(this.itemData.value) :
                   this.itemData.value,
                 set: (value) => {
                   // set data
@@ -296,20 +313,6 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
                 }
               }
             }, {
-              type: CreateViewModifyV2TabInputType.TEXTAREA,
-              name: 'description',
-              placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION',
-              description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
-              value: {
-                get: () => this.itemData.description ?
-                  this.translateService.instant(this.itemData.description) :
-                  this.itemData.description,
-                set: (value) => {
-                  // set data
-                  this.itemData.description = value;
-                }
-              }
-            }, {
               type: CreateViewModifyV2TabInputType.COLOR,
               name: 'colorCode',
               placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR',
@@ -326,12 +329,39 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
               name: 'iconId',
               placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON',
               description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<OutbreakModel>).options,
+              options: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<IconModel>).options,
               value: {
                 get: () => this.itemData.iconId,
                 set: (value) => {
                   // set data
                   this.itemData.iconId = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'isSystemWide',
+              placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE',
+              description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.isSystemWide,
+                set: (value) => {
+                  // set data
+                  this.itemData.isSystemWide = value;
+                }
+              },
+              visible: () => !!this._diseaseSpecificCategories?.map[this.category.id]
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'description',
+              placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION',
+              description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+              value: {
+                get: () => this.itemData.description ?
+                  this.i18nService.instant(this.itemData.description) :
+                  this.itemData.description,
+                set: (value) => {
+                  // set data
+                  this.itemData.description = value;
                 }
               }
             }
@@ -342,10 +372,10 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
 
     // add lat & lng for specific categories
     if (
-      this.category.id === ReferenceDataCategory.INSTITUTION_NAME ||
-      this.category.id === ReferenceDataCategory.LAB_NAME ||
-      this.category.id === ReferenceDataCategory.LAB_SEQUENCE_LABORATORY ||
-      this.category.id === ReferenceDataCategory.DATE_RANGE_CENTRE_NAME
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_INSTITUTION_NAME ||
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_NAME ||
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_LABORATORY ||
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME
     ) {
       tab.sections[0].inputs.push({
         type: CreateViewModifyV2TabInputType.NUMBER,
@@ -384,6 +414,62 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
 
     // finished
     return tab;
+  }
+
+  /**
+   * Initialize tabs - Reference data per disease
+   */
+  private initializeTabsReferenceDataPerDisease(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'ref_data_per_disease',
+      label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR,
+        name: 'allowedRefDataItems',
+        displaySystemWide: true,
+        options: this._diseaseSpecificReferenceData,
+        value: {
+          get: () => this.itemData.allowedRefDataItems,
+          set: (value) => {
+            this.itemData.allowedRefDataItems = value;
+          }
+        },
+        add: {
+          callback: (data) => {
+            this.referenceDataHelperService
+              .showNewItemDialog(
+                {
+                  icon: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<IconModel>).options
+                },
+                data.category,
+                (
+                  item,
+                  addAnother
+                ) => {
+                  data.finish(
+                    item ?
+                      {
+                        id: item.id,
+                        label: item.value,
+                        disabled: !item.active,
+                        colorCode: item.colorCode,
+                        isSystemWide: !!item.isSystemWide,
+                        iconUrl: item.iconUrl
+                      } :
+                      null,
+                    addAnother
+                  );
+                }
+              );
+          },
+          visible: () => ReferenceDataEntryModel.canCreate(this.authUser)
+        }
+      },
+      visible: () => {
+        return this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE;
+      }
+    };
   }
 
   /**
@@ -512,7 +598,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       type: CreateViewModifyV2ExpandColumnType.TEXT,
       link: (item: ReferenceDataEntryModel) => ['/reference-data', this.category.id, item.id, 'view'],
       get: {
-        text: (item: ReferenceDataEntryModel) => this.translateService.instant(item.value)
+        text: (item: ReferenceDataEntryModel) => this.i18nService.instant(item.value)
       }
     };
   }

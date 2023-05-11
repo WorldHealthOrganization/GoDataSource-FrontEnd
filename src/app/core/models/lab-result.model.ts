@@ -13,9 +13,9 @@ import { PERMISSION } from './permission.model';
 import { IAnswerData, QuestionModel } from './question.model';
 import { UserModel } from './user.model';
 import { Moment } from '../helperClasses/x-moment';
-import { TranslateService } from '@ngx-translate/core';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { SafeHtml } from '@angular/platform-browser';
+import { I18nService } from '../services/helper/i18n.service';
 
 export class LabResultModel
   extends BaseModel
@@ -219,7 +219,7 @@ export class LabResultModel
     info: {
       // required
       item: LabResultModel,
-      translateService: TranslateService
+      i18nService: I18nService
     }
   ): V2ColumnStatusForm[] {
     // construct list of forms that we need to display
@@ -230,7 +230,7 @@ export class LabResultModel
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     }
 

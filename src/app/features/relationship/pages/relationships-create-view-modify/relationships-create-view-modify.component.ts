@@ -3,7 +3,6 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { forkJoin, Observable, throwError } from 'rxjs';
@@ -38,6 +37,8 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Location } from '@angular/common';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -89,12 +90,13 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected relationshipDataService: RelationshipDataService,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected toastV2Service: ToastV2Service,
     protected entityHelperService: EntityHelperService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
     protected location: Location,
+    protected referenceDataHelperService: ReferenceDataHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -263,7 +265,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE', {
             name: this.itemData.relatedEntity(this._entity.id)?.model?.name || ''
           }
@@ -273,7 +275,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_RELATIONSHIP_TITLE', {
             name: this.itemData.relatedEntity(this._entity.id)?.model?.name || ''
           }
@@ -297,8 +299,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             {
               name: this._entity.name
@@ -466,7 +468,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             name: name('exposureTypeId'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationshipData.exposureTypeId
+            ),
             value: {
               get: () => relationshipData.exposureTypeId,
               set: (value) => {
@@ -479,7 +485,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             name: name('exposureFrequencyId'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationshipData.exposureFrequencyId
+            ),
             value: {
               get: () => relationshipData.exposureFrequencyId,
               set: (value) => {
@@ -492,7 +502,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             name: name('exposureDurationId'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationshipData.exposureDurationId
+            ),
             value: {
               get: () => relationshipData.exposureDurationId,
               set: (value) => {
@@ -505,7 +519,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             name: name('socialRelationshipTypeId'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationshipData.socialRelationshipTypeId
+            ),
             value: {
               get: () => relationshipData.socialRelationshipTypeId,
               set: (value) => {
@@ -824,10 +842,26 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     this.expandListAdvancedFilters = this.entityHelperService.generateAdvancedFilters({
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
       }
     });
@@ -981,7 +1015,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
                 !CaseModel.canView(this.authUser)
               )
             ) {
-              return `${item.name} (${this.translateService.instant(item.type)})`;
+              return `${item.name} (${this.i18nService.instant(item.type)})`;
             }
 
             // create url
@@ -989,11 +1023,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
             // finished
             const additionalInfo = this.isCreate && this.relationshipType === RelationshipType.EXPOSURE ?
-              this.translateService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
+              this.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
               '';
 
             // return entity as a link
-            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)}) ${additionalInfo}</span></a>`;
+            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.i18nService.instant(item.type)}) ${additionalInfo}</span></a>`;
           })
             .join(', ')
         },

@@ -1,11 +1,11 @@
 import { DomSanitizer } from '@angular/platform-browser';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from '../models/permission.model';
 import * as _ from 'lodash';
-import { TranslateService } from '@ngx-translate/core';
 import { DialogV2Service } from '../services/helper/dialog-v2.service';
 import { IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { v4 as uuid } from 'uuid';
 import { GroupEventDataAction, IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../shared/forms-v2/components/app-form-select-groups-v2/models/select-group.model';
+import { I18nService } from '../services/helper/i18n.service';
 
 export class UserRoleHelper {
   /**
@@ -13,7 +13,7 @@ export class UserRoleHelper {
    */
   public static groupOptionFormatMethod(
     sanitized: DomSanitizer,
-    translateService: TranslateService,
+    i18nService: I18nService,
     optionsMap: ISelectGroupOptionMap<IPermissionChildModel>,
     option: IPermissionChildModel
   ): ISelectGroupOptionFormatResponse {
@@ -35,7 +35,7 @@ export class UserRoleHelper {
           optionsMap[requiredPermission] &&
           optionsMap[requiredPermission].option.label
         ) {
-          requiredPermissionTranslations.push(translateService.instant(optionsMap[requiredPermission].option.label));
+          requiredPermissionTranslations.push(i18nService.instant(optionsMap[requiredPermission].option.label));
         }
       });
 
@@ -52,13 +52,13 @@ export class UserRoleHelper {
 
       // label
       response.label = sanitized.bypassSecurityTrustHtml(
-        translateService.instant(
+        i18nService.instant(
           'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_LABEL_MESSAGE', {
             label: option.label ?
-              translateService.instant(option.label) :
+              i18nService.instant(option.label) :
               '',
             requirements: extraRequiredPermMessage ?
-              translateService.instant(
+              i18nService.instant(
                 'LNG_ROLE_AVAILABLE_PERMISSIONS_LABEL_REQUIRE_MESSAGE', {
                   labels: extraRequiredPermMessage
                 }
@@ -68,13 +68,13 @@ export class UserRoleHelper {
       );
 
       // tooltip
-      response.tooltip = translateService.instant(
+      response.tooltip = i18nService.instant(
         'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_TOOLTIP_MESSAGE', {
           tooltip: option.description ?
-            translateService.instant(option.description) :
+            i18nService.instant(option.description) :
             '',
           requirements: extraRequiredPermMessage ?
-            translateService.instant(
+            i18nService.instant(
               'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_MESSAGE', {
                 labels: extraRequiredPermMessage
               }
@@ -84,12 +84,12 @@ export class UserRoleHelper {
     } else {
       // label
       response.label = option.label ?
-        translateService.instant(option.label) :
+        i18nService.instant(option.label) :
         '';
 
       // tooltip
       response.tooltip = option.description ?
-        translateService.instant(option.description) :
+        i18nService.instant(option.description) :
         '';
     }
 
@@ -101,7 +101,7 @@ export class UserRoleHelper {
      * Display popup with required permissions
      */
   private static displayRequiredByPopup(
-    translateService: TranslateService,
+    i18nService: I18nService,
     dialogV2Service: DialogV2Service,
     data: {
       readonly optionsMap: ISelectGroupOptionMap<any>,
@@ -135,15 +135,15 @@ export class UserRoleHelper {
     }
 
     // labels
-    const requiredByLabel: string = translateService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_BY_PERMISSIONS_LABEL');
-    const requiredLabel: string = translateService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_PERMISSIONS_LABEL');
+    const requiredByLabel: string = i18nService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_BY_PERMISSIONS_LABEL');
+    const requiredLabel: string = i18nService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_PERMISSIONS_LABEL');
 
     // determine missing permission labels
     let labels: string[] = requiredByList.map((permission): string => {
       return `<div>${data.optionsMap[permission] ?
-        translateService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) : (
+        i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) : (
           data.groupsMap[permission] ?
-            translateService.instant((data.groupsMap[permission] as PermissionModel).groupLabel) :
+            i18nService.instant((data.groupsMap[permission] as PermissionModel).groupLabel) :
             permission
         )}</div>`;
     });
@@ -160,7 +160,7 @@ export class UserRoleHelper {
         `<br /><div style="font-weight: bold;">${requiredLabel}</div>`,
         ...thirdButton.requiredPermissions.map((permission): string => {
           return `<div>${data.optionsMap[permission] ?
-            translateService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
+            i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
             permission
           }</div>`;
         })
@@ -354,7 +354,7 @@ export class UserRoleHelper {
       showPanel(): void
     },
     missingPermissions: string[],
-    translateService: TranslateService,
+    i18nService: I18nService,
     dialogV2Service: DialogV2Service
   ) {
     // do we need to request user if he want to enable missing permissions ?
@@ -368,7 +368,7 @@ export class UserRoleHelper {
         inputs.push({
           type: V2SideDialogConfigInputType.DIVIDER,
           placeholder: data.optionsMap[permission] ?
-            translateService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
+            i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
             permission
         });
       });
@@ -422,7 +422,7 @@ export class UserRoleHelper {
    */
   public static groupOptionCheckStateChanged(
     data: IGroupOptionEventData,
-    translateService: TranslateService,
+    i18nService: I18nService,
     dialogV2Service: DialogV2Service
   ) {
     // determine selected option
@@ -453,7 +453,7 @@ export class UserRoleHelper {
           this.displayRequiresPopup(
             data,
             missingPermissions,
-            translateService,
+            i18nService,
             dialogV2Service
           );
         }
@@ -493,7 +493,7 @@ export class UserRoleHelper {
 
           // display dependable options
           UserRoleHelper.displayRequiredByPopup(
-            translateService,
+            i18nService,
             dialogV2Service,
             data,
             selectedOptionRequiredByList,
@@ -517,7 +517,7 @@ export class UserRoleHelper {
     } else if (data.value) {
       // option unchecked - need to see if thi isn't required by other permissions
       UserRoleHelper.displayRequiredByPopup(
-        translateService,
+        i18nService,
         dialogV2Service,
         data,
         UserRoleHelper.determineRequiredBy(
@@ -534,7 +534,7 @@ export class UserRoleHelper {
    */
   public static groupSelectionChanged(
     data: IGroupEventData,
-    translateService: TranslateService,
+    i18nService: I18nService,
     dialogV2Service: DialogV2Service
   ) {
     // check if we don't have permissions that require permissions that we wan't to disable by changing to None
@@ -600,7 +600,7 @@ export class UserRoleHelper {
         // do we need to display revert back popup ?
         if (requiredByPermissions.length > 0) {
           UserRoleHelper.displayRequiredByPopup(
-            translateService,
+            i18nService,
             dialogV2Service,
             data,
             requiredByPermissions,
@@ -638,7 +638,7 @@ export class UserRoleHelper {
       this.displayRequiresPopup(
         data,
         missingPermissions,
-        translateService,
+        i18nService,
         dialogV2Service
       );
     }

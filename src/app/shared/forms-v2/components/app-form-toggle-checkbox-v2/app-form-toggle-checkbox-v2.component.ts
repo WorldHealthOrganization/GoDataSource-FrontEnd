@@ -8,9 +8,9 @@ import {
   SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-toggle-checkbox-v2',
@@ -45,7 +45,7 @@ export class AppFormToggleCheckboxV2Component
 
     // translate tooltip
     this.tooltipTranslated = this._tooltip ?
-      this.translateService.instant(this._tooltip) :
+      this.i18nService.instant(this._tooltip) :
       this._tooltip;
 
     // add / remove tooltip icon
@@ -64,12 +64,12 @@ export class AppFormToggleCheckboxV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }
@@ -79,21 +79,5 @@ export class AppFormToggleCheckboxV2Component
    */
   ngOnDestroy(): void {
     super.onDestroy();
-  }
-
-  /**
-   * Click button
-   */
-  iconButtonClick(
-    event,
-    iconB: IAppFormIconButtonV2
-  ): void {
-    // prevent propagation
-    event.stopPropagation();
-
-    // execute click action
-    if (iconB.clickAction) {
-      iconB.clickAction(this);
-    }
   }
 }

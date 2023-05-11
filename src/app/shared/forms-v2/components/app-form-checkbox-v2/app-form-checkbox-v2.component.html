@@ -10,7 +10,8 @@
     (click)="onTouchItem()"
     (change)="onTouchItem()"
     color="primary">
-    {{ placeholder | translate }}
+    <span
+      [innerHTML]="placeholder | translate | highlight:highlightPlaceholder"></span>
   </mat-checkbox>
 
   <!-- Tooltip -->

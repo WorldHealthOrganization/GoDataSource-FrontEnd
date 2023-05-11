@@ -1,4 +1,3 @@
-import { TranslateService } from '@ngx-translate/core';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
@@ -34,77 +33,77 @@ export abstract class AppFormBaseErrorMsgV2 {
    * Retrieve message
    */
   static msg(
-    translateService: TranslateService | I18nService,
+    i18nService: I18nService,
     errKey: AppFormBaseErrorMsgV2Type,
     errData: any
   ): string {
     // dynamic error content, must generate string accordingly
     switch (errKey) {
       case AppFormBaseErrorMsgV2Type.REQUIRED:
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED');
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED');
 
       case AppFormBaseErrorMsgV2Type.INTEGER:
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_INTEGER');
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_INTEGER');
       case AppFormBaseErrorMsgV2Type.MIN_NUMBER:
-        return translateService.instant(
+        return i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_MIN_NUMBER',
           errData
         );
       case AppFormBaseErrorMsgV2Type.MAX_NUMBER:
-        return translateService.instant(
+        return i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER',
           errData
         );
 
       case AppFormBaseErrorMsgV2Type.EMAIL:
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL');
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL');
 
       case AppFormBaseErrorMsgV2Type.INVALID_DATE:
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_INVALID_DATE');
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_INVALID_DATE');
 
       case AppFormBaseErrorMsgV2Type.DATE:
-        return translateService.instant(
+        return i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE',
           errData
         );
 
       case AppFormBaseErrorMsgV2Type.GENERAL_ASYNC:
-        return translateService.instant(
+        return i18nService.instant(
           errData.err,
           errData.details
         );
 
       case AppFormBaseErrorMsgV2Type.MIN_LENGTH:
-        return translateService.instant(
+        return i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH', {
             length: errData.requiredLength
           }
         );
 
       case AppFormBaseErrorMsgV2Type.EQUAL:
-        return translateService.instant(errData.err);
+        return i18nService.instant(errData.err);
 
       case AppFormBaseErrorMsgV2Type.NOT_EQUAL:
-        return translateService.instant(errData.err);
+        return i18nService.instant(errData.err);
 
       case AppFormBaseErrorMsgV2Type.REGEX:
-        return translateService.instant(
+        return i18nService.instant(
           errData.msg ?
             errData.msg :
             'LNG_FORM_VALIDATION_ERROR_INVALID_REGEX'
         );
 
       case AppFormBaseErrorMsgV2Type.NOT_NUMBER:
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER');
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER');
 
       case AppFormBaseErrorMsgV2Type.HAS_PROPERTY:
-        return translateService.instant(errData.err);
+        return i18nService.instant(errData.err);
 
       case AppFormBaseErrorMsgV2Type.NO_SPACES:
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NO_SPACES');
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NO_SPACES');
 
       case AppFormBaseErrorMsgV2Type.MISSING_OPTIONS:
-        return translateService.instant(
+        return i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_MISSING_REQUIRED_OPTIONS', {
             options: errData.options.join(', ')
           }

@@ -95,6 +95,10 @@ export abstract class CreateViewModifyComponent<T>
   // click listener
   private _clickListener: () => void;
 
+  // timers
+  private _createNewItemTimer: number;
+  private _retrieveItemTimer: number;
+
   // constants
   Constants = Constants;
   UserSettings = UserSettings;
@@ -131,7 +135,10 @@ export abstract class CreateViewModifyComponent<T>
     this.loadingPage = true;
     if (this.isCreate) {
       // create
-      setTimeout(() => {
+      this._createNewItemTimer = setTimeout(() => {
+        // reset
+        this._createNewItemTimer = undefined;
+
         // initialize item
         this.itemData = this.createNewItem();
 
@@ -145,7 +152,11 @@ export abstract class CreateViewModifyComponent<T>
     } else {
       // view / modify
       // retrieve item data
-      setTimeout(() => {
+      this._retrieveItemTimer = setTimeout(() => {
+        // reset
+        this._retrieveItemTimer = undefined;
+
+        // retrieve
         this.getData(this.retrieveItem());
       });
     }
@@ -222,6 +233,30 @@ export abstract class CreateViewModifyComponent<T>
     if (this._clickListener) {
       this._clickListener();
       this._clickListener = undefined;
+    }
+
+    // stop timers
+    this.stopCreateNewItemTimer();
+    this.stopRetrieveItemTimer();
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopCreateNewItemTimer(): void {
+    if (this._createNewItemTimer) {
+      clearTimeout(this._createNewItemTimer);
+      this._createNewItemTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopRetrieveItemTimer(): void {
+    if (this._retrieveItemTimer) {
+      clearTimeout(this._retrieveItemTimer);
+      this._retrieveItemTimer = undefined;
     }
   }
 

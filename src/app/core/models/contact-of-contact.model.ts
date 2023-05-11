@@ -28,7 +28,7 @@ import { SafeHtml } from '@angular/platform-browser';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from './reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../services/helper/i18n.service';
 
 export class ContactOfContactModel
   extends BaseModel
@@ -188,7 +188,7 @@ export class ContactOfContactModel
     info: {
       // required
       item: ContactOfContactModel,
-      translateService: TranslateService,
+      i18nService: I18nService,
       risk: IResolverV2ResponseModel<ReferenceDataEntryModel>
     }
   ): V2ColumnStatusForm[] {
@@ -203,7 +203,7 @@ export class ContactOfContactModel
       forms.push({
         type: IV2ColumnStatusFormType.TRIANGLE,
         color: info.risk.map[info.item.riskLevel].getColorCode(),
-        tooltip: info.translateService.instant(info.item.riskLevel)
+        tooltip: info.i18nService.instant(info.item.riskLevel)
       });
     }
 

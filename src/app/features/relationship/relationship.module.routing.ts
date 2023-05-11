@@ -125,7 +125,7 @@ const relationshipTypeChildrenRoutes = [
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
-      context: ContextOfTransmissionDataResolver,
+      contextOfTransmission: ContextOfTransmissionDataResolver,
       cluster: ClusterDataResolver
     },
     canDeactivate: [

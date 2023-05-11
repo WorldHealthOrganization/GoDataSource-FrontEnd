@@ -8,12 +8,12 @@ import {
   SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { MAT_SELECT_CONFIG, MatSelect } from '@angular/material/select';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AppFormLocationBaseV2, ILocation } from '../../core/app-form-location-base-v2';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-select-location-single-v2',
@@ -67,14 +67,14 @@ export class AppFormSelectLocationSingleV2Component
   }
 
   // timers
-  private _openTimer: any;
+  private _openTimer: number;
 
   /**
    * Constructor
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef,
     protected locationDataService: LocationDataService,
     protected outbreakDataService: OutbreakDataService,
@@ -83,7 +83,7 @@ export class AppFormSelectLocationSingleV2Component
     super(
       false,
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef,
       locationDataService,
       outbreakDataService,

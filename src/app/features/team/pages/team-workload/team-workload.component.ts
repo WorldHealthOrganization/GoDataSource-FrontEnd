@@ -64,8 +64,9 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
     private location: Location
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
   }
 

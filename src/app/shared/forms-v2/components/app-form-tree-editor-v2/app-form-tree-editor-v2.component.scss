@@ -1,0 +1,173 @@
+@import 'mixins';
+
+// #TODO - move animation somewhere global to be able to use it on other components too
+@keyframes gd-flash {
+  0%, 50%, 100% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0;
+  }
+}
+
+/* Tree Editor */
+.gd-form-tree-editor-v2 {
+  height: 100%;
+
+  /* Editor Top Section */
+  .gd-form-tree-editor-v2-top {
+    border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 1.6rem;
+
+    button.mat-flat-button,
+    a.mat-flat-button {
+      @include breakpoint('xxs') {
+        padding: 0.8rem;
+      }
+    }
+
+    /* Search */
+    app-form-input-v2 {
+      .mat-form-field-wrapper {
+        .mat-form-field-subscript-wrapper {
+          min-height: 0;
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  /* Editor List */
+  .gd-form-tree-editor-v2-list {
+    height: calc(100% - 11.2rem);
+    min-height: 30rem;
+
+    @media only screen and (max-height: 599px) {
+      min-height: 7rem;
+    }
+
+    .gd-create-view-modify-modify & {
+      @include breakpoint('xxs') {
+        height: calc(100% - 13.4rem);
+      }
+    }
+
+    .cdk-virtual-scroll-viewport {
+      height: 100%;
+      overflow-y: overlay;
+      overflow-x: hidden;
+
+      .gd-form-tree-editor-v2-list-item {
+        height: 2.6rem;
+
+        &.gd-form-tree-editor-v2-list-item-child {
+          padding-left: 3.5rem;
+        }
+
+        .gd-form-tree-editor-v2-list-category-item {
+          /* Flash when new item is added */
+          /* #TODO: Implement the same flash effect as on bulk create/edit to be consistent ? */
+          &.gd-form-tree-editor-v2-list-category-item-flash {
+            -webkit-animation-duration: 2s;
+            animation-duration: 2s;
+            -webkit-animation-fill-mode: both;
+            animation-fill-mode: both;
+            animation-name: gd-flash;
+          }
+
+          .gd-form-tree-editor-v2-list-category-item-color {
+            @include border-radius(0.4rem);
+            display: block;
+            height: 2rem;
+            margin-top: 0.2rem;
+            margin-right: 0.8rem;
+            width: 2rem;
+          }
+
+          .gd-form-tree-editor-v2-list-category-item-icon {
+            display: block;
+            height: 2rem;
+            margin-top: 0.2rem;
+            margin-right: 0.8rem;
+            width: 2rem;
+
+            > img {
+              display: inline-block;
+              height: 2rem;
+              vertical-align: middle;
+            }
+          }
+        }
+      }
+    }
+
+    &.gd-form-tree-editor-v2-list-copy-value {
+      cursor: copy;
+
+      app-form-checkbox-v2 {
+        mat-checkbox {
+          cursor: copy;
+        }
+      }
+    }
+  }
+
+  /* Editor Legend Section */
+  .gd-form-tree-editor-v2-legend {
+    border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 0.8rem 0;
+
+    .gd-form-tree-editor-v2-legend-title {
+      color: var(--gd-secondary);
+      font-size: 1.2rem;
+      margin-left: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .gd-form-tree-editor-v2-legend-items {
+      .gd-form-tree-editor-v2-legend-items-item {
+        @include flex_align_items(center);
+        @include flex(flex);
+        @include flex_direction(row);
+        font-size: 1.2rem;
+        margin-left: 0.8rem;
+
+        .mat-icon {
+          font-size: 2.4rem;
+          height: 2.2rem;
+          margin-right: 0.4rem;
+          width: 2.2rem;
+        }
+      }
+    }
+  }
+
+  /* Empty */
+  .gd-form-tree-editor-v2-list-empty {
+    height: 100%;
+
+    .gd-form-tree-editor-v2-list-empty-image {
+      background-image: url(../../../../../assets/images/nothing-found.svg);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 25rem;
+      width: 25rem;
+
+      @include breakpoint('xs') {
+        height: 15rem;
+        width: 15rem;
+      }
+    }
+
+    .gd-form-tree-editor-v2-list-empty-text {
+      color: var(--gd-secondary);
+      font-size: 1.6rem;
+      margin-top: 2rem;
+
+      @include breakpoint('xs') {
+        font-size: 1.4rem;
+      }
+    }
+  }
+}

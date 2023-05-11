@@ -15,6 +15,7 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-epi-curve-reporting-dashlet',
@@ -83,7 +84,7 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
   }
 
   // outbreak
-  outbreakId: string;
+  private _selectedOutbreak: OutbreakModel;
 
   // subscribers
   outbreakSubscriber: Subscription;
@@ -112,6 +113,7 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
     private outbreakDataService: OutbreakDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
+    private referenceDataHelperService: ReferenceDataHelperService,
     activatedRoute: ActivatedRoute
   ) {
     this.epiCurveWeekTypesOptions = (activatedRoute.snapshot.data.epiCurveWeekTypes as IResolverV2ResponseModel<ILabelValuePairModel>).options;
@@ -121,33 +123,49 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
    * Component initialized
    */
   ngOnInit() {
-    // retrieve ref data
+    // outbreak
     this.displayLoading = true;
-    this.refdataSubscriber = this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
-      .subscribe((caseClassification) => {
-        // map classifications to translation and color
-        this.mapCaseClassifications = {};
-        _.forEach(caseClassification.entries, (caseClassificationItem) => {
-          this.mapCaseClassifications[caseClassificationItem.value] = {};
-          this.mapCaseClassifications[caseClassificationItem.value].valueTranslated = this.i18nService.instant(caseClassificationItem.value);
-          this.mapCaseClassifications[caseClassificationItem.value].colorCode = caseClassificationItem.colorCode;
-        });
+    this.outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        // reset
+        this.outbreakSubscriber = null;
 
-        // outbreak subscriber
-        if (this.outbreakSubscriber) {
-          this.outbreakSubscriber.unsubscribe();
-          this.outbreakSubscriber = null;
+        // nothing to do
+        if (!selectedOutbreak?.id) {
+          return;
         }
 
-        // outbreak
-        this.outbreakSubscriber = this.outbreakDataService
-          .getSelectedOutbreakSubject()
-          .subscribe((selectedOutbreak: OutbreakModel) => {
-            if (selectedOutbreak) {
-              this.outbreakId = selectedOutbreak.id;
-              this.refreshDataCaller.call();
-            }
+        // set outbreak
+        this._selectedOutbreak = selectedOutbreak;
+
+        // stop ref data
+        this.stopRefDataSubscriber();
+
+        // retrieve ref data
+        this.displayLoading = true;
+        this.refdataSubscriber = this.referenceDataDataService
+          .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION)
+          .subscribe((caseClassification) => {
+            // reset
+            this.refdataSubscriber = null;
+
+            // determine outbreak specific entries
+            const entries = this.referenceDataHelperService.filterPerOutbreak(
+              this._selectedOutbreak,
+              caseClassification.entries
+            );
+
+            // map classifications to translation and color
+            this.mapCaseClassifications = {};
+            _.forEach(entries, (caseClassificationItem) => {
+              this.mapCaseClassifications[caseClassificationItem.value] = {};
+              this.mapCaseClassifications[caseClassificationItem.value].valueTranslated = this.i18nService.instant(caseClassificationItem.value);
+              this.mapCaseClassifications[caseClassificationItem.value].colorCode = caseClassificationItem.colorCode;
+            });
+
+            // refresh data
+            this.refreshDataCaller.call();
           });
       });
   }
@@ -168,16 +186,24 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
       this.previousSubscriber = null;
     }
 
-    // ref data
-    if (this.refdataSubscriber) {
-      this.refdataSubscriber.unsubscribe();
-      this.refdataSubscriber = null;
-    }
+    // stop ref data
+    this.stopRefDataSubscriber();
 
     // debounce caller
     if (this.refreshDataCaller) {
       this.refreshDataCaller.unsubscribe();
       this.refreshDataCaller = null;
+    }
+  }
+
+  /**
+   * Stop ref data subscriber
+   */
+  private stopRefDataSubscriber(): void {
+    // ref data
+    if (this.refdataSubscriber) {
+      this.refdataSubscriber.unsubscribe();
+      this.refdataSubscriber = null;
     }
   }
 
@@ -262,7 +288,7 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
     }
 
     if (
-      this.outbreakId &&
+      this._selectedOutbreak?.id &&
       !_.isEmpty(this.mapCaseClassifications)
     ) {
       // release previous subscriber
@@ -332,7 +358,7 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
       this.displayLoading = true;
       this.detectChanges.emit();
       this.previousSubscriber = this.caseDataService
-        .getCasesStratifiedByClassificationOverReportingTime(this.outbreakId, qb)
+        .getCasesStratifiedByClassificationOverReportingTime(this._selectedOutbreak.id, qb)
         .subscribe((results) => {
           // convert data to chart data format
           this.chartData = [];

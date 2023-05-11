@@ -27,6 +27,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ConvertHtmlToPDFStep, DomService } from '../../../../core/services/helper/dom.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-transmission-chain-bars',
@@ -98,9 +99,10 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
     private i18nService: I18nService,
-    protected toastV2Service: ToastV2Service,
-    protected activatedRoute: ActivatedRoute,
-    private domService: DomService
+    private toastV2Service: ToastV2Service,
+    private activatedRoute: ActivatedRoute,
+    private domService: DomService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {}
 
   /**
@@ -122,7 +124,13 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     this.outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
+        // set outbreak
         this.selectedOutbreak = selectedOutbreak;
+
+        // refresh advanced filters
+        this.refreshAdvancedFilters();
+
+        // load graph
         this.loadGraph();
       });
 
@@ -149,7 +157,216 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         }
       ]
     };
+  }
 
+  /**
+   * Component destroyed
+   */
+  ngOnDestroy() {
+    // release subscriber
+    if (this.outbreakSubscriber) {
+      this.outbreakSubscriber.unsubscribe();
+      this.outbreakSubscriber = null;
+    }
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE',
+      action: null
+    });
+  }
+
+  /**
+   * (Re)Build the graph
+   */
+  private loadGraph() {
+    if (!this.selectedOutbreak) {
+      return;
+    }
+
+    // load data
+    this.loadingData = true;
+
+    // retrieve center names & chain bar data
+    this.transmissionChainBarsDataService
+      .getTransmissionChainBarsData(this.selectedOutbreak.id, this.queryBuilder)
+      .subscribe((graphData) => {
+        // map center names
+        // - IMPORTANT: keep all values and NOT only those associated with outbreak
+        (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options.forEach((center) => {
+          this.centerTokenToNameMap[center.value] = this.i18nService.instant(center.label);
+        });
+
+        // graph data
+        if (graphData.personsOrder.length > 0) {
+          this.noData = false;
+
+          this.graphData = graphData;
+          this.redrawGraph();
+        } else {
+          this.noData = true;
+        }
+
+        // finished loading data
+        this.loadingData = false;
+      });
+  }
+
+  /**
+   * Redraw graph
+   */
+  redrawGraph() {
+    // there is no point in drawing graph if we have no data
+    if (this.graphData === undefined) {
+      return;
+    }
+
+    // draw graph
+    this.transmissionChainBarsService.drawGraph(
+      this.chartContainer.nativeElement,
+      this.graphData,
+      this.centerTokenToNameMap, {
+        cellWidth: parseInt(this.selectedCellWidthValue, 10)
+      }
+    );
+  }
+
+  /**
+   * Changed cell width
+   */
+  cellWidthChanged(): void {
+    this.redrawGraph();
+  }
+
+  /**
+   * Display loading dialog
+   */
+  private showLoadingDialog() {
+    // loading dialog already visible ?
+    if (this.loadingDialog) {
+      return;
+    }
+
+    // show
+    this.loadingDialog = this.dialogV2Service.showLoadingDialog();
+  }
+
+  /**
+   * Hide loading dialog
+   */
+  private closeLoadingDialog() {
+    if (this.loadingDialog) {
+      this.loadingDialog.close();
+      this.loadingDialog = null;
+    }
+  }
+
+  /**
+   * Export visible chain as PDF
+   */
+  exportChain() {
+    // display loading
+    this.showLoadingDialog();
+
+    // convert dom container to image
+    this.domService
+      .convertHTML2PDF(
+        this.chartContainer.nativeElement,
+        `${this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE')}.pdf`, {
+          onclone: (_document, element) => {
+            // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
+            const dateSection = element.querySelector<HTMLElement>('.gd-dates-section');
+            const dateSectionContainer = dateSection.querySelector<HTMLElement>('.gd-dates-section-container');
+            const chartSection = element.querySelector<HTMLElement>('.gd-entities-section');
+            const chartSectionHeader = chartSection.querySelector<HTMLElement>('.gd-entities-section-header');
+            const chartSectionContainer = chartSection.querySelector<HTMLElement>('.gd-entities-section-container');
+            if (
+              dateSection &&
+              dateSectionContainer &&
+              chartSection &&
+              chartSectionHeader &&
+              chartSectionContainer
+            ) {
+              element.style.whiteSpace = 'nowrap';
+              element.style.width = 'fit-content';
+              element.style.height = 'fit-content';
+              dateSection.style.height = 'fit-content';
+              dateSectionContainer.style.overflow = 'visible';
+              dateSectionContainer.style.height = 'fit-content';
+              chartSection.style.width = 'fit-content';
+              chartSection.style.height = 'fit-content';
+              chartSectionHeader.style.overflow = 'visible';
+              chartSectionHeader.style.width = 'fit-content';
+              chartSectionContainer.style.overflow = 'visible';
+              chartSectionContainer.style.width = 'fit-content';
+              chartSectionContainer.style.height = 'fit-content';
+            }
+          }
+        },
+        (step) => {
+          // determine percent
+          let percent: number;
+          switch (step) {
+            case ConvertHtmlToPDFStep.INITIALIZED:
+              percent = 5;
+              break;
+            case ConvertHtmlToPDFStep.CONVERTING_HTML_TO_PDF:
+              percent = 50;
+              break;
+            case ConvertHtmlToPDFStep.EXPORTING_PDF:
+              percent = 99;
+              break;
+          }
+
+          // update dialog percent
+          this.loadingDialog.message({
+            message: `${percent}%`
+          });
+        }
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          this.closeLoadingDialog();
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished
+        this.closeLoadingDialog();
+      });
+  }
+
+  /**
+   * Filter
+   */
+  advancedFilterBy(response: IV2SideDialogAdvancedFiltersResponse): void {
+    // create custom query builder
+    this.queryBuilder = response.queryBuilder;
+
+    // rebuild graph
+    this.loadGraph();
+  }
+
+  /**
+   * Refresh advanced filters
+   */
+  private refreshAdvancedFilters(): void {
     // advanced filters
     this.advancedFilters = [{
       type: V2AdvancedFilterType.RANGE_DATE,
@@ -312,7 +529,11 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
       type: V2AdvancedFilterType.MULTISELECT,
       field: 'isolationCenterName',
       label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
-      options: (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      options: this.referenceDataHelperService.filterPerOutbreakOptions(
+        this.selectedOutbreak,
+        (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        undefined
+      ),
       allowedComparators: [
         _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
       ],
@@ -332,7 +553,11 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
       type: V2AdvancedFilterType.MULTISELECT,
       field: 'caseClassification',
       label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-      options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      options: this.referenceDataHelperService.filterPerOutbreakOptions(
+        this.selectedOutbreak,
+        (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        undefined
+      ),
       allowedComparators: [
         _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
       ],
@@ -352,7 +577,11 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
       type: V2AdvancedFilterType.MULTISELECT,
       field: 'caseOutcome',
       label: 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_CASE_OUTCOME',
-      options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      options: this.referenceDataHelperService.filterPerOutbreakOptions(
+        this.selectedOutbreak,
+        (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        undefined
+      ),
       allowedComparators: [
         _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
       ],
@@ -369,208 +598,5 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
           );
       }
     }];
-  }
-
-  /**
-   * Component destroyed
-   */
-  ngOnDestroy() {
-    // release subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
-  }
-
-  /**
-   * Initialize breadcrumbs
-   */
-  initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [{
-      label: 'LNG_COMMON_LABEL_HOME',
-      action: {
-        link: DashboardModel.canViewDashboard(this.authUser) ?
-          ['/dashboard'] :
-          ['/account/my-profile']
-      }
-    }];
-
-    // current page
-    this.breadcrumbs.push({
-      label: 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE',
-      action: null
-    });
-  }
-
-  /**
-   * (Re)Build the graph
-   */
-  private loadGraph() {
-    if (!this.selectedOutbreak) {
-      return;
-    }
-
-    // load data
-    this.loadingData = true;
-
-    // retrieve center names & chain bar data
-    this.transmissionChainBarsDataService
-      .getTransmissionChainBarsData(this.selectedOutbreak.id, this.queryBuilder)
-      .subscribe((graphData) => {
-        // map center names
-        (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options.forEach((center) => {
-          this.centerTokenToNameMap[center.value] = this.i18nService.instant(center.label);
-        });
-
-        // graph data
-        if (graphData.personsOrder.length > 0) {
-          this.noData = false;
-
-          this.graphData = graphData;
-          this.redrawGraph();
-        } else {
-          this.noData = true;
-        }
-
-        // finished loading data
-        this.loadingData = false;
-      });
-  }
-
-  /**
-   * Redraw graph
-   */
-  redrawGraph() {
-    // there is no point in drawing graph if we have no data
-    if (this.graphData === undefined) {
-      return;
-    }
-
-    // draw graph
-    this.transmissionChainBarsService.drawGraph(
-      this.chartContainer.nativeElement,
-      this.graphData,
-      this.centerTokenToNameMap, {
-        cellWidth: parseInt(this.selectedCellWidthValue, 10)
-      }
-    );
-  }
-
-  /**
-   * Changed cell width
-   */
-  cellWidthChanged(): void {
-    this.redrawGraph();
-  }
-
-  /**
-   * Display loading dialog
-   */
-  private showLoadingDialog() {
-    // loading dialog already visible ?
-    if (this.loadingDialog) {
-      return;
-    }
-
-    // show
-    this.loadingDialog = this.dialogV2Service.showLoadingDialog();
-  }
-
-  /**
-   * Hide loading dialog
-   */
-  private closeLoadingDialog() {
-    if (this.loadingDialog) {
-      this.loadingDialog.close();
-      this.loadingDialog = null;
-    }
-  }
-
-  /**
-   * Export visible chain as PDF
-   */
-  exportChain() {
-    // display loading
-    this.showLoadingDialog();
-
-    // convert dom container to image
-    this.domService
-      .convertHTML2PDF(
-        this.chartContainer.nativeElement,
-        `${this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE')}.pdf`, {
-          onclone: (_document, element) => {
-            // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
-            const dateSection = element.querySelector<HTMLElement>('.gd-dates-section');
-            const dateSectionContainer = dateSection.querySelector<HTMLElement>('.gd-dates-section-container');
-            const chartSection = element.querySelector<HTMLElement>('.gd-entities-section');
-            const chartSectionHeader = chartSection.querySelector<HTMLElement>('.gd-entities-section-header');
-            const chartSectionContainer = chartSection.querySelector<HTMLElement>('.gd-entities-section-container');
-            if (
-              dateSection &&
-              dateSectionContainer &&
-              chartSection &&
-              chartSectionHeader &&
-              chartSectionContainer
-            ) {
-              element.style.whiteSpace = 'nowrap';
-              element.style.width = 'fit-content';
-              element.style.height = 'fit-content';
-              dateSection.style.height = 'fit-content';
-              dateSectionContainer.style.overflow = 'visible';
-              dateSectionContainer.style.height = 'fit-content';
-              chartSection.style.width = 'fit-content';
-              chartSection.style.height = 'fit-content';
-              chartSectionHeader.style.overflow = 'visible';
-              chartSectionHeader.style.width = 'fit-content';
-              chartSectionContainer.style.overflow = 'visible';
-              chartSectionContainer.style.width = 'fit-content';
-              chartSectionContainer.style.height = 'fit-content';
-            }
-          }
-        },
-        (step) => {
-          // determine percent
-          let percent: number;
-          switch (step) {
-            case ConvertHtmlToPDFStep.INITIALIZED:
-              percent = 5;
-              break;
-            case ConvertHtmlToPDFStep.CONVERTING_HTML_TO_PDF:
-              percent = 50;
-              break;
-            case ConvertHtmlToPDFStep.EXPORTING_PDF:
-              percent = 99;
-              break;
-          }
-
-          // update dialog percent
-          this.loadingDialog.message({
-            message: `${percent}%`
-          });
-        }
-      )
-      .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          this.closeLoadingDialog();
-          return throwError(err);
-        })
-      )
-      .subscribe(() => {
-        // finished
-        this.closeLoadingDialog();
-      });
-  }
-
-  /**
-   * Filter
-   */
-  advancedFilterBy(response: IV2SideDialogAdvancedFiltersResponse): void {
-    // create custom query builder
-    this.queryBuilder = response.queryBuilder;
-
-    // rebuild graph
-    this.loadGraph();
   }
 }

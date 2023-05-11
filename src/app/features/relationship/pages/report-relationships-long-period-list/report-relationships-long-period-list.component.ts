@@ -25,8 +25,9 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
     private relationshipDataService: RelationshipDataService
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
   }
 

@@ -1,0 +1,245 @@
+<form
+  class="gd-form-tree-editor-v2">
+
+  <!-- Top -->
+  <div
+    class="gd-form-tree-editor-v2-top"
+    fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0.8rem">
+
+    <!-- Filter -->
+    <app-form-input-v2
+      fxFlex
+      [ngModel]="searchValue"
+      name="filterValue"
+      placeholder="LNG_COMMON_LABEL_SEARCH"
+      autocomplete="off"
+      (ngModelChange)="filter($event, true)"></app-form-input-v2>
+
+    <!-- Expand All -->
+    <button
+      type="button"
+      mat-flat-button
+      color="text"
+      (click)="collapseExpandAll(false)">
+      {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_EXPAND_ALL' | translate}}
+    </button>
+
+    <!-- Collapse All -->
+    <button
+      type="button"
+      mat-flat-button
+      color="text"
+      (click)="collapseExpandAll(true)">
+      {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL' | translate}}
+    </button>
+
+  </div>
+
+  <!-- Records -->
+  <div
+    class="gd-form-tree-editor-v2-list"
+    [class.gd-form-tree-editor-v2-list-copy-value]="copyCheckbox !== undefined">
+
+    <!-- Records -->
+    <ng-container
+      *ngIf="flattenedData?.length; else noCategories">
+      <cdk-virtual-scroll-viewport
+        #cdkViewport
+        [minBufferPx]="1024"
+        [maxBufferPx]="1024"
+        [itemSize]="26">
+        <!-- Item -->
+        <div
+          *cdkVirtualFor="let item of flattenedData; templateCacheSize: 0"
+          class="gd-form-tree-editor-v2-list-item"
+          [class.gd-form-tree-editor-v2-list-item-child]="item.type !== FlattenType.CATEGORY"
+          [ngSwitch]="item.type">
+
+          <!-- Category -->
+          <div
+            *ngSwitchCase="FlattenType.CATEGORY"
+            class="gd-form-tree-editor-v2-list-category"
+            fxLayout="row" fxLayoutAlign="none center">
+
+            <!-- Collapse / Expand -->
+            <mat-icon
+              [style.visibility]="(viewOnly && item.data.checked > 0) || (!viewOnly && item.data.children.length > 0) ? 'visible' : 'hidden'"
+              (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
+            <!-- Label -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-content"
+              fxFlex
+              [innerHTML]="item.text | highlight:searchValue"></div>
+
+            <!-- Total checked -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-checked-no"
+              fxGrow="0">
+              {{item.data.checked}}/{{item.data.children.length}}
+            </div>
+
+            <!-- Buttons -->
+            <div
+              *ngIf="!viewOnly"
+              class="gd-form-tree-editor-v2-list-category-buttons"
+              fxGrow="0">
+
+              <!-- Check all -->
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_CHECK_ALL' | translate"
+                (click)="checkUncheckAll(item, true)">
+                <mat-icon>done_all</mat-icon>
+              </button>
+
+              <!-- Uncheck all -->
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate"
+                (click)="checkUncheckAll(item, false)">
+                <mat-icon>remove_done</mat-icon>
+              </button>
+
+              <!-- Add item -->
+              <button
+                *ngIf="addNewItemVisible"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_ADD' | translate"
+                (click)="add(item)">
+                <mat-icon>playlist_add</mat-icon>
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- Category item -->
+          <div
+            *ngSwitchCase="FlattenType.CATEGORY_ITEM"
+            class="gd-form-tree-editor-v2-list-category-item"
+            [class.gd-form-tree-editor-v2-list-category-item-flash]="item.data.flash"
+            fxLayout="row" fxLayoutAlign="none center">
+
+            <!-- System-wide -->
+            <mat-icon
+              [style.visibility]="displaySystemWide && item.data.isSystemWide ? 'visible' : 'hidden'"
+              [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate">public</mat-icon>
+
+            <!-- Color -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-item-color"
+              [style.backgroundColor]="item.data.colorCode"></div>
+
+            <!-- Icon -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-item-icon">
+              <img
+                *ngIf="item.data.iconUrl"
+                [src]="item.data.iconUrl" />
+            </div>
+
+            <!-- Checkbox + label -->
+            <app-form-checkbox-v2
+              [ngModel]="(item.data.isSystemWide && !item.data.disabled) || (value && value[item.parent.data.id] && value[item.parent.data.id][item.data.id])"
+              [name]="item.data.id"
+              [placeholder]="item.data.label"
+              [disabled]="viewOnly || item.data.disabled || item.data.isSystemWide"
+              [highlightPlaceholder]="searchValue"
+              (ngModelChange)="selectedChanged(item, $event)"
+              (mousedown)="copyCheckboxMouseDown($event, item)"
+              (mouseenter)="copyCheckboxMouseEnter($event, item)"
+              (mouseleave)="copyCheckboxMouseLeave()"></app-form-checkbox-v2>
+
+          </div>
+
+          <!-- Info -->
+          <div
+            *ngSwitchCase="FlattenType.INFO"
+            class="gd-form-tree-editor-v2-list-category-info"
+            fxLayout="row" fxLayoutAlign="none center"
+            [innerHTML]="item.text | highlight:searchValue"></div>
+
+        </div>
+      </cdk-virtual-scroll-viewport>
+    </ng-container>
+
+    <!-- No categories image -->
+    <ng-template
+      #noCategories>
+      <div
+        fxLayout="column" fxLayoutAlign="center center"
+        class="gd-form-tree-editor-v2-list-empty">
+
+        <!-- Image -->
+        <div
+          class="gd-form-tree-editor-v2-list-empty-image"></div>
+
+        <!-- Message -->
+        <div
+          class="gd-form-tree-editor-v2-list-empty-text">{{'LNG_REFERENCE_DATA_CATEGORY_LABEL_EDIT_NO_CATEGORIES' | translate}}</div>
+      </div>
+    </ng-template>
+
+  </div>
+
+  <!-- Legend -->
+  <div
+    class="gd-form-tree-editor-v2-legend"
+    fxLayout="row" fxLayoutAlign="start center">
+
+    <!-- Header -->
+    <div
+      class="gd-form-tree-editor-v2-legend-title">
+      {{'LNG_COMMON_LABEL_LEGEND' | translate}}
+    </div>
+
+    <!-- Items -->
+    <div
+      class="gd-form-tree-editor-v2-legend-items"
+      fxLayout="row wrap" fxLayoutAlign="start center">
+
+      <!-- System-wide -->
+      <div
+        *ngIf="displaySystemWide"
+        class="gd-form-tree-editor-v2-legend-items-item">
+        <mat-icon>public</mat-icon>
+        <span>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate}}</span>
+      </div>
+
+      <!-- Visible only on edit mode -->
+      <ng-container
+        *ngIf="!viewOnly">
+
+        <!-- Check all -->
+        <div
+          class="gd-form-tree-editor-v2-legend-items-item">
+          <mat-icon>done_all</mat-icon>
+          <span>{{'LNG_COMMON_BUTTON_CHECK_ALL' | translate}}</span>
+        </div>
+
+        <!-- Uncheck all -->
+        <div
+          class="gd-form-tree-editor-v2-legend-items-item">
+          <mat-icon>remove_done</mat-icon>
+          <span>{{'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate}}</span>
+        </div>
+
+        <!-- Add entry -->
+        <div
+          *ngIf="addNewItemVisible"
+          class="gd-form-tree-editor-v2-legend-items-item">
+          <mat-icon>playlist_add</mat-icon>
+          <span>{{'LNG_COMMON_BUTTON_ADD' | translate}}</span>
+        </div>
+
+      </ng-container>
+
+    </div>
+
+  </div>
+
+</form>

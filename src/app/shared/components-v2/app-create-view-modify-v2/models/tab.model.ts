@@ -17,10 +17,14 @@ import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter
 import { MapServerModel } from '../../../../core/models/map-server.model';
 import { IAnswerData, QuestionModel } from '../../../../core/models/question.model';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TranslateService } from '@ngx-translate/core';
 import { IGroupEventData, IGroupOptionEventData, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
 import { LocationIdentifierModel } from '../../../../core/models/location-identifier.model';
 import { IV2SideDialogData, V2SideDialogConfigInput } from '../../app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  ITreeEditorDataCategory,
+  ITreeEditorDataCategoryItem, ITreeEditorDataValue
+} from '../../../forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Input type
@@ -61,6 +65,7 @@ export enum CreateViewModifyV2TabInputType {
   TAB_TABLE_RECORDS_LIST,
   TAB_TABLE_EDIT_QUESTIONNAIRE,
   TAB_TABLE_FILL_QUESTIONNAIRE,
+  TAB_TABLE_TREE_EDITOR,
   SECTION,
 
   // other
@@ -86,6 +91,18 @@ interface ICreateViewModifyV2TabInputActionButton {
     input: CreateViewModifyV2TabInput,
     index?: number,
   ) => boolean;
+}
+
+/**
+ * Tab table - tree - add new item
+ */
+export interface ICreateViewModifyV2TabTableTreeAddNewItem {
+  // required
+  category: ITreeEditorDataCategory;
+  finish: (
+    item: ITreeEditorDataCategoryItem,
+    addAnother: boolean
+  ) => void;
 }
 
 /**
@@ -272,6 +289,7 @@ interface ICreateViewModifyV2TabInputToggleCheckbox extends Omit<ICreateViewModi
 
   // optional
   suffixIconButtons?: IAppFormIconButtonV2[];
+  visible?: () => boolean;
 }
 
 /**
@@ -353,7 +371,7 @@ interface ICreateViewModifyV2TabInputSelectGroups extends Omit<ICreateViewModify
   defaultValues: any[];
   groupOptionFormatMethod: (
     sanitized: DomSanitizer,
-    i18nService: TranslateService,
+    i18nService: I18nService,
     optionsMap: ISelectGroupOptionMap<any>,
     option: any
   ) => ISelectGroupOptionFormatResponse;
@@ -671,7 +689,7 @@ export interface ICreateViewModifyV2TabTableRecordsList {
   queryBuilder?: RequestQueryBuilder;
   applyHasMoreLimit?: boolean;
   pageCount?: IBasicCount;
-  previousRefreshRequest?: any;
+  previousRefreshRequest?: number;
 }
 
 /**
@@ -703,6 +721,24 @@ interface ICreateViewModifyV2TabTableFillQuestionnaire {
 }
 
 /**
+ * Tab table - tree
+ */
+interface ICreateViewModifyV2TabTableTree {
+  // required
+  type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR;
+  name: string;
+  value: ICreateViewModifyV2TabInputValue<ITreeEditorDataValue>;
+  options: ITreeEditorDataCategory[];
+  displaySystemWide: boolean;
+
+  // optional
+  add?: {
+    callback: (data: ICreateViewModifyV2TabTableTreeAddNewItem) => void,
+    visible?: () => boolean
+  };
+}
+
+/**
  * Tab table
  */
 export interface ICreateViewModifyV2TabTable {
@@ -710,7 +746,7 @@ export interface ICreateViewModifyV2TabTable {
   type: CreateViewModifyV2TabInputType.TAB_TABLE;
   name: string;
   label: string;
-  definition: ICreateViewModifyV2TabTableRecordsList | ICreateViewModifyV2TabTableEditQuestionnaire | ICreateViewModifyV2TabTableFillQuestionnaire;
+  definition: ICreateViewModifyV2TabTableRecordsList | ICreateViewModifyV2TabTableEditQuestionnaire | ICreateViewModifyV2TabTableFillQuestionnaire | ICreateViewModifyV2TabTableTree;
 
   // optional
   visible?: () => boolean

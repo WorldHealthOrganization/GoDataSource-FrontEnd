@@ -7,6 +7,9 @@ import { Constants } from './constants';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { BaseModel } from './base.model';
+import {
+  ITreeEditorDataValue
+} from '../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 
 export class OutbreakTemplateModel
   extends BaseModel
@@ -43,6 +46,8 @@ export class OutbreakTemplateModel
   generateFollowUpsKeepTeamAssignment: boolean;
   generateFollowUpsTeamAssignmentAlgorithm: string;
   generateFollowUpsDateOfLastContact: boolean;
+
+  allowedRefDataItems: ITreeEditorDataValue;
 
   /**
    * Advanced filters
@@ -179,6 +184,7 @@ export class OutbreakTemplateModel
     this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
     this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
     this.generateFollowUpsDateOfLastContact = _.get(data, 'generateFollowUpsDateOfLastContact', false);
+    this.allowedRefDataItems = _.get(data, 'allowedRefDataItems');
 
     // CASE INVESTIGATION TEMPLATE
     this.caseInvestigationTemplate = _.map(

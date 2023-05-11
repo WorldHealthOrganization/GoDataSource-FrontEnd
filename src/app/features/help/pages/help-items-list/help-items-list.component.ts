@@ -37,8 +37,9 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
     private dialogV2Service: DialogV2Service
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // Retrieve category

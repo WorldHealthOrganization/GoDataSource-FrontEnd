@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 
 export enum ImportDataExtension {
   CSV = '.csv',
@@ -83,8 +84,15 @@ export class ImportableFileModel {
   readonly modelPropertyValues: ImportableFilePropertyValuesModel;
   readonly modelPropertyValuesMap: {
     [modelProperty: string]: {
+      // from api
       id: string;
       label: string;
+      value: string;
+      active?: boolean;
+      isSystemWide?: boolean;
+
+      // set by fe
+      disabled: boolean;
     }[]
   } = {};
   readonly modelPropertyValuesMapChildMap: {
@@ -118,7 +126,7 @@ export class ImportableFileModel {
     // validate input object
     if (
       !object ||
-            !path
+      !path
     ) {
       return undefined;
     }
@@ -152,6 +160,10 @@ export class ImportableFileModel {
       fileArrayHeaders: any,
       modelProperties: any,
       modelPropertyValues: any,
+      modelPropertyToRefCategory: {
+        // path => ref category
+        [propertyPath: string]: string
+      },
       suggestedFieldMapping: any,
       modelArrayProperties: any
     },
@@ -175,7 +187,8 @@ export class ImportableFileModel {
       },
       fileType: ImportDataExtension,
       extraDataUsedToFormat: any
-    ) => void
+    ) => void,
+    selectedOutbreak: OutbreakModel
   ) {
     // file id
     this.id = data.id;
@@ -256,6 +269,17 @@ export class ImportableFileModel {
         // indexes
         modelPropertyValuesMapIndex[impLVPair.value] = {};
         _.each(this.modelPropertyValuesMap[impLVPair.value], (propValue) => {
+          // disabled ?
+          // propValue.active === false because undefined should be active in this case
+          propValue.disabled = propValue.active === false || (
+            !propValue.isSystemWide &&
+            selectedOutbreak?.allowedRefDataItems &&
+            data.modelPropertyToRefCategory &&
+            data.modelPropertyToRefCategory[impLVPair.value] &&
+            selectedOutbreak.allowedRefDataItems[data.modelPropertyToRefCategory[impLVPair.value]] &&
+            !selectedOutbreak.allowedRefDataItems[data.modelPropertyToRefCategory[impLVPair.value]][propValue.value]
+          );
+
           // label
           if (propValue.label) {
             // label translated

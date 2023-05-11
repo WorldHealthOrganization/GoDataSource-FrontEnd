@@ -8,7 +8,6 @@ import {
   SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { Moment } from '../../../../core/helperClasses/x-moment';
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
@@ -103,7 +102,7 @@ export class AppFormDateV2Component
 
     // translate tooltip
     this.tooltipTranslated = this._tooltip ?
-      this.translateService.instant(this._tooltip) :
+      this.i18nService.instant(this._tooltip) :
       this._tooltip;
 
     // add / remove tooltip icon
@@ -157,22 +156,22 @@ export class AppFormDateV2Component
   }
 
   // timers
-  private _focusTimer: any;
-  private _openTimer: any;
-  private _setStartingValueTimer: any;
+  private _focusTimer: number;
+  private _openTimer: number;
+  private _setStartingValueTimer: number;
 
   /**
    * Constructor
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef,
     protected elementRef: ElementRef
   ) {
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }
@@ -188,22 +187,6 @@ export class AppFormDateV2Component
     this.stopFocusTimer();
     this.stopOpenTimer();
     this.stopSetStartingValueTimer();
-  }
-
-  /**
-   * Click button
-   */
-  iconButtonClick(
-    event,
-    iconB: IAppFormIconButtonV2
-  ): void {
-    // prevent propagation
-    event.stopPropagation();
-
-    // execute click action
-    if (iconB.clickAction) {
-      iconB.clickAction(this);
-    }
   }
 
   /**

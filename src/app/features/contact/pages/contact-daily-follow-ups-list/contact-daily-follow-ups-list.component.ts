@@ -50,8 +50,9 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { AppFormSelectMultipleV2Component } from '../../../../shared/forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
-import { TranslateService } from '@ngx-translate/core';
 import { LocationModel } from '../../../../core/models/location.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -116,15 +117,19 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   constructor(
     protected listHelperService: ListHelperService,
     protected followUpsDataService: FollowUpsDataService,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected outbreakDataService: OutbreakDataService,
-    private toastV2Service: ToastV2Service,
-    private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    protected toastV2Service: ToastV2Service,
+    protected activatedRoute: ActivatedRoute,
+    protected dialogV2Service: DialogV2Service,
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
     );
 
     // from team/user workload ?
@@ -593,7 +598,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             // View follow-ups
             {
               label: {
-                get: (item: FollowUpModel) => this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
+                get: (item: FollowUpModel) => this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
               },
               action: {
                 link: (item: FollowUpModel): string[] => {
@@ -696,7 +701,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         sortable: true,
         format: {
           type: (item) => item.person?.gender && (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender] ?
-            this.translateService.instant((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender].value) :
+            this.i18nService.instant((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender].value) :
             '—'
         },
         filter: {
@@ -712,13 +717,17 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         sortable: true,
         format: {
           type: (item) => item.person?.occupation && (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation] ?
-            this.translateService.instant((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation].value) :
+            this.i18nService.instant((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation].value) :
             '—'
         },
         filter: {
           // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           includeNoValue: true
         }
       },
@@ -813,7 +822,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   type: IV2ColumnStatusFormType.CIRCLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           },
@@ -826,13 +836,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 type: IV2ColumnStatusFormType.STAR,
                 color: 'var(--gd-danger)'
               },
-              label: ' '
+              label: ' ',
+              order: undefined
             }]
           }
         ],
         forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
           item: data,
-          translateService: this.translateService,
+          i18nService: this.i18nService,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
         })
       },
@@ -1008,13 +1019,17 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         notVisible: true,
         format: {
           type: (item) => item.person?.riskLevel && (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel] ?
-            this.translateService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
+            this.i18nService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
             '—'
         },
         filter: {
           // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           includeNoValue: true
         }
       },
@@ -1418,7 +1433,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'contact.riskLevel',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
-        options: this.activatedRoute.snapshot.data.risk.options,
+        options: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          this.activatedRoute.snapshot.data.risk.options,
+          undefined
+        ),
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
       },
       {
@@ -1455,7 +1474,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'contact.occupation',
         label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-        options: this.activatedRoute.snapshot.data.occupation.options,
+        options: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          this.activatedRoute.snapshot.data.occupation.options,
+          undefined
+        ),
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
       }
     );
@@ -1503,7 +1526,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'riskLevel',
           label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-          options: this.activatedRoute.snapshot.data.risk.options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            this.activatedRoute.snapshot.data.risk.options,
+            undefined
+          ),
           relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
           childQueryBuilderKey: 'case'
         },
@@ -1518,7 +1545,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'classification',
           label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-          options: this.activatedRoute.snapshot.data.classification.options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            this.activatedRoute.snapshot.data.classification.options,
+            undefined
+          ),
           relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
           childQueryBuilderKey: 'case'
         },
@@ -1526,7 +1557,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'occupation',
           label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-          options: this.activatedRoute.snapshot.data.occupation.options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            this.activatedRoute.snapshot.data.occupation.options,
+            undefined
+          ),
           relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
           childQueryBuilderKey: 'case'
         },
@@ -1622,7 +1657,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'outcomeId',
           label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-          options: this.activatedRoute.snapshot.data.outcome.options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            this.activatedRoute.snapshot.data.outcome.options,
+            undefined
+          ),
           relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
           childQueryBuilderKey: 'case'
         },
@@ -1716,7 +1755,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     url: `outbreaks/${ this.selectedOutbreak.id }/contacts/daily-followup-form/export`,
                     async: false,
                     method: ExportDataMethod.GET,
-                    fileName: this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
+                    fileName: this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
                     queryBuilder: qb,
                     allow: {
                       types: [ExportDataExtension.PDF]
@@ -2612,7 +2651,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   url: `outbreaks/${ this.selectedOutbreak.id }/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${ this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
+                  fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
                   queryBuilder: qb,
                   allow: {
                     types: [

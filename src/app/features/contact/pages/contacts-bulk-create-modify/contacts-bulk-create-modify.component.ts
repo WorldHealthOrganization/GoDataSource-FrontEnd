@@ -30,6 +30,7 @@ import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-contacts-bulk-create-modify',
@@ -40,7 +41,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
   private _entity: EventModel | CaseModel;
 
   // used to keep timer id
-  private _displayOnceGeoLocationChangeTimeout: any;
+  private _displayOnceGeoLocationChangeTimeout: number;
 
   // keep data used to copy geolocation
   private _geoData: {
@@ -87,13 +88,16 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     protected dialogV2Service: DialogV2Service,
     protected toastV2Service: ToastV2Service,
     protected router: Router,
-    protected bulkCacheHelperService: BulkCacheHelperService
+    protected bulkCacheHelperService: BulkCacheHelperService,
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
       activatedRoute,
       authDataService,
-      outbreakDataService
+      outbreakDataService, {
+        initializeTableColumnsAfterRecordsInitialized: true
+      }
     );
 
     // retrieve data
@@ -208,6 +212,9 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
    * Initialize Table Columns
    */
   protected initializeTableColumns(): void {
+    // retrieve records data
+    const records: EntityModel[] = this.spreadsheetEditorV2Component.getRecords<EntityModel>();
+
     // column
     this.tableColumns = [
       // Contact properties
@@ -281,7 +288,11 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
         field: 'model.occupation',
-        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        options: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          records.map((item) => (item.model as ContactModel).occupation)
+        )
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
         label: 'LNG_CONTACT_FIELD_LABEL_AGE_YEARS',
@@ -484,7 +495,11 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
         field: 'model.riskLevel',
-        options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        options: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          records.map((item) => (item.model as ContactModel).riskLevel)
+        )
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
@@ -598,7 +613,11 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         field: 'relationship.exposureTypeId',
         visible: this.isCreate,
         options: this.isCreate ?
-          (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options :
+          this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            records.map((item) => item.relationship.exposureTypeId)
+          ) :
           []
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
@@ -606,7 +625,11 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         field: 'relationship.exposureFrequencyId',
         visible: this.isCreate,
         options: this.isCreate ?
-          (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options :
+          this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            records.map((item) => item.relationship.exposureFrequencyId)
+          ) :
           []
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
@@ -614,7 +637,11 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         field: 'relationship.exposureDurationId',
         visible: this.isCreate,
         options: this.isCreate ?
-          (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options :
+          this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            records.map((item) => item.relationship.exposureDurationId)
+          ) :
           []
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
@@ -622,7 +649,11 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         field: 'relationship.socialRelationshipTypeId',
         visible: this.isCreate,
         options: this.isCreate ?
-          (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options :
+          this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            records.map((item) => item.relationship.socialRelationshipTypeId)
+          ) :
           []
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
@@ -791,6 +822,10 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
       // call again
       this._displayOnceGeoLocationChangeTimeout = setTimeout(
         () => {
+          // reset
+          this._displayOnceGeoLocationChangeTimeout = undefined;
+
+          // call
           this.displayOnceGeoLocationChange(false);
         },
         300

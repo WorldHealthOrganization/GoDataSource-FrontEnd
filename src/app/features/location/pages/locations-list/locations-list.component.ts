@@ -60,8 +60,9 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
     private dialogV2Service: DialogV2Service
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // get data

@@ -21,7 +21,7 @@ export class OccupationDataResolver implements IMapResolverV2<ReferenceDataEntry
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.OCCUPATION)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OCCUPATION)
       .pipe(
         map((data) => {
           // construct map

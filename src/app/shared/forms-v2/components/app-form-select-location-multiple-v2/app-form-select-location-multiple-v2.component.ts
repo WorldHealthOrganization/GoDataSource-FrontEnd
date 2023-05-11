@@ -8,12 +8,12 @@ import {
   SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { MAT_SELECT_CONFIG } from '@angular/material/select';
 import { AppFormLocationBaseV2, ILocation } from '../../core/app-form-location-base-v2';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-select-location-multiple-v2',
@@ -55,7 +55,7 @@ export class AppFormSelectLocationMultipleV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef,
     protected locationDataService: LocationDataService,
     protected outbreakDataService: OutbreakDataService,
@@ -64,7 +64,7 @@ export class AppFormSelectLocationMultipleV2Component
     super(
       true,
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef,
       locationDataService,
       outbreakDataService,

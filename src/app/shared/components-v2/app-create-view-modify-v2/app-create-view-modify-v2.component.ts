@@ -9,7 +9,7 @@ import {
   ICreateViewModifyV2Tab,
   ICreateViewModifyV2TabInputChanged,
   ICreateViewModifyV2TabInputList,
-  ICreateViewModifyV2TabTable
+  ICreateViewModifyV2TabTable, ICreateViewModifyV2TabTableRecordsList
 } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
@@ -230,7 +230,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // search
   expandListSearchValue: string;
-  expandListSearchValueTimeout: any;
+  expandListSearchValueTimeout: number;
   expandListSearchSuffixButtons: IAppFormIconButtonV2[] = [
     {
       icon: 'clear',
@@ -425,6 +425,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // switch viewed item
   @Output() expandListChangeRecord = new EventEmitter<any>();
 
+  // timers
+  private _resizeTableTimer: number;
+  private _markArrayItemsAsDirtyTimer: number;
+  private _detectChangesTimer: number;
+
   // constants
   CreateViewModifyV2TabInputType = CreateViewModifyV2TabInputType;
   Constants = Constants;
@@ -472,6 +477,23 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
+
+    // stop timers
+    this.stopResizeTableTimer();
+    this.stopMarkArrayItemsAsDirtyTimer();
+    this.stopDetectChangesTimer();
+    this.tabData?.tabs?.forEach((tab) => {
+      // no need to stop anything ?
+      if (tab.type !== CreateViewModifyV2TabInputType.TAB_TABLE) {
+        return;
+      }
+
+      // cancel requests
+      if ((tab.definition as ICreateViewModifyV2TabTableRecordsList).previousRefreshRequest) {
+        clearTimeout((tab.definition as ICreateViewModifyV2TabTableRecordsList).previousRefreshRequest);
+        (tab.definition as ICreateViewModifyV2TabTableRecordsList).previousRefreshRequest = undefined;
+      }
+    });
   }
 
   /**
@@ -508,6 +530,16 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     if (this.expandListRecordsSubscription) {
       this.expandListRecordsSubscription.unsubscribe();
       this.expandListRecordsSubscription = undefined;
+    }
+  }
+
+  /**
+   * Stop resize table timer
+   */
+  private stopResizeTableTimer(): void {
+    if (this._resizeTableTimer) {
+      clearTimeout(this._resizeTableTimer);
+      this._resizeTableTimer = undefined;
     }
   }
 
@@ -867,14 +899,30 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop timer
+   */
+  private stopMarkArrayItemsAsDirtyTimer(): void {
+    if (this._markArrayItemsAsDirtyTimer) {
+      clearTimeout(this._markArrayItemsAsDirtyTimer);
+      this._markArrayItemsAsDirtyTimer = undefined;
+    }
+  }
+
+  /**
    * Hack to mark an array of items as dirty since ngModelGroup isn't working with arrays
    */
   markArrayItemsAsDirty(
     form: NgForm,
     groupName: string
   ): void {
+    // stop previous
+    this.stopMarkArrayItemsAsDirtyTimer();
+
     // wait for form to catch up
-    setTimeout(() => {
+    this._markArrayItemsAsDirtyTimer = setTimeout(() => {
+      // reset
+      this._markArrayItemsAsDirtyTimer = undefined;
+
       // determine inputs that should become dirty
       Object.keys(form.controls)
         .filter((name) => name.startsWith(`${groupName}[`) || name === groupName)
@@ -989,6 +1037,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // search
     this.expandListSearchValueTimeout = setTimeout(() => {
       // reset
+      this.expandListSearchValueTimeout = undefined;
       this.expandListPageIndex = 0;
 
       // search
@@ -1096,15 +1145,20 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     if (instant) {
       tab.definition.refresh(tab);
     } else {
-      tab.definition.previousRefreshRequest = setTimeout(() => {
-        // applies only for records lists
-        if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
-          return;
-        }
+      tab.definition.previousRefreshRequest = setTimeout((function(localTab) {
+        return () => {
+          // reset
+          (localTab.definition as ICreateViewModifyV2TabTableRecordsList).previousRefreshRequest = undefined;
 
-        // refresh
-        tab.definition.refresh(tab);
-      }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
+          // applies only for records lists
+          if (localTab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+            return;
+          }
+
+          // refresh
+          localTab.definition.refresh(tab);
+        };
+      })(tab), Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
     }
   }
 
@@ -1353,8 +1407,15 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       // update table size
       this.resizeTable();
 
+      // stop previous
+      this.stopResizeTableTimer();
+
       // wait for html to be rendered since isSmallScreenMode was changed
-      setTimeout(() => {
+      this._resizeTableTimer = setTimeout(() => {
+        // reset
+        this._resizeTableTimer = undefined;
+
+        // update
         this.resizeTable();
       });
     } else {
@@ -1542,6 +1603,16 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop timer
+   */
+  private stopDetectChangesTimer(): void {
+    if (this._detectChangesTimer) {
+      clearTimeout(this._detectChangesTimer);
+      this._detectChangesTimer = undefined;
+    }
+  }
+
+  /**
    * Configure tabs
    */
   configureTabs(): void {
@@ -1667,9 +1738,16 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
               // update settings
               this.loadPageSettings();
 
+              // not really necessary
+              this.stopDetectChangesTimer();
+
               // hack to fix tab drawing issue when you move a tab before the selected tab
               this.loadingPage = true;
-              setTimeout(() => {
+              this._detectChangesTimer = setTimeout(() => {
+                // reset
+                this._detectChangesTimer = undefined;
+
+                // update
                 this.loadingPage = false;
                 this.detectChanges();
               });

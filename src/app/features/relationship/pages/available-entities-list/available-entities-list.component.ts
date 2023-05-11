@@ -19,13 +19,14 @@ import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatu
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-available-entities-list',
@@ -49,14 +50,18 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
     protected activatedRoute: ActivatedRoute,
     protected relationshipDataService: RelationshipDataService,
     protected genericDataService: GenericDataService,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected locationDataService: LocationDataService,
-    protected entityHelperService: EntityHelperService
+    protected entityHelperService: EntityHelperService,
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
     );
 
     // disable select outbreak
@@ -172,7 +177,7 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
-              tooltip: this.translateService.instant(data.type)
+              tooltip: this.i18nService.instant(data.type)
             });
           }
 
@@ -215,7 +220,11 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           includeNoValue: true
         }
       },
@@ -224,13 +233,17 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
         label: 'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION',
         format: {
           type: (item) => item.classification ?
-            this.translateService.instant(item.classification) :
+            this.i18nService.instant(item.classification) :
             ''
         },
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {

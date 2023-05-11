@@ -21,7 +21,7 @@ export class ExposureTypeDataResolver implements IMapResolverV2<ReferenceDataEnt
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_TYPE)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE)
       .pipe(
         map((data) => {
           // construct map

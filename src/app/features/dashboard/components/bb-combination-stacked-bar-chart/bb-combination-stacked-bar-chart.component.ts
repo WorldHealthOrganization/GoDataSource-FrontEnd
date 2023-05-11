@@ -30,6 +30,9 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
 
   maxTickCulling: number = 1;
 
+  // timers
+  private _zoomTimer: number;
+
   ngOnInit() {
     // render bb object
     this.render();
@@ -45,9 +48,23 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
   }
 
   private destroyChart() {
+    // stop previous
+    this.stopZoomTimer();
+
+    // chart
     if (this.chart) {
       this.chart.destroy();
       this.chart = null;
+    }
+  }
+
+  /**
+   * Zoom timer
+   */
+  private stopZoomTimer(): void {
+    if (this._zoomTimer) {
+      clearTimeout(this._zoomTimer);
+      this._zoomTimer = undefined;
     }
   }
 
@@ -63,7 +80,15 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
       bindto: chartIdBind,
       oninit: () => {
         if (this.initialZoomRanges) {
-          setTimeout(() => {
+          // stop previous
+          this.stopZoomTimer();
+
+          // call
+          this._zoomTimer = setTimeout(() => {
+            // reset
+            this._zoomTimer = undefined;
+
+            // zoom
             this.chart.zoom(this.initialZoomRanges);
           });
         }

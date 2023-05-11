@@ -40,8 +40,9 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
 
     // get data
@@ -163,7 +164,8 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
                   type: IV2ColumnStatusFormType.CIRCLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           }

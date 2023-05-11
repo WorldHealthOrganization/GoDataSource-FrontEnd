@@ -6,12 +6,12 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { TranslateService } from '@ngx-translate/core';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { MetricIndependentTransmissionChainsModel } from '../../../../core/models/metrics/metric-independent-transmission-chains.model';
 import { Constants } from '../../../../core/models/constants';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { AppKpiDashletComponent } from '../app-kpi-dashlet/app-kpi-dashlet.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-cot-kpi-dashlet',
@@ -28,7 +28,7 @@ export class AppCotKpiDashletComponent
    */
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private transmissionChainDataService: TransmissionChainDataService,
     authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
@@ -172,7 +172,7 @@ export class AppCotKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_INDEPENDENT_TRANSMISSION_CHAINS_DESCRIPTION')
       },
 
       // Number of active chains of transmission
@@ -288,7 +288,7 @@ export class AppCotKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_ACTIVE_CHAINS_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_ACTIVE_CHAINS_DESCRIPTION')
       },
 
       // Number of new chains of transmission from registered contacts who have became cases
@@ -369,7 +369,7 @@ export class AppCotKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES_DESCRIPTION')
       }
     ];
 

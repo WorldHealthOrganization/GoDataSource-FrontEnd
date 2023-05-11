@@ -11,9 +11,10 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { IResolverV2ResponseModel } from '../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
+import { I18nService } from '../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-form-case-quick',
@@ -91,8 +92,9 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
     @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
-    private outbreakDataService: OutbreakDataService
+    private i18nService: I18nService,
+    private outbreakDataService: OutbreakDataService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     super(controlContainer, validators, asyncValidators);
   }
@@ -108,10 +110,6 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
 
     // reference data
     this.genderOptions = (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
-    this.occupationOptions = (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
-    this.caseRiskLevelsOptions = (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
-    this.caseClassificationsOptions = (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
-    this.outcomeOptions = (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
 
     // subscribe to the Selected Outbreak
     this.outbreakSubscriber = this.outbreakDataService
@@ -119,8 +117,15 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
 
+        if (!this.selectedOutbreak?.id) {
+          return;
+        }
+
+        // refresh ref data options
+        this.refreshReferenceData();
+
         // set visual ID translate data
-        this.visualIDTooltip = this.translateService.instant(
+        this.visualIDTooltip = this.i18nService.instant(
           'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION', {
             mask: CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
           }
@@ -134,6 +139,16 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+  }
+
+  /**
+   * Write value
+   */
+  writeValue(value: CaseModel) {
+    super.writeValue(value);
+
+    // refresh ref data options
+    this.refreshReferenceData();
   }
 
   /**
@@ -156,5 +171,32 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
       }
     });
     return dirtyControls;
+  }
+
+  /**
+   * Refresh ref data options
+   */
+  private refreshReferenceData(): void {
+    // reference data
+    this.occupationOptions = this.referenceDataHelperService.filterPerOutbreakOptions(
+      this.selectedOutbreak,
+      (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      this.value?.occupation
+    );
+    this.caseRiskLevelsOptions = this.referenceDataHelperService.filterPerOutbreakOptions(
+      this.selectedOutbreak,
+      (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      this.value?.riskLevel
+    );
+    this.caseClassificationsOptions = this.referenceDataHelperService.filterPerOutbreakOptions(
+      this.selectedOutbreak,
+      (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      this.value?.classification
+    );
+    this.outcomeOptions = this.referenceDataHelperService.filterPerOutbreakOptions(
+      this.selectedOutbreak,
+      (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      this.value?.outcomeId
+    );
   }
 }

@@ -5,48 +5,49 @@ import { BaseModel } from './base.model';
 import { IPermissionBasic, IPermissionExportable, IPermissionImportable } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import {
+  ITreeEditorDataValue
+} from '../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 
 export enum ReferenceDataCategory {
-  GLOSSARY = 'LNG_REFERENCE_DATA_CATEGORY_GLOSSARY_TERM',
-  CASE_CLASSIFICATION = 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION',
-  CASE_CLASSIFICATION_CONFIRMED_BY_LAB_RESULT = 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED_BY_LAB_RESULT',
-  GENDER = 'LNG_REFERENCE_DATA_CATEGORY_GENDER',
-  INVESTIGATION_STATUS = 'LNG_REFERENCE_DATA_CATEGORY_INVESTIGATION_STATUS',
-  EVENT_CATEGORY = 'LNG_REFERENCE_DATA_CATEGORY_EVENT_CATEGORY',
-  OCCUPATION = 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION',
-  LAB_NAME = 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME',
-  LAB_SEQUENCE_LABORATORY = 'LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_LABORATORY',
-  LAB_SEQUENCE_RESULT = 'LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_RESULT',
-  TYPE_OF_SAMPLE = 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE',
-  TYPE_OF_LAB_TEST = 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST',
-  LAB_TEST_RESULT = 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT',
-  DOCUMENT_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE',
-  DISEASE = 'LNG_REFERENCE_DATA_CATEGORY_DISEASE',
-  EXPOSURE_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE',
-  EXPOSURE_INTENSITY = 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_INTENSITY',
-  EXPOSURE_FREQUENCY = 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_FREQUENCY',
-  EXPOSURE_DURATION = 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_DURATION',
-  CERTAINTY_LEVEL = 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL',
-  RISK_LEVEL = 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL',
-  CONTEXT_OF_TRANSMISSION = 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION',
-  OUTCOME = 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME',
-  QUESTION_ANSWER_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE',
-  QUESTION_CATEGORY = 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_CATEGORY',
-  CUSTOMIZABLE_UI_ELEMENT = 'LNG_REFERENCE_DATA_CATEGORY_MISCELLANEOUS_CUSTOMIZABLE_UI_ELEMENT',
-  PERSON_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE',
-  COUNTRY = 'LNG_REFERENCE_DATA_CATEGORY_COUNTRY',
-  ADDRESS_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE',
-  CONTACT_DAILY_FOLLOW_UP_STATUS = 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE',
-  CONTACT_FINAL_FOLLOW_UP_STATUS = 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE',
-  LOCATION_GEOGRAPHICAL_LEVEL = 'LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL',
-  PERSON_DATE_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE',
-  VACCINES = 'LNG_REFERENCE_DATA_CATEGORY_VACCINE',
-  VACCINES_STATUS = 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS',
-  PREGNANCY_STATUS = 'LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS',
-  INSTITUTION_NAME = 'LNG_REFERENCE_DATA_CATEGORY_INSTITUTION_NAME',
-  DATE_RANGE_CENTRE_NAME = 'LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME',
-  FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM = 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
-  OUTBREAK_MAP_SERVER_TYPE = 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE'
+  LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION = 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION',
+  LNG_REFERENCE_DATA_CATEGORY_GENDER = 'LNG_REFERENCE_DATA_CATEGORY_GENDER',
+  LNG_REFERENCE_DATA_CATEGORY_OCCUPATION = 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION',
+  LNG_REFERENCE_DATA_CATEGORY_LAB_NAME = 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME',
+  LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE = 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE',
+  LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST = 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST',
+  LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT = 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT',
+  LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS = 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS',
+  LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_LABORATORY = 'LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_LABORATORY',
+  LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_RESULT = 'LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_RESULT',
+  LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE',
+  LNG_REFERENCE_DATA_CATEGORY_DISEASE = 'LNG_REFERENCE_DATA_CATEGORY_DISEASE',
+  LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE',
+  LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_INTENSITY = 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_INTENSITY',
+  LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_FREQUENCY = 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_FREQUENCY',
+  LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_DURATION = 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_DURATION',
+  LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL = 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL',
+  LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL = 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL',
+  LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION = 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION',
+  LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE',
+  LNG_REFERENCE_DATA_CATEGORY_QUESTION_CATEGORY = 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_CATEGORY',
+  LNG_REFERENCE_DATA_CATEGORY_INVESTIGATION_STATUS = 'LNG_REFERENCE_DATA_CATEGORY_INVESTIGATION_STATUS',
+  LNG_REFERENCE_DATA_CATEGORY_EVENT_CATEGORY = 'LNG_REFERENCE_DATA_CATEGORY_EVENT_CATEGORY',
+  LNG_REFERENCE_DATA_CATEGORY_OUTCOME = 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME',
+  LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE',
+  LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE',
+  LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE',
+  LNG_REFERENCE_DATA_CATEGORY_COUNTRY = 'LNG_REFERENCE_DATA_CATEGORY_COUNTRY',
+  LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL = 'LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL',
+  LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE = 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE',
+  LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE = 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE',
+  LNG_REFERENCE_DATA_CATEGORY_VACCINE = 'LNG_REFERENCE_DATA_CATEGORY_VACCINE',
+  LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS = 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS',
+  LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS = 'LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS',
+  LNG_REFERENCE_DATA_CATEGORY_INSTITUTION_NAME = 'LNG_REFERENCE_DATA_CATEGORY_INSTITUTION_NAME',
+  LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME = 'LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME',
+  LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM = 'LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+  LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE = 'LNG_REFERENCE_DATA_OUTBREAK_MAP_SERVER_TYPE'
 }
 
 export class ReferenceDataCategoryModel
@@ -54,14 +55,18 @@ implements
         IPermissionBasic,
         IPermissionExportable,
         IPermissionImportable {
+  // required
   id: string;
   name: string;
-  description: string;
   entries: ReferenceDataEntryModel[];
+  systemWideCount: number;
+
+  // optional
+  description?: string;
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Static Permissions - IPermissionBasic
+   */
   static canView(): boolean { return false; }
   static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_LIST) : false; }
   static canCreate(): boolean { return false; }
@@ -69,18 +74,18 @@ implements
   static canDelete(): boolean { return false; }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_EXPORT) : false; }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_IMPORT) : false; }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
@@ -89,8 +94,8 @@ implements
   }
 
   /**
-     * Permissions - IPermissionBasic
-     */
+   * Permissions - IPermissionBasic
+   */
   canView(): boolean { return ReferenceDataCategoryModel.canView(); }
   canList(user: UserModel): boolean { return ReferenceDataCategoryModel.canList(user); }
   canCreate(): boolean { return ReferenceDataCategoryModel.canCreate(); }
@@ -98,13 +103,13 @@ implements
   canDelete(): boolean { return ReferenceDataCategoryModel.canDelete(); }
 
   /**
-     * Permissions - IPermissionExportable
-     */
+   * Permissions - IPermissionExportable
+   */
   canExport(user: UserModel): boolean { return ReferenceDataCategoryModel.canExport(user); }
 
   /**
-     * Permissions - IPermissionImportable
-     */
+   * Permissions - IPermissionImportable
+   */
   canImport(user: UserModel): boolean { return ReferenceDataCategoryModel.canImport(user); }
 }
 
@@ -123,6 +128,8 @@ export class ReferenceDataEntryModel
   colorCode: string;
   order: number;
   geoLocation: { lat: number, lng: number };
+  isSystemWide: boolean;
+  allowedRefDataItems: ITreeEditorDataValue;
 
   private _iconId: string;
   iconUrl: string;
@@ -137,8 +144,8 @@ export class ReferenceDataEntryModel
   }
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Static Permissions - IPermissionBasic
+   */
   static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_VIEW) : false; }
   static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_LIST) : false; }
   static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_CREATE) : false; }
@@ -146,8 +153,8 @@ export class ReferenceDataEntryModel
   static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_DELETE) : false; }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 
@@ -162,6 +169,8 @@ export class ReferenceDataEntryModel
     this.iconId = _.get(data, 'iconId');
     this.order = _.get(data, 'order');
     this.geoLocation = _.get(data, 'geoLocation', {});
+    this.isSystemWide = _.get(data, 'isSystemWide', false);
+    this.allowedRefDataItems = _.get(data, 'allowedRefDataItems');
 
     // add category
     const categoryData = _.get(data, 'category');
@@ -171,8 +180,8 @@ export class ReferenceDataEntryModel
   }
 
   /**
-     * Permissions - IPermissionBasic
-     */
+   * Permissions - IPermissionBasic
+   */
   canView(user: UserModel): boolean { return ReferenceDataEntryModel.canView(user); }
   canList(user: UserModel): boolean { return ReferenceDataEntryModel.canList(user); }
   canCreate(user: UserModel): boolean { return ReferenceDataEntryModel.canCreate(user); }
@@ -180,8 +189,8 @@ export class ReferenceDataEntryModel
   canDelete(user: UserModel): boolean { return ReferenceDataEntryModel.canDelete(user); }
 
   /**
-     * Return color code / default color
-     */
+   * Return color code / default color
+   */
   getColorCode(): string {
     return this.colorCode ?
       this.colorCode :

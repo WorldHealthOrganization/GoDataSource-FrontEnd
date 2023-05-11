@@ -26,7 +26,6 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import * as momentOriginal from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
@@ -35,6 +34,8 @@ import { UserModel } from '../../../../core/models/user.model';
 import {
   FollowUpCreateViewModifyComponent
 } from '../follow-up-create-view-modify/follow-up-create-view-modify.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -63,268 +64,7 @@ export class ContactRangeFollowUpsListComponent
   ];
 
   // default table columns
-  defaultTableColumns: IV2Column[] = [
-    {
-      field: 'name',
-      label: 'LNG_ENTITY_FIELD_LABEL_NAME',
-      pinned: IV2ColumnPinned.LEFT,
-      format: {
-        type: 'person.name'
-      },
-      link: (data) => {
-        return data.person.type === EntityType.CASE ?
-          (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
-          (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
-      },
-      filter: {
-        type: V2FilterType.TEXT,
-        textType: V2FilterTextType.STARTS_WITH,
-        search: (column: IV2Column) => {
-          // value
-          const value: string = (column.filter as IV2FilterText).value;
-
-          // remove previous condition
-          const qb: RequestQueryBuilder = this.queryBuilder.addChildQueryBuilder('contact');
-          qb.filter.removePathCondition('or.firstName');
-          qb.filter.removePathCondition('or.lastName');
-          if (value) {
-            // add new condition
-            qb.filter.where({
-              or: [
-                {
-                  firstName: RequestFilterGenerator.textStartWith(
-                    value,
-                    false
-                  )
-                }, {
-                  lastName: RequestFilterGenerator.textStartWith(
-                    value,
-                    false
-                  )
-                }
-              ]
-            });
-          }
-
-          // refresh list
-          this.needsRefreshList();
-        }
-      }
-    }, {
-      field: 'visualId',
-      label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
-      format: {
-        type: 'person.visualId'
-      },
-      link: (data) => {
-        return data.person.type === EntityType.CASE ?
-          (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
-          (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
-      },
-      pinned: IV2ColumnPinned.LEFT,
-      filter: {
-        type: V2FilterType.TEXT,
-        textType: V2FilterTextType.STARTS_WITH,
-        childQueryBuilderKey: 'contact'
-      }
-    }, {
-      field: 'locationId',
-      label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
-      format: {
-        type: 'person.mainAddress.location.name'
-      },
-      link: (data) => {
-        return data.person?.mainAddress?.location?.id && LocationModel.canView(this.authUser) ?
-          `/locations/${data.person.mainAddress.location.id}/view` :
-          undefined;
-      },
-      filter: {
-        type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
-        childQueryBuilderKey: 'contact',
-        address: this._filterAddress,
-        field: 'addresses',
-        fieldIsArray: true
-      }
-    }, {
-      field: 'phoneNumber',
-      label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
-      notVisible: true,
-      format: {
-        type: 'person.mainAddress.phoneNumber'
-      },
-      filter: {
-        type: V2FilterType.ADDRESS_PHONE_NUMBER,
-        childQueryBuilderKey: 'contact',
-        address: this._filterAddress,
-        field: 'addresses',
-        fieldIsArray: true
-      }
-    },
-    {
-      field: 'emailAddress',
-      label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
-      notVisible: true,
-      format: {
-        type: 'person.mainAddress.emailAddress'
-      },
-      filter: {
-        type: V2FilterType.ADDRESS_FIELD,
-        childQueryBuilderKey: 'contact',
-        address: this._filterAddress,
-        addressField: 'emailAddress',
-        field: 'addresses',
-        fieldIsArray: true
-      }
-    },
-    {
-      field: 'addressLine1',
-      label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
-      notVisible: true,
-      format: {
-        type: 'person.mainAddress.addressLine1'
-      },
-      filter: {
-        type: V2FilterType.ADDRESS_FIELD,
-        childQueryBuilderKey: 'contact',
-        address: this._filterAddress,
-        addressField: 'addressLine1',
-        field: 'addresses',
-        fieldIsArray: true
-      }
-    },
-    {
-      field: 'city',
-      label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-      notVisible: true,
-      format: {
-        type: 'person.mainAddress.city'
-      },
-      filter: {
-        type: V2FilterType.ADDRESS_FIELD,
-        childQueryBuilderKey: 'contact',
-        address: this._filterAddress,
-        addressField: 'city',
-        field: 'addresses',
-        fieldIsArray: true
-      }
-    },
-    {
-      field: 'dateOfLastContact',
-      label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-      format: {
-        type: V2ColumnFormat.DATE,
-        field: 'person.dateOfLastContact'
-      },
-      filter: {
-        type: V2FilterType.DATE_RANGE,
-        childQueryBuilderKey: 'contact'
-      }
-    },
-    {
-      field: 'followUp.endDate',
-      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP',
-      format: {
-        type: V2ColumnFormat.DATE,
-        field: 'person.followUp.endDate'
-      },
-      filter: {
-        type: V2FilterType.DATE_RANGE,
-        childQueryBuilderKey: 'contact'
-      }
-    },
-    {
-      field: 'followUpTeamId',
-      label: `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.translateService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM').toLowerCase()}`,
-      format: {
-        type: (data) => {
-          return data.person.followUpTeamId && (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
-            (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId].name :
-            '';
-        }
-      },
-      link: (data) => {
-        return data.person.followUpTeamId &&
-        TeamModel.canView(this.authUser) &&
-        (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
-          `/teams/${data.person.followUpTeamId}/view` :
-          undefined;
-      },
-      filter: {
-        type: V2FilterType.MULTIPLE_SELECT,
-        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
-        childQueryBuilderKey: 'contact',
-        includeNoValue: true
-      }
-    }, {
-      field: 'type',
-      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
-      notVisible: true,
-      format: {
-        type: (data) => data.person?.type ?
-          this.translateService.instant(data.person.type) :
-          ''
-      },
-      filter: {
-        type: V2FilterType.MULTIPLE_SELECT,
-        childQueryBuilderKey: 'contact',
-        options: this._personTypeOptions
-      }
-    },
-    {
-      field: 'occupation',
-      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_OCCUPATION',
-      notVisible: true,
-      format: {
-        type: (data) => data.person?.occupation ?
-          this.translateService.instant(data.person.occupation) :
-          ''
-      },
-      filter: {
-        type: V2FilterType.MULTIPLE_SELECT,
-        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        childQueryBuilderKey: 'contact'
-      }
-    },
-    {
-      field: 'riskLevel',
-      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_RISK',
-      notVisible: true,
-      format: {
-        type: (data) => data.person?.riskLevel ?
-          this.translateService.instant(data.person.riskLevel) :
-          ''
-      },
-      filter: {
-        type: V2FilterType.MULTIPLE_SELECT,
-        options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        childQueryBuilderKey: 'contact'
-      }
-    },
-    {
-      field: 'responsibleUserId',
-      label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-      notVisible: true,
-      format: {
-        type: (item) => item.person?.responsibleUserId && (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[item.person?.responsibleUserId] ?
-          (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[item.person?.responsibleUserId].name :
-          ''
-      },
-      filter: {
-        type: V2FilterType.MULTIPLE_SELECT,
-        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-        childQueryBuilderKey: 'contact',
-        includeNoValue: true
-      },
-      exclude: (): boolean => {
-        return !UserModel.canListForFilters(this.authUser);
-      },
-      link: (data) => {
-        return data.person?.responsibleUserId && UserModel.canView(this.authUser) ?
-          `/users/${ data.person?.responsibleUserId }/view` :
-          undefined;
-      }
-    }
-  ];
+  defaultTableColumns: IV2Column[];
 
   /**
    * Constructor
@@ -336,9 +76,16 @@ export class ContactRangeFollowUpsListComponent
     private location: Location,
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service,
-    private translateService: TranslateService
+    private i18nService: I18nService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
-    super(listHelperService);
+    // parent
+    super(
+      listHelperService, {
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
+    );
 
     // additional information
     this.suffixLegends = [{
@@ -381,7 +128,278 @@ export class ContactRangeFollowUpsListComponent
   /**
    * Initialize side table columns
    */
-  protected initializeTableColumns(): void {}
+  protected initializeTableColumns(): void {
+    this.defaultTableColumns = [
+      {
+        field: 'name',
+        label: 'LNG_ENTITY_FIELD_LABEL_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        format: {
+          type: 'person.name'
+        },
+        link: (data) => {
+          return data.person.type === EntityType.CASE ?
+            (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
+            (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+        },
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH,
+          search: (column: IV2Column) => {
+            // value
+            const value: string = (column.filter as IV2FilterText).value;
+
+            // remove previous condition
+            const qb: RequestQueryBuilder = this.queryBuilder.addChildQueryBuilder('contact');
+            qb.filter.removePathCondition('or.firstName');
+            qb.filter.removePathCondition('or.lastName');
+            if (value) {
+              // add new condition
+              qb.filter.where({
+                or: [
+                  {
+                    firstName: RequestFilterGenerator.textStartWith(
+                      value,
+                      false
+                    )
+                  }, {
+                    lastName: RequestFilterGenerator.textStartWith(
+                      value,
+                      false
+                    )
+                  }
+                ]
+              });
+            }
+
+            // refresh list
+            this.needsRefreshList();
+          }
+        }
+      }, {
+        field: 'visualId',
+        label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+        format: {
+          type: 'person.visualId'
+        },
+        link: (data) => {
+          return data.person.type === EntityType.CASE ?
+            (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
+            (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+        },
+        pinned: IV2ColumnPinned.LEFT,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH,
+          childQueryBuilderKey: 'contact'
+        }
+      }, {
+        field: 'locationId',
+        label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        format: {
+          type: 'person.mainAddress.location.name'
+        },
+        link: (data) => {
+          return data.person?.mainAddress?.location?.id && LocationModel.canView(this.authUser) ?
+            `/locations/${data.person.mainAddress.location.id}/view` :
+            undefined;
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
+          childQueryBuilderKey: 'contact',
+          address: this._filterAddress,
+          field: 'addresses',
+          fieldIsArray: true
+        }
+      }, {
+        field: 'phoneNumber',
+        label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
+        notVisible: true,
+        format: {
+          type: 'person.mainAddress.phoneNumber'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_PHONE_NUMBER,
+          childQueryBuilderKey: 'contact',
+          address: this._filterAddress,
+          field: 'addresses',
+          fieldIsArray: true
+        }
+      },
+      {
+        field: 'emailAddress',
+        label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        notVisible: true,
+        format: {
+          type: 'person.mainAddress.emailAddress'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          childQueryBuilderKey: 'contact',
+          address: this._filterAddress,
+          addressField: 'emailAddress',
+          field: 'addresses',
+          fieldIsArray: true
+        }
+      },
+      {
+        field: 'addressLine1',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        notVisible: true,
+        format: {
+          type: 'person.mainAddress.addressLine1'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          childQueryBuilderKey: 'contact',
+          address: this._filterAddress,
+          addressField: 'addressLine1',
+          field: 'addresses',
+          fieldIsArray: true
+        }
+      },
+      {
+        field: 'city',
+        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        notVisible: true,
+        format: {
+          type: 'person.mainAddress.city'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          childQueryBuilderKey: 'contact',
+          address: this._filterAddress,
+          addressField: 'city',
+          field: 'addresses',
+          fieldIsArray: true
+        }
+      },
+      {
+        field: 'dateOfLastContact',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        format: {
+          type: V2ColumnFormat.DATE,
+          field: 'person.dateOfLastContact'
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE,
+          childQueryBuilderKey: 'contact'
+        }
+      },
+      {
+        field: 'followUp.endDate',
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP',
+        format: {
+          type: V2ColumnFormat.DATE,
+          field: 'person.followUp.endDate'
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE,
+          childQueryBuilderKey: 'contact'
+        }
+      },
+      {
+        field: 'followUpTeamId',
+        label: `${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.i18nService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM').toLowerCase()}`,
+        format: {
+          type: (data) => {
+            return data.person.followUpTeamId && (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
+              (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId].name :
+              '';
+          }
+        },
+        link: (data) => {
+          return data.person.followUpTeamId &&
+          TeamModel.canView(this.authUser) &&
+          (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
+            `/teams/${data.person.followUpTeamId}/view` :
+            undefined;
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+          childQueryBuilderKey: 'contact',
+          includeNoValue: true
+        }
+      }, {
+        field: 'type',
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
+        notVisible: true,
+        format: {
+          type: (data) => data.person?.type ?
+            this.i18nService.instant(data.person.type) :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          childQueryBuilderKey: 'contact',
+          options: this._personTypeOptions
+        }
+      },
+      {
+        field: 'occupation',
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_OCCUPATION',
+        notVisible: true,
+        format: {
+          type: (data) => data.person?.occupation ?
+            this.i18nService.instant(data.person.occupation) :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
+          childQueryBuilderKey: 'contact'
+        }
+      },
+      {
+        field: 'riskLevel',
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_RISK',
+        notVisible: true,
+        format: {
+          type: (data) => data.person?.riskLevel ?
+            this.i18nService.instant(data.person.riskLevel) :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
+          childQueryBuilderKey: 'contact'
+        }
+      },
+      {
+        field: 'responsibleUserId',
+        label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        notVisible: true,
+        format: {
+          type: (item) => item.person?.responsibleUserId && (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[item.person?.responsibleUserId] ?
+            (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[item.person?.responsibleUserId].name :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          childQueryBuilderKey: 'contact',
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canListForFilters(this.authUser);
+        },
+        link: (data) => {
+          return data.person?.responsibleUserId && UserModel.canView(this.authUser) ?
+            `/users/${ data.person?.responsibleUserId }/view` :
+            undefined;
+        }
+      }
+    ];
+  }
 
   /**
    * Initialize process data
@@ -404,7 +422,7 @@ export class ContactRangeFollowUpsListComponent
    */
   protected initializeTableAdvancedFilters(): void {
     // data
-    const personLabel: string = `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')}`;
+    const personLabel: string = `${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')}`;
 
     // advanced filters
     this.advancedFilters = [
@@ -499,7 +517,11 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'occupation',
         childQueryBuilderKey: 'contact',
-        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        options: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_OCCUPATION',
         relationshipLabel: personLabel
       },
@@ -507,7 +529,11 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'riskLevel',
         childQueryBuilderKey: 'contact',
-        options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        options: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_RISK',
         relationshipLabel: personLabel
       },
@@ -614,7 +640,7 @@ export class ContactRangeFollowUpsListComponent
                   url: `outbreaks/${this.selectedOutbreak.id}/contacts/range-list/export`,
                   async: false,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.translateService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
                   allow: {
                     types: [
                       ExportDataExtension.PDF

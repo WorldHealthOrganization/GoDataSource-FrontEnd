@@ -13,9 +13,9 @@ import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/component
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder/request-filter-generator';
 import { map, takeUntil } from 'rxjs/operators';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { TranslateService } from '@ngx-translate/core';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import * as _ from 'lodash';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-view-history-system-device',
@@ -33,7 +33,7 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
   constructor(
     protected toastV2Service: ToastV2Service,
     protected activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private deviceDataService: DeviceDataService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
@@ -82,7 +82,7 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
             // format status
             this._devicesHistoryPlaceholders.push(
               item.status ?
-                this.translateService.instant(item.status) :
+                this.i18nService.instant(item.status) :
                 ''
             );
 

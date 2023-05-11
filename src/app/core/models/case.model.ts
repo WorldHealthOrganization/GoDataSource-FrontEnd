@@ -31,8 +31,8 @@ import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pai
 import { LocationModel } from './location.model';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { ReferenceDataEntryModel } from './reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
 import { SafeHtml } from '@angular/platform-browser';
+import { I18nService } from '../services/helper/i18n.service';
 
 export class CaseModel
   extends BaseModel
@@ -386,7 +386,7 @@ export class CaseModel
     info: {
       // required
       item: CaseModel,
-      translateService: TranslateService,
+      i18nService: I18nService,
       classification: IResolverV2ResponseModel<ReferenceDataEntryModel>,
       outcome: IResolverV2ResponseModel<ReferenceDataEntryModel>
     }
@@ -402,7 +402,7 @@ export class CaseModel
       forms.push({
         type: IV2ColumnStatusFormType.CIRCLE,
         color: info.classification.map[info.item.classification].getColorCode(),
-        tooltip: info.translateService.instant(info.item.classification)
+        tooltip: info.i18nService.instant(info.item.classification)
       });
     }
 
@@ -414,7 +414,7 @@ export class CaseModel
       forms.push({
         type: IV2ColumnStatusFormType.TRIANGLE,
         color: info.outcome.map[info.item.outcomeId].getColorCode(),
-        tooltip: info.translateService.instant(info.item.outcomeId)
+        tooltip: info.i18nService.instant(info.item.outcomeId)
       });
     }
 
@@ -423,7 +423,7 @@ export class CaseModel
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     }
 

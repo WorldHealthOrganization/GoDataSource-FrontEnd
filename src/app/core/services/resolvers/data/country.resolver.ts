@@ -21,7 +21,7 @@ export class CountryDataResolver implements IMapResolverV2<ReferenceDataEntryMod
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.COUNTRY)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_COUNTRY)
       .pipe(
         map((data) => {
           // construct map

@@ -21,7 +21,7 @@ export class LabNameDataResolver implements IMapResolverV2<ReferenceDataEntryMod
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.LAB_NAME)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_NAME)
       .pipe(
         map((data) => {
           // construct map

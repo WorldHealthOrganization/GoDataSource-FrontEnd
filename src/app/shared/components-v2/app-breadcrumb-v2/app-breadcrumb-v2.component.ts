@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { IV2Breadcrumb } from './models/breadcrumb.model';
 
 /**
@@ -10,7 +10,10 @@ import { IV2Breadcrumb } from './models/breadcrumb.model';
   styleUrls: ['./app-breadcrumb-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppBreadcrumbV2Component {
+export class AppBreadcrumbV2Component implements OnDestroy {
+  // timers
+  private _detectChangesTimer: number;
+
   // breadcrumbs
   private _breadcrumbs: IV2Breadcrumb[];
   @Input() set breadcrumbs(breadcrumbs: IV2Breadcrumb[]) {
@@ -22,8 +25,14 @@ export class AppBreadcrumbV2Component {
       return;
     }
 
+    // stop previous
+    this.stopDetectChangesTimer();
+
     // wait for html to be updated
-    setTimeout(() => {
+    this._detectChangesTimer = setTimeout(() => {
+      // reset
+      this._detectChangesTimer = undefined;
+
       // update ui
       this.detectChanges.emit();
     });
@@ -34,4 +43,21 @@ export class AppBreadcrumbV2Component {
 
   // detect changes
   @Output() detectChanges = new EventEmitter<void>();
+
+  /**
+   * Component destroyed
+   */
+  ngOnDestroy(): void {
+    this.stopDetectChangesTimer();
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopDetectChangesTimer(): void {
+    if (this._detectChangesTimer) {
+      clearTimeout(this._detectChangesTimer);
+      this._detectChangesTimer = undefined;
+    }
+  }
 }

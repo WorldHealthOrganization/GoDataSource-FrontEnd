@@ -18,6 +18,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import * as moment from 'moment';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-create-entity-relationship-bulk',
@@ -69,6 +70,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     private entityDataService: EntityDataService,
     private relationshipDataService: RelationshipDataService,
     protected toastV2Service: ToastV2Service,
+    private referenceDataHelperService: ReferenceDataHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -359,7 +361,11 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
               name: 'exposureTypeId',
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
-              options: this.activatedRoute.snapshot.data.exposureType.options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                this.activatedRoute.snapshot.data.exposureType.options,
+                this._relationship.exposureTypeId
+              ),
               value: {
                 get: () => this._relationship.exposureTypeId,
                 set: (value) => this._relationship.exposureTypeId = value
@@ -370,7 +376,11 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
               name: 'exposureFrequencyId',
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
-              options: this.activatedRoute.snapshot.data.exposureFrequency.options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                this.activatedRoute.snapshot.data.exposureFrequency.options,
+                this._relationship.exposureFrequencyId
+              ),
               value: {
                 get: () => this._relationship.exposureFrequencyId,
                 set: (value) => this._relationship.exposureFrequencyId = value
@@ -381,7 +391,11 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
               name: 'exposureDurationId',
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
-              options: this.activatedRoute.snapshot.data.exposureFrequency.options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                this.activatedRoute.snapshot.data.exposureDuration.options,
+                this._relationship.exposureDurationId
+              ),
               value: {
                 get: () => this._relationship.exposureDurationId,
                 set: (value) => this._relationship.exposureDurationId = value
@@ -392,7 +406,11 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
               name: 'socialRelationshipTypeId',
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
-              options: this.activatedRoute.snapshot.data.context.options,
+              options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                this.selectedOutbreak,
+                this.activatedRoute.snapshot.data.contextOfTransmission.options,
+                this._relationship.socialRelationshipTypeId
+              ),
               value: {
                 get: () => this._relationship.socialRelationshipTypeId,
                 set: (value) => this._relationship.socialRelationshipTypeId = value
