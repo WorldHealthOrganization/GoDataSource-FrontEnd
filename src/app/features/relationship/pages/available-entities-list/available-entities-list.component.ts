@@ -26,6 +26,7 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-available-entities-list',
@@ -51,12 +52,15 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
     protected genericDataService: GenericDataService,
     protected i18nService: I18nService,
     protected locationDataService: LocationDataService,
-    protected entityHelperService: EntityHelperService
+    protected entityHelperService: EntityHelperService,
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
       }
     );
 
@@ -216,7 +220,11 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           includeNoValue: true
         }
       },
@@ -231,7 +239,11 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {

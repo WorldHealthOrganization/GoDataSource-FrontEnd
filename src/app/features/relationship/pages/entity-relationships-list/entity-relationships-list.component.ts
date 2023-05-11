@@ -24,6 +24,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-entity-relationships-list',
@@ -54,12 +55,15 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
     protected toastV2Service: ToastV2Service,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
-    protected entityHelperService: EntityHelperService
+    protected entityHelperService: EntityHelperService,
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
       }
     );
 
@@ -120,10 +124,26 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
       cluster: this.activatedRoute.snapshot.data.cluster,
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
@@ -146,10 +166,26 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
     this.advancedFilters = this.entityHelperService.generateAdvancedFilters({
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
       }
     });
