@@ -15,6 +15,7 @@ export interface ITreeEditorDataCategoryItem {
   // required
   id: string;
   label: string;
+  order: number;
 
   // optional
   disabled?: boolean;
