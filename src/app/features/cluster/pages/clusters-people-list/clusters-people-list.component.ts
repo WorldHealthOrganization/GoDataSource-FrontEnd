@@ -27,6 +27,7 @@ import { of } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-clusters-people-list',
@@ -45,10 +46,16 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
     private clusterDataService: ClusterDataService,
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
-    private locationDataService: LocationDataService
+    private locationDataService: LocationDataService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
-    super(listHelperService);
+    super(
+      listHelperService, {
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
+    );
 
     // disable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
@@ -182,7 +189,11 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           includeNoValue: true
         }
       },

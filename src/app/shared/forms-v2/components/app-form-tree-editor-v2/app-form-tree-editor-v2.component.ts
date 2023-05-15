@@ -297,8 +297,26 @@ export class AppFormTreeEditorV2Component
       }
 
       // sort
-      category.children.sort((i1, i2): number => {
-        return (i1.label ? this.i18nService.instant(i1.label) : '').localeCompare(i2.label ? this.i18nService.instant(i2.label) : '');
+      category.children.sort((item1, item2): number => {
+        // if same order, compare labels
+        if (item1.order === item2.order) {
+          return (item1.label ? this.i18nService.instant(item1.label) : '').localeCompare(item2.label ? this.i18nService.instant(item2.label) : '');
+        }
+
+        // format order
+        let order1: number = Number.MAX_SAFE_INTEGER;
+        try {
+          order1 = typeof item1.order === 'number' ? item1.order : parseInt(item1.order, 10);
+          order1 = isNaN(order1) ? Number.MAX_SAFE_INTEGER : order1;
+        } catch (e) {}
+        let order2: number = Number.MAX_SAFE_INTEGER;
+        try {
+          order2 = typeof item2.order === 'number' ? item2.order : parseInt(item2.order, 10);
+          order2 = isNaN(order2) ? Number.MAX_SAFE_INTEGER : order2;
+        } catch (e) {}
+
+        // compare order
+        return order1 - order2;
       });
     });
   }

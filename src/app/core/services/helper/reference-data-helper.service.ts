@@ -47,6 +47,7 @@ export class ReferenceDataHelperService {
           return {
             id: entry.id,
             label: entry.value,
+            order: entry.order,
             disabled: !entry.active,
             colorCode: entry.colorCode,
             isSystemWide: !!entry.isSystemWide,

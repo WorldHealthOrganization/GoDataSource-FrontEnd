@@ -993,6 +993,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                       {
                         id: item.id,
                         label: item.value,
+                        order: item.order,
                         disabled: !item.active,
                         colorCode: item.colorCode,
                         isSystemWide: !!item.isSystemWide,
