@@ -2,14 +2,10 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, throwError } from 'rxjs';
-import {
-  catchError,
-  switchMap,
-  takeUntil
-} from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { BackupModel } from '../../../../core/models/backup.model';
-import { Constants } from '../../../../core/models/constants';
+import { Constants, RestoreStatusStep } from '../../../../core/models/constants';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { SystemBackupDataService } from '../../../../core/services/data/system-backup.data.service';
@@ -19,9 +15,14 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import {
+  IV2BottomDialogConfigButtonType
+} from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import {
+  IV2ColumnPinned,
+  V2ColumnFormat
+} from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import {
   IV2SideDialogConfigButtonType,
@@ -36,11 +37,14 @@ import {
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
-import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import {
+  IV2LoadingDialogHandler
+} from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
+import { RestoreLogDataService } from '../../../../core/services/data/restore-log.data.service';
 
 @Component({
   selector: 'app-backups',
@@ -65,7 +69,8 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
     private formHelperService: FormHelperService,
-    private referenceDataDataService: ReferenceDataDataService
+    private referenceDataDataService: ReferenceDataDataService,
+    private restoreLogDataService: RestoreLogDataService
   ) {
     // parent
     super(listHelperService);
@@ -619,17 +624,12 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   * Restore system data to a previous state from a data backup
   */
   restoreBackup(item: BackupModel) {
-    // restore backup handler
-    const restoreBackupNow = (loading: IV2LoadingDialogHandler) => {
-      this._waitForBackupIdToBeReady = undefined;
-      this.systemBackupDataService
-        .restoreBackup(item.id)
+    // finished restoring backup
+    const finishedRestoreBackupNow = (loading: IV2LoadingDialogHandler) => {
+      // reload all translations
+      this.i18nService
+        .loadUserLanguage(true)
         .pipe(
-          switchMap(() => {
-            // reload all translations
-            return this.i18nService
-              .loadUserLanguage(true);
-          }),
           catchError((err) => {
             // hide loading
             loading.close();
@@ -655,6 +655,149 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
 
           // refresh page
           this.needsRefreshList(true);
+        });
+    };
+
+    // restore backup handler
+    const restoreBackupNow = (loading: IV2LoadingDialogHandler) => {
+      this._waitForBackupIdToBeReady = undefined;
+      this.systemBackupDataService
+        .restoreBackup(item.id)
+        .pipe(
+          catchError((err) => {
+            // hide loading
+            loading.close();
+
+            // error
+            this.toastV2Service.error(err);
+            return throwError(err);
+          })
+        )
+        .subscribe((response) => {
+          const checkStatusPeriodically = () => {
+            this.restoreLogDataService
+              .getRestoreLog(response.restoreLogId)
+              .pipe(
+                catchError((err) => {
+                  // hide loading
+                  loading.close();
+
+                  // error
+                  this.toastV2Service.error(err);
+                  return throwError(err);
+                })
+              )
+              .subscribe((restoreLogModel) => {
+                // check if we still need to wait for data to be processed
+                if (restoreLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.IN_PROGRESS.value) {
+                  // update progress
+                  switch (restoreLogModel.statusStep) {
+                    case RestoreStatusStep.LNG_STATUS_STEP_PREPARING_RESTORE:
+                      // show message
+                      loading.message({
+                        message: 'LNG_PAGE_SYSTEM_BACKUPS_RESTORE_PREPARING'
+                      });
+
+                      // finished
+                      break;
+
+                    case RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING:
+                      // show message
+                      loading.message({
+                        message: 'LNG_PAGE_SYSTEM_BACKUPS_RESTORE_UNZIPPING'
+                      });
+
+                      // finished
+                      break;
+
+                    case RestoreStatusStep.LNG_STATUS_STEP_DECRYPTING:
+                      // show message
+                      loading.message({
+                        message: 'LNG_PAGE_SYSTEM_BACKUPS_RESTORE_DECRYPTING',
+                        messageData: {
+                          no: restoreLogModel.processedNo ?
+                            restoreLogModel.processedNo.toLocaleString('en') :
+                            '0',
+                          total: restoreLogModel.totalNo ?
+                            restoreLogModel.totalNo.toLocaleString('en') :
+                            '0'
+                        }
+                      });
+
+                      // finished
+                      break;
+
+                    case RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING_COLLECTIONS:
+                      // show message
+                      loading.message({
+                        message: 'LNG_PAGE_SYSTEM_BACKUPS_RESTORE_UNZIPPING_COLLECTIONS',
+                        messageData: {
+                          no: restoreLogModel.processedNo ?
+                            restoreLogModel.processedNo.toLocaleString('en') :
+                            '0',
+                          total: restoreLogModel.totalNo ?
+                            restoreLogModel.totalNo.toLocaleString('en') :
+                            '0'
+                        }
+                      });
+
+                      // finished
+                      break;
+
+                    case RestoreStatusStep.LNG_STATUS_STEP_RESTORING:
+                      // show message
+                      loading.message({
+                        message: 'LNG_PAGE_SYSTEM_BACKUPS_RESTORE_RESTORING',
+                        messageData: {
+                          no: restoreLogModel.processedNo ?
+                            restoreLogModel.processedNo.toLocaleString('en') :
+                            '0',
+                          total: restoreLogModel.totalNo ?
+                            restoreLogModel.totalNo.toLocaleString('en') :
+                            '0'
+                        }
+                      });
+
+                      // finished
+                      break;
+
+                    case RestoreStatusStep.LNG_STATUS_STEP_MIGRATING_DATABASE:
+                      // show message
+                      loading.message({
+                        message: 'LNG_PAGE_SYSTEM_BACKUPS_RESTORE_MIGRATING'
+                      });
+
+                      // finished
+                      break;
+                  }
+
+                  // wait
+                  setTimeout(() => {
+                    checkStatusPeriodically();
+                  }, 3000);
+
+                  // finished
+                  return;
+                }
+
+                // finished everything with success ?
+                if (restoreLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.SUCCESS.value) {
+                  finishedRestoreBackupNow(loading);
+                }
+
+                // process errors
+                if (restoreLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value) {
+                  // show error
+                  this.toastV2Service.error('LNG_PAGE_SYSTEM_BACKUPS_RESTORE_FAILED_ERROR');
+
+                  // hide loading
+                  loading.close();
+                }
+              });
+          };
+
+          // update status periodically
+          checkStatusPeriodically();
         });
     };
 

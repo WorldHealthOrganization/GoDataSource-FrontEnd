@@ -81,11 +81,18 @@ export class SystemBackupDataService {
   }
 
   /**
-     * Restore backup
-     * @param backupId
-     */
-  restoreBackup(backupId: string): Observable<any> {
-    return this.http.post(`backups/${backupId}/restore`, {});
+   * Restore backup
+   */
+  restoreBackup(backupId: string): Observable<{
+    restoreLogId: string
+  }> {
+    return this.http.post<{
+      restoreLogId: string
+    }>(
+      `backups/${backupId}/restore`, {
+        asynchronous: true
+      }
+    );
   }
 }
 
