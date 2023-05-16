@@ -377,8 +377,8 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
           'create-bulk'
         ],
         linkQueryParams: () => ({
-          selectedSourceIds: JSON.stringify([this._entity.id]),
-          selectedTargetIds: JSON.stringify(this._selectedRecords)
+          selectedSourceIds: JSON.stringify(this._selectedRecords),
+          selectedTargetIds: JSON.stringify([this._entity.id])
         })
       },
       disable: () => {

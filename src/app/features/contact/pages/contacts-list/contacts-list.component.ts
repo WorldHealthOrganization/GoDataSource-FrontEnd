@@ -408,7 +408,7 @@ export class ContactsListComponent
                                   get: () => 'LNG_COMMON_LABEL_CONVERT',
                                   data: () => ({
                                     name: item.name,
-                                    type: this.i18nService.instant(EntityType.CONTACT)
+                                    type: this.i18nService.instant(EntityType.CASE)
                                   })
                                 },
                                 message: {

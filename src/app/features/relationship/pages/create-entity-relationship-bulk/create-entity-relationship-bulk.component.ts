@@ -21,6 +21,7 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 
 @Component({
   selector: 'app-create-entity-relationship-bulk',
@@ -73,6 +74,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     private entityDataService: EntityDataService,
     private relationshipDataService: RelationshipDataService,
     private referenceDataHelperService: ReferenceDataHelperService,
+    private contactDataService: ContactDataService,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
     private dialogV2Service: DialogV2Service,
     protected toastV2Service: ToastV2Service,
@@ -195,7 +197,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
           // convert the entity
           const convertSubscriber = this.entityType === EntityType.CONTACT_OF_CONTACT ?
             this.contactsOfContactsDataService.convertContactOfContactToContact(this.selectedOutbreak.id, this.entityId) :
-            this.contactsOfContactsDataService.convertContactOfContactToContact(this.selectedOutbreak.id, this.entityId);
+            this.contactDataService.convertContactToContactOfContact(this.selectedOutbreak.id, this.entityId);
           convertSubscriber
             .pipe(
               catchError((err) => {
@@ -271,7 +273,10 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
       // which are sources and which are targets (based on relationship type) ?
       let relationshipSources = this.selectedSourceIds;
       let relationshipTargets = this.selectedTargetIds;
-      if (this.relationshipType === RelationshipType.EXPOSURE) {
+      if (
+        this.relationshipType === RelationshipType.EXPOSURE &&
+        !this.isAddAndConvert
+      ) {
         relationshipTargets = this.selectedSourceIds;
         relationshipSources = this.selectedTargetIds;
       }
