@@ -180,6 +180,13 @@ export class ContactDataService {
   }
 
   /**
+   * Convert a contact to contact of contact
+   */
+  convertContactToContactOfContact(outbreakId: string, contactId: string): Observable<any> {
+    return this.http.post(`outbreaks/${outbreakId}/contacts/${contactId}/convert-to-contact-of-contact`, {});
+  }
+
+  /**
    * Generate Contact Visual ID
    */
   generateContactVisualID(

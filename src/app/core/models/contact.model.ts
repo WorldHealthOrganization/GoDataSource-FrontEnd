@@ -74,10 +74,14 @@ export class ContactModel
   dateOfLastContact: string;
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
-  dateBecomeContact: string;
-  dateBecomeCase: string;
-  wasCase: boolean;
   visualId: string;
+
+  wasCase: boolean;
+  dateBecomeCase: string | Moment;
+  wasContact: string;
+  dateBecomeContact: string | Moment;
+  wasContactOfContact: boolean;
+  dateBecomeContactOfContact: string | Moment;
 
   numberOfContacts: number;
   numberOfExposures: number;
@@ -200,6 +204,12 @@ export class ContactModel
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateBecomeContact',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT',
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.ADDRESS,
         field: 'addresses',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
@@ -264,6 +274,13 @@ export class ContactModel
         type: V2AdvancedFilterType.SELECT,
         field: 'wasCase',
         label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasContactOfContact',
+        label: 'LNG_CONTACT_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
         options: data.options.yesNo,
         sortable: true
       },
@@ -574,6 +591,7 @@ export class ContactModel
      */
   static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_GENERATE_VISUAL_ID) : false); }
   static canConvertToCase(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_CONVERT_TO_CASE) : false); }
+  static canConvertToContactOfContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_CONVERT_TO_CONTACT_OF_CONTACT) : false); }
   static canExportDailyFollowUpList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_DAILY_FOLLOW_UP_LIST) : false); }
   static canExportDailyFollowUpsForm(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_DAILY_FOLLOW_UP_FORM) : false); }
   static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_DOSSIER) : false); }
@@ -609,8 +627,6 @@ export class ContactModel
     this.occupation = _.get(data, 'occupation');
     this.outbreakId = _.get(data, 'outbreakId');
     this.documents = _.get(data, 'documents', []);
-    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
-    this.wasCase = _.get(data, 'wasCase', false);
 
     this.dob = _.get(data, 'dob');
     this.age = new AgeModel(_.get(data, 'age'));
@@ -660,8 +676,14 @@ export class ContactModel
     this.dateOfReporting = _.get(data, 'dateOfReporting');
     this.dateOfLastContact = _.get(data, 'dateOfLastContact');
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
-    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
     this.visualId = _.get(data, 'visualId', '');
+
+    this.wasCase = _.get(data, 'wasCase', false);
+    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
+    this.wasContact = _.get(data, 'wasContact', false);
+    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+    this.wasContactOfContact = _.get(data, 'wasContactOfContact', false);
+    this.dateBecomeContactOfContact = _.get(data, 'dateBecomeContactOfContact');
 
     this.followUpTeamId = _.get(data, 'followUpTeamId');
 
@@ -761,6 +783,7 @@ export class ContactModel
      */
   canGenerateVisualId(user: UserModel): boolean { return ContactModel.canGenerateVisualId(user); }
   canConvertToCase(user: UserModel): boolean { return ContactModel.canConvertToCase(user); }
+  canConvertToContactOfContact(user: UserModel): boolean { return ContactModel.canConvertToContactOfContact(user); }
   canExportDailyFollowUpList(user: UserModel): boolean { return ContactModel.canExportDailyFollowUpList(user); }
   canExportDailyFollowUpsForm(user: UserModel): boolean { return ContactModel.canExportDailyFollowUpsForm(user); }
   canExportDossier(user: UserModel): boolean { return ContactModel.canExportDossier(user); }

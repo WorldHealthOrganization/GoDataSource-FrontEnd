@@ -29,6 +29,7 @@ import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/compon
 import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from './reference-data.model';
 import { I18nService } from '../services/helper/i18n.service';
+import { IAnswerData } from './question.model';
 
 export class ContactOfContactModel
   extends BaseModel
@@ -57,9 +58,22 @@ export class ContactOfContactModel
   dateOfLastContact: string;
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
-  dateBecomeContact: string;
   visualId: string;
+  wasCase: boolean;
+  dateBecomeCase: string | Moment;
+  wasContact: boolean;
+  dateBecomeContact: string | Moment;
+  wasContactOfContact: boolean;
+  dateBecomeContactOfContact: string | Moment;
 
+  questionnaireAnswersCase: {
+    [variable: string]: IAnswerData[];
+  };
+  questionnaireAnswersContact: {
+    [variable: string]: IAnswerData[];
+  };
+
+  numberOfContacts: number;
   numberOfExposures: number;
 
   dob: string | Moment;
@@ -86,7 +100,8 @@ export class ContactOfContactModel
     authUser: UserModel,
     options: {
       occupation: ILabelValuePairModel[],
-      user: ILabelValuePairModel[]
+      user: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -157,6 +172,26 @@ export class ContactOfContactModel
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasCase',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasContact',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfContacts',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
         sortable: true
       },
       {
@@ -263,7 +298,7 @@ export class ContactOfContactModel
   /**
      * Static Permissions - IPermissionRelatedRelationship
      */
-  static canListRelationshipContacts(): boolean { return false; }
+  static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_RELATIONSHIP_CONTACTS) : false); }
   static canViewRelationshipContacts(): boolean { return false; }
   static canCreateRelationshipContacts(): boolean { return false; }
   static canModifyRelationshipContacts(): boolean { return false; }
@@ -297,6 +332,7 @@ export class ContactOfContactModel
      */
   static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_GENERATE_VISUAL_ID) : false); }
   static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_DOSSIER) : false); }
+  static canConvertToContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT) : false); }
 
   /**
      * Constructor
@@ -343,6 +379,7 @@ export class ContactOfContactModel
       }
     );
 
+    this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
 
     // vaccines received
@@ -357,8 +394,14 @@ export class ContactOfContactModel
     this.dateOfReporting = _.get(data, 'dateOfReporting');
     this.dateOfLastContact = _.get(data, 'dateOfLastContact');
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
-    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
     this.visualId = _.get(data, 'visualId', '');
+
+    this.wasCase = _.get(data, 'wasCase');
+    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
+    this.wasContact = _.get(data, 'wasContact');
+    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+    this.wasContactOfContact = _.get(data, 'wasContactOfContact');
+    this.dateBecomeContactOfContact = _.get(data, 'dateBecomeContactOfContact');
 
     this.inconsistencies = _.get(data, 'inconsistencies', []);
     _.each(this.inconsistencies, (inconsistency, index) => {
@@ -414,7 +457,7 @@ export class ContactOfContactModel
   /**
      * Permissions - IPermissionRelatedRelationship
      */
-  canListRelationshipContacts(): boolean { return ContactOfContactModel.canListRelationshipContacts(); }
+  canListRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canListRelationshipContacts(user); }
   canViewRelationshipContacts(): boolean { return ContactOfContactModel.canViewRelationshipContacts(); }
   canCreateRelationshipContacts(): boolean { return ContactOfContactModel.canCreateRelationshipContacts(); }
   canModifyRelationshipContacts(): boolean { return ContactOfContactModel.canModifyRelationshipContacts(); }
@@ -448,6 +491,7 @@ export class ContactOfContactModel
      */
   canGenerateVisualId(user: UserModel): boolean { return ContactOfContactModel.canGenerateVisualId(user); }
   canExportDossier(user: UserModel): boolean { return ContactOfContactModel.canExportDossier(user); }
+  canConvertToContact(user: UserModel): boolean { return ContactOfContactModel.canConvertToContact(user); }
 
   /**
    * Contact Of Contact Name

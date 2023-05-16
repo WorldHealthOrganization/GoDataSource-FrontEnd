@@ -234,6 +234,7 @@ export enum PERMISSION {
   CONTACT_EXPORT_MOVEMENT_MAP = 'contact_export_movement_map',
   CONTACT_VIEW_CHRONOLOGY_CHART = 'contact_view_chronology_chart',
   CONTACT_CONVERT_TO_CASE = 'contact_convert_to_case',
+  CONTACT_CONVERT_TO_CONTACT_OF_CONTACT = 'contact_convert_to_contact_of_contact',
   CONTACT_EXPORT_DAILY_FOLLOW_UP_LIST = 'contact_export_daily_follow_up_list',
   CONTACT_EXPORT_DAILY_FOLLOW_UP_FORM = 'contact_export_daily_follow_up_form',
   CONTACT_EXPORT_DOSSIER = 'contact_export_dossier',
@@ -266,6 +267,7 @@ export enum PERMISSION {
   CONTACT_OF_CONTACT_BULK_CREATE = 'contact_of_contact_bulk_create',
   CONTACT_OF_CONTACT_BULK_MODIFY = 'contact_of_contact_bulk_modify',
   CONTACT_OF_CONTACT_GENERATE_VISUAL_ID = 'contact_of_contact_generate_visual_id',
+  CONTACT_OF_CONTACT_LIST_RELATIONSHIP_CONTACTS = 'contact_of_contact_list_relationship_contacts',
   CONTACT_OF_CONTACT_LIST_RELATIONSHIP_EXPOSURES = 'contact_of_contact_list_relationship_exposures',
   CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_EXPOSURES = 'contact_of_contact_view_relationship_exposures',
   CONTACT_OF_CONTACT_CREATE_RELATIONSHIP_EXPOSURES = 'contact_of_contact_create_relationship_exposures',
@@ -280,6 +282,7 @@ export enum PERMISSION {
   CONTACT_OF_CONTACT_EXPORT_MOVEMENT_MAP = 'contact_of_contact_export_movement_map',
   CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART = 'contact_of_contact_view_chronology_chart',
   CONTACT_OF_CONTACT_EXPORT_DOSSIER = 'contact_of_contact_export_dossier',
+  CONTACT_OF_CONTACT_CONVERT_TO_CONTACT = 'contact_of_contact_convert_to_contact',
 
   // case
   CASE_LIST = 'case_list',

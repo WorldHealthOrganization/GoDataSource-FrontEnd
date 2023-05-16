@@ -225,4 +225,11 @@ export class ContactsOfContactsDataService {
         })
       );
   }
+
+  /**
+   * Convert a contact of contact to contact
+   */
+  convertContactOfContactToContact(outbreakId: string, contactOfContactId: string): Observable<any> {
+    return this.http.post(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContactId}/convert-to-contact`, {});
+  }
 }

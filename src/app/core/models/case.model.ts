@@ -66,7 +66,6 @@ export class CaseModel
   dateOfOnset: string | Moment;
   isDateOfOnsetApproximate: boolean;
   dateOfOutcome: string | Moment;
-  dateBecomeCase: string | Moment;
   safeBurial: boolean;
   dateOfBurial: string | Moment;
   dateRanges: CaseCenterDateRangeModel[];
@@ -88,8 +87,12 @@ export class CaseModel
   investigationStatus: string;
   dateInvestigationCompleted: string | Moment;
   outcomeId: string;
-  dateBecomeContact: string;
+  wasCase: boolean;
+  dateBecomeCase: string | Moment;
   wasContact: boolean;
+  dateBecomeContact: string | Moment;
+  wasContactOfContact: boolean;
+  dateBecomeContactOfContact: string | Moment;
 
   numberOfContacts: number;
   numberOfExposures: number;
@@ -311,6 +314,13 @@ export class CaseModel
         type: V2AdvancedFilterType.SELECT,
         field: 'wasContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasContactOfContact',
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
         options: data.options.yesNo,
         sortable: true
       },
@@ -592,7 +602,6 @@ export class CaseModel
     this.dateOfInfection = _.get(data, 'dateOfInfection');
     this.dateOfOnset = _.get(data, 'dateOfOnset');
     this.dateOfOutcome = _.get(data, 'dateOfOutcome');
-    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
     this.dateOfBurial = _.get(data, 'dateOfBurial');
     this.safeBurial = _.get(data, 'safeBurial');
     this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
@@ -623,8 +632,12 @@ export class CaseModel
     this.questionnaireAnswersContact = _.get(data, 'questionnaireAnswersContact', {});
 
     this.relationships = _.get(data, 'relationships', []);
-    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+    this.wasCase = _.get(data, 'wasCase');
+    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
     this.wasContact = _.get(data, 'wasContact');
+    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+    this.wasContactOfContact = _.get(data, 'wasContactOfContact');
+    this.dateBecomeContactOfContact = _.get(data, 'dateBecomeContactOfContact');
 
     this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
