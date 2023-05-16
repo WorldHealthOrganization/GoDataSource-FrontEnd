@@ -41,6 +41,14 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { Location } from '@angular/common';
+
+export interface IsolatedContact {
+  id: string,
+  firstName: string,
+  middleName: string,
+  lastName: string
+}
 
 @Component({
   selector: 'app-cases-list',
@@ -84,6 +92,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
     { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT', value: 'wasContact' },
     { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase' },
+    { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT', value: 'wasContactOfContact' },
     { label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS', value: 'investigationStatus' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED', value: 'dateInvestigationCompleted' },
     { label: 'LNG_CASE_FIELD_LABEL_OUTCOME_ID', value: 'outcomeId' },
@@ -141,7 +150,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     private entityHelperService: EntityHelperService,
     private redirectService: RedirectService,
     private clusterDataService: ClusterDataService,
-    private referenceDataHelperService: ReferenceDataHelperService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    protected location: Location
   ) {
     super(
       listHelperService, {
@@ -377,12 +387,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                     // show loading
                     const loading = this.dialogV2Service.showLoadingDialog();
 
-                    // convert
+                    // determine if case has exposed contacts
                     this.caseDataService
-                      .convertToContact(
-                        this.selectedOutbreak.id,
-                        item.id
-                      )
+                      .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
                       .pipe(
                         catchError((err) => {
                           // show error
@@ -395,15 +402,97 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                           return throwError(err);
                         })
                       )
-                      .subscribe(() => {
-                        // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+                      .subscribe((exposedContacts: { count: number, contacts: IsolatedContact[] }) => {
+                        // create a convert method
+                        const convertCase = () => {
+                          this.caseDataService
+                            .convertToContact(
+                              this.selectedOutbreak.id,
+                              item.id
+                            )
+                            .pipe(
+                              catchError((err) => {
+                                // show error
+                                this.toastV2Service.error(err);
 
-                        // hide loading
-                        loading.close();
+                                // hide loading
+                                loading.close();
 
-                        // reload data
-                        this.needsRefreshList(true);
+                                // send error down the road
+                                return throwError(err);
+                              })
+                            )
+                            .subscribe(() => {
+                              // success
+                              this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+
+                              // hide loading
+                              loading.close();
+
+                              // reload data
+                              this.needsRefreshList(true);
+
+                            });
+                        };
+
+                        // show isolated contacts ?
+                        if (exposedContacts?.count) {
+                          // get the isolated contacts
+                          const isolatedContacts: string = exposedContacts.contacts
+                            .map((entity) => {
+                              // create contact full name
+                              const fullName = [entity.firstName, entity.middleName, entity.lastName]
+                                .filter(Boolean)
+                                .join(' ');
+
+                              // check rights
+                              if (!ContactModel.canView(this.authUser)) {
+                                return `${fullName} (${this.i18nService.instant(EntityType.CONTACT)})`;
+                              }
+
+                              // create url
+                              const url = `contacts/${entity.id}/view`;
+
+                              // finished
+                              return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${fullName}</span></a>`;
+                            })
+                            .join(', ');
+
+                          // show isolated contacts
+                          this.dialogV2Service.showConfirmDialog({
+                            config: {
+                              title: {
+                                get: () => 'LNG_COMMON_LABEL_CONVERT',
+                                data: () => ({
+                                  name: item.name,
+                                  type: this.i18nService.instant(EntityType.CONTACT)
+                                })
+                              },
+                              message: {
+                                get: () => 'LNG_PAGE_LIST_CASES_ACTION_ISOLATED_CONTACTS',
+                                data: () => ({
+                                  contacts: isolatedContacts
+                                })
+                              }
+                            },
+                            yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
+                          }).subscribe((dialogResponse) => {
+                            // canceled ?
+                            if (dialogResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                              // hide loading
+                              loading.close();
+
+                              // finished
+                              return;
+                            }
+
+                            // convert case
+                            convertCase();
+                          });
+                        } else {
+                          // convert case
+                          convertCase();
+                        }
                       });
                   });
                 }
@@ -1243,6 +1332,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'wasContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'wasContactOfContact',
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -2287,6 +2390,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'burialLocationId',
       'burialPlaceName',
       'wasContact',
+      'wasContactOfContact',
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',

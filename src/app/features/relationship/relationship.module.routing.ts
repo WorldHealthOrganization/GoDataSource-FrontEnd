@@ -87,6 +87,52 @@ const relationshipTypeChildrenRoutes = [
       personType: PersonTypeDataResolver
     }
   },
+  // Add new exposures and convert entity (1): Select people to expose with
+  {
+    path: 'add',
+    component: fromPages.EntityRelationshipsListAddComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.OUTBREAK_VIEW,
+        PERMISSION.RELATIONSHIP_SHARE
+      ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      entity: RelationshipPersonDataResolver,
+      gender: GenderDataResolver,
+      risk: RiskDataResolver,
+      classification: ClassificationDataResolver,
+      personType: PersonTypeDataResolver
+    }
+  },
+  // Add new exposures and convert entity (2): Create relationships form
+  {
+    path: 'add-and-convert/create-bulk',
+    component: fromPages.CreateEntityRelationshipBulkComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.OUTBREAK_VIEW,
+        PERMISSION.RELATIONSHIP_SHARE
+      ],
+      action: CreateViewModifyV2Action.MODIFY,
+      addAndConvert: true
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      certainty: CertaintyLevelDataResolver,
+      exposureType: ExposureTypeDataResolver,
+      exposureFrequency: ExposureFrequencyDataResolver,
+      exposureDuration: ExposureDurationDataResolver,
+      contextOfTransmission: ContextOfTransmissionDataResolver,
+      cluster: ClusterDataResolver
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
   // Share selected relationships (1): Select people to share with
   {
     path: 'share',
