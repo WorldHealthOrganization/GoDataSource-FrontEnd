@@ -399,7 +399,7 @@ export class ContactsListComponent
                               });
                           };
 
-                          // show an warning if there is at least one contact of contact as contact
+                          // show a warning if there is at least one contact of contact as contact
                           if (exposedContacts?.length) {
                             // show isolated contacts
                             this.dialogV2Service.showConfirmDialog({
@@ -412,7 +412,7 @@ export class ContactsListComponent
                                   })
                                 },
                                 message: {
-                                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CONTACT_OF_CONTACT_CONTACTS_WARNING'
+                                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE_CONTACTS_WARNING'
                                 }
                               },
                               yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
@@ -522,7 +522,7 @@ export class ContactsListComponent
                                   get: () => 'LNG_COMMON_LABEL_CONVERT',
                                   data: () => ({
                                     name: item.name,
-                                    type: this.i18nService.instant(EntityType.CONTACT)
+                                    type: this.i18nService.instant(EntityType.CONTACT_OF_CONTACT)
                                   })
                                 },
                                 message: {

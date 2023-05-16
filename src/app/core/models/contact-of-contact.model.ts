@@ -403,6 +403,9 @@ export class ContactOfContactModel
     this.wasContactOfContact = _.get(data, 'wasContactOfContact');
     this.dateBecomeContactOfContact = _.get(data, 'dateBecomeContactOfContact');
 
+    this.questionnaireAnswersCase = _.get(data, 'questionnaireAnswersCase', {});
+    this.questionnaireAnswersContact = _.get(data, 'questionnaireAnswersContact', {});
+
     this.inconsistencies = _.get(data, 'inconsistencies', []);
     _.each(this.inconsistencies, (inconsistency, index) => {
       this.inconsistencies[index] = new InconsistencyModel(inconsistency);
