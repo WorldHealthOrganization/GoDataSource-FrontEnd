@@ -65,6 +65,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_TYPE', value: 'type' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES', value: 'addresses' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
@@ -906,6 +907,34 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         }
       },
       {
+        field: 'numberOfContacts',
+        label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        format: {
+          type: V2ColumnFormat.BUTTON
+        },
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true,
+        cssCellClass: 'gd-cell-button',
+        buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
+        color: 'text',
+        click: (item) => {
+          // if we do not have contacts return
+          if (item.numberOfContacts < 1) {
+            return;
+          }
+
+          // display dialog
+          this.entityHelperService.contacts(this.selectedOutbreak, item);
+        },
+        disabled: (data) =>
+          !RelationshipModel.canList(this.authUser) ||
+          !data.canListRelationshipContacts(this.authUser)
+      },
+      {
         field: 'numberOfExposures',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
         format: {
@@ -1730,6 +1759,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
       'wasCase',
       'wasContact',
       'responsibleUserId',
+      'numberOfContacts',
       'numberOfExposures',
       'deleted',
       'createdBy',
