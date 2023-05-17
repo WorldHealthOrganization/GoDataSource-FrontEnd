@@ -683,6 +683,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
         name: 'caseInvestigationTemplate',
+        outbreak: this.itemData,
         value: {
           get: () => this.itemData.caseInvestigationTemplate,
           set: (value) => {
@@ -707,6 +708,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
         name: 'contactInvestigationTemplate',
+        outbreak: this.itemData,
         value: {
           get: () => this.itemData.contactInvestigationTemplate,
           set: (value) => {
@@ -731,6 +733,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
         name: 'contactFollowUpTemplate',
+        outbreak: this.itemData,
         value: {
           get: () => this.itemData.contactFollowUpTemplate,
           set: (value) => {
@@ -755,6 +758,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
         name: 'labResultsTemplate',
+        outbreak: this.itemData,
         value: {
           get: () => this.itemData.labResultsTemplate,
           set: (value) => {

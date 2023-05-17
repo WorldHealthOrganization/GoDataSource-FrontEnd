@@ -21,6 +21,7 @@ import {
   ITreeEditorDataCategory
 } from '../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 import { OutbreakModel } from '../../models/outbreak.model';
+import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
 
 @Injectable()
 export class ReferenceDataHelperService {
@@ -279,7 +280,7 @@ export class ReferenceDataHelperService {
    * Filter reference data options based on outbreak configurations
    */
   filterPerOutbreakOptions(
-    outbreak: OutbreakModel,
+    outbreak: OutbreakModel | OutbreakTemplateModel,
     options: ILabelValuePairModel[],
     selectedValue: string | string[] | undefined
   ): ILabelValuePairModel[] {

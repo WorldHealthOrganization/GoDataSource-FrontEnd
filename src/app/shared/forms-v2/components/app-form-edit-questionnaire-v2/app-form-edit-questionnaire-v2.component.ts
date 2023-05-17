@@ -25,6 +25,9 @@ import * as _ from 'lodash';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 import { IV2BottomDialogConfigButtonType } from '../../../components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 
 /**
  * Flatten type
@@ -90,6 +93,9 @@ export class AppFormEditQuestionnaireV2Component
   // view only
   @Input() viewOnly: boolean;
 
+  // outbreak
+  @Input() outbreak: OutbreakModel | OutbreakTemplateModel;
+
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
 
@@ -137,7 +143,8 @@ export class AppFormEditQuestionnaireV2Component
     protected changeDetectorRef: ChangeDetectorRef,
     protected dialogV2Service: DialogV2Service,
     protected activatedRoute: ActivatedRoute,
-    protected formHelperService: FormHelperService
+    protected formHelperService: FormHelperService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
@@ -734,7 +741,11 @@ export class AppFormEditQuestionnaireV2Component
           value: modifyQuestion ?
             modifyQuestion.category :
             '',
-          options: (this.activatedRoute.snapshot.data.questionnaireQuestionCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.outbreak,
+            (this.activatedRoute.snapshot.data.questionnaireQuestionCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            modifyQuestion?.category
+          ),
           validators: {
             required: () => true
           }
