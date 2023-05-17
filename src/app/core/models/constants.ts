@@ -479,6 +479,40 @@ export class Constants {
     }
   };
 
+  /**
+   * System sync log status step - backup restore
+   */
+  static SYSTEM_SYNC_LOG_STATUS_STEP_BACKUP_RESTORE = {
+    PREPARING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_PREPARING_RESTORE,
+      value: RestoreStatusStep.LNG_STATUS_STEP_PREPARING_RESTORE
+    },
+    UNZIPPING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING,
+      value: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING
+    },
+    DECRYPTING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_DECRYPTING,
+      value: RestoreStatusStep.LNG_STATUS_STEP_DECRYPTING
+    },
+    UNZIPPING_COLLECTIONS: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING_COLLECTIONS,
+      value: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING_COLLECTIONS
+    },
+    RESTORING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_RESTORING,
+      value: RestoreStatusStep.LNG_STATUS_STEP_RESTORING
+    },
+    MIGRATING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_MIGRATING_DATABASE,
+      value: RestoreStatusStep.LNG_STATUS_STEP_MIGRATING_DATABASE
+    },
+    FINISHED: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_RESTORE_FINISHED,
+      value: RestoreStatusStep.LNG_STATUS_STEP_RESTORE_FINISHED
+    }
+  };
+
   // keep functionality
   static APPLY_LIST_FILTER = ApplyListFilter;
 

@@ -146,6 +146,9 @@ import { ReferenceDataDiseaseSpecificCategoriesResolver } from './resolvers/data
 import { ReferenceDataHelperService } from './helper/reference-data-helper.service';
 import { BulkCacheHelperService } from './helper/bulk-cache-helper.service';
 import { RestoreLogDataService } from './data/restore-log.data.service';
+import {
+  SyncPackageStatusStepBackupRestoreResolver
+} from './resolvers/data/sync-package-status-step-backup-restore.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -230,6 +233,7 @@ export const services: any[] = [
   SyncPackageExportTypeDataResolver,
   SyncPackageModuleDataResolver,
   SyncPackageStatusDataResolver,
+  SyncPackageStatusStepBackupRestoreResolver,
   TeamDataResolver,
   UpstreamServersDataResolver,
   UserDataResolver,

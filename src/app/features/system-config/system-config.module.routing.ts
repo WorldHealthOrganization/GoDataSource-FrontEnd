@@ -16,6 +16,9 @@ import { SyncPackageModuleDataResolver } from '../../core/services/resolvers/dat
 import { SyncPackageExportTypeDataResolver } from '../../core/services/resolvers/data/sync-package-export-type.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UpstreamServersDataResolver } from '../../core/services/resolvers/data/upstream-servers.resolver';
+import {
+  SyncPackageStatusStepBackupRestoreResolver
+} from '../../core/services/resolvers/data/sync-package-status-step-backup-restore.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -44,6 +47,22 @@ const routes: Routes = [
       backupModules: BackupModuleDataResolver,
       backupStatus: BackupStatusDataResolver,
       backupTypes: BackupTypesDataResolver,
+      user: UserDataResolver
+    }
+  },
+  {
+    path: 'backups-restores',
+    component: fromPages.BackupsRestoresComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.BACKUP_RESTORE
+      ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      syncLogsStatus: SyncPackageStatusDataResolver,
+      syncLogsStatusStep: SyncPackageStatusStepBackupRestoreResolver,
       user: UserDataResolver
     }
   },

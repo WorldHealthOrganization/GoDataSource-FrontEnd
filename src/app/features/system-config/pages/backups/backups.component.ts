@@ -351,6 +351,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           BackupModel.canCreate(this.authUser);
       },
       menuOptions: [
+        // settings
         {
           label: {
             get: () => 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_BUTTON'
@@ -365,6 +366,30 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           }
         },
 
+        // restores
+        {
+          label: {
+            get: () => 'LNG_PAGE_SYSTEM_BACKUPS_RESTORE_LIST'
+          },
+          action: {
+            link: () => ['/system-config', 'backups-restores']
+          },
+          visible: (): boolean => {
+            return BackupModel.canRestore(this.authUser);
+          }
+        },
+
+        // divider
+        {
+          visible: (): boolean => {
+            return (
+              BackupModel.canSetAutomaticBackupSettings(this.authUser) ||
+              BackupModel.canRestore(this.authUser)
+            ) && BackupModel.canCreate(this.authUser);
+          }
+        },
+
+        // create backup
         {
           label: {
             get: () => 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_BUTTON'

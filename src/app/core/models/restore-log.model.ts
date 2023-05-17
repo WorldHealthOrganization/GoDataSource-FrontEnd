@@ -3,16 +3,22 @@ import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { IPermissionBasic } from './permission.interface';
 import { RestoreStatusStep } from './constants';
+import { Moment } from 'moment';
+import { BackupModel } from './backup.model';
 
 export class RestoreLogModel
   extends BaseModel
   implements
-        IPermissionBasic {
+    IPermissionBasic {
   id: string;
   status: string;
   statusStep: RestoreStatusStep;
   totalNo: number;
   processedNo: number;
+  actionStartDate: string | Moment;
+  actionCompletionDate: string | Moment;
+  backupId: string;
+  backup: BackupModel;
 
   /**
    * Static Permissions - IPermissionBasic
@@ -35,6 +41,14 @@ export class RestoreLogModel
     this.statusStep = _.get(data, 'statusStep');
     this.totalNo = _.get(data, 'totalNo');
     this.processedNo = _.get(data, 'processedNo');
+    this.actionStartDate = _.get(data, 'actionStartDate');
+    this.actionCompletionDate = _.get(data, 'actionCompletionDate');
+    this.backupId = _.get(data, 'backupId');
+
+    this.backup = _.get(data, 'backup');
+    if (this.backup) {
+      this.backup = new BackupModel(this.backup);
+    }
   }
 
   /**
