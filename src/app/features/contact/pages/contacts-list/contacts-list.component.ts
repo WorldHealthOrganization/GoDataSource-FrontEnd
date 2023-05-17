@@ -2204,6 +2204,12 @@ export class ContactsListComponent
                       checked: false
                     }, {
                       type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CONTACT_OF_CONTACT_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CONTACT_OF_CONTACT_INFORMATION_DESCRIPTION',
+                      name: 'includeContactOfContactFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
                       placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_EXPOSURE_INFORMATION',
                       tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_EXPOSURE_INFORMATION_DESCRIPTION',
                       name: 'includePersonExposureFields',

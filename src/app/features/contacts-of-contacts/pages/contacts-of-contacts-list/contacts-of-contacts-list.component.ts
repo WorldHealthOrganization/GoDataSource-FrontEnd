@@ -1583,6 +1583,18 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   append: [
                     {
                       type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CASE_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
+                      name: 'includeCaseFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CONTACT_OF_CONTACT_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
+                      name: 'includeContactFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
                       placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_EXPOSURE_INFORMATION',
                       tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_EXPOSURE_INFORMATION_DESCRIPTION',
                       name: 'includePersonExposureFields',

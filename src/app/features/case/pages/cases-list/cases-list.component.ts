@@ -2198,6 +2198,13 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                         tooltip: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
                         name: 'includeContactFields',
                         checked: false
+                      },
+                      {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_OF_CONTACT_INFORMATION',
+                        tooltip: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_OF_CONTACT_INFORMATION_DESCRIPTION',
+                        name: 'includeContactOfContactFields',
+                        checked: false
                       }
                     ]
                   }
