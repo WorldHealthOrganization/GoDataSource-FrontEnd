@@ -272,6 +272,7 @@ export class ReferenceDataHelperService {
       item.isSystemWide ||
       !outbreak?.allowedRefDataItems ||
       !outbreak.allowedRefDataItems[item.categoryId] ||
+      Object.keys(outbreak.allowedRefDataItems[item.categoryId]).length < 1 ||
       outbreak.allowedRefDataItems[item.categoryId][item.id]
     );
   }
@@ -314,6 +315,7 @@ export class ReferenceDataHelperService {
       const isAllowed: boolean = item.data.isSystemWide ||
         !outbreak?.allowedRefDataItems ||
         !outbreak.allowedRefDataItems[item.data.categoryId] ||
+        Object.keys(outbreak.allowedRefDataItems[item.data.categoryId]).length < 1 ||
         outbreak.allowedRefDataItems[item.data.categoryId][item.value];
 
       // allowed ?
