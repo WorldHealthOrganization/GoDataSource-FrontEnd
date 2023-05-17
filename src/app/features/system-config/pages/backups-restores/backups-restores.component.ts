@@ -135,6 +135,11 @@ export class BackupsRestoresComponent extends ListComponent<RestoreLogModel> imp
         }
       },
       {
+        field: 'error',
+        label: 'LNG_BACKUP_RESTORE_FIELD_LABEL_ERROR',
+        sortable: true
+      },
+      {
         field: 'backupId',
         label: 'LNG_BACKUP_RESTORE_FIELD_LABEL_BACKUP_ID',
         sortable: true,
