@@ -37,7 +37,8 @@ export class ReferenceDataCategoriesListComponent
   ) {
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
   }

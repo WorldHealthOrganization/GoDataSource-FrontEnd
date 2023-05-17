@@ -38,7 +38,8 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
   ) {
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
 
