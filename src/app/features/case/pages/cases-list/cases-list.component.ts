@@ -387,7 +387,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                     // show loading
                     const loading = this.dialogV2Service.showLoadingDialog();
 
-                    // determine if case has exposed contacts
+                    // determine if case has isolated contacts
                     this.caseDataService
                       .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
                       .pipe(
@@ -402,7 +402,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                           return throwError(err);
                         })
                       )
-                      .subscribe((exposedContacts: { count: number, contacts: IsolatedContact[] }) => {
+                      .subscribe((isolatedContacts: { count: number, contacts: IsolatedContact[] }) => {
                         // create a convert method
                         const convertCase = () => {
                           this.caseDataService
@@ -436,9 +436,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                         };
 
                         // show isolated contacts ?
-                        if (exposedContacts?.count) {
+                        if (isolatedContacts?.count) {
                           // get the isolated contacts
-                          const isolatedContacts: string = exposedContacts.contacts
+                          const contactLinks: string = isolatedContacts.contacts
                             .map((entity) => {
                               // create contact full name
                               const fullName = [entity.firstName, entity.middleName, entity.lastName]
@@ -471,7 +471,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                               message: {
                                 get: () => 'LNG_PAGE_LIST_CASES_ACTION_ISOLATED_CONTACTS',
                                 data: () => ({
-                                  contacts: isolatedContacts
+                                  contacts: contactLinks
                                 })
                               }
                             },
