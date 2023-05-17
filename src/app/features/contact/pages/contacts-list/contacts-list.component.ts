@@ -47,7 +47,6 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 @Component({
   selector: 'app-contacts-list',
@@ -385,11 +384,7 @@ export class ContactsListComponent
                               )
                               .subscribe(() => {
                                 // success
-                                this.toastV2Service.notice(
-                                  'LNG_GENERIC_WARNING_EDIT_COT',
-                                  {},
-                                  AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT
-                                );
+                                this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
 
                                 // hide loading
                                 loading.close();
@@ -580,7 +575,8 @@ export class ContactsListComponent
               visible: (item: ContactModel): boolean => {
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
-                  ContactModel.canConvertToContactOfContact(this.authUser);
+                  ContactModel.canConvertToContactOfContact(this.authUser) &&
+                  this.selectedOutbreak.isContactsOfContactsActive;
               }
             },
 
@@ -590,8 +586,10 @@ export class ContactsListComponent
                 // visible only if at least one of the first two items is visible
                 return !item.deleted &&
                   this.selectedOutbreakIsActive && (
-                  ContactModel.canConvertToCase(this.authUser) ||
-                  ContactModel.canConvertToContactOfContact(this.authUser)
+                  ContactModel.canConvertToCase(this.authUser) || (
+                    ContactModel.canConvertToContactOfContact(this.authUser) &&
+                    this.selectedOutbreak.isContactsOfContactsActive
+                  )
                 );
               }
             },
