@@ -15,7 +15,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ActivatedRoute } from '@angular/router';
 import { UserModel } from '../../../../core/models/user.model';
-import * as moment from 'moment';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-backups-restores',
