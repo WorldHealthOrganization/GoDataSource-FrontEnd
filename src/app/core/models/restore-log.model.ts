@@ -19,6 +19,7 @@ export class RestoreLogModel
   actionCompletionDate: string | Moment;
   backupId: string;
   backup: BackupModel;
+  error: string;
 
   /**
    * Static Permissions - IPermissionBasic
@@ -44,6 +45,7 @@ export class RestoreLogModel
     this.actionStartDate = _.get(data, 'actionStartDate');
     this.actionCompletionDate = _.get(data, 'actionCompletionDate');
     this.backupId = _.get(data, 'backupId');
+    this.error = _.get(data, 'error');
 
     this.backup = _.get(data, 'backup');
     if (this.backup) {

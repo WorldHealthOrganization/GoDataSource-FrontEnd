@@ -231,7 +231,8 @@ export class BackupsRestoresComponent extends ListComponent<RestoreLogModel> imp
       'processedNo',
       'totalNo',
       'createdBy',
-      'backupId'
+      'backupId',
+      'error'
     ];
   }
 
