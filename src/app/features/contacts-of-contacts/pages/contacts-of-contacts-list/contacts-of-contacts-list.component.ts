@@ -1589,7 +1589,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                       checked: false
                     }, {
                       type: V2SideDialogConfigInputType.CHECKBOX,
-                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CONTACT_OF_CONTACT_INFORMATION',
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CONTACT_INFORMATION',
                       tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
                       name: 'includeContactFields',
                       checked: false
