@@ -385,8 +385,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
           'create-bulk'
         ],
         linkQueryParams: () => ({
-          selectedSourceIds: JSON.stringify(this._selectedRecords),
-          selectedTargetIds: JSON.stringify([this._entity.id])
+          selectedSourceIds: JSON.stringify(this._selectedRecords)
         })
       },
       disable: () => {
@@ -460,9 +459,19 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
 
     // get available entities as exposures. note that the entity type is before convert
     // exclude root person
-    const availableTypes: EntityType[] = this._entity.type === EntityType.CONTACT_OF_CONTACT ?
-      [EntityType.EVENT, EntityType.CASE] :
-      [EntityType.CONTACT];
+    let availableTypes: EntityType[];
+    switch (this._entity.type) {
+      case EntityType.CONTACT:
+        // convert contact to contact of contact
+        availableTypes = [EntityType.CONTACT];
+
+        break;
+      case EntityType.CONTACT_OF_CONTACT:
+        // convert contact of contact to contact
+        availableTypes = [EntityType.EVENT, EntityType.CASE];
+
+        break;
+    }
 
     this.queryBuilder.filter.where({
       id: {

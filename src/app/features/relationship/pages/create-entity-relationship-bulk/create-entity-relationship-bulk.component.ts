@@ -93,10 +93,6 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     // disable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
 
-    // get source and target persons from query params
-    this.selectedSourceIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedSourceIds);
-    this.selectedTargetIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
-
     // get addAndConvert flag
     this.isAddAndConvert = this.activatedRoute.snapshot.data.addAndConvert;
 
@@ -106,6 +102,12 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     // get person type and ID from route params
     this.entityType = this.activatedRoute.snapshot.params.entityType;
     this.entityId = this.activatedRoute.snapshot.params.entityId;
+
+    // get source and target persons from query params
+    this.selectedSourceIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedSourceIds);
+    this.selectedTargetIds = this.isAddAndConvert ?
+      [this.entityId] :
+      JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
   }
 
   /**
