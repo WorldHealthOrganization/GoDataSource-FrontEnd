@@ -95,7 +95,7 @@ const relationshipTypeChildrenRoutes = [
     data: {
       permissions: [
         PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.RELATIONSHIP_SHARE
+        PERMISSION.RELATIONSHIP_CREATE
       ]
     },
     resolve: {
@@ -115,7 +115,7 @@ const relationshipTypeChildrenRoutes = [
     data: {
       permissions: [
         PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.RELATIONSHIP_SHARE
+        PERMISSION.RELATIONSHIP_CREATE
       ],
       action: CreateViewModifyV2Action.MODIFY,
       addAndConvert: true
