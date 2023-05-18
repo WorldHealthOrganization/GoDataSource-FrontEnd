@@ -23,6 +23,7 @@ import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-entity-relationships-list-add',
@@ -47,10 +48,14 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
     protected entityHelperService: EntityHelperService,
-    private i18nService: I18nService
+    private i18nService: I18nService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     super(
-      listHelperService
+      listHelperService, {
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
     );
 
     // disable select outbreak
@@ -65,8 +70,8 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
   }
 
   /**
-  * Component destroyed
-  */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
@@ -76,8 +81,8 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
   }
 
   /**
- * Selected outbreak was changed
- */
+   * Selected outbreak was changed
+   */
   selectedOutbreakChanged(): void {
     // initialize pagination
     this.initPaginator();
@@ -200,7 +205,11 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
@@ -209,7 +218,11 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
@@ -323,7 +336,11 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'riskLevel',
         label: 'LNG_ENTITY_FIELD_LABEL_RISK',
-        options: this.activatedRoute.snapshot.data.risk.options,
+        options: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          this.activatedRoute.snapshot.data.risk.options,
+          undefined
+        ),
         sortable: true
       }
     ];
