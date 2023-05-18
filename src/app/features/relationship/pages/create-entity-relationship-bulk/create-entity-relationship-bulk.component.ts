@@ -545,7 +545,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
             'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
           'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE',
         action: {
-          link: [`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }/share`],
+          link: [`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }/` + (this.isAddAndConvert ? 'add' : 'share')],
           linkQueryParams: {
             selectedTargetIds: JSON.stringify(this.selectedTargetIds)
           }

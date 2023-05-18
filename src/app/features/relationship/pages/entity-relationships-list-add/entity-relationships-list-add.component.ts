@@ -432,7 +432,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         {
           label: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE',
           action: {
-            link: [`/relationships/${ this._entity.type }/${ this._entity.id }/exposures }`]
+            link: [`/relationships/${ this._entity.type }/${ this._entity.id }/exposures`]
           }
         },
         {
