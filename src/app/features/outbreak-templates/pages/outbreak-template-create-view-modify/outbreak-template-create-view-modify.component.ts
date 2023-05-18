@@ -1038,6 +1038,9 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         ?.form
         ?.controls
         ?.allowedRefDataItems?.markAsDirty();
+
+      // update ui - required - otherwise data isn't saved if tab not visited...
+      this.createViewModifyComponent.detectChanges();
     });
   }
 }
