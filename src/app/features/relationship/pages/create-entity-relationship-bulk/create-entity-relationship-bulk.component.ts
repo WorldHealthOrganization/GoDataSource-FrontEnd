@@ -540,12 +540,14 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
       },
       {
         label: this.relationshipType === RelationshipType.EXPOSURE ?
-          this.isAddAndConvert ?
-            'LNG_PAGE_LIST_ENTITY_ADD_EXPOSURES_TITLE' :
-            'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
+          (
+            this.isAddAndConvert ?
+              'LNG_PAGE_LIST_ENTITY_ADD_EXPOSURES_TITLE' :
+              'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE'
+          ) :
           'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE',
         action: {
-          link: [`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }/` + (this.isAddAndConvert ? 'add' : 'share')],
+          link: [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/` + (this.isAddAndConvert ? 'add' : 'share')],
           linkQueryParams: {
             selectedTargetIds: JSON.stringify(this.selectedTargetIds)
           }
