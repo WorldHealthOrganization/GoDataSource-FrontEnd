@@ -225,6 +225,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     config?: {
       // optional
       disableFilterCaching?: boolean,
+      disableWaitForSelectedOutbreakToRefreshList?: boolean,
       initializeTableColumnsAfterSelectedOutbreakChanged?: boolean,
       initializeTableAdvancedFiltersAfterSelectedOutbreakChanged?: boolean
     }
@@ -241,7 +242,10 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         triggeredByPageChange?: boolean
       ) => {
         // do we have outbreak - if not, it will be refreshed by that ?
-        if (!this.selectedOutbreak?.id) {
+        if (
+          !config?.disableWaitForSelectedOutbreakToRefreshList &&
+          !this.selectedOutbreak?.id
+        ) {
           return;
         }
 

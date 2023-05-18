@@ -39,7 +39,8 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
   ) {
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
   }

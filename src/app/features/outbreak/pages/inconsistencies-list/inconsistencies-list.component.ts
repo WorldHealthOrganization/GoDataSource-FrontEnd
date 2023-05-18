@@ -41,7 +41,8 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
     // parent
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
 

@@ -34,7 +34,11 @@ export class SavedFiltersComponent extends ListComponent<SavedFilterModel> imple
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**
