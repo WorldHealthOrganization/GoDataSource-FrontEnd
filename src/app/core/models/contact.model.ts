@@ -44,6 +44,13 @@ export interface IFollowUpHistory {
   status: string;
 }
 
+export interface IContactIsolated {
+  id: string,
+  firstName: string,
+  middleName: string,
+  lastName: string
+}
+
 export class ContactModel
   extends BaseModel
   implements

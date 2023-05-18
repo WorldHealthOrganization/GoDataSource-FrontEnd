@@ -15,7 +15,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { ContactModel } from '../../../../core/models/contact.model';
+import { ContactModel, IContactIsolated } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
@@ -42,13 +42,6 @@ import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { Location } from '@angular/common';
-
-export interface IsolatedContact {
-  id: string,
-  firstName: string,
-  middleName: string,
-  lastName: string
-}
 
 @Component({
   selector: 'app-cases-list',
@@ -402,7 +395,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                           return throwError(err);
                         })
                       )
-                      .subscribe((isolatedContacts: { count: number, contacts: IsolatedContact[] }) => {
+                      .subscribe((isolatedContacts: { count: number, contacts: IContactIsolated[] }) => {
                         // create a convert method
                         const convertCase = () => {
                           this.caseDataService

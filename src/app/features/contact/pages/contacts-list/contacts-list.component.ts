@@ -429,7 +429,6 @@ export class ContactsListComponent
                             convertContact();
                           }
                         });
-                      // console.log(exposedContacts);
 
                       // hide loading
                       loading.close();
@@ -508,7 +507,7 @@ export class ContactsListComponent
                           })
                         )
                         .subscribe((exposedContacts: EntityModel[]) => {
-                          // if there is no case/event as exposure, redirect cu add exposures
+                          // if there is no case/event as exposure, redirect to add exposures
                           if (!exposedContacts?.length) {
                             // show isolated contacts
                             this.dialogV2Service.showConfirmDialog({

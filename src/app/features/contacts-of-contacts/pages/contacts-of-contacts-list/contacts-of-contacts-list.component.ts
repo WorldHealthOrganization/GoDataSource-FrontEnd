@@ -348,7 +348,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                           })
                         )
                         .subscribe((exposedContacts: EntityModel[]) => {
-                          // if there is no case/event as exposure, redirect cu add exposures
+                          // if there is no case/event as exposure, redirect to add exposures
                           if (!exposedContacts?.length) {
                             // show isolated contacts
                             this.dialogV2Service.showConfirmDialog({

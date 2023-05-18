@@ -35,11 +35,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
   private _selectedRecords: string[];
 
   // relationship type
-  relationshipType: RelationshipType;
-  // // selected records ids
-  selectedTargetIds: string[] = [];
-  // provide constants to template
-  RelationshipType = RelationshipType;
+  private _relationshipType: RelationshipType;
 
   /**
    * Constructor
@@ -62,12 +58,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
 
     // retrieve entity related data
     this._entity = this.activatedRoute.snapshot.data.entity;
-    this.relationshipType = this.activatedRoute.snapshot.data.relationshipType;
-
-    // get selected records ids
-    if (!_.isEmpty(this.activatedRoute.snapshot.queryParams.selectedTargetIds)) {
-      this.selectedTargetIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
-    }
+    this._relationshipType = this.activatedRoute.snapshot.data.relationshipType;
 
     // clear queryBuilder
     this.clearQueryBuilder();
@@ -397,7 +388,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
    */
   protected initializeBreadcrumbs(): void {
     if (
-      this.relationshipType &&
+      this._relationshipType &&
       this._entity
     ) {
       // set breadcrumbs
