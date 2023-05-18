@@ -268,6 +268,7 @@
 
             <!-- Title & view button -->
             <div
+              *ngIf="!isSmallScreenMode"
               fxFlex fxFlex.lt-md="none" fxLayoutAlign="start center" fxLayoutGap="1.6rem"
               class="gd-create-view-modify-top-title-buttons-title">
 
@@ -276,7 +277,7 @@
                 {{pageTitle | translate:pageTitleData}}
               </span>
 
-              <!-- View button -->
+              <!-- Large screen - View button -->
               <a
                 *ngIf="isModify && tabData.buttons.view && (!tabData.buttons.view.visible || tabData.buttons.view.visible())"
                 type="button"
@@ -320,6 +321,16 @@
                 </ng-template>
 
               </ng-container>
+
+              <!-- Small screen - View button -->
+              <a
+                *ngIf="isSmallScreenMode && isModify && tabData.buttons.view && (!tabData.buttons.view.visible || tabData.buttons.view.visible())"
+                type="button"
+                mat-icon-button
+                [routerLink]="tabData.buttons.view.link.link()"
+                [queryParams]="tabData.buttons.view.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.view.link.queryParams()) : selectedTabParams">
+                <mat-icon>visibility</mat-icon>
+              </a>
 
               <!-- Quick Actions -->
               <ng-container
