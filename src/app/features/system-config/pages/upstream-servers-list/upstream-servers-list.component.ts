@@ -37,7 +37,11 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
     private systemSyncLogDataService: SystemSyncLogDataService,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**

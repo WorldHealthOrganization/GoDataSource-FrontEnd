@@ -41,7 +41,11 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
     private dialogV2Service: DialogV2Service
   ) {
     // parent
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
 
     // map teams by user
     this.userTeamMap = {};

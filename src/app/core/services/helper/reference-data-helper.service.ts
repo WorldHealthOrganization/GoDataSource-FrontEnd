@@ -21,6 +21,7 @@ import {
   ITreeEditorDataCategory
 } from '../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 import { OutbreakModel } from '../../models/outbreak.model';
+import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
 
 @Injectable()
 export class ReferenceDataHelperService {
@@ -271,6 +272,7 @@ export class ReferenceDataHelperService {
       item.isSystemWide ||
       !outbreak?.allowedRefDataItems ||
       !outbreak.allowedRefDataItems[item.categoryId] ||
+      Object.keys(outbreak.allowedRefDataItems[item.categoryId]).length < 1 ||
       outbreak.allowedRefDataItems[item.categoryId][item.id]
     );
   }
@@ -279,7 +281,7 @@ export class ReferenceDataHelperService {
    * Filter reference data options based on outbreak configurations
    */
   filterPerOutbreakOptions(
-    outbreak: OutbreakModel,
+    outbreak: OutbreakModel | OutbreakTemplateModel,
     options: ILabelValuePairModel[],
     selectedValue: string | string[] | undefined
   ): ILabelValuePairModel[] {
@@ -313,6 +315,7 @@ export class ReferenceDataHelperService {
       const isAllowed: boolean = item.data.isSystemWide ||
         !outbreak?.allowedRefDataItems ||
         !outbreak.allowedRefDataItems[item.data.categoryId] ||
+        Object.keys(outbreak.allowedRefDataItems[item.data.categoryId]).length < 1 ||
         outbreak.allowedRefDataItems[item.data.categoryId][item.value];
 
       // allowed ?

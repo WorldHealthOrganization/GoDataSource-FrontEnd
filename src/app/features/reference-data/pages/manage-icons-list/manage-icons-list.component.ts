@@ -34,7 +34,11 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
 
     // retrieve data
     this._category = this.activatedRoute.snapshot.data.category;

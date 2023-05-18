@@ -25,6 +25,8 @@ import {
   ITreeEditorDataCategoryItem, ITreeEditorDataValue
 } from '../../../forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 
 /**
  * Input type
@@ -700,6 +702,7 @@ interface ICreateViewModifyV2TabTableEditQuestionnaire {
   type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE;
   name: string;
   value: ICreateViewModifyV2TabInputValue<QuestionModel[]>;
+  outbreak: OutbreakModel | OutbreakTemplateModel;
 }
 
 /**

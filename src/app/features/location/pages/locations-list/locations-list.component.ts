@@ -61,7 +61,8 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
   ) {
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
 

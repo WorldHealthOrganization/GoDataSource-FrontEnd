@@ -36,7 +36,8 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
   ) {
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
   }

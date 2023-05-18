@@ -34,7 +34,8 @@ export class BackupsRestoresComponent extends ListComponent<RestoreLogModel> imp
     // parent
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
   }

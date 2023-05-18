@@ -73,7 +73,11 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
     private restoreLogDataService: RestoreLogDataService
   ) {
     // parent
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**

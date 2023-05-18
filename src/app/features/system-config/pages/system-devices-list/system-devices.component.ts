@@ -28,7 +28,11 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**

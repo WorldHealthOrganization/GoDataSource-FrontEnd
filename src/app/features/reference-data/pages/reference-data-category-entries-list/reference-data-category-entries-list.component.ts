@@ -44,7 +44,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
   ) {
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
 

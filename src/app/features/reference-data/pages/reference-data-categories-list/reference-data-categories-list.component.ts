@@ -1,9 +1,10 @@
 import { Component, OnDestroy } from '@angular/core';
-import { takeUntil, tap } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IconModel } from '../../../../core/models/icon.model';
 import {
+  ReferenceDataCategory,
   ReferenceDataCategoryModel,
   ReferenceDataEntryModel
 } from '../../../../core/models/reference-data.model';
@@ -25,6 +26,15 @@ import { ActivatedRoute } from '@angular/router';
 export class ReferenceDataCategoriesListComponent
   extends ListComponent<ReferenceDataCategoryModel>
   implements OnDestroy {
+
+  // hidden categories
+  private _hiddenCategories: {
+    [category: string]: true
+  } = {
+      [ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE]: true,
+      [ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM]: true
+    };
+
   /**
    * Constructor
    */
@@ -37,7 +47,8 @@ export class ReferenceDataCategoriesListComponent
   ) {
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
   }
@@ -280,12 +291,18 @@ export class ReferenceDataCategoriesListComponent
     this.records$ = this.referenceDataDataService
       .getReferenceData()
       .pipe(
-        // update page count
-        tap((entities) => {
+        map((entities) => {
+          // shallow clone
+          const filteredEntities = entities.filter((entity) => !this._hiddenCategories[entity.id]);
+
+          // update page count
           this.pageCount = {
-            count: entities.length,
+            count: filteredEntities.length,
             hasMore: false
           };
+
+          // finished
+          return filteredEntities;
         }),
 
         // should be the last pipe

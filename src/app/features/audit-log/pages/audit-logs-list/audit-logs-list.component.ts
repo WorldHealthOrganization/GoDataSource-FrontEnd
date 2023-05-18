@@ -61,7 +61,11 @@ export class AuditLogsListComponent
     private i18nService: I18nService,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**

@@ -32,7 +32,8 @@ export class HelpCategoriesListComponent extends ListComponent<HelpCategoryModel
   ) {
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
   }
