@@ -112,6 +112,15 @@ export class EntityHelperService {
         label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
         link: '/contacts-of-contacts',
         can: {
+          contacts: {
+            view: ContactOfContactModel.canViewRelationshipContacts,
+            create: ContactOfContactModel.canCreateRelationshipContacts,
+            modify: ContactOfContactModel.canModifyRelationshipContacts,
+            delete: ContactOfContactModel.canDeleteRelationshipContacts,
+            share: ContactOfContactModel.canShareRelationship,
+            changeSource: ContactOfContactModel.canChangeSource,
+            bulkDelete: ContactOfContactModel.canBulkDeleteRelationshipContacts
+          },
           exposures: {
             view: ContactOfContactModel.canViewRelationshipExposures,
             create: ContactOfContactModel.canCreateRelationshipExposures,

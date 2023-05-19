@@ -148,6 +148,15 @@ export class ImportExportDataService {
       delete data.includeUpdatedByUser;
     }
 
+    // add flag includeContactOfContactFields
+    if (!_.isUndefined(data.includeContactOfContactFields)) {
+      queryBuilder.filter.flag(
+        'includeContactOfContactFields',
+        data.includeContactOfContactFields
+      );
+      delete data.includeContactOfContactFields;
+    }
+
     // add flag includeContactFields
     if (!_.isUndefined(data.includeContactFields)) {
       queryBuilder.filter.flag(
@@ -323,6 +332,15 @@ export class ImportExportDataService {
         data.includeUpdatedByUser
       );
       delete data.includeUpdatedByUser;
+    }
+
+    // add flag includeContactOfContactFields
+    if (!_.isUndefined(data.includeContactOfContactFields)) {
+      queryBuilder.filter.flag(
+        'includeContactOfContactFields',
+        data.includeContactOfContactFields
+      );
+      delete data.includeContactOfContactFields;
     }
 
     // add flag includeContactFields

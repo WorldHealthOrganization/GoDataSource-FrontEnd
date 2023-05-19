@@ -9,7 +9,7 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { Constants } from '../../../../core/models/constants';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
 import { LocationModel } from '../../../../core/models/location.model';
@@ -36,6 +36,9 @@ import { IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputMultiDropdown
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { EventModel } from '../../../../core/models/event.model';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -64,6 +67,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_TYPE', value: 'type' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES', value: 'addresses' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
@@ -79,7 +83,9 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
-    { label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', value: 'dateBecomeContact' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT', value: 'wasContact' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT', value: 'dateBecomeContactOfContact' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ID', value: 'id' }
   ];
 
@@ -123,7 +129,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     private entityHelperService: EntityHelperService,
     private router: Router,
     private bulkCacheHelperService: BulkCacheHelperService,
-    private referenceDataHelperService: ReferenceDataHelperService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private relationshipDataService: RelationshipDataService
   ) {
     super(
       listHelperService, {
@@ -280,6 +287,172 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               }
             },
 
+            // Convert Contact of Contact to Contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CONTACT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: ContactOfContactModel): void => {
+                  // show confirm dialog to confirm the action
+                  this.dialogV2Service
+                    .showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_CONVERT',
+                          data: () => ({
+                            name: item.name,
+                            type: this.i18nService.instant(EntityType.CONTACT)
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_OF_CONTACT_TO_CONTACT',
+                          data: () => item as any
+                        }
+                      }
+                    })
+                    .subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // check if there is at least one legacy exposure (case/event)
+                      const qb = new RequestQueryBuilder();
+                      qb.filter.where({
+                        type: {
+                          'inq': [EntityType.CASE, EntityType.EVENT]
+                        }
+                      });
+                      qb.limit(1);
+                      this.relationshipDataService
+                        .getEntityExposures(
+                          this.selectedOutbreak.id,
+                          item.type,
+                          item.id,
+                          qb
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe((exposedContacts: EntityModel[]) => {
+                          // if there is no case/event as exposure, redirect to add exposures
+                          if (!exposedContacts?.length) {
+                            // show isolated contacts
+                            this.dialogV2Service.showConfirmDialog({
+                              config: {
+                                title: {
+                                  get: () => 'LNG_COMMON_LABEL_CONVERT',
+                                  data: () => ({
+                                    name: item.name,
+                                    type: this.i18nService.instant(EntityType.CONTACT)
+                                  })
+                                },
+                                message: {
+                                  get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CONTACT_RELATIONSHIP_WARNING'
+                                }
+                              },
+                              yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
+                            }).subscribe((dialogResponse) => {
+                              // hide loading
+                              loading.close();
+
+                              // canceled ?
+                              if (dialogResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                                // finished
+                                return;
+                              }
+
+                              // redirect
+                              this.router.navigate(
+                                [`/relationships/${item.type}/${item.id}/exposures/add`]
+                              );
+                              return;
+                            });
+                          } else {
+                            // convert
+                            this.contactsOfContactsDataService
+                              .convertContactOfContactToContact(this.selectedOutbreak.id, item.id)
+                              .pipe(
+                                catchError((err) => {
+                                  // show error
+                                  this.toastV2Service.error(err);
+
+                                  // hide loading
+                                  loading.close();
+
+                                  // send error down the road
+                                  return throwError(err);
+                                })
+                              )
+                              .subscribe(() => {
+                                // success
+                                this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+
+                                // hide loading
+                                loading.close();
+
+                                // reload data
+                                this.needsRefreshList(true);
+                              });
+                          }
+                        });
+                    });
+                }
+              },
+              visible: (item: ContactOfContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactOfContactModel.canConvertToContact(this.authUser) &&
+                  (
+                    EventModel.canList(this.authUser) ||
+                    CaseModel.canList(this.authUser)
+                  ) &&
+                  ContactOfContactModel.canView(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: ContactOfContactModel): boolean => {
+                // visible only if at least one of the first two items is visible
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactOfContactModel.canConvertToContact(this.authUser);
+              }
+            },
+
+            // See  Contact of contact contacts
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM'
+              },
+              action: {
+                link: (item: ContactOfContactModel): string[] => {
+                  return ['/relationships', EntityType.CONTACT_OF_CONTACT, item.id, 'contacts'];
+                }
+              },
+              visible: (item: ContactOfContactModel): boolean => {
+                return !item.deleted &&
+                  RelationshipModel.canList(this.authUser) &&
+                  ContactOfContactModel.canListRelationshipContacts(this.authUser);
+              }
+            },
+
             // See Contact of contact exposures
             {
               label: {
@@ -304,7 +477,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                 return !item.deleted &&
                   RelationshipModel.canList(this.authUser) &&
                   (
-                    ContactOfContactModel.canListRelationshipContacts() ||
+                    ContactOfContactModel.canListRelationshipContacts(this.authUser) ||
                     ContactOfContactModel.canListRelationshipExposures(this.authUser)
                   );
               }
@@ -692,6 +865,34 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         sortable: true
       },
       {
+        field: 'wasCase',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'wasContact',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
         notVisible: true,
@@ -711,6 +912,34 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
+      },
+      {
+        field: 'numberOfContacts',
+        label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        format: {
+          type: V2ColumnFormat.BUTTON
+        },
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true,
+        cssCellClass: 'gd-cell-button',
+        buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
+        color: 'text',
+        click: (item) => {
+          // if we do not have contacts return
+          if (item.numberOfContacts < 1) {
+            return;
+          }
+
+          // display dialog
+          this.entityHelperService.contacts(this.selectedOutbreak, item);
+        },
+        disabled: (data) =>
+          !RelationshipModel.canList(this.authUser) ||
+          !data.canListRelationshipContacts(this.authUser)
       },
       {
         field: 'numberOfExposures',
@@ -845,7 +1074,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
-        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
       }
     });
   }
@@ -1360,6 +1590,18 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   append: [
                     {
                       type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CASE_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
+                      name: 'includeCaseFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CONTACT_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
+                      name: 'includeContactFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
                       placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_EXPOSURE_INFORMATION',
                       tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_EXPOSURE_INFORMATION_DESCRIPTION',
                       name: 'includePersonExposureFields',
@@ -1533,7 +1775,10 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
       'gender',
       'riskLevel',
       'dateOfLastContact',
+      'wasCase',
+      'wasContact',
       'responsibleUserId',
+      'numberOfContacts',
       'numberOfExposures',
       'deleted',
       'createdBy',

@@ -87,6 +87,86 @@ const relationshipTypeChildrenRoutes = [
       personType: PersonTypeDataResolver
     }
   },
+  // Add new exposures and convert entity (1): Select people to expose with
+  {
+    path: 'add',
+    component: fromPages.EntityRelationshipsListAddComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.OUTBREAK_VIEW,
+        new PermissionExpression({
+          or: [
+            PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT,
+            PERMISSION.CONTACT_CONVERT_TO_CONTACT_OF_CONTACT
+          ]
+        }),
+        new PermissionExpression({
+          or: [
+            PERMISSION.EVENT_LIST,
+            PERMISSION.CASE_LIST,
+            PERMISSION.CONTACT_LIST,
+            PERMISSION.CONTACT_OF_CONTACT_LIST
+          ]
+        }),
+        new PermissionExpression({
+          or: [
+            PERMISSION.EVENT_VIEW,
+            PERMISSION.CASE_VIEW,
+            PERMISSION.CONTACT_VIEW,
+            PERMISSION.CONTACT_OF_CONTACT_VIEW
+          ]
+        })
+      ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      entity: RelationshipPersonDataResolver,
+      gender: GenderDataResolver,
+      risk: RiskDataResolver,
+      classification: ClassificationDataResolver,
+      personType: PersonTypeDataResolver
+    }
+  },
+  // Add new exposures and convert entity (2): Create relationships form
+  {
+    path: 'add-and-convert/create-bulk',
+    component: fromPages.CreateEntityRelationshipBulkComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.OUTBREAK_VIEW,
+        new PermissionExpression({
+          or: [
+            PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT,
+            PERMISSION.CONTACT_CONVERT_TO_CONTACT_OF_CONTACT
+          ]
+        }),
+        new PermissionExpression({
+          or: [
+            PERMISSION.EVENT_VIEW,
+            PERMISSION.CASE_VIEW,
+            PERMISSION.CONTACT_VIEW,
+            PERMISSION.CONTACT_OF_CONTACT_VIEW
+          ]
+        })
+      ],
+      action: CreateViewModifyV2Action.MODIFY,
+      addAndConvert: true
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      certainty: CertaintyLevelDataResolver,
+      exposureType: ExposureTypeDataResolver,
+      exposureFrequency: ExposureFrequencyDataResolver,
+      exposureDuration: ExposureDurationDataResolver,
+      contextOfTransmission: ContextOfTransmissionDataResolver,
+      cluster: ClusterDataResolver
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
   // Share selected relationships (1): Select people to share with
   {
     path: 'share',

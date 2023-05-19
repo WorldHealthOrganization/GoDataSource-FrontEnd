@@ -46,6 +46,7 @@ import * as moment from 'moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 @Component({
   selector: 'app-contacts-list',
@@ -86,6 +87,7 @@ export class ContactsListComponent
     { label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION', value: 'classification' },
     { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase' },
     { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT', value: 'wasContact' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CONTACT_OF_CONTACT', value: 'wasContactOfContact' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', value: 'dateBecomeContact' },
     { label: 'LNG_CONTACT_FIELD_LABEL_OUTCOME_ID', value: 'outcomeId' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome' },
@@ -145,7 +147,8 @@ export class ContactsListComponent
     private entityHelperService: EntityHelperService,
     private bulkCacheHelperService: BulkCacheHelperService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private router: Router
+    private router: Router,
+    private relationshipDataService: RelationshipDataService
   ) {
     super(
       listHelperService, {
@@ -300,7 +303,7 @@ export class ContactsListComponent
               }
             },
 
-            // Convert Contact to Contact
+            // Convert Contact to Case
             {
               label: {
                 get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE'
@@ -335,9 +338,21 @@ export class ContactsListComponent
                       // show loading
                       const loading = this.dialogV2Service.showLoadingDialog();
 
-                      // convert
-                      this.contactDataService
-                        .convertContactToCase(this.selectedOutbreak.id, item.id)
+                      // determine if contact has at least one exposed contact (contact of contact)
+                      const qb = new RequestQueryBuilder();
+                      qb.filter.where({
+                        type: {
+                          'inq': [EntityType.CONTACT_OF_CONTACT]
+                        }
+                      });
+                      qb.limit(1);
+                      this.relationshipDataService
+                        .getEntityContacts(
+                          this.selectedOutbreak.id,
+                          item.type,
+                          item.id,
+                          qb
+                        )
                         .pipe(
                           catchError((err) => {
                             // show error
@@ -350,16 +365,75 @@ export class ContactsListComponent
                             return throwError(err);
                           })
                         )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
+                        .subscribe((exposedContacts: EntityModel[]) => {
+                          // create a convert method
+                          const convertContact = () => {
+                            this.contactDataService
+                              .convertContactToCase(this.selectedOutbreak.id, item.id)
+                              .pipe(
+                                catchError((err) => {
+                                  // show error
+                                  this.toastV2Service.error(err);
 
-                          // hide loading
-                          loading.close();
+                                  // hide loading
+                                  loading.close();
 
-                          // reload data
-                          this.needsRefreshList(true);
+                                  // send error down the road
+                                  return throwError(err);
+                                })
+                              )
+                              .subscribe(() => {
+                                // success
+                                this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
+
+                                // hide loading
+                                loading.close();
+
+                                // reload data
+                                this.needsRefreshList(true);
+                              });
+                          };
+
+                          // show a warning if there is at least one contact of contact as contact
+                          if (exposedContacts?.length) {
+                            // show isolated contacts
+                            this.dialogV2Service.showConfirmDialog({
+                              config: {
+                                title: {
+                                  get: () => 'LNG_COMMON_LABEL_CONVERT',
+                                  data: () => ({
+                                    name: item.name,
+                                    type: this.i18nService.instant(EntityType.CASE)
+                                  })
+                                },
+                                message: {
+                                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE_CONTACTS_WARNING'
+                                }
+                              },
+                              yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
+                            }).subscribe((dialogResponse) => {
+                              // canceled ?
+                              if (dialogResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                                // hide loading
+                                loading.close();
+
+                                // finished
+                                return;
+                              }
+
+                              // convert contact
+                              convertContact();
+                            });
+                          } else {
+                            // convert contact
+                            convertContact();
+                          }
                         });
+
+                      // hide loading
+                      loading.close();
+
+                      return;
                     });
                 }
               },
@@ -370,13 +444,154 @@ export class ContactsListComponent
               }
             },
 
+            // Convert Contact to Contact of Contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CONTACT_OF_CONTACT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: ContactModel): void => {
+                  // show confirm dialog to confirm the action
+                  this.dialogV2Service
+                    .showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_CONVERT',
+                          data: () => ({
+                            name: item.name,
+                            type: this.i18nService.instant(EntityType.CONTACT_OF_CONTACT)
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CONTACT_OF_CONTACT',
+                          data: () => item as any
+                        }
+                      }
+                    })
+                    .subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // check if there is at least one legacy exposure (case/event)
+                      const qb = new RequestQueryBuilder();
+                      qb.filter.where({
+                        type: {
+                          'inq': [EntityType.CONTACT]
+                        }
+                      });
+                      qb.limit(1);
+                      this.relationshipDataService
+                        .getEntityExposures(
+                          this.selectedOutbreak.id,
+                          item.type,
+                          item.id,
+                          qb
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe((exposedContacts: EntityModel[]) => {
+                          // if there is no case/event as exposure, redirect to add exposures
+                          if (!exposedContacts?.length) {
+                            // show isolated contacts
+                            this.dialogV2Service.showConfirmDialog({
+                              config: {
+                                title: {
+                                  get: () => 'LNG_COMMON_LABEL_CONVERT',
+                                  data: () => ({
+                                    name: item.name,
+                                    type: this.i18nService.instant(EntityType.CONTACT_OF_CONTACT)
+                                  })
+                                },
+                                message: {
+                                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CONTACT_OF_CONTACT_RELATIONSHIP_WARNING'
+                                }
+                              },
+                              yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
+                            }).subscribe((dialogResponse) => {
+                              // hide loading
+                              loading.close();
+
+                              // canceled ?
+                              if (dialogResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                                // finished
+                                return;
+                              }
+
+                              // redirect
+                              this.router.navigate(
+                                [`/relationships/${item.type}/${item.id}/exposures/add`]
+                              );
+                              return;
+                            });
+                          } else {
+                            // convert
+                            this.contactDataService
+                              .convertContactToContactOfContact(this.selectedOutbreak.id, item.id)
+                              .pipe(
+                                catchError((err) => {
+                                  // show error
+                                  this.toastV2Service.error(err);
+
+                                  // hide loading
+                                  loading.close();
+
+                                  // send error down the road
+                                  return throwError(err);
+                                })
+                              )
+                              .subscribe(() => {
+                                // success
+                                this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
+
+                                // hide loading
+                                loading.close();
+
+                                // reload data
+                                this.needsRefreshList(true);
+                              });
+                          }
+                        });
+                    });
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canConvertToContactOfContact(this.authUser) &&
+                  this.selectedOutbreak.isContactsOfContactsActive &&
+                  ContactModel.canList(this.authUser) &&
+                  ContactModel.canView(this.authUser);
+              }
+            },
+
             // Divider
             {
               visible: (item: ContactModel): boolean => {
                 // visible only if at least one of the first two items is visible
                 return !item.deleted &&
-                  this.selectedOutbreakIsActive &&
-                  ContactModel.canConvertToCase(this.authUser);
+                  this.selectedOutbreakIsActive && (
+                  ContactModel.canConvertToCase(this.authUser) || (
+                    ContactModel.canConvertToContactOfContact(this.authUser) &&
+                    this.selectedOutbreak.isContactsOfContactsActive
+                  )
+                );
               }
             },
 
@@ -1050,6 +1265,20 @@ export class ContactsListComponent
       {
         field: 'wasCase',
         label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'wasContactOfContact',
+        label: 'LNG_CONTACT_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1846,6 +2075,7 @@ export class ContactsListComponent
       'followUpTeamId',
       'followUp',
       'wasCase',
+      'wasContactOfContact',
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',
@@ -1972,6 +2202,12 @@ export class ContactsListComponent
                       placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
                       tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
                       name: 'includeCaseFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CONTACT_OF_CONTACT_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CONTACT_OF_CONTACT_INFORMATION_DESCRIPTION',
+                      name: 'includeContactOfContactFields',
                       checked: false
                     }, {
                       type: V2SideDialogConfigInputType.CHECKBOX,

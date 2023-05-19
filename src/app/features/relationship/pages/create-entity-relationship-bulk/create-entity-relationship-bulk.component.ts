@@ -19,6 +19,9 @@ import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateView
 import * as moment from 'moment';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 
 @Component({
   selector: 'app-create-entity-relationship-bulk',
@@ -30,6 +33,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
   entityType: EntityType;
   entityId: string;
   relationshipType: RelationshipType;
+  isAddAndConvert: boolean = false;
   private _relationship: RelationshipModel = new RelationshipModel();
 
   // Entities Map for specific data
@@ -69,8 +73,11 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     private activatedRoute: ActivatedRoute,
     private entityDataService: EntityDataService,
     private relationshipDataService: RelationshipDataService,
-    protected toastV2Service: ToastV2Service,
     private referenceDataHelperService: ReferenceDataHelperService,
+    private contactDataService: ContactDataService,
+    private contactsOfContactsDataService: ContactsOfContactsDataService,
+    private dialogV2Service: DialogV2Service,
+    protected toastV2Service: ToastV2Service,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -86,9 +93,8 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     // disable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
 
-    // get source and target persons from query params
-    this.selectedSourceIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedSourceIds);
-    this.selectedTargetIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
+    // get addAndConvert flag
+    this.isAddAndConvert = this.activatedRoute.snapshot.data.addAndConvert;
 
     // get relationship type
     this.relationshipType = this.activatedRoute.snapshot.data.relationshipType;
@@ -96,6 +102,12 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     // get person type and ID from route params
     this.entityType = this.activatedRoute.snapshot.params.entityType;
     this.entityId = this.activatedRoute.snapshot.params.entityId;
+
+    // get source and target persons from query params
+    this.selectedSourceIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedSourceIds);
+    this.selectedTargetIds = this.isAddAndConvert ?
+      [this.entityId] :
+      JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
   }
 
   /**
@@ -180,8 +192,44 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
       // create or update
       createOrUpdate: this.initializeProcessData(),
       redirectAfterCreateUpdate: () => {
-        // update - redirect to view
-        this.router.navigate([`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }`]);
+        if (this.isAddAndConvert) {
+          // show loading
+          const loading = this.dialogV2Service.showLoadingDialog();
+
+          // convert the entity
+          const convertSubscriber = this.entityType === EntityType.CONTACT_OF_CONTACT ?
+            this.contactsOfContactsDataService.convertContactOfContactToContact(this.selectedOutbreak.id, this.entityId) :
+            this.contactDataService.convertContactToContactOfContact(this.selectedOutbreak.id, this.entityId);
+          convertSubscriber
+            .pipe(
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // hide loading
+                loading.close();
+
+                // send error down the road
+                return throwError(err);
+              })
+            )
+            .subscribe(() => {
+              // success
+              this.toastV2Service.success(this.entityType === EntityType.CONTACT_OF_CONTACT ?
+                'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE' :
+                'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_OF_CONTACT_SUCCESS_MESSAGE'
+              );
+
+              // hide loading
+              loading.close();
+
+              // navigate back to Entities list
+              this.router.navigate([this.entityMap[this.entityType].link]);
+            });
+        } else {
+          // update - redirect to view
+          this.router.navigate([`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }`]);
+        }
       }
     };
   }
@@ -227,7 +275,10 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
       // which are sources and which are targets (based on relationship type) ?
       let relationshipSources = this.selectedSourceIds;
       let relationshipTargets = this.selectedTargetIds;
-      if (this.relationshipType === RelationshipType.EXPOSURE) {
+      if (
+        this.relationshipType === RelationshipType.EXPOSURE &&
+        !this.isAddAndConvert
+      ) {
         relationshipTargets = this.selectedSourceIds;
         relationshipSources = this.selectedTargetIds;
       }
@@ -489,10 +540,14 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
       },
       {
         label: this.relationshipType === RelationshipType.EXPOSURE ?
-          'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
+          (
+            this.isAddAndConvert ?
+              'LNG_PAGE_LIST_ENTITY_ADD_EXPOSURES_TITLE' :
+              'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE'
+          ) :
           'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE',
         action: {
-          link: [`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }/share`],
+          link: [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/` + (this.isAddAndConvert ? 'add' : 'share')],
           linkQueryParams: {
             selectedTargetIds: JSON.stringify(this.selectedTargetIds)
           }
