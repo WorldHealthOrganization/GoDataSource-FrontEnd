@@ -561,6 +561,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               name: 'pregnancyStatus',
               placeholder: () => 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
               description: () => 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
+              clearable: false,
               options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               value: {
                 get: () => this.itemData.pregnancyStatus,

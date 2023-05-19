@@ -545,6 +545,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               name: 'pregnancyStatus',
               placeholder: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
               description: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
+              clearable: false,
               options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               value: {
                 get: () => this.itemData.pregnancyStatus,

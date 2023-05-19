@@ -255,6 +255,7 @@ interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModify
   value: ICreateViewModifyV2TabInputValue<string>;
 
   // optional
+  clearable?: boolean;
   validators?: {
     required?: () => boolean,
     validateOther?: () => string,
