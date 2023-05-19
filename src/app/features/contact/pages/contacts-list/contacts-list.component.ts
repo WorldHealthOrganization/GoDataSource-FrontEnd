@@ -575,7 +575,9 @@ export class ContactsListComponent
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
                   ContactModel.canConvertToContactOfContact(this.authUser) &&
-                  this.selectedOutbreak.isContactsOfContactsActive;
+                  this.selectedOutbreak.isContactsOfContactsActive &&
+                  ContactModel.canList(this.authUser) &&
+                  ContactModel.canView(this.authUser);
               }
             },
 

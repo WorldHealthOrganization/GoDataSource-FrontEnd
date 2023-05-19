@@ -95,7 +95,28 @@ const relationshipTypeChildrenRoutes = [
     data: {
       permissions: [
         PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.RELATIONSHIP_CREATE
+        new PermissionExpression({
+          or: [
+            PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT,
+            PERMISSION.CONTACT_CONVERT_TO_CONTACT_OF_CONTACT
+          ]
+        }),
+        new PermissionExpression({
+          or: [
+            PERMISSION.EVENT_LIST,
+            PERMISSION.CASE_LIST,
+            PERMISSION.CONTACT_LIST,
+            PERMISSION.CONTACT_OF_CONTACT_LIST
+          ]
+        }),
+        new PermissionExpression({
+          or: [
+            PERMISSION.EVENT_VIEW,
+            PERMISSION.CASE_VIEW,
+            PERMISSION.CONTACT_VIEW,
+            PERMISSION.CONTACT_OF_CONTACT_VIEW
+          ]
+        })
       ]
     },
     resolve: {
@@ -115,7 +136,20 @@ const relationshipTypeChildrenRoutes = [
     data: {
       permissions: [
         PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.RELATIONSHIP_CREATE
+        new PermissionExpression({
+          or: [
+            PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT,
+            PERMISSION.CONTACT_CONVERT_TO_CONTACT_OF_CONTACT
+          ]
+        }),
+        new PermissionExpression({
+          or: [
+            PERMISSION.EVENT_VIEW,
+            PERMISSION.CASE_VIEW,
+            PERMISSION.CONTACT_VIEW,
+            PERMISSION.CONTACT_OF_CONTACT_VIEW
+          ]
+        })
       ],
       action: CreateViewModifyV2Action.MODIFY,
       addAndConvert: true

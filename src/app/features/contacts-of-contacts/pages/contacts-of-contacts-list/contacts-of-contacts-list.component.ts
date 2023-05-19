@@ -37,6 +37,8 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { EventModel } from '../../../../core/models/event.model';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -415,7 +417,12 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               visible: (item: ContactOfContactModel): boolean => {
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
-                  ContactOfContactModel.canConvertToContact(this.authUser);
+                  ContactOfContactModel.canConvertToContact(this.authUser) &&
+                  (
+                    EventModel.canList(this.authUser) ||
+                    CaseModel.canList(this.authUser)
+                  ) &&
+                  ContactOfContactModel.canView(this.authUser);
               }
             },
 
