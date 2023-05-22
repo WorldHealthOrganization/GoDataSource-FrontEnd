@@ -969,6 +969,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR,
         name: 'allowedRefDataItems',
         options: this._diseaseSpecificReferenceData,
+        emptyLabel: 'LNG_COMMON_LABEL_ALL_OPTIONS_INCLUDED',
         value: {
           get: () => this.itemData.allowedRefDataItems,
           set: (value) => {

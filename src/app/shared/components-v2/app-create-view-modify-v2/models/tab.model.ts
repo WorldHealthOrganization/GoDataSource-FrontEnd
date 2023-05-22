@@ -733,6 +733,7 @@ interface ICreateViewModifyV2TabTableTree {
   name: string;
   value: ICreateViewModifyV2TabInputValue<ITreeEditorDataValue>;
   options: ITreeEditorDataCategory[];
+  emptyLabel: string;
 
   // optional
   add?: {

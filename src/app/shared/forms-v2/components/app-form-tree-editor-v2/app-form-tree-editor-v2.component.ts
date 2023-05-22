@@ -140,6 +140,9 @@ export class AppFormTreeEditorV2Component
     return this._options;
   }
 
+  // empty label
+  @Input() emptyLabel: string;
+
   // add new item
   @Input() addNewItemVisible: boolean = false;
   @Output() addNewItem: EventEmitter<ICreateViewModifyV2TabTableTreeAddNewItem> = new EventEmitter<ICreateViewModifyV2TabTableTreeAddNewItem>();
@@ -389,7 +392,7 @@ export class AppFormTreeEditorV2Component
           delete this.value[category.id][item.id];
         }
 
-        // if view only - display only selected & system-wide
+        // if view only - display only selected & system-wide if we have at least one selected
         if (this.viewOnly) {
           // not selected, and not system-wide
           if (
@@ -403,8 +406,11 @@ export class AppFormTreeEditorV2Component
 
           // system-wide, but disabled
           if (
-            item.isSystemWide &&
-            item.disabled
+            item.isSystemWide && (
+              item.disabled ||
+              !this.value[category.id] ||
+              !Object.keys(this.value[category.id]).length
+            )
           ) {
             return;
           }
@@ -449,12 +455,13 @@ export class AppFormTreeEditorV2Component
       // add info
       if (
         this.viewOnly &&
-        category.checked < 1
+        category.checked < 1 &&
+        this.emptyLabel
       ) {
         // add nothing info text
         this._allFlattenedData.push({
           type: FlattenType.INFO,
-          text: this.i18nService.instant('LNG_COMMON_LABEL_NOTHING_SELECTED'),
+          text: this.i18nService.instant(this.emptyLabel),
           parent: categoryNode,
           data: {
             id: uuid()
