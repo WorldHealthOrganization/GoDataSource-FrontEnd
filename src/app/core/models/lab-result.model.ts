@@ -3,7 +3,6 @@ import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { BaseModel } from './base.model';
 import { CaseModel } from './case.model';
-import { Constants } from './constants';
 import { ContactModel } from './contact.model';
 import { EntityType } from './entity-type';
 import { LabResultSequenceModel } from './lab-result-sequence.model';
@@ -291,7 +290,7 @@ export class LabResultModel
     this.testType = _.get(data, 'testType');
     this.result = _.get(data, 'result');
     this.notes = _.get(data, 'notes');
-    this.status = _.get(data, 'status', Constants.PROGRESS_OPTIONS.IN_PROGRESS.value);
+    this.status = _.get(data, 'status', 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_IN_PROGRESS');
     this.quantitativeResult = _.get(data, 'quantitativeResult');
     this.personId = _.get(data, 'personId');
     this.personType = _.get(data, 'personType');

@@ -169,7 +169,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
           (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
-        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -221,7 +221,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
           (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
-        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

@@ -536,17 +536,6 @@ export class Constants {
     }
   };
 
-  static PROGRESS_OPTIONS = {
-    IN_PROGRESS: {
-      label: 'LNG_PROGRESS_OPTION_LABEL_IN_PROGRESS',
-      value: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_IN_PROGRESS'
-    },
-    COMPLETED: {
-      label: 'LNG_PROGRESS_OPTION_LABEL_COMPLETED',
-      value: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_COMPLETED'
-    }
-  };
-
   /**
      * Used to match suspect or confirmed cases in the logic ( ex: metrics )
      */

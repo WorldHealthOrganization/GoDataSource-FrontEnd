@@ -613,7 +613,7 @@ export class ListFilterDataService {
     const filterQueryBuilder = new RequestQueryBuilder();
     const labResultsQueryBuilder = filterQueryBuilder.include('labResults');
     labResultsQueryBuilder.queryBuilder.filter.where({
-      status: Constants.PROGRESS_OPTIONS.IN_PROGRESS.value
+      status: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_IN_PROGRESS'
     }, true);
 
     return filterQueryBuilder;
