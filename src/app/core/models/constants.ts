@@ -537,6 +537,13 @@ export class Constants {
   };
 
   /**
+   * Lab result status
+   */
+  static LAB_TEST_RESULT_STATUS = {
+    IN_PROGRESS: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_IN_PROGRESS'
+  };
+
+  /**
      * Used to match suspect or confirmed cases in the logic ( ex: metrics )
      */
   static CASE_CLASSIFICATION = {

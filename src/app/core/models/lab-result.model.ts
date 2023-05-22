@@ -15,6 +15,7 @@ import { Moment } from '../helperClasses/x-moment';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { SafeHtml } from '@angular/platform-browser';
 import { I18nService } from '../services/helper/i18n.service';
+import { Constants } from './constants';
 
 export class LabResultModel
   extends BaseModel
@@ -290,7 +291,7 @@ export class LabResultModel
     this.testType = _.get(data, 'testType');
     this.result = _.get(data, 'result');
     this.notes = _.get(data, 'notes');
-    this.status = _.get(data, 'status', 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_IN_PROGRESS');
+    this.status = _.get(data, 'status', Constants.LAB_TEST_RESULT_STATUS.IN_PROGRESS);
     this.quantitativeResult = _.get(data, 'quantitativeResult');
     this.personId = _.get(data, 'personId');
     this.personType = _.get(data, 'personType');

@@ -573,7 +573,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                 }
               },
               validators: {
-                required: () => this.itemData.status === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_IN_PROGRESS'
+                required: () => this.itemData.status === Constants.LAB_TEST_RESULT_STATUS.IN_PROGRESS
               }
             },
             {
