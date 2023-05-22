@@ -14,7 +14,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { EntityType } from '../../../../core/models/entity-type';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { Constants } from '../../../../core/models/constants';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -367,7 +366,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
               name: 'status',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_STATUS_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+              options: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               value: {
                 get: () => null,
                 set: () => null

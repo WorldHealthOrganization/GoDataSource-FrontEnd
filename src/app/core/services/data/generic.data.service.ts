@@ -48,14 +48,6 @@ export class GenericDataService {
   }
 
   /**
-     * Retrieve the list of Progress Options
-     * @returns {Observable<any[]>}
-     */
-  getProgressOptionsList(): Observable<any[]> {
-    return of(Object.values(Constants.PROGRESS_OPTIONS));
-  }
-
-  /**
      * Retrieve the list of available Entity Types that, optionally, can be related to a given type (Case, Contact or Event)
      * @param {EntityType} forType
      * @param {RelationshipType} relationshipType

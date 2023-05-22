@@ -32,7 +32,10 @@ export class ReferenceDataCategoriesListComponent
     [category: string]: true
   } = {
       [ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE]: true,
-      [ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM]: true
+      [ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM]: true,
+
+      // IMPORTANT: required since this exists in db because it was removed at a later stage without a migration script to remove existing values from db
+      'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_INTENSITY': true
     };
 
   /**

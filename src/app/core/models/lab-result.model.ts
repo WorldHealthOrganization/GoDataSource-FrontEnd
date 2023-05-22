@@ -3,7 +3,6 @@ import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { BaseModel } from './base.model';
 import { CaseModel } from './case.model';
-import { Constants } from './constants';
 import { ContactModel } from './contact.model';
 import { EntityType } from './entity-type';
 import { LabResultSequenceModel } from './lab-result-sequence.model';
@@ -16,6 +15,7 @@ import { Moment } from '../helperClasses/x-moment';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { SafeHtml } from '@angular/platform-browser';
 import { I18nService } from '../services/helper/i18n.service';
+import { Constants } from './constants';
 
 export class LabResultModel
   extends BaseModel
@@ -291,7 +291,7 @@ export class LabResultModel
     this.testType = _.get(data, 'testType');
     this.result = _.get(data, 'result');
     this.notes = _.get(data, 'notes');
-    this.status = _.get(data, 'status', Constants.PROGRESS_OPTIONS.IN_PROGRESS.value);
+    this.status = _.get(data, 'status', Constants.LAB_TEST_RESULT_STATUS.IN_PROGRESS);
     this.quantitativeResult = _.get(data, 'quantitativeResult');
     this.personId = _.get(data, 'personId');
     this.personType = _.get(data, 'personType');
