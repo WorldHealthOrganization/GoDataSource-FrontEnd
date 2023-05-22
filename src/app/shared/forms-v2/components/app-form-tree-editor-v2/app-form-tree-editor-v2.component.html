@@ -13,14 +13,14 @@
       name="filterValue"
       placeholder="LNG_COMMON_LABEL_SEARCH"
       autocomplete="off"
-      (ngModelChange)="filter($event, true)"></app-form-input-v2>
+      (ngModelChange)="filter($event, true, true)"></app-form-input-v2>
 
     <!-- Expand All -->
     <button
       type="button"
       mat-flat-button
       color="text"
-      (click)="collapseExpandAll(false)">
+      (click)="collapseExpandAll(false, true)">
       {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_EXPAND_ALL' | translate}}
     </button>
 
@@ -29,7 +29,7 @@
       type="button"
       mat-flat-button
       color="text"
-      (click)="collapseExpandAll(true)">
+      (click)="collapseExpandAll(true, true)">
       {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL' | translate}}
     </button>
 
@@ -117,26 +117,75 @@
 
           </div>
 
+          <!-- Info -->
+          <div
+            *ngSwitchCase="FlattenType.INFO"
+            class="gd-form-tree-editor-v2-list-category-info"
+            fxLayout="row" fxLayoutAlign="none center"
+            [innerHTML]="item.text | highlight:searchValue"></div>
+
+          <!-- Category columns -->
+          <div
+            *ngSwitchCase="FlattenType.CATEGORY_COLUMNS"
+            class="gd-form-tree-editor-v2-list-category-column"
+            fxLayout="row" fxLayoutAlign="none center">
+
+            <!-- System-wide -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-column-system-wide">
+              {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate}}
+            </div>
+
+            <!-- Color -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-column-color">
+              {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR' | translate}}
+            </div>
+
+            <!-- Item icon -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-column-icon">
+              {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate}}
+            </div>
+
+            <!-- Order -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-column-order">
+              {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate}}
+            </div>
+
+            <!-- Item -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-column-item"></div>
+
+          </div>
+
           <!-- Category item -->
           <div
             *ngSwitchCase="FlattenType.CATEGORY_ITEM"
             class="gd-form-tree-editor-v2-list-category-item"
             [class.gd-form-tree-editor-v2-list-category-item-flash]="item.data.flash"
+            [class.gd-form-tree-editor-v2-list-category-item-is-systemw-wide]="item.data.isSystemWide"
             fxLayout="row" fxLayoutAlign="none center">
 
             <!-- System-wide -->
-            <mat-icon
-              [style.visibility]="displaySystemWide && item.data.isSystemWide ? 'visible' : 'hidden'"
-              [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate">public</mat-icon>
+            <div
+              class="gd-form-tree-editor-v2-list-category-column-system-wide gd-form-tree-editor-v2-list-category-item-system-wide">
+              <mat-icon
+                [style.visibility]="item.data.isSystemWide ? 'visible' : 'hidden'"
+                [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE_DESCRIPTION' | translate">done</mat-icon>
+            </div>
 
             <!-- Color -->
             <div
-              class="gd-form-tree-editor-v2-list-category-item-color"
-              [style.backgroundColor]="item.data.colorCode"></div>
+              class="gd-form-tree-editor-v2-list-category-column-color gd-form-tree-editor-v2-list-category-item-color">
+              <div
+                [style.backgroundColor]="item.data.colorCode"></div>
+            </div>
 
             <!-- Icon -->
             <div
-              class="gd-form-tree-editor-v2-list-category-item-icon">
+              class="gd-form-tree-editor-v2-list-category-column-icon gd-form-tree-editor-v2-list-category-item-icon">
               <img
                 *ngIf="item.data.iconUrl"
                 [src]="item.data.iconUrl" />
@@ -144,30 +193,26 @@
 
             <!-- Order -->
             <div
-              class="gd-form-tree-editor-v2-list-category-item-order">
+              class="gd-form-tree-editor-v2-list-category-column-order gd-form-tree-editor-v2-list-category-item-order">
               {{ item.data.order !== undefined ? item.data.order : '—' }}
             </div>
 
             <!-- Checkbox + label -->
-            <app-form-checkbox-v2
-              [ngModel]="(item.data.isSystemWide && !item.data.disabled) || (value && value[item.parent.data.id] && value[item.parent.data.id][item.data.id])"
-              [name]="item.data.id"
-              [placeholder]="item.data.label"
-              [disabled]="viewOnly || item.data.disabled || item.data.isSystemWide"
-              [highlightPlaceholder]="searchValue"
-              (ngModelChange)="selectedChanged(item, $event)"
-              (mousedown)="copyCheckboxMouseDown($event, item)"
-              (mouseenter)="copyCheckboxMouseEnter($event, item)"
-              (mouseleave)="copyCheckboxMouseLeave()"></app-form-checkbox-v2>
+            <div
+              class="gd-form-tree-editor-v2-list-category-column-item">
+              <app-form-checkbox-v2
+                [ngModel]="(item.data.isSystemWide && !item.data.disabled) || (value && value[item.parent.data.id] && value[item.parent.data.id][item.data.id])"
+                [name]="item.data.id"
+                [placeholder]="item.data.label"
+                [disabled]="viewOnly || item.data.disabled || item.data.isSystemWide"
+                [highlightPlaceholder]="searchValue"
+                (ngModelChange)="selectedChanged(item, $event)"
+                (mousedown)="copyCheckboxMouseDown($event, item)"
+                (mouseenter)="copyCheckboxMouseEnter($event, item)"
+                (mouseleave)="copyCheckboxMouseLeave()"></app-form-checkbox-v2>
+            </div>
 
           </div>
-
-          <!-- Info -->
-          <div
-            *ngSwitchCase="FlattenType.INFO"
-            class="gd-form-tree-editor-v2-list-category-info"
-            fxLayout="row" fxLayoutAlign="none center"
-            [innerHTML]="item.text | highlight:searchValue"></div>
 
         </div>
       </cdk-virtual-scroll-viewport>
@@ -194,6 +239,7 @@
 
   <!-- Legend -->
   <div
+    *ngIf="!viewOnly"
     class="gd-form-tree-editor-v2-legend"
     fxLayout="row" fxLayoutAlign="start center">
 
@@ -208,41 +254,27 @@
       class="gd-form-tree-editor-v2-legend-items"
       fxLayout="row wrap" fxLayoutAlign="start center">
 
-      <!-- System-wide -->
+      <!-- Check all -->
       <div
-        *ngIf="displaySystemWide"
         class="gd-form-tree-editor-v2-legend-items-item">
-        <mat-icon>public</mat-icon>
-        <span>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate}}</span>
+        <mat-icon>done_all</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_CHECK_ALL' | translate}}</span>
       </div>
 
-      <!-- Visible only on edit mode -->
-      <ng-container
-        *ngIf="!viewOnly">
+      <!-- Uncheck all -->
+      <div
+        class="gd-form-tree-editor-v2-legend-items-item">
+        <mat-icon>remove_done</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate}}</span>
+      </div>
 
-        <!-- Check all -->
-        <div
-          class="gd-form-tree-editor-v2-legend-items-item">
-          <mat-icon>done_all</mat-icon>
-          <span>{{'LNG_COMMON_BUTTON_CHECK_ALL' | translate}}</span>
-        </div>
-
-        <!-- Uncheck all -->
-        <div
-          class="gd-form-tree-editor-v2-legend-items-item">
-          <mat-icon>remove_done</mat-icon>
-          <span>{{'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate}}</span>
-        </div>
-
-        <!-- Add entry -->
-        <div
-          *ngIf="addNewItemVisible"
-          class="gd-form-tree-editor-v2-legend-items-item">
-          <mat-icon>playlist_add</mat-icon>
-          <span>{{'LNG_COMMON_BUTTON_ADD' | translate}}</span>
-        </div>
-
-      </ng-container>
+      <!-- Add entry -->
+      <div
+        *ngIf="addNewItemVisible"
+        class="gd-form-tree-editor-v2-legend-items-item">
+        <mat-icon>playlist_add</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_ADD' | translate}}</span>
+      </div>
 
     </div>
 

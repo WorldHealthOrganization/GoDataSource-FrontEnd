@@ -487,7 +487,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       'order',
       'active',
       'isSystemWide',
-      'readonly',
+      'readOnly',
       'createdBy',
       'createdAt',
       'updatedBy',

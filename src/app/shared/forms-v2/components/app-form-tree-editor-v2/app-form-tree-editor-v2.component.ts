@@ -29,8 +29,19 @@ import {
  */
 enum FlattenType {
   CATEGORY,
+  CATEGORY_COLUMNS,
   CATEGORY_ITEM,
   INFO
+}
+
+/**
+ * Flatten node - category
+ */
+interface IFlattenNodeCategory {
+  // required
+  type: FlattenType.CATEGORY;
+  text: string;
+  data: ITreeEditorDataCategory;
 }
 
 /**
@@ -40,6 +51,18 @@ interface IFlattenNodeInfo {
   // required
   type: FlattenType.INFO;
   text: string;
+  parent: IFlattenNodeCategory;
+  data: {
+    id: string
+  };
+}
+
+/**
+ * Flatten node - category columns
+ */
+interface IFlattenNodeCategoryColumns {
+  // required
+  type: FlattenType.CATEGORY_COLUMNS;
   parent: IFlattenNodeCategory;
   data: {
     id: string
@@ -62,16 +85,6 @@ interface IFlattenNodeCategoryItem {
 enum VisibleCause {
   SEARCH = 1,
   CHILD = 2
-}
-
-/**
- * Flatten node - category
- */
-interface IFlattenNodeCategory {
-  // required
-  type: FlattenType.CATEGORY;
-  text: string;
-  data: ITreeEditorDataCategory;
 }
 
 @Component({
@@ -107,9 +120,6 @@ export class AppFormTreeEditorV2Component
   // view only
   @Input() viewOnly: boolean;
 
-  // display system wide
-  @Input() displaySystemWide: boolean;
-
   // options
   private _options: ITreeEditorDataCategory[];
   @Input() set options(options: ITreeEditorDataCategory[]) {
@@ -121,11 +131,17 @@ export class AppFormTreeEditorV2Component
 
     // flatten & start collapsed
     // - detect changes is triggered by this.collapseExpandAll => this.nonFlatToFlat function
-    this.collapseExpandAll(true);
+    this.collapseExpandAll(
+      true,
+      true
+    );
   }
   get options(): ITreeEditorDataCategory[] {
     return this._options;
   }
+
+  // empty label
+  @Input() emptyLabel: string;
 
   // add new item
   @Input() addNewItemVisible: boolean = false;
@@ -135,8 +151,8 @@ export class AppFormTreeEditorV2Component
   private _languageSubscription: Subscription;
 
   // flattened data
-  private _allFlattenedData: (IFlattenNodeCategory | IFlattenNodeCategoryItem | IFlattenNodeInfo)[] = [];
-  flattenedData: (IFlattenNodeCategory | IFlattenNodeCategoryItem | IFlattenNodeInfo)[] = [];
+  private _allFlattenedData: (IFlattenNodeCategory | IFlattenNodeInfo | IFlattenNodeCategoryColumns | IFlattenNodeCategoryItem)[] = [];
+  flattenedData: (IFlattenNodeCategory | IFlattenNodeInfo | IFlattenNodeCategoryColumns | IFlattenNodeCategoryItem)[] = [];
 
   // filter
   searchValue: string;
@@ -230,12 +246,11 @@ export class AppFormTreeEditorV2Component
     }
 
     // reset collapse
-    this.options?.forEach((category) => {
-      category.collapsed = true;
-    });
-
-    // update selected
-    this.nonFlatToFlat();
+    // - calls this.nonFlatToFlat
+    this.collapseExpandAll(
+      true,
+      true
+    );
   }
 
   /**
@@ -332,6 +347,7 @@ export class AppFormTreeEditorV2Component
     // - detect changes is triggered by this.filter function
     this.filter(
       this.searchValue,
+      false,
       false
     );
   }
@@ -364,6 +380,7 @@ export class AppFormTreeEditorV2Component
       this._allFlattenedData.push(categoryNode);
 
       // push items
+      let addHeaders: boolean = true;
       category.checked = 0;
       category.children?.forEach((item) => {
         // fix for when an item was selected before being made a system-wide item
@@ -375,7 +392,7 @@ export class AppFormTreeEditorV2Component
           delete this.value[category.id][item.id];
         }
 
-        // if view only - display only selected & system-wide
+        // if view only - display only selected & system-wide if we have at least one selected
         if (this.viewOnly) {
           // not selected, and not system-wide
           if (
@@ -389,8 +406,11 @@ export class AppFormTreeEditorV2Component
 
           // system-wide, but disabled
           if (
-            item.isSystemWide &&
-            item.disabled
+            item.isSystemWide && (
+              item.disabled ||
+              !this.value[category.id] ||
+              !Object.keys(this.value[category.id]).length
+            )
           ) {
             return;
           }
@@ -409,6 +429,21 @@ export class AppFormTreeEditorV2Component
           category.checked++;
         }
 
+        // add headers ?
+        if (addHeaders) {
+          // attach header columns
+          this._allFlattenedData.push({
+            type: FlattenType.CATEGORY_COLUMNS,
+            parent: categoryNode,
+            data: {
+              id: uuid()
+            }
+          });
+
+          // no need to add headers again until next category
+          addHeaders = false;
+        }
+
         // add item
         this._allFlattenedData.push({
           type: FlattenType.CATEGORY_ITEM,
@@ -420,12 +455,13 @@ export class AppFormTreeEditorV2Component
       // add info
       if (
         this.viewOnly &&
-        category.checked < 1
+        category.checked < 1 &&
+        this.emptyLabel
       ) {
         // add nothing info text
         this._allFlattenedData.push({
           type: FlattenType.INFO,
-          text: this.i18nService.instant('LNG_COMMON_LABEL_NOTHING_SELECTED'),
+          text: this.i18nService.instant(this.emptyLabel),
           parent: categoryNode,
           data: {
             id: uuid()
@@ -450,6 +486,7 @@ export class AppFormTreeEditorV2Component
    */
   filter(
     searchValue: string,
+    collapseAll: boolean,
     delay: boolean
   ): void {
     // delay ?
@@ -465,6 +502,7 @@ export class AppFormTreeEditorV2Component
         // filter
         this.filter(
           searchValue,
+          collapseAll,
           false
         );
       }, 500);
@@ -491,6 +529,14 @@ export class AppFormTreeEditorV2Component
     // case insensitive
     const byValue: string = (this.searchValue || '').toLowerCase();
 
+    // collapse
+    if (collapseAll) {
+      this.collapseExpandAll(
+        true,
+        false
+      );
+    }
+
     // filter
     // - we need to determine first all filtered items to be able to show category if one of its children is visible
     const visibleIds: {
@@ -504,17 +550,17 @@ export class AppFormTreeEditorV2Component
           item.type === FlattenType.CATEGORY &&
           item.text.toLowerCase().indexOf(byValue) > -1
         ) || (
+          item.type === FlattenType.INFO && (
+            visibleIds[item.parent.data.id] === VisibleCause.SEARCH ||
+            item.text.toLowerCase().indexOf(byValue) > -1
+          )
+        ) || (
           item.type === FlattenType.CATEGORY_ITEM && (
             visibleIds[item.parent.data.id] === VisibleCause.SEARCH || (
               item.data.label &&
               this.i18nService.instant(item.data.label) &&
               this.i18nService.instant(item.data.label).toLowerCase().indexOf(byValue) > -1
             )
-          )
-        ) || (
-          item.type === FlattenType.INFO && (
-            visibleIds[item.parent.data.id] === VisibleCause.SEARCH ||
-            item.text.toLowerCase().indexOf(byValue) > -1
           )
         )
       ) {
@@ -556,7 +602,17 @@ export class AppFormTreeEditorV2Component
     });
 
     // filter
-    this.flattenedData = this._allFlattenedData.filter((item): boolean => !!visibleIds[item.data.id] && (item.type === FlattenType.CATEGORY || !item.parent.data.collapsed));
+    this.flattenedData = this._allFlattenedData.filter((item): boolean =>
+      (
+        item.type === FlattenType.CATEGORY_COLUMNS &&
+        !item.parent.data.collapsed
+      ) || (
+        !!visibleIds[item.data.id] && (
+          item.type === FlattenType.CATEGORY ||
+          !item.parent.data.collapsed
+        )
+      )
+    );
 
     // update ui
     this.detectChanges();
@@ -581,7 +637,10 @@ export class AppFormTreeEditorV2Component
   /**
    * Collapse / Expand questions and Answers
    */
-  collapseExpandAll(collapsed: boolean): void {
+  collapseExpandAll(
+    collapsed: boolean,
+    refresh: boolean
+  ): void {
     // nothing to collapse ?
     if (!this.options?.length) {
       return;
@@ -593,7 +652,9 @@ export class AppFormTreeEditorV2Component
     });
 
     // refresh
-    this.nonFlatToFlat();
+    if (refresh) {
+      this.nonFlatToFlat();
+    }
   }
 
   /**

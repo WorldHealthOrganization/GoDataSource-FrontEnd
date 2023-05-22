@@ -64,6 +64,14 @@
           padding-left: 3.5rem;
         }
 
+        // #TODO - applies to both header and rows (each needs to have its own width and ellipsis if longer text)
+        .gd-form-tree-editor-v2-list-category-column-system-wide,
+        .gd-form-tree-editor-v2-list-category-column-color,
+        .gd-form-tree-editor-v2-list-category-column-icon,
+        .gd-form-tree-editor-v2-list-category-column-order {
+          width: 100px;
+        }
+
         .gd-form-tree-editor-v2-list-category-item {
           /* Flash when new item is added */
           /* #TODO: Implement the same flash effect as on bulk create/edit to be consistent ? */
@@ -75,7 +83,7 @@
             animation-name: gd-flash;
           }
 
-          .gd-form-tree-editor-v2-list-category-item-color {
+          .gd-form-tree-editor-v2-list-category-item-color > div {
             @include border-radius(0.4rem);
             display: block;
             height: 2rem;
@@ -84,18 +92,10 @@
             width: 2rem;
           }
 
-          .gd-form-tree-editor-v2-list-category-item-icon {
-            display: block;
+          .gd-form-tree-editor-v2-list-category-item-icon > img {
+            display: inline-block;
             height: 2rem;
-            margin-top: 0.2rem;
-            margin-right: 0.8rem;
-            width: 2rem;
-
-            > img {
-              display: inline-block;
-              height: 2rem;
-              vertical-align: middle;
-            }
+            vertical-align: middle;
           }
 
           .gd-form-tree-editor-v2-list-category-item-order {
@@ -173,5 +173,12 @@
         font-size: 1.4rem;
       }
     }
+  }
+}
+
+// #TODO - exclude legend on view...
+.gd-create-view-modify-view {
+  .gd-form-tree-editor-v2-list {
+    height: calc(100% - 7.3rem);
   }
 }

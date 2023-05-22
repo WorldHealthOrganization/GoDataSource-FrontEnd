@@ -629,8 +629,8 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR,
         name: 'allowedRefDataItems',
-        displaySystemWide: true,
         options: this._diseaseSpecificReferenceData,
+        emptyLabel: 'LNG_COMMON_LABEL_ALL_OPTIONS_INCLUDED',
         value: {
           get: () => this.itemData.allowedRefDataItems,
           set: (value) => {
