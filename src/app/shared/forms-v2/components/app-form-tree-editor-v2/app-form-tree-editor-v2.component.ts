@@ -131,7 +131,10 @@ export class AppFormTreeEditorV2Component
 
     // flatten & start collapsed
     // - detect changes is triggered by this.collapseExpandAll => this.nonFlatToFlat function
-    this.collapseExpandAll(true);
+    this.collapseExpandAll(
+      true,
+      true
+    );
   }
   get options(): ITreeEditorDataCategory[] {
     return this._options;
@@ -240,12 +243,11 @@ export class AppFormTreeEditorV2Component
     }
 
     // reset collapse
-    this.options?.forEach((category) => {
-      category.collapsed = true;
-    });
-
-    // update selected
-    this.nonFlatToFlat();
+    // - calls this.nonFlatToFlat
+    this.collapseExpandAll(
+      true,
+      true
+    );
   }
 
   /**
@@ -342,6 +344,7 @@ export class AppFormTreeEditorV2Component
     // - detect changes is triggered by this.filter function
     this.filter(
       this.searchValue,
+      false,
       false
     );
   }
@@ -476,6 +479,7 @@ export class AppFormTreeEditorV2Component
    */
   filter(
     searchValue: string,
+    collapseAll: boolean,
     delay: boolean
   ): void {
     // delay ?
@@ -491,6 +495,7 @@ export class AppFormTreeEditorV2Component
         // filter
         this.filter(
           searchValue,
+          collapseAll,
           false
         );
       }, 500);
@@ -517,6 +522,14 @@ export class AppFormTreeEditorV2Component
     // case insensitive
     const byValue: string = (this.searchValue || '').toLowerCase();
 
+    // collapse
+    if (collapseAll) {
+      this.collapseExpandAll(
+        true,
+        false
+      );
+    }
+
     // filter
     // - we need to determine first all filtered items to be able to show category if one of its children is visible
     const visibleIds: {
@@ -530,17 +543,17 @@ export class AppFormTreeEditorV2Component
           item.type === FlattenType.CATEGORY &&
           item.text.toLowerCase().indexOf(byValue) > -1
         ) || (
+          item.type === FlattenType.INFO && (
+            visibleIds[item.parent.data.id] === VisibleCause.SEARCH ||
+            item.text.toLowerCase().indexOf(byValue) > -1
+          )
+        ) || (
           item.type === FlattenType.CATEGORY_ITEM && (
             visibleIds[item.parent.data.id] === VisibleCause.SEARCH || (
               item.data.label &&
               this.i18nService.instant(item.data.label) &&
               this.i18nService.instant(item.data.label).toLowerCase().indexOf(byValue) > -1
             )
-          )
-        ) || (
-          item.type === FlattenType.INFO && (
-            visibleIds[item.parent.data.id] === VisibleCause.SEARCH ||
-            item.text.toLowerCase().indexOf(byValue) > -1
           )
         )
       ) {
@@ -582,7 +595,17 @@ export class AppFormTreeEditorV2Component
     });
 
     // filter
-    this.flattenedData = this._allFlattenedData.filter((item): boolean => !!visibleIds[item.data.id] && (item.type === FlattenType.CATEGORY || !item.parent.data.collapsed));
+    this.flattenedData = this._allFlattenedData.filter((item): boolean =>
+      (
+        item.type === FlattenType.CATEGORY_COLUMNS &&
+        !item.parent.data.collapsed
+      ) || (
+        !!visibleIds[item.data.id] && (
+          item.type === FlattenType.CATEGORY ||
+          !item.parent.data.collapsed
+        )
+      )
+    );
 
     // update ui
     this.detectChanges();
@@ -607,7 +630,10 @@ export class AppFormTreeEditorV2Component
   /**
    * Collapse / Expand questions and Answers
    */
-  collapseExpandAll(collapsed: boolean): void {
+  collapseExpandAll(
+    collapsed: boolean,
+    refresh: boolean
+  ): void {
     // nothing to collapse ?
     if (!this.options?.length) {
       return;
@@ -619,7 +645,9 @@ export class AppFormTreeEditorV2Component
     });
 
     // refresh
-    this.nonFlatToFlat();
+    if (refresh) {
+      this.nonFlatToFlat();
+    }
   }
 
   /**

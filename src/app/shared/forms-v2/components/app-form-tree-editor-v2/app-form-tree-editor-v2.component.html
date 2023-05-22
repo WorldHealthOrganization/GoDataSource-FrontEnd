@@ -13,14 +13,14 @@
       name="filterValue"
       placeholder="LNG_COMMON_LABEL_SEARCH"
       autocomplete="off"
-      (ngModelChange)="filter($event, true)"></app-form-input-v2>
+      (ngModelChange)="filter($event, true, true)"></app-form-input-v2>
 
     <!-- Expand All -->
     <button
       type="button"
       mat-flat-button
       color="text"
-      (click)="collapseExpandAll(false)">
+      (click)="collapseExpandAll(false, true)">
       {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_EXPAND_ALL' | translate}}
     </button>
 
@@ -29,7 +29,7 @@
       type="button"
       mat-flat-button
       color="text"
-      (click)="collapseExpandAll(true)">
+      (click)="collapseExpandAll(true, true)">
       {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL' | translate}}
     </button>
 
