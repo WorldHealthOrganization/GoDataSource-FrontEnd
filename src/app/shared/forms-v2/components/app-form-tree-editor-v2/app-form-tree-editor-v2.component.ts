@@ -29,8 +29,19 @@ import {
  */
 enum FlattenType {
   CATEGORY,
+  CATEGORY_COLUMNS,
   CATEGORY_ITEM,
   INFO
+}
+
+/**
+ * Flatten node - category
+ */
+interface IFlattenNodeCategory {
+  // required
+  type: FlattenType.CATEGORY;
+  text: string;
+  data: ITreeEditorDataCategory;
 }
 
 /**
@@ -40,6 +51,18 @@ interface IFlattenNodeInfo {
   // required
   type: FlattenType.INFO;
   text: string;
+  parent: IFlattenNodeCategory;
+  data: {
+    id: string
+  };
+}
+
+/**
+ * Flatten node - category columns
+ */
+interface IFlattenNodeCategoryColumns {
+  // required
+  type: FlattenType.CATEGORY_COLUMNS;
   parent: IFlattenNodeCategory;
   data: {
     id: string
@@ -62,16 +85,6 @@ interface IFlattenNodeCategoryItem {
 enum VisibleCause {
   SEARCH = 1,
   CHILD = 2
-}
-
-/**
- * Flatten node - category
- */
-interface IFlattenNodeCategory {
-  // required
-  type: FlattenType.CATEGORY;
-  text: string;
-  data: ITreeEditorDataCategory;
 }
 
 @Component({
@@ -132,8 +145,8 @@ export class AppFormTreeEditorV2Component
   private _languageSubscription: Subscription;
 
   // flattened data
-  private _allFlattenedData: (IFlattenNodeCategory | IFlattenNodeCategoryItem | IFlattenNodeInfo)[] = [];
-  flattenedData: (IFlattenNodeCategory | IFlattenNodeCategoryItem | IFlattenNodeInfo)[] = [];
+  private _allFlattenedData: (IFlattenNodeCategory | IFlattenNodeInfo | IFlattenNodeCategoryColumns | IFlattenNodeCategoryItem)[] = [];
+  flattenedData: (IFlattenNodeCategory | IFlattenNodeInfo | IFlattenNodeCategoryColumns | IFlattenNodeCategoryItem)[] = [];
 
   // filter
   searchValue: string;
@@ -361,6 +374,7 @@ export class AppFormTreeEditorV2Component
       this._allFlattenedData.push(categoryNode);
 
       // push items
+      let addHeaders: boolean = true;
       category.checked = 0;
       category.children?.forEach((item) => {
         // fix for when an item was selected before being made a system-wide item
@@ -404,6 +418,21 @@ export class AppFormTreeEditorV2Component
           )
         ) {
           category.checked++;
+        }
+
+        // add headers ?
+        if (addHeaders) {
+          // attach header columns
+          this._allFlattenedData.push({
+            type: FlattenType.CATEGORY_COLUMNS,
+            parent: categoryNode,
+            data: {
+              id: uuid()
+            }
+          });
+
+          // no need to add headers again until next category
+          addHeaders = false;
         }
 
         // add item
