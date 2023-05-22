@@ -107,9 +107,6 @@ export class AppFormTreeEditorV2Component
   // view only
   @Input() viewOnly: boolean;
 
-  // display system wide
-  @Input() displaySystemWide: boolean;
-
   // options
   private _options: ITreeEditorDataCategory[];
   @Input() set options(options: ITreeEditorDataCategory[]) {

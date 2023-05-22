@@ -122,11 +122,12 @@
             *ngSwitchCase="FlattenType.CATEGORY_ITEM"
             class="gd-form-tree-editor-v2-list-category-item"
             [class.gd-form-tree-editor-v2-list-category-item-flash]="item.data.flash"
+            [class.gd-form-tree-editor-v2-list-category-item-is-systemw-wide]="item.data.isSystemWide"
             fxLayout="row" fxLayoutAlign="none center">
 
             <!-- System-wide -->
             <mat-icon
-              [style.visibility]="displaySystemWide && item.data.isSystemWide ? 'visible' : 'hidden'"
+              [style.visibility]="item.data.isSystemWide ? 'visible' : 'hidden'"
               [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate">public</mat-icon>
 
             <!-- Color -->
@@ -205,44 +206,31 @@
 
     <!-- Items -->
     <div
+      *ngIf="!viewOnly"
       class="gd-form-tree-editor-v2-legend-items"
       fxLayout="row wrap" fxLayoutAlign="start center">
 
-      <!-- System-wide -->
+      <!-- Check all -->
       <div
-        *ngIf="displaySystemWide"
         class="gd-form-tree-editor-v2-legend-items-item">
-        <mat-icon>public</mat-icon>
-        <span>{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate}}</span>
+        <mat-icon>done_all</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_CHECK_ALL' | translate}}</span>
       </div>
 
-      <!-- Visible only on edit mode -->
-      <ng-container
-        *ngIf="!viewOnly">
+      <!-- Uncheck all -->
+      <div
+        class="gd-form-tree-editor-v2-legend-items-item">
+        <mat-icon>remove_done</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate}}</span>
+      </div>
 
-        <!-- Check all -->
-        <div
-          class="gd-form-tree-editor-v2-legend-items-item">
-          <mat-icon>done_all</mat-icon>
-          <span>{{'LNG_COMMON_BUTTON_CHECK_ALL' | translate}}</span>
-        </div>
-
-        <!-- Uncheck all -->
-        <div
-          class="gd-form-tree-editor-v2-legend-items-item">
-          <mat-icon>remove_done</mat-icon>
-          <span>{{'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate}}</span>
-        </div>
-
-        <!-- Add entry -->
-        <div
-          *ngIf="addNewItemVisible"
-          class="gd-form-tree-editor-v2-legend-items-item">
-          <mat-icon>playlist_add</mat-icon>
-          <span>{{'LNG_COMMON_BUTTON_ADD' | translate}}</span>
-        </div>
-
-      </ng-container>
+      <!-- Add entry -->
+      <div
+        *ngIf="addNewItemVisible"
+        class="gd-form-tree-editor-v2-legend-items-item">
+        <mat-icon>playlist_add</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_ADD' | translate}}</span>
+      </div>
 
     </div>
 
