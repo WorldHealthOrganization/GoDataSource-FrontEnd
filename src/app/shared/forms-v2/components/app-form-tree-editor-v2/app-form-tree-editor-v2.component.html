@@ -47,12 +47,13 @@
         #cdkViewport
         [minBufferPx]="1024"
         [maxBufferPx]="1024"
-        [itemSize]="26">
+        [itemSize]="31">
         <!-- Item -->
         <div
           *cdkVirtualFor="let item of flattenedData; templateCacheSize: 0"
           class="gd-form-tree-editor-v2-list-item"
           [class.gd-form-tree-editor-v2-list-item-child]="item.type !== FlattenType.CATEGORY"
+          [class.gd-form-tree-editor-v2-list-item-expanded]="!item.data.collapsed && item.type === FlattenType.CATEGORY"
           [ngSwitch]="item.type">
 
           <!-- Category -->
@@ -130,10 +131,16 @@
             class="gd-form-tree-editor-v2-list-category-column"
             fxLayout="row" fxLayoutAlign="none center">
 
-            <!-- System-wide -->
+            <!-- Item -->
             <div
-              class="gd-form-tree-editor-v2-list-category-column-system-wide">
-              {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate}}
+              class="gd-form-tree-editor-v2-list-category-column-item">
+              {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE' | translate}}
+            </div>
+
+            <!-- Order -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-column-order">
+              {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate}}
             </div>
 
             <!-- Color -->
@@ -148,15 +155,11 @@
               {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON' | translate}}
             </div>
 
-            <!-- Order -->
+            <!-- System-wide -->
             <div
-              class="gd-form-tree-editor-v2-list-category-column-order">
-              {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate}}
+              class="gd-form-tree-editor-v2-list-category-column-system-wide">
+              {{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE' | translate}}
             </div>
-
-            <!-- Item -->
-            <div
-              class="gd-form-tree-editor-v2-list-category-column-item"></div>
 
           </div>
 
@@ -165,15 +168,28 @@
             *ngSwitchCase="FlattenType.CATEGORY_ITEM"
             class="gd-form-tree-editor-v2-list-category-item"
             [class.gd-form-tree-editor-v2-list-category-item-flash]="item.data.flash"
-            [class.gd-form-tree-editor-v2-list-category-item-is-systemw-wide]="item.data.isSystemWide"
+            [class.gd-form-tree-editor-v2-list-category-item-is-system-wide]="item.data.isSystemWide"
             fxLayout="row" fxLayoutAlign="none center">
 
-            <!-- System-wide -->
+            <!-- Checkbox + label -->
             <div
-              class="gd-form-tree-editor-v2-list-category-column-system-wide gd-form-tree-editor-v2-list-category-item-system-wide">
-              <mat-icon
-                [style.visibility]="item.data.isSystemWide ? 'visible' : 'hidden'"
-                [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE_DESCRIPTION' | translate">done</mat-icon>
+              class="gd-form-tree-editor-v2-list-category-column-item">
+              <app-form-checkbox-v2
+                [ngModel]="(item.data.isSystemWide && !item.data.disabled) || (value && value[item.parent.data.id] && value[item.parent.data.id][item.data.id])"
+                [name]="item.data.id"
+                [placeholder]="item.data.label"
+                [disabled]="viewOnly || item.data.disabled || item.data.isSystemWide"
+                [highlightPlaceholder]="searchValue"
+                (ngModelChange)="selectedChanged(item, $event)"
+                (mousedown)="copyCheckboxMouseDown($event, item)"
+                (mouseenter)="copyCheckboxMouseEnter($event, item)"
+                (mouseleave)="copyCheckboxMouseLeave()"></app-form-checkbox-v2>
+            </div>
+
+            <!-- Order -->
+            <div
+              class="gd-form-tree-editor-v2-list-category-column-order gd-form-tree-editor-v2-list-category-item-order">
+              {{ item.data.order !== undefined ? item.data.order : '—' }}
             </div>
 
             <!-- Color -->
@@ -191,25 +207,12 @@
                 [src]="item.data.iconUrl" />
             </div>
 
-            <!-- Order -->
+            <!-- System-wide -->
             <div
-              class="gd-form-tree-editor-v2-list-category-column-order gd-form-tree-editor-v2-list-category-item-order">
-              {{ item.data.order !== undefined ? item.data.order : '—' }}
-            </div>
-
-            <!-- Checkbox + label -->
-            <div
-              class="gd-form-tree-editor-v2-list-category-column-item">
-              <app-form-checkbox-v2
-                [ngModel]="(item.data.isSystemWide && !item.data.disabled) || (value && value[item.parent.data.id] && value[item.parent.data.id][item.data.id])"
-                [name]="item.data.id"
-                [placeholder]="item.data.label"
-                [disabled]="viewOnly || item.data.disabled || item.data.isSystemWide"
-                [highlightPlaceholder]="searchValue"
-                (ngModelChange)="selectedChanged(item, $event)"
-                (mousedown)="copyCheckboxMouseDown($event, item)"
-                (mouseenter)="copyCheckboxMouseEnter($event, item)"
-                (mouseleave)="copyCheckboxMouseLeave()"></app-form-checkbox-v2>
+              class="gd-form-tree-editor-v2-list-category-column-system-wide gd-form-tree-editor-v2-list-category-item-system-wide">
+              <mat-icon
+                [style.visibility]="item.data.isSystemWide ? 'visible' : 'hidden'"
+                [matTooltip]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE_DESCRIPTION' | translate">done</mat-icon>
             </div>
 
           </div>

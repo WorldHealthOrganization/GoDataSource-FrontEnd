@@ -3,10 +3,11 @@
 // #TODO - move animation somewhere global to be able to use it on other components too
 @keyframes gd-flash {
   0%, 50%, 100% {
-    opacity: 1;
+    background: rgba(var(--gd-primary-rgb), 0.15);
   }
+
   25%, 75% {
-    opacity: 0;
+    background: transparent;
   }
 }
 
@@ -57,30 +58,111 @@
       overflow-y: overlay;
       overflow-x: hidden;
 
-      .gd-form-tree-editor-v2-list-item {
-        height: 2.6rem;
+      .cdk-virtual-scroll-content-wrapper {
+        width: 100%;
+      }
 
-        &.gd-form-tree-editor-v2-list-item-child {
-          padding-left: 3.5rem;
+      .gd-form-tree-editor-v2-list-item {
+        border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        height: 3.1rem;
+
+        &.gd-form-tree-editor-v2-list-item-expanded {
+          background: rgba(var(--gd-warning-rgb), 0.2);
+          font-weight: 700;
         }
 
-        // #TODO - applies to both header and rows (each needs to have its own width and ellipsis if longer text)
-        .gd-form-tree-editor-v2-list-category-column-system-wide,
+        &.gd-form-tree-editor-v2-list-item-child {
+          .gd-form-tree-editor-v2-list-category-column {
+            background: rgba(var(--gd-warning-rgb), 0.1);
+            height: 100%;
+            line-height: 1;
+            padding: 0 1.6rem 0 4.8rem;
+          }
+
+          .gd-form-tree-editor-v2-list-category-info {
+            color: var(--gd-primary);
+            height: 100%;
+            padding: 0 1.6rem 0 4.8rem;
+          }
+        }
+
+        .gd-form-tree-editor-v2-list-category-column {
+          .gd-form-tree-editor-v2-list-category-column-item {
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+
         .gd-form-tree-editor-v2-list-category-column-color,
         .gd-form-tree-editor-v2-list-category-column-icon,
         .gd-form-tree-editor-v2-list-category-column-order {
-          width: 100px;
+          font-weight: 700;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 10rem;
+        }
+
+        .gd-form-tree-editor-v2-list-category-column-system-wide {
+          font-weight: 700;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 13rem;
         }
 
         .gd-form-tree-editor-v2-list-category-item {
+          background: rgba(var(--gd-warning-rgb), 0.01);
+          height: 100%;
+          padding: 0 1.6rem 0 4.8rem;
+
+          &:hover {
+            background: rgba(var(--gd-warning-rgb), 0.05);
+          }
+
           /* Flash when new item is added */
           /* #TODO: Implement the same flash effect as on bulk create/edit to be consistent ? */
           &.gd-form-tree-editor-v2-list-category-item-flash {
-            -webkit-animation-duration: 2s;
-            animation-duration: 2s;
+            -webkit-animation-duration: 3s;
+            animation-duration: 3s;
             -webkit-animation-fill-mode: both;
             animation-fill-mode: both;
             animation-name: gd-flash;
+          }
+
+          &.gd-form-tree-editor-v2-list-category-item-is-system-wide {
+            .gd-form-checkbox-v2 {
+              .mat-checkbox {
+                &.mat-checkbox-indeterminate,
+                &.mat-checkbox-checked {
+                  &.mat-checkbox-disabled {
+                    opacity: 0.5;
+
+                    .mat-checkbox-frame {
+                      border-color: var(--gd-primary);
+                    }
+
+                    .mat-checkbox-background {
+                      background-color: var(--gd-primary);
+                    }
+
+                    .mat-checkbox-label {
+                      color: var(--gd-primary);
+                      font-weight: 700;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          .gd-form-tree-editor-v2-list-category-item-system-wide {
+            .mat-icon {
+              color: var(--gd-primary);
+              font-size: 2.4rem;
+            }
           }
 
           .gd-form-tree-editor-v2-list-category-item-color > div {
@@ -99,7 +181,58 @@
           }
 
           .gd-form-tree-editor-v2-list-category-item-order {
-            width: 50px;
+            font-weight: normal;
+          }
+        }
+
+        .gd-form-tree-editor-v2-list-category-column-item {
+          flex: 100%;
+          overflow: hidden;
+          padding-right: 1.6rem;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .gd-form-tree-editor-v2-list-category {
+          padding: 0.3rem 1.6rem;
+
+          > .mat-icon {
+            background: rgba(var(--gd-secondary-rgb), 0.35);
+            border-radius: 0.4rem;
+            color: var(--gd-text);
+            cursor: pointer;
+            font-size: 1.6rem;
+            height: 2.4rem;
+            line-height: 1;
+            margin-right: 0.8rem;
+            min-width: 2.4rem;
+            padding: 0.4rem;
+            text-align: center;
+            width: 2.4rem;
+          }
+
+          .gd-form-tree-editor-v2-list-category-checked-no {
+            margin-right: 1.6rem;
+            text-align: right;
+          }
+
+          .gd-form-tree-editor-v2-list-category-buttons {
+            @include flex_align_items(center);
+            @include flex(flex);
+            @include flex_direction(row);
+            gap: 0.8rem;
+
+            .mat-icon-button {
+              font-size: 1.6rem;
+              height: 2.4rem;
+              min-width: 2.4rem;
+              padding: 0.4rem;
+              width: 2.4rem;
+
+              .mat-icon {
+                font-size: 1.6rem;
+              }
+            }
           }
         }
       }

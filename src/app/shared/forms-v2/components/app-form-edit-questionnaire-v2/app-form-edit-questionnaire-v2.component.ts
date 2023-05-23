@@ -771,6 +771,7 @@ export class AppFormEditQuestionnaireV2Component
         {
           type: V2SideDialogConfigInputType.ROW,
           name: 'inactive_required_multi_answer',
+          cssClasses: 'gd-app-side-dialog-v2-content-middle-item-input-row-flex',
           inputs: [
             // inactive
             {
