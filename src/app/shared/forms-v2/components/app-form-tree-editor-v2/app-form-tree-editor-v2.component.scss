@@ -1,16 +1,5 @@
 @import 'mixins';
 
-// #TODO - move animation somewhere global to be able to use it on other components too
-@keyframes gd-flash {
-  0%, 50%, 100% {
-    background: rgba(var(--gd-primary-rgb), 0.15);
-  }
-
-  25%, 75% {
-    background: transparent;
-  }
-}
-
 /* Tree Editor */
 .gd-form-tree-editor-v2 {
   height: 100%;
@@ -123,7 +112,6 @@
           }
 
           /* Flash when new item is added */
-          /* #TODO: Implement the same flash effect as on bulk create/edit to be consistent ? */
           &.gd-form-tree-editor-v2-list-category-item-flash {
             -webkit-animation-duration: 3s;
             animation-duration: 3s;
@@ -309,7 +297,7 @@
   }
 }
 
-// #TODO - exclude legend on view...
+/* Exclude legend on view */
 .gd-create-view-modify-view {
   .gd-form-tree-editor-v2-list {
     height: calc(100% - 7.3rem);
