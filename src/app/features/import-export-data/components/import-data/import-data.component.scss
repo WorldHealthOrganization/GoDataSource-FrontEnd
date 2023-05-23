@@ -239,6 +239,18 @@ app-import-data {
             font-size: 12px;
             font-weight: 700;
           }
+
+          .gd-form-select-single-v2 {
+            .mat-form-field {
+              background: var(--gd-background);
+
+              .mat-form-field-wrapper {
+                .mat-form-field-subscript-wrapper {
+                  min-height: 0;
+                }
+              }
+            }
+          }
         }
 
         .import-data-body-row-extra-details {
@@ -279,6 +291,18 @@ app-import-data {
                 //color: @color-error;
                 font-size: 1.2rem;
                 font-weight: 700;
+              }
+
+              .gd-form-select-single-v2 {
+                .mat-form-field {
+                  background: var(--gd-background);
+
+                  .mat-form-field-wrapper {
+                    .mat-form-field-subscript-wrapper {
+                      min-height: 0;
+                    }
+                  }
+                }
               }
             }
 

@@ -64,7 +64,8 @@ app-hover-row-actions {
       }
 
       &.icon-item-delete {
-        color: var(--gd-danger);
+        background: var(--gd-danger);
+        color: var(--gd-background);
       }
     }
   }

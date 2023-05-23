@@ -596,6 +596,14 @@
               position: absolute;
               width: calc(100% + 3.2rem);
             }
+
+            &.gd-app-side-dialog-v2-content-middle-item-input-row-flex {
+              @include flex_wrap(nowrap);
+
+              > .gd-app-side-dialog-v2-content-middle-item-input {
+                width: 100%;
+              }
+            }
           }
 
           /* Sort List */
