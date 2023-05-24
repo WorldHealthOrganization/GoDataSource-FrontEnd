@@ -98,9 +98,8 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
       this.initializeBreadcrumbs();
 
       // initialize table columns
-      if (!this._config.initializeTableColumnsAfterRecordsInitialized) {
-        this.initializeTableColumns();
-      }
+      // IMPORTANT: we need to call this even if this._config.initializeTableColumnsAfterRecordsInitialized is true because otherwise location columns aren't determined and locations aren't retrieved resulting in displaying ids instead of labels
+      this.initializeTableColumns();
 
       // initialize ignore groups
       this.initializeSaveIgnoreGroups();
