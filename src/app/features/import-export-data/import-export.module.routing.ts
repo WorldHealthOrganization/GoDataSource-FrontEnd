@@ -189,6 +189,22 @@ const routes: Routes = [
     resolve: {
       savedImportMapping: SavedImportMappingDataResolver
     }
+  },
+
+  // Import user data
+  {
+    path: 'user-data/import',
+    component: fromPages.ImportUserDataComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.USER_IMPORT
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.USER.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
+    }
   }
 ];
 

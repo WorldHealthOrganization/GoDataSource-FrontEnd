@@ -458,6 +458,10 @@ export class Constants {
     RELATIONSHIP_DATA: {
       label: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA',
       value: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA'
+    },
+    USER: {
+      label: 'LNG_APP_PAGE_IMPORT_USERS',
+      value: 'LNG_APP_PAGE_IMPORT_USERS'
     }
   };
 

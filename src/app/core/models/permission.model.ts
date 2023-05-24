@@ -62,6 +62,8 @@ export enum PERMISSION {
   USER_MODIFY_OWN_ACCOUNT = 'user_modify_own_account',
   USER_LIST_FOR_FILTERS = 'user_list_for_filters',
   USER_LIST_WORKLOAD = 'user_list_workload',
+  USER_EXPORT = 'user_export',
+  USER_IMPORT = 'user_import',
 
   // roles
   USER_ROLE_LIST = 'user_role_list',

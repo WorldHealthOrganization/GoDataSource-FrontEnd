@@ -14,5 +14,6 @@ export enum AppMessages {
   APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET = 'app-message-last-contact-should-not-be-before-date-of-onset',
   APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET = 'app-message-hospitalization-should-not-be-before-date-of-onset',
   APP_MESSAGE_DUPLICATE_ENTITY_MASK = 'app-message-duplicate-entity-mask',
-  APP_MESSAGE_PASTE_WARNING = 'app-message-paste-warning'
+  APP_MESSAGE_PASTE_WARNING = 'app-message-paste-warning',
+  APP_MESSAGE_IMPORT_USER_DATA_WARNING = 'app-message-import-user-data-warning'
 }

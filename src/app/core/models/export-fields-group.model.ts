@@ -5,7 +5,8 @@ export enum ExportFieldsGroupModelNameEnum {
   EVENT = 'event',
   FOLLOWUP = 'followUp',
   LAB_RESULT = 'LabResult',
-  RELATIONSHIP = 'relationship'
+  RELATIONSHIP = 'relationship',
+  USER = 'user'
 }
 
 export interface IExportFieldsGroupRequired {
