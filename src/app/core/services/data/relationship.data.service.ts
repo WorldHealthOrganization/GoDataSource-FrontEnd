@@ -244,18 +244,16 @@ export class RelationshipDataService {
   }
 
   /**
-     * Delete multiple relationships at once
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<any>}
-     */
+   * Delete multiple relationships at once
+   */
   deleteBulkRelationships(
     outbreakId: string,
-    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
-    const selectedRelationships = queryBuilder.filter.generateCondition(true);
-
-    return this.http.delete(
-      `outbreaks/${outbreakId}/relationships/bulk?where=${selectedRelationships}`
+    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+  ): Observable<any> {
+    return this.http.post(
+      `outbreaks/${outbreakId}/relationships/bulk-delete`, {
+        where: queryBuilder.filter.generateCondition(false)
+      }
     );
   }
 
