@@ -263,7 +263,7 @@ export class FollowUpsDataService {
   ): Observable<any> {
     const filter = queryBuilder.buildQuery(false);
     return this.http.post(
-      `outbreaks/${outbreakId}/follow-ups/bulk-delete`, {
+      `outbreaks/${outbreakId}/follow-ups/bulk/delete`, {
         filter
       }
     );

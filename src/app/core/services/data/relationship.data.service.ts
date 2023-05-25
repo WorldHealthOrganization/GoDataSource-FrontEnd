@@ -251,7 +251,7 @@ export class RelationshipDataService {
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
   ): Observable<any> {
     return this.http.post(
-      `outbreaks/${outbreakId}/relationships/bulk-delete`, {
+      `outbreaks/${outbreakId}/relationships/bulk/delete`, {
         where: queryBuilder.filter.generateCondition(false)
       }
     );
