@@ -2044,6 +2044,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           label: {
             get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS'
           },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
           action: {
             click: (selected: string[]) => {
               // create query
@@ -2115,6 +2116,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           label: {
             get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS'
           },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
           action: {
             click: (selected: string[]) => {
               // create query
