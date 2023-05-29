@@ -2041,6 +2041,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_DELETE_SELECTED_CASES'
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_DELETE_SELECTED_CASES_DESCRIPTION') :
+            undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
@@ -2156,6 +2159,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_RESTORE_SELECTED_CASES'
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allDeleted ?
+            this.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_RESTORE_SELECTED_CASES_DESCRIPTION') :
+            undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation

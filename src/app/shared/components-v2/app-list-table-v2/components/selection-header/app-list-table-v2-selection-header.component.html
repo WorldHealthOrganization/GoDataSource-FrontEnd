@@ -31,6 +31,7 @@
           [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(component.selectedRows)) ? menuOption.action.link(component.selectedRows) : undefined"
           [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(component.selectedRows) : undefined"
           [disabled]="menuOption.disable && menuOption.disable(component.selectedRows)"
+          [matTooltip]="menuOption.tooltip ? menuOption.tooltip(component.selectedRows) : undefined"
           (click)="menuOption.action.click && (!menuOption.disable || !menuOption.disable(component.selectedRows)) ? menuOption.action.click(component.selectedRows) : undefined">
           {{menuOption.label.get(component.selectedRows) | translate:(menuOption.label.data ? menuOption.label.data(component.selectedRows) : undefined)}}
         </a>
