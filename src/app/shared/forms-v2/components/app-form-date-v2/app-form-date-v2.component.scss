@@ -16,6 +16,7 @@
       padding-bottom: 0;
 
       .mat-form-field-flex {
+        @include flex_align_items(center);
         margin-top: 0;
         padding: 0 1.6rem;
 
@@ -69,7 +70,7 @@
         /* Select prefix */
         .mat-form-field-prefix {
           left: -0.4rem;
-          top: 0.5rem;
+          top: 0.2rem;
 
           + .mat-form-field-infix {
             line-height: 1.125;
@@ -121,7 +122,7 @@
         .mat-form-field-suffix {
           @include flex(flex);
           @include flex_align_items(center);
-          top: 0.6rem;
+          top: 0;
 
           .mat-icon-button {
             font-size: 1.6rem;

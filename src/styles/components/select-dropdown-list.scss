@@ -145,6 +145,10 @@
       line-height: 2.4rem;
       padding: 0.8rem 1.6rem;
 
+      @include safari {
+        height: 3em;
+      }
+
       .mat-option-text {
         .mat-tooltip-trigger {
           @include flex(flex);
