@@ -277,6 +277,7 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
       // all selected records were not deleted ?
       {
         key: 'updateSelected',
+        shouldProcess: () => true,
         process: (
           _dataMap,
           selected

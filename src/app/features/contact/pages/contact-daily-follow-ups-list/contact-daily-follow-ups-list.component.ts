@@ -1255,6 +1255,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       // all selected records were not deleted ?
       {
         key: 'allNotDeleted',
+        shouldProcess: () => FollowUpModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive,
         process: (
           dataMap: {
             [id: string]: FollowUpModel
@@ -1282,6 +1284,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       // all selected records were deleted ?
       {
         key: 'allDeleted',
+        shouldProcess: () => FollowUpModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive,
         process: (
           dataMap: {
             [id: string]: FollowUpModel
@@ -1959,7 +1963,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         ) ||
         FollowUpModel.canExport(this.authUser) ||
         (
-          FollowUpModel.canBulkDelete(this.authUser) &&
+          (
+            FollowUpModel.canBulkDelete(this.authUser) ||
+            FollowUpModel.canBulkRestore(this.authUser)
+          ) &&
           this.selectedOutbreakIsActive
         ),
       actions: [

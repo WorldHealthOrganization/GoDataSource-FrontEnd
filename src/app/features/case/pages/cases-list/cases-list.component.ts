@@ -1530,6 +1530,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       // all selected records were not deleted ?
       {
         key: 'allNotDeleted',
+        shouldProcess: () => CaseModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive,
         process: (
           dataMap: {
             [id: string]: CaseModel
@@ -1557,6 +1559,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       // all selected records were deleted ?
       {
         key: 'allDeleted',
+        shouldProcess: () => CaseModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive,
         process: (
           dataMap: {
             [id: string]: CaseModel

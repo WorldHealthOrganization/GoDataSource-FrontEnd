@@ -166,6 +166,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
       // all selected records were not deleted ?
       {
         key: 'allNotDeleted',
+        shouldProcess: () => FollowUpModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive,
         process: (
           dataMap: {
             [id: string]: FollowUpModel
@@ -193,6 +195,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
       // all selected records were deleted ?
       {
         key: 'allDeleted',
+        shouldProcess: () => FollowUpModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive,
         process: (
           dataMap: {
             [id: string]: FollowUpModel
@@ -344,7 +348,10 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
         ) ||
         FollowUpModel.canExport(this.authUser) ||
         (
-          FollowUpModel.canBulkDelete(this.authUser) &&
+          (
+            FollowUpModel.canBulkDelete(this.authUser) ||
+            FollowUpModel.canBulkRestore(this.authUser)
+          ) &&
           this.selectedOutbreakIsActive
         ),
       actions: [
@@ -420,7 +427,10 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
             ) ||
             FollowUpModel.canExport(this.authUser)
           ) && (
-            FollowUpModel.canBulkDelete(this.authUser) &&
+            (
+              FollowUpModel.canBulkDelete(this.authUser) ||
+              FollowUpModel.canBulkRestore(this.authUser)
+            ) &&
             this.selectedOutbreakIsActive
           )
         },
@@ -560,7 +570,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
             }
           },
           visible: (): boolean => {
-            return FollowUpModel.canBulkDelete(this.authUser) &&
+            return FollowUpModel.canBulkRestore(this.authUser) &&
               this.selectedOutbreakIsActive;
           },
           disable: (selected: string[]): boolean => {

@@ -2042,6 +2042,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this._processedSelectedResults = {};
     if (this.processSelectedData?.length > 0) {
       this.processSelectedData.forEach((processor) => {
+        // no need to execute?
+        if (!processor.shouldProcess(
+          this._recordsDataMap,
+          this._selected
+        )) {
+          return;
+        }
+
+        // process
         this._processedSelectedResults[processor.key] = processor.process(
           this._recordsDataMap,
           this._selected
