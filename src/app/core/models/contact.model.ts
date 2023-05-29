@@ -602,6 +602,7 @@ export class ContactModel
   static canExportDailyFollowUpList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_DAILY_FOLLOW_UP_LIST) : false); }
   static canExportDailyFollowUpsForm(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_DAILY_FOLLOW_UP_FORM) : false); }
   static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_DOSSIER) : false); }
+  static canListIsolatedContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_LIST_ISOLATED_CONTACTS) : false); }
 
   /**
      * Static Permissions - IPermissionRelatedLabResult
@@ -791,6 +792,7 @@ export class ContactModel
   canGenerateVisualId(user: UserModel): boolean { return ContactModel.canGenerateVisualId(user); }
   canConvertToCase(user: UserModel): boolean { return ContactModel.canConvertToCase(user); }
   canConvertToContactOfContact(user: UserModel): boolean { return ContactModel.canConvertToContactOfContact(user); }
+  canListIsolatedContacts(user: UserModel): boolean { return ContactModel.canListIsolatedContacts(user); }
   canExportDailyFollowUpList(user: UserModel): boolean { return ContactModel.canExportDailyFollowUpList(user); }
   canExportDailyFollowUpsForm(user: UserModel): boolean { return ContactModel.canExportDailyFollowUpsForm(user); }
   canExportDossier(user: UserModel): boolean { return ContactModel.canExportDossier(user); }

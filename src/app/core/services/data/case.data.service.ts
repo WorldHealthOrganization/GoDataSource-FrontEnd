@@ -111,7 +111,7 @@ export class CaseDataService {
   }
 
   /**
-   * Get exposed contacts for a case that user want to delete
+   * Get exposed contacts for a case that user want to delete/convert
    */
   getExposedContactsForCase(outbreakId: string, caseId: string) {
     return this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/isolated-contacts`);

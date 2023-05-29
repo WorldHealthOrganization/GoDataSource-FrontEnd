@@ -254,6 +254,7 @@ export enum PERMISSION {
   CONTACT_IMPORT_LAB_RESULT = 'contact_import_lab_result',
   CONTACT_EXPORT_LAB_RESULT = 'contact_export_lab_result',
   CONTACT_CREATE_CONTACT_OF_CONTACT = 'contact_create_contact_of_contact',
+  CONTACT_LIST_ISOLATED_CONTACTS = 'contact_list_isolated_contacts',
 
   // contacts of contact
   CONTACT_OF_CONTACT_LIST = 'contact_of_contact_list',

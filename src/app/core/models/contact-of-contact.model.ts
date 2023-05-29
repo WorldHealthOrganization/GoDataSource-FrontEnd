@@ -31,6 +31,13 @@ import { ReferenceDataEntryModel } from './reference-data.model';
 import { I18nService } from '../services/helper/i18n.service';
 import { IAnswerData } from './question.model';
 
+export interface IContactOfContactIsolated {
+  id: string,
+  firstName: string,
+  middleName: string,
+  lastName: string
+}
+
 export class ContactOfContactModel
   extends BaseModel
   implements

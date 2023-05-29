@@ -98,7 +98,12 @@ const relationshipTypeChildrenRoutes = [
         new PermissionExpression({
           or: [
             PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT,
-            PERMISSION.CONTACT_CONVERT_TO_CONTACT_OF_CONTACT
+            new PermissionExpression({
+              and: [
+                PERMISSION.CONTACT_CONVERT_TO_CONTACT_OF_CONTACT,
+                PERMISSION.CONTACT_LIST_ISOLATED_CONTACTS
+              ]
+            })
           ]
         }),
         new PermissionExpression({
@@ -139,7 +144,12 @@ const relationshipTypeChildrenRoutes = [
         new PermissionExpression({
           or: [
             PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT,
-            PERMISSION.CONTACT_CONVERT_TO_CONTACT_OF_CONTACT
+            new PermissionExpression({
+              and: [
+                PERMISSION.CONTACT_CONVERT_TO_CONTACT_OF_CONTACT,
+                PERMISSION.CONTACT_LIST_ISOLATED_CONTACTS
+              ]
+            })
           ]
         }),
         new PermissionExpression({
