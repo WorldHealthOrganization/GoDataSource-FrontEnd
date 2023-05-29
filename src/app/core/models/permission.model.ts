@@ -208,6 +208,8 @@ export enum PERMISSION {
   CONTACT_MODIFY = 'contact_modify',
   CONTACT_DELETE = 'contact_delete',
   CONTACT_RESTORE = 'contact_restore',
+  CONTACT_BULK_DELETE = 'contact_bulk_delete',
+  CONTACT_BULK_RESTORE = 'contact_bulk_restore',
   CONTACT_EXPORT = 'contact_export',
   CONTACT_IMPORT = 'contact_import',
   CONTACT_BULK_CREATE = 'contact_bulk_create',
