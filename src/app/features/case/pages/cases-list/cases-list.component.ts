@@ -1896,7 +1896,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       type: V2ActionType.GROUP_ACTIONS,
       visible: () => CaseModel.canExport(this.authUser) ||
         CaseModel.canExportDossier(this.authUser) ||
-        CaseModel.canExportRelationships(this.authUser),
+        CaseModel.canExportRelationships(this.authUser) ||
+        CaseModel.canBulkDelete(this.authUser) ||
+        CaseModel.canBulkRestore(this.authUser),
       actions: [
         {
           label: {
