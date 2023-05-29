@@ -264,6 +264,8 @@ export enum PERMISSION {
   CONTACT_OF_CONTACT_MODIFY = 'contact_of_contact_modify',
   CONTACT_OF_CONTACT_DELETE = 'contact_of_contact_delete',
   CONTACT_OF_CONTACT_RESTORE = 'contact_of_contact_restore',
+  CONTACT_OF_CONTACT_BULK_DELETE = 'contact_of_contact_bulk_delete',
+  CONTACT_OF_CONTACT_BULK_RESTORE = 'contact_of_contact_bulk_restore',
   CONTACT_OF_CONTACT_EXPORT = 'contact_of_contact_export',
   CONTACT_OF_CONTACT_IMPORT = 'contact_of_contact_import',
   CONTACT_OF_CONTACT_BULK_CREATE = 'contact_of_contact_bulk_create',
