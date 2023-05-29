@@ -1897,8 +1897,14 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       visible: () => CaseModel.canExport(this.authUser) ||
         CaseModel.canExportDossier(this.authUser) ||
         CaseModel.canExportRelationships(this.authUser) ||
-        CaseModel.canBulkDelete(this.authUser) ||
-        CaseModel.canBulkRestore(this.authUser),
+        (
+          CaseModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
+        (
+          CaseModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
       actions: [
         {
           label: {
