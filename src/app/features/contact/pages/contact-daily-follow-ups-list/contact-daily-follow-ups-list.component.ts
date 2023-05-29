@@ -2034,7 +2034,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             ) ||
             FollowUpModel.canExport(this.authUser)
           ) && (
-            FollowUpModel.canBulkDelete(this.authUser) &&
+            (
+              FollowUpModel.canBulkDelete(this.authUser) ||
+              FollowUpModel.canBulkRestore(this.authUser)
+            ) &&
             this.selectedOutbreakIsActive
           )
         },
@@ -2174,7 +2177,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             }
           },
           visible: (): boolean => {
-            return FollowUpModel.canBulkDelete(this.authUser) &&
+            return FollowUpModel.canBulkRestore(this.authUser) &&
               this.selectedOutbreakIsActive;
           },
           disable: (selected: string[]): boolean => {
