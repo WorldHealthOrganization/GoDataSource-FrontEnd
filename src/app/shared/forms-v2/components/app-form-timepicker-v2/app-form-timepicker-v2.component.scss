@@ -17,6 +17,7 @@
       padding-bottom: 0;
 
       .mat-form-field-flex {
+        @include flex_align_items(center);
         margin-top: 0;
         padding: 0 1.6rem;
 
@@ -70,7 +71,7 @@
         /* Timepicker input prefix */
         .mat-form-field-prefix {
           left: -0.4rem;
-          top: 0.5rem;
+          top: 0.2rem;
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
@@ -119,7 +120,7 @@
         .mat-form-field-suffix {
           @include flex(flex);
           @include flex_align_items(center);
-          top: 0.3rem;
+          top: 0;
 
           .mat-progress-spinner {
             margin-right: 0.4rem;

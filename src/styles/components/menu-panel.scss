@@ -69,6 +69,18 @@
           color: var(--gd-danger);
         }
       }
+
+      .gd-list-table-actions-action-menu-button,
+      .gd-list-table-selection-header-button {
+        &.gd-list-table-actions-action-menu-warning {
+          color: var(--gd-danger);
+  
+          &:hover {
+            background: rgba(var(--gd-danger-rgb), 0.1);
+            color: var(--gd-danger);
+          }
+        }
+      }
     }
   }
 }
