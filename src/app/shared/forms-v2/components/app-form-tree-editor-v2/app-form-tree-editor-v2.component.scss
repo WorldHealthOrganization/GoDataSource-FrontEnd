@@ -9,6 +9,10 @@
     border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
     padding: 1.6rem;
 
+    @include breakpoint('xs') {
+      padding: 0.4rem;
+    }
+
     button.mat-flat-button,
     a.mat-flat-button {
       @include breakpoint('xxs') {
@@ -30,16 +34,11 @@
   /* Editor List */
   .gd-form-tree-editor-v2-list {
     height: calc(100% - 11.2rem);
-    min-height: 30rem;
+    min-height: 19rem;
 
-    @media only screen and (max-height: 599px) {
-      min-height: 7rem;
-    }
-
-    .gd-create-view-modify-modify & {
-      @include breakpoint('xxs') {
-        height: calc(100% - 13.4rem);
-      }
+    @include breakpoint('xs') {
+      height: calc(100% - 8.8rem);
+      min-height: 10rem;
     }
 
     .cdk-virtual-scroll-viewport {
@@ -65,13 +64,21 @@
             background: rgba(var(--gd-warning-rgb), 0.1);
             height: 100%;
             line-height: 1;
-            padding: 0 1.6rem 0 4.8rem;
+            padding: 0 1.6rem 0 6.4rem;
+
+            @include breakpoint('xs') {
+              padding-left: 4rem;
+            }
           }
 
           .gd-form-tree-editor-v2-list-category-info {
             color: var(--gd-primary);
             height: 100%;
-            padding: 0 1.6rem 0 4.8rem;
+            padding: 0 1.6rem 0 6.4rem;
+
+            @include breakpoint('xs') {
+              padding-left: 4rem;
+            }
           }
         }
 
@@ -92,6 +99,11 @@
           text-overflow: ellipsis;
           white-space: nowrap;
           width: 10rem;
+
+          @include breakpoint('xs') {
+            min-width: 3rem;
+            width: 3rem;
+          }
         }
 
         .gd-form-tree-editor-v2-list-category-column-system-wide {
@@ -100,12 +112,27 @@
           text-overflow: ellipsis;
           white-space: nowrap;
           width: 13rem;
+
+          @include breakpoint('xs') {
+            min-width: 5rem;
+            width: 5rem;
+          }
+        }
+
+        .gd-form-tree-editor-v2-list-category-content {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .gd-form-tree-editor-v2-list-category-item {
           background: rgba(var(--gd-warning-rgb), 0.01);
           height: 100%;
-          padding: 0 1.6rem 0 4.8rem;
+          padding: 0 1.6rem 0 6.4rem;
+
+          @include breakpoint('xs') {
+            padding-left: 4rem;
+          }
 
           &:hover {
             background: rgba(var(--gd-warning-rgb), 0.05);
@@ -175,14 +202,18 @@
 
         .gd-form-tree-editor-v2-list-category-column-item {
           flex: 100%;
+          margin-right: 1.6rem;
           overflow: hidden;
-          padding-right: 1.6rem;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
 
         .gd-form-tree-editor-v2-list-category {
           padding: 0.3rem 1.6rem;
+
+          @include breakpoint('xs') {
+            padding: 0.3rem 0.8rem;
+          }
 
           > .mat-icon {
             background: rgba(var(--gd-secondary-rgb), 0.35);
@@ -209,6 +240,11 @@
             @include flex(flex);
             @include flex_direction(row);
             gap: 0.8rem;
+
+            @include breakpoint('xs') {
+              gap: 0.4rem;
+              padding-right: 0.4rem;
+            }
 
             .mat-icon-button {
               font-size: 1.6rem;
