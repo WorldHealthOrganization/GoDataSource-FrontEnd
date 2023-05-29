@@ -388,6 +388,8 @@ export enum PERMISSION {
   LAB_RESULT_BULK_MODIFY = 'lab_result_bulk_modify',
   LAB_RESULT_DELETE = 'lab_result_delete',
   LAB_RESULT_RESTORE = 'lab_result_restore',
+  LAB_RESULT_BULK_DELETE = 'lab_result_bulk_delete',
+  LAB_RESULT_BULK_RESTORE = 'lab_result_bulk_restore',
   LAB_RESULT_IMPORT = 'lab_result_import',
   LAB_RESULT_EXPORT = 'lab_result_export',
 
