@@ -291,6 +291,8 @@ export enum PERMISSION {
   CASE_MODIFY = 'case_modify',
   CASE_DELETE = 'case_delete',
   CASE_RESTORE = 'case_restore',
+  CASE_BULK_DELETE = 'case_bulk_delete',
+  CASE_BULK_RESTORE = 'case_bulk_restore',
   CASE_IMPORT = 'case_import',
   CASE_EXPORT = 'case_export',
   CASE_CREATE_CONTACT = 'case_create_contact',
