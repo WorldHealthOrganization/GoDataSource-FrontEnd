@@ -10,6 +10,10 @@
         height: 2rem;
         width: 2rem;
 
+        .cdk-visually-hidden {
+          height: 0;
+        }
+
         .mat-checkbox-ripple {
           display: none;
         }

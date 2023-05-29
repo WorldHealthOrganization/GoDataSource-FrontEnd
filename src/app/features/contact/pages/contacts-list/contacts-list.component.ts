@@ -2017,8 +2017,8 @@ export class ContactsListComponent
                   loading.message({
                     message: 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_WAIT_MESSAGE',
                     messageData: {
-                      no: '—',
-                      total: '—',
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
                       date: '—'
                     }
                   });
@@ -2135,8 +2135,8 @@ export class ContactsListComponent
                   loading.message({
                     message: 'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_WAIT_MESSAGE',
                     messageData: {
-                      no: '—',
-                      total: '—',
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
                       date: '—'
                     }
                   });

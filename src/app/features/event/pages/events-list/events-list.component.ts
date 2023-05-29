@@ -1194,8 +1194,8 @@ export class EventsListComponent
                   loading.message({
                     message: 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SELECTED_EVENTS_WAIT_MESSAGE',
                     messageData: {
-                      no: '—',
-                      total: '—',
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
                       date: '—'
                     }
                   });
@@ -1312,8 +1312,8 @@ export class EventsListComponent
                   loading.message({
                     message: 'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SELECTED_EVENTS_WAIT_MESSAGE',
                     messageData: {
-                      no: '—',
-                      total: '—',
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
                       date: '—'
                     }
                   });

@@ -1465,8 +1465,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   loading.message({
                     message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS_WAIT_MESSAGE',
                     messageData: {
-                      no: '—',
-                      total: '—',
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
                       date: '—'
                     }
                   });
@@ -1583,8 +1583,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   loading.message({
                     message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS_WAIT_MESSAGE',
                     messageData: {
-                      no: '—',
-                      total: '—',
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
                       date: '—'
                     }
                   });

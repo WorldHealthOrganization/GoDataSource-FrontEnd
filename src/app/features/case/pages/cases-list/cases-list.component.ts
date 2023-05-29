@@ -2078,8 +2078,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   loading.message({
                     message: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_SELECTED_CASES_WAIT_MESSAGE',
                     messageData: {
-                      no: '—',
-                      total: '—',
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
                       date: '—'
                     }
                   });
@@ -2196,8 +2196,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   loading.message({
                     message: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_SELECTED_CASES_WAIT_MESSAGE',
                     messageData: {
-                      no: '—',
-                      total: '—',
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
                       date: '—'
                     }
                   });

@@ -1079,8 +1079,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                   loading.message({
                     message: 'LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SELECTED_LAB_RESULTS_WAIT_MESSAGE',
                     messageData: {
-                      no: '—',
-                      total: '—',
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
                       date: '—'
                     }
                   });
@@ -1205,8 +1205,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                   loading.message({
                     message: 'LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_SELECTED_LAB_RESULTS_WAIT_MESSAGE',
                     messageData: {
-                      no: '—',
-                      total: '—',
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
                       date: '—'
                     }
                   });
