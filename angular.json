@@ -14,7 +14,7 @@
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "less"
+          "style": "scss"
         }
       },
       "architect": {
