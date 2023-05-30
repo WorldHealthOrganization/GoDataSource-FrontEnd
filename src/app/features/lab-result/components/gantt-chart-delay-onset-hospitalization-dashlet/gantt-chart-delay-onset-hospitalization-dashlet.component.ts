@@ -10,7 +10,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/index';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../../../core/models/metrics/metric-cases-delay-between-onset-hospitalization.model';
 import { Moment } from '../../../../core/helperClasses/x-moment';
 import { IGanttDataInterface } from '../../interfaces/gantt-data.interface';
