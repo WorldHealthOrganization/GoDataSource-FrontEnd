@@ -290,11 +290,21 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
           }
         },
 
+        // Divider
+        {
+          visible: (): boolean => {
+            return RelationshipModel.canBulkDelete(this.authUser) &&
+              this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          }
+        },
+
         // Bulk delete
         {
           label: {
             get: () => 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS'
           },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
           action: {
             click: (selected: string[]) => {
               // create query

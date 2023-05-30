@@ -39,6 +39,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EventModel } from '../../../../core/models/event.model';
 import { CaseModel } from '../../../../core/models/case.model';
+import { Moment } from 'moment';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -1055,7 +1056,67 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
   /**
    * Initialize process data
    */
-  protected initializeProcessSelectedData(): void {}
+  protected initializeProcessSelectedData(): void {
+    this.processSelectedData = [
+      // all selected records were not deleted ?
+      {
+        key: 'allNotDeleted',
+        shouldProcess: () => ContactOfContactModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive,
+        process: (
+          dataMap: {
+            [id: string]: ContactOfContactModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allNotDeleted: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (dataMap[selected[index]]?.deleted) {
+              // at least one not deleted
+              allNotDeleted = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allNotDeleted;
+        }
+      },
+
+      // all selected records were deleted ?
+      {
+        key: 'allDeleted',
+        shouldProcess: () => ContactOfContactModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive,
+        process: (
+          dataMap: {
+            [id: string]: ContactOfContactModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allDeleted: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (!dataMap[selected[index]]?.deleted) {
+              // at least one not deleted
+              allDeleted = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allDeleted;
+        }
+      }
+    ];
+  }
 
   /**
    * Initialize table infos
@@ -1203,6 +1264,14 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         (
           ContactOfContactModel.canBulkModify(this.authUser) &&
           this.selectedOutbreakIsActive
+        ) ||
+        (
+          ContactOfContactModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
+        (
+          ContactOfContactModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive
         ),
       actions: [
         {
@@ -1339,6 +1408,261 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           },
           disable: (selected: string[]): boolean => {
             return selected.length < 1;
+          }
+        },
+
+        // Divider
+        {
+          visible: () => (
+            ContactOfContactModel.canExport(this.authUser) ||
+            ContactOfContactModel.canExportDossier(this.authUser) ||
+            ContactOfContactModel.canExportRelationships(this.authUser) ||
+            (
+              ContactOfContactModel.canBulkModify(this.authUser) &&
+              this.selectedOutbreakIsActive
+            )
+          ) && (
+            (
+              ContactOfContactModel.canBulkDelete(this.authUser) ||
+              ContactOfContactModel.canBulkRestore(this.authUser)
+            ) &&
+            this.selectedOutbreakIsActive
+          )
+        },
+
+        // bulk delete
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS'
+          },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS_DESCRIPTION') :
+            undefined,
+          action: {
+            click: (selected: string[]) => {
+              // ask for confirmation
+              this.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_DELETE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_CONTACTS_OF_CONTACTS'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // show loading
+                  const loading = this.dialogV2Service.showLoadingDialog();
+                  loading.message({
+                    message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS_WAIT_MESSAGE',
+                    messageData: {
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
+                      date: '—'
+                    }
+                  });
+
+                  // delete - we can't use bulk here since deleting contact of contacts triggers many hooks
+                  let startTime: Moment;
+                  const selectedShallowClone: string[] = [...selected];
+                  const nextDelete = () => {
+                    // finished ?
+                    if (selectedShallowClone.length < 1) {
+                      this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS_SUCCESS_MESSAGE');
+                      loading.close();
+                      this.needsRefreshList(true);
+                      return;
+                    }
+
+                    // delete
+                    this.contactsOfContactsDataService
+                      .deleteContactOfContact(
+                        this.selectedOutbreak.id,
+                        selectedShallowClone.shift()
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // hide loading
+                          loading.close();
+
+                          // error
+                          this.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // determine estimated end time
+                        let estimatedEndDate: Moment;
+
+                        // initialize start time if necessary
+                        if (!startTime) {
+                          startTime = moment();
+                        }
+
+                        // determine estimated time
+                        const processed: number = selected.length - selectedShallowClone.length;
+                        const total: number = selected.length;
+                        if (processed > 0) {
+                          const processedSoFarTimeMs: number = moment().diff(startTime);
+                          const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
+                          const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
+                          estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                        }
+
+                        // update progress
+                        loading.message({
+                          message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS_WAIT_MESSAGE',
+                          messageData: {
+                            no: processed.toLocaleString('en'),
+                            total: total.toLocaleString('en'),
+                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                          }
+                        });
+
+                        // next
+                        nextDelete();
+                      });
+                  };
+
+                  // start delete
+                  nextDelete();
+                });
+            }
+          },
+          visible: (): boolean => {
+            return ContactOfContactModel.canBulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
+          }
+        },
+
+        // bulk restore
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS'
+          },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allDeleted ?
+            this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS_DESCRIPTION') :
+            undefined,
+          action: {
+            click: (selected: string[]) => {
+              // ask for confirmation
+              this.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_RESTORE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_CONTACTS_OF_CONTACTS'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // show loading
+                  const loading = this.dialogV2Service.showLoadingDialog();
+                  loading.message({
+                    message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS_WAIT_MESSAGE',
+                    messageData: {
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
+                      date: '—'
+                    }
+                  });
+
+                  // restore - we can't use bulk here since restoring contact of contacts triggers many hooks
+                  let startTime: Moment;
+                  const selectedShallowClone: string[] = [...selected];
+                  const nextRestore = () => {
+                    // finished ?
+                    if (selectedShallowClone.length < 1) {
+                      this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS_SUCCESS_MESSAGE');
+                      loading.close();
+                      this.needsRefreshList(true);
+                      return;
+                    }
+
+                    // restore
+                    this.contactsOfContactsDataService
+                      .restoreContactOfContact(
+                        this.selectedOutbreak.id,
+                        selectedShallowClone.shift()
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // hide loading
+                          loading.close();
+
+                          // error
+                          this.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // determine estimated end time
+                        let estimatedEndDate: Moment;
+
+                        // initialize start time if necessary
+                        if (!startTime) {
+                          startTime = moment();
+                        }
+
+                        // determine estimated time
+                        const processed: number = selected.length - selectedShallowClone.length;
+                        const total: number = selected.length;
+                        if (processed > 0) {
+                          const processedSoFarTimeMs: number = moment().diff(startTime);
+                          const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
+                          const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
+                          estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                        }
+
+                        // update progress
+                        loading.message({
+                          message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS_WAIT_MESSAGE',
+                          messageData: {
+                            no: processed.toLocaleString('en'),
+                            total: total.toLocaleString('en'),
+                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                          }
+                        });
+
+                        // next
+                        nextRestore();
+                      });
+                  };
+
+                  // start restore
+                  nextRestore();
+                });
+            }
+          },
+          visible: (): boolean => {
+            return ContactOfContactModel.canBulkRestore(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allDeleted;
           }
         }
       ]

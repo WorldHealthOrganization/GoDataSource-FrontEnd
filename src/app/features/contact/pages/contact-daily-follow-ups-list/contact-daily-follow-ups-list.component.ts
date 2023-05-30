@@ -1255,6 +1255,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       // all selected records were not deleted ?
       {
         key: 'allNotDeleted',
+        shouldProcess: () => FollowUpModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive,
         process: (
           dataMap: {
             [id: string]: FollowUpModel
@@ -1282,6 +1284,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       // all selected records were deleted ?
       {
         key: 'allDeleted',
+        shouldProcess: () => FollowUpModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive,
         process: (
           dataMap: {
             [id: string]: FollowUpModel
@@ -1959,7 +1963,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         ) ||
         FollowUpModel.canExport(this.authUser) ||
         (
-          FollowUpModel.canBulkDelete(this.authUser) &&
+          (
+            FollowUpModel.canBulkDelete(this.authUser) ||
+            FollowUpModel.canBulkRestore(this.authUser)
+          ) &&
           this.selectedOutbreakIsActive
         ),
       actions: [
@@ -2034,7 +2041,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             ) ||
             FollowUpModel.canExport(this.authUser)
           ) && (
-            FollowUpModel.canBulkDelete(this.authUser) &&
+            (
+              FollowUpModel.canBulkDelete(this.authUser) ||
+              FollowUpModel.canBulkRestore(this.authUser)
+            ) &&
             this.selectedOutbreakIsActive
           )
         },
@@ -2044,6 +2054,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           label: {
             get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS'
           },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
           action: {
             click: (selected: string[]) => {
               // create query
@@ -2115,6 +2126,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           label: {
             get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS'
           },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
           action: {
             click: (selected: string[]) => {
               // create query
@@ -2172,7 +2184,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             }
           },
           visible: (): boolean => {
-            return FollowUpModel.canBulkDelete(this.authUser) &&
+            return FollowUpModel.canBulkRestore(this.authUser) &&
               this.selectedOutbreakIsActive;
           },
           disable: (selected: string[]): boolean => {

@@ -7,7 +7,13 @@ import { ContactModel } from './contact.model';
 import { EntityType } from './entity-type';
 import { LabResultSequenceModel } from './lab-result-sequence.model';
 import { OutbreakModel } from './outbreak.model';
-import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRestorable } from './permission.interface';
+import {
+  IPermissionBasic,
+  IPermissionBasicBulk,
+  IPermissionExportable,
+  IPermissionImportable,
+  IPermissionRestorable
+} from './permission.interface';
 import { PERMISSION } from './permission.model';
 import { IAnswerData, QuestionModel } from './question.model';
 import { UserModel } from './user.model';
@@ -20,10 +26,11 @@ import { Constants } from './constants';
 export class LabResultModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRestorable,
-        IPermissionImportable,
-        IPermissionExportable {
+    IPermissionBasic,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionImportable,
+    IPermissionExportable {
   id: string;
   sampleIdentifier: string;
   dateSampleTaken: string | Moment;
@@ -248,9 +255,12 @@ export class LabResultModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionBasicBulk
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
   static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_MODIFY) : false); }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_RESTORE) : false); }
 
   /**
      * Static Permissions - IPermissionRestorable
@@ -315,7 +325,10 @@ export class LabResultModel
   /**
    * Permissions - IPermissionBasicBulk
    */
+  canBulkCreate(): boolean { return LabResultModel.canBulkCreate(); }
   canBulkModify(user: UserModel): boolean { return LabResultModel.canBulkModify(user); }
+  canBulkDelete(user: UserModel): boolean { return LabResultModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return LabResultModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionRestorable

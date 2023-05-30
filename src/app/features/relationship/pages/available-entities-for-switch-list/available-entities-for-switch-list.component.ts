@@ -242,6 +242,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
       // all selected records were not deleted ?
       {
         key: 'updateSelected',
+        shouldProcess: () => true,
         process: (
           _dataMap,
           selected

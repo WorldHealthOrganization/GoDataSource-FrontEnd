@@ -34,15 +34,15 @@ import { IAnswerData } from './question.model';
 export class ContactOfContactModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionExportable,
-        IPermissionImportable,
-        IPermissionBasicBulk,
-        IPermissionRestorable,
-        IPermissionRelatedRelationship,
-        IPermissionMovement,
-        IPermissionChronology,
-        IPermissionContactOfContacts {
+    IPermissionBasic,
+    IPermissionExportable,
+    IPermissionImportable,
+    IPermissionBasicBulk,
+    IPermissionRestorable,
+    IPermissionRelatedRelationship,
+    IPermissionMovement,
+    IPermissionChronology,
+    IPermissionContactOfContacts {
   id: string;
   firstName: string;
   middleName: string;
@@ -283,12 +283,12 @@ export class ContactOfContactModel
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_IMPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionBasicBulk
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
   static canBulkCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE) : false); }
   static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY) : false); }
-  static canBulkDelete(): boolean { return false; }
-  static canBulkRestore(): boolean { return false; }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_RESTORE) : false); }
 
   /**
      * Static Permissions - IPermissionRestorable
@@ -449,8 +449,8 @@ export class ContactOfContactModel
      */
   canBulkCreate(user: UserModel): boolean { return ContactOfContactModel.canBulkCreate(user); }
   canBulkModify(user: UserModel): boolean { return ContactOfContactModel.canBulkModify(user); }
-  canBulkDelete(): boolean { return ContactOfContactModel.canBulkDelete(); }
-  canBulkRestore(): boolean { return ContactOfContactModel.canBulkRestore(); }
+  canBulkDelete(user: UserModel): boolean { return ContactOfContactModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return ContactOfContactModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionRestorable

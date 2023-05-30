@@ -11,7 +11,7 @@ import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import {
-  IPermissionBasic,
+  IPermissionBasic, IPermissionBasicBulk,
   IPermissionCase,
   IPermissionChronology,
   IPermissionExportable,
@@ -37,17 +37,18 @@ import { I18nService } from '../services/helper/i18n.service';
 export class CaseModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRelatedRelationship,
-        IPermissionRestorable,
-        IPermissionImportable,
-        IPermissionExportable,
-        IPermissionRelatedContact,
-        IPermissionRelatedContactBulk,
-        IPermissionMovement,
-        IPermissionChronology,
-        IPermissionCase,
-        IPermissionRelatedLabResult {
+    IPermissionBasic,
+    IPermissionRelatedRelationship,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionImportable,
+    IPermissionExportable,
+    IPermissionRelatedContact,
+    IPermissionRelatedContactBulk,
+    IPermissionMovement,
+    IPermissionChronology,
+    IPermissionCase,
+    IPermissionRelatedLabResult {
   id: string;
   firstName: string;
   middleName: string;
@@ -494,6 +495,14 @@ export class CaseModel
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_RESTORE) : false); }
 
   /**
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
+  static canBulkModify(): boolean { return false; }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_RESTORE) : false); }
+
+  /**
      * Static Permissions - IPermissionImportable
      */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_IMPORT) : false); }
@@ -698,6 +707,14 @@ export class CaseModel
      * Permissions - IPermissionRestorable
      */
   canRestore(user: UserModel): boolean { return CaseModel.canRestore(user); }
+
+  /**
+   * Permissions - IPermissionBasicBulk
+   */
+  canBulkCreate(): boolean { return CaseModel.canBulkCreate(); }
+  canBulkModify(): boolean { return CaseModel.canBulkModify(); }
+  canBulkDelete(user: UserModel): boolean { return CaseModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return CaseModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionImportable
