@@ -6,12 +6,15 @@ import { EventModel } from './event.model';
 import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-default.pipe';
 import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic } from './permission.interface';
+import { TeamModel } from './team.model';
 
 export class LocationUsageModel {
   followUp: FollowUpModel[];
   case: CaseModel[];
   contact: ContactModel[];
   event: EventModel[];
+  team: TeamModel[];
+  outbreak: OutbreakModel[];
 
   constructor(data = null) {
     this.followUp = _.map(_.get(data, 'followUp', []), (followUpData) => {
@@ -26,6 +29,12 @@ export class LocationUsageModel {
     this.event = _.map(_.get(data, 'event', []), (eventData) => {
       return new EventModel(eventData);
     });
+    this.team = _.map(_.get(data, 'team', []), (teamData) => {
+      return new TeamModel(teamData);
+    });
+    this.outbreak = _.map(_.get(data, 'outbreak', []), (outbreakData) => {
+      return new OutbreakModel(outbreakData);
+    });
   }
 }
 
@@ -33,13 +42,15 @@ export enum UsageDetailsItemType {
   FOLLOW_UP = 'follow-up',
   EVENT = 'event',
   CONTACT = 'contact',
-  CASE = 'case'
+  CASE = 'case',
+  TEAM = 'team',
+  OUTBREAK = 'outbreak'
 }
 
 export class UsageDetailsItem {
-  private _type: string;
+  private _type: UsageDetailsItemType;
   private _typePermissions: IPermissionBasic;
-  set type(type: string) {
+  set type(type: UsageDetailsItemType) {
     this._type = type;
     switch (this.type) {
       case UsageDetailsItemType.FOLLOW_UP:
@@ -54,9 +65,15 @@ export class UsageDetailsItem {
       case UsageDetailsItemType.CASE:
         this._typePermissions = CaseModel;
         break;
+      case UsageDetailsItemType.TEAM:
+        this._typePermissions = TeamModel;
+        break;
+      case UsageDetailsItemType.OUTBREAK:
+        this._typePermissions = OutbreakModel;
+        break;
     }
   }
-  get type(): string {
+  get type(): UsageDetailsItemType {
     return this._type;
   }
   get typePermissions(): IPermissionBasic {
@@ -71,7 +88,7 @@ export class UsageDetailsItem {
   outbreakName: string;
 
   constructor(data: {
-    type: string,
+    type: UsageDetailsItemType,
     typeLabel: string,
     name: string,
     viewUrl: string,
@@ -144,6 +161,32 @@ export class UsageDetails {
         modifyUrl: `/cases/${caseM.id}/modify`,
         outbreakId: caseM.outbreakId,
         outbreakName: outbreaks[caseM.outbreakId] ? outbreaks[caseM.outbreakId].name : ''
+      }));
+    });
+
+    // teams
+    _.each(data.team, (team) => {
+      this.items.push(new UsageDetailsItem({
+        type: UsageDetailsItemType.TEAM,
+        typeLabel: 'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_TEAM',
+        name: team.name,
+        viewUrl: `/teams/${team.id}/view`,
+        modifyUrl: `/teams/${team.id}/modify`,
+        outbreakId: undefined,
+        outbreakName: undefined
+      }));
+    });
+
+    // outbreaks
+    _.each(data.outbreak, (outbreak) => {
+      this.items.push(new UsageDetailsItem({
+        type: UsageDetailsItemType.OUTBREAK,
+        typeLabel: 'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK',
+        name: outbreak.name,
+        viewUrl: `/outbreaks/${outbreak.id}/view`,
+        modifyUrl: `/outbreaks/${outbreak.id}/modify`,
+        outbreakId: undefined,
+        outbreakName: undefined
       }));
     });
   }
