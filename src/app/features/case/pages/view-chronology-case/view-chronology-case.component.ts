@@ -11,7 +11,7 @@ import { CaseChronology } from './typings/case-chronology';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -23,7 +23,7 @@ import { forkJoin } from 'rxjs';
   selector: 'app-view-chronology-case',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './view-chronology-case.component.html',
-  styleUrls: ['./view-chronology-case.component.less']
+  styleUrls: ['./view-chronology-case.component.scss']
 })
 export class ViewChronologyCaseComponent implements OnInit {
   // breadcrumbs

@@ -7,7 +7,7 @@ import { Chart } from 'billboard.js/types/chart';
   selector: 'app-bb-combination-stacked-bar-chart',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './bb-combination-stacked-bar-chart.component.html',
-  styleUrls: ['./bb-combination-stacked-bar-chart.component.less']
+  styleUrls: ['./bb-combination-stacked-bar-chart.component.scss']
 })
 export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
 
