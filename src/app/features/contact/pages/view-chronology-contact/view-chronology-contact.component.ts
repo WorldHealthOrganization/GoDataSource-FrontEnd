@@ -25,7 +25,7 @@ import { forkJoin, of } from 'rxjs';
   selector: 'app-view-chronology-contact',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './view-chronology-contact.component.html',
-  styleUrls: ['./view-chronology-contact.component.less']
+  styleUrls: ['./view-chronology-contact.component.scss']
 })
 export class ViewChronologyContactComponent implements OnInit {
   // breadcrumbs

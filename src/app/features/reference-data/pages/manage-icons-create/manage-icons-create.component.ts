@@ -25,7 +25,7 @@ export enum IconExtension {
   selector: 'app-manage-icons-create',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './manage-icons-create.component.html',
-  styleUrls: ['./manage-icons-create.component.less']
+  styleUrls: ['./manage-icons-create.component.scss']
 })
 export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements OnInit {
   // breadcrumbs

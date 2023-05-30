@@ -8,7 +8,7 @@ import { BulkCacheHelperService } from './core/services/helper/bulk-cache-helper
   selector: 'app-root',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.less']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
   // instance configuration
