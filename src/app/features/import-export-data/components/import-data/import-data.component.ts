@@ -1299,7 +1299,9 @@ export class ImportDataComponent
                     (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()])
         ) {
           pushNewMapField(
-            `${parentPath}.${property}`,
+            parentPath ?
+              `${parentPath}.${property}` :
+              property,
             mappedHeaderObj
           );
         } else {
