@@ -17,7 +17,7 @@ import { Chart } from 'billboard.js/types/chart';
   selector: 'app-bb-stacked-bar-chart',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './bb-stacked-bar-chart.component.html',
-  styleUrls: ['./bb-stacked-bar-chart.component.less']
+  styleUrls: ['./bb-stacked-bar-chart.component.scss']
 })
 export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
   // chart id generator

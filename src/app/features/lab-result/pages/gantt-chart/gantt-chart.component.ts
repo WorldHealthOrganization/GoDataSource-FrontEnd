@@ -187,7 +187,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
       .convertHTML2PDF(
         document.querySelector(
           this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value ?
-            'app-gantt-chart-delay-onset-hospitalization-dashlet #gantt-svg-root' :
+            'app-gantt-chart-delay-onset-hospitalization-dashlet #gantt-svg-root-hospitalization' :
             'app-gantt-chart-delay-onset-dashlet #gantt-svg-root'
         ),
         `${this.i18nService.instant('LNG_PAGE_GANTT_CHART_REPORT_LABEL')}.pdf`, {
