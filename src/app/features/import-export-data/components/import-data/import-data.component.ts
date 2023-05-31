@@ -1,14 +1,39 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { IAsyncImportResponse, IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
+import {
+  IAsyncImportResponse,
+  IMappedOption,
+  IModelArrayProperties,
+  ImportableFileModel,
+  ImportableFilePropertiesModel,
+  ImportableFilePropertyValuesModel,
+  ImportableLabelValuePair,
+  ImportableMapField,
+  ImportDataExtension
+} from './model';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { v4 as uuid } from 'uuid';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
-import { ISavedImportMappingModel, SavedImportField, SavedImportMappingModel, SavedImportOption } from '../../../../core/models/saved-import-mapping.model';
+import {
+  ISavedImportMappingModel,
+  SavedImportField,
+  SavedImportMappingModel,
+  SavedImportOption
+} from '../../../../core/models/saved-import-mapping.model';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
@@ -16,7 +41,11 @@ import { HoverRowActionsDirective } from '../../../../shared/directives/hover-ro
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
-import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
+import {
+  RequestFilterGenerator,
+  RequestQueryBuilder,
+  RequestSortDirection
+} from '../../../../core/helperClasses/request-query-builder';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { NgModel } from '@angular/forms';
 import { ImportLogDataService } from '../../../../core/services/data/import-log.data.service';
@@ -30,9 +59,19 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, IV2SideDialogConfigInputToggleCheckbox, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputText,
+  IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInput,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2BottomDialogConfigButtonType
+} from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import {
+  IV2LoadingDialogHandler
+} from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { ILocation } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
@@ -1167,7 +1206,8 @@ export class ImportDataComponent
         // create new possible map item
         const importableItem = new ImportableMapField(
           destination,
-          source.value
+          source.value,
+          this.importableObject
         );
 
         // add options if necessary
@@ -1316,7 +1356,9 @@ export class ImportDataComponent
                 ) {
                   // create object
                   pushNewMapField(
-                    `${parentPath}.${property}`,
+                    parentPath ?
+                      `${parentPath}.${property}` :
+                      property,
                     mappedHeaderObj,
                     supportedLevel.value
                   );
@@ -1336,12 +1378,21 @@ export class ImportDataComponent
     };
 
     // go through each property of the model and try to map it to a property from the imported file
-    _.each(this.importableObject.modelProperties, (value: ImportableFilePropertiesModel, property: string) => {
+    _.each(this.importableObject.modelProperties, (value, property: string) => {
       if (_.isObject(value)) {
         mapToHeaderFile(
           value,
           property,
           property
+        );
+      } else if (
+        // array of primitives ?
+        property.indexOf('[]') > -1
+      ) {
+        mapToHeaderFile(
+          value,
+          property,
+          ''
         );
       } else {
         // TOKEN
@@ -1365,7 +1416,8 @@ export class ImportDataComponent
       // create new possible map item
       const importableItem = new ImportableMapField(
         destinationField,
-        sourceField
+        sourceField,
+        this.importableObject
       );
 
       // add options if necessary
@@ -1385,7 +1437,9 @@ export class ImportDataComponent
     _.each(mapOfRequiredDestinationFields, (_n: boolean, property: string) => {
       // create
       const importableItem = new ImportableMapField(
-        property
+        property,
+        null,
+        this.importableObject
       );
 
       // make it readonly
@@ -1828,7 +1882,8 @@ export class ImportDataComponent
                 // initialize field map
                 const field: ImportableMapField = new ImportableMapField(
                   savedFieldMap.destination,
-                  savedFieldMap.source
+                  savedFieldMap.source,
+                  this.importableObject
                 );
 
                 // map levels
@@ -1853,7 +1908,9 @@ export class ImportDataComponent
               ) => {
                 // create
                 const importableItem = new ImportableMapField(
-                  destinationField
+                  destinationField,
+                  null,
+                  this.importableObject
                 );
 
                 // make it readonly
@@ -1939,6 +1996,14 @@ export class ImportDataComponent
     mapValue: string,
     itemLevels: number[]
   ): any {
+    // if non-flat remove array for primitives
+    if (
+      this.importableObject.fileType === ImportDataExtension.JSON &&
+      mapValue.endsWith('[]')
+    ) {
+      mapValue = mapValue.substring(0, mapValue.lastIndexOf('['));
+    }
+
     // add indexes
     let index: number = 0;
     while (mapValue ? mapValue.indexOf('[]') > -1 : false) {
@@ -2335,7 +2400,11 @@ export class ImportDataComponent
      */
   addNewFieldMap(): void {
     // create the new item
-    const newItem: ImportableMapField = new ImportableMapField();
+    const newItem: ImportableMapField = new ImportableMapField(
+      null,
+      null,
+      this.importableObject
+    );
 
     // add new item at the top
     this.mappedFields = [
@@ -2400,7 +2469,8 @@ export class ImportDataComponent
     // mapped options aren't cloneable
     const clonedItem: ImportableMapField = new ImportableMapField(
       item.destinationField,
-      item.sourceField
+      item.sourceField,
+      this.importableObject
     );
 
     // insert item in table
