@@ -107,6 +107,7 @@ interface IV2ActionMenuOption {
   cssClasses?: (data: any) => string;
   visible?: (data: any) => boolean;
   disable?: (data: any) => boolean;
+  tooltip?: (data: any) => string;
 }
 
 /**

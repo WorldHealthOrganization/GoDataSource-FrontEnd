@@ -11,20 +11,30 @@ import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
-import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRelatedContact, IPermissionRelatedContactBulk, IPermissionRelatedRelationship, IPermissionRestorable } from './permission.interface';
+import {
+  IPermissionBasic,
+  IPermissionBasicBulk,
+  IPermissionExportable,
+  IPermissionImportable,
+  IPermissionRelatedContact,
+  IPermissionRelatedContactBulk,
+  IPermissionRelatedRelationship,
+  IPermissionRestorable
+} from './permission.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 export class EventModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRelatedRelationship,
-        IPermissionRestorable,
-        IPermissionImportable,
-        IPermissionExportable,
-        IPermissionRelatedContact,
-        IPermissionRelatedContactBulk {
+    IPermissionBasic,
+    IPermissionRelatedRelationship,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionImportable,
+    IPermissionExportable,
+    IPermissionRelatedContact,
+    IPermissionRelatedContactBulk {
   id: string;
   name: string;
   date: string | Moment;
@@ -176,6 +186,14 @@ export class EventModel
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_RESTORE) : false); }
 
   /**
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
+  static canBulkModify(): boolean { return false; }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_BULK_RESTORE) : false); }
+
+  /**
      * Static Permissions - IPermissionImportable
      */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_IMPORT) : false); }
@@ -283,6 +301,14 @@ export class EventModel
      * Permissions - IPermissionRestorable
      */
   canRestore(user: UserModel): boolean { return EventModel.canRestore(user); }
+
+  /**
+   * Permissions - IPermissionBasicBulk
+   */
+  canBulkCreate(): boolean { return EventModel.canBulkCreate(); }
+  canBulkModify(): boolean { return EventModel.canBulkModify(); }
+  canBulkDelete(user: UserModel): boolean { return EventModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return EventModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionImportable

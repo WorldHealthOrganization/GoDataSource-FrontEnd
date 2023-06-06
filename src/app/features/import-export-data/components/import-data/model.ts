@@ -53,6 +53,9 @@ export class ImportableFileModel {
   // file id
   readonly id: string;
 
+  // file type
+  readonly fileType: ImportDataExtension;
+
   // file headers
   readonly fileHeaders: string[] = [];
 
@@ -192,6 +195,7 @@ export class ImportableFileModel {
   ) {
     // file id
     this.id = data.id;
+    this.fileType = fileType;
 
     // file headers
     this.fileHeaders = (data.fileHeaders || []).map((value: any) => {
@@ -466,7 +470,15 @@ export class ImportableMapField {
     this._sourceFieldWithoutIndexes = this.sourceFieldWithoutIndexes ? this.sourceFieldWithoutIndexes.replace(/\[\d+\]/g, '[]') : this.sourceFieldWithoutIndexes;
 
     // determine if source contains array index ?
+    // - on non-flat file types we need to map without levels primitive arrays
     this._isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
+    if (
+      this._isSourceArray &&
+      this._parent?.fileType === ImportDataExtension.JSON &&
+      this.sourceField.endsWith('[]')
+    ) {
+      this._isSourceArray = false;
+    }
 
     // determine number of max levels
     this.checkNumberOfMaxLevels();
@@ -486,6 +498,13 @@ export class ImportableMapField {
 
     // determine if destination contains array index ?
     this._isDestinationArray = this.destinationField ? this.destinationField.indexOf('[]') > -1 : false;
+    if (
+      this._isDestinationArray &&
+      this._parent?.fileType === ImportDataExtension.JSON &&
+      this.destinationField.endsWith('[]')
+    ) {
+      this._isDestinationArray = false;
+    }
 
     // determine number of max levels
     this.checkNumberOfMaxLevels();
@@ -502,7 +521,8 @@ export class ImportableMapField {
      */
   constructor(
     destinationField: string = null,
-    sourceField: string = null
+    sourceField: string = null,
+    private _parent: ImportableFileModel
   ) {
     // generate unique id
     this.id = uuid();

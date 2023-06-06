@@ -161,6 +161,12 @@
   transform: rotate($deg);
 }
 
+@mixin safari {
+  @supports (background: -webkit-named-image(i)) {
+    @content;
+  }
+}
+
 @mixin scale($factor) {
   -webkit-transform: scale($factor);
   -moz-transform: scale($factor);

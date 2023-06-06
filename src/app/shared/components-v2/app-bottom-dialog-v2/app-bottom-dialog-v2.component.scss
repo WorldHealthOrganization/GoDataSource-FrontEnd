@@ -27,6 +27,10 @@
     min-height: 17.4rem;
 
     .gd-app-bottom-dialog-v2-top {
+      background: var(--gd-background);
+      position: sticky;
+      top: 0;
+
       .gd-app-bottom-dialog-v2-tb {
         border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
 
@@ -64,8 +68,11 @@
     }
 
     .gd-app-bottom-dialog-v2-bottom {
+      background: var(--gd-background);
       border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      bottom: 0;
       padding: 0.8rem 1.6rem;
+      position: sticky;
 
       @include breakpoint('xxs') {
         @include flex_wrap(wrap);

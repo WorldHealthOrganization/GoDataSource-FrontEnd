@@ -283,6 +283,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       // all selected records were not deleted ?
       {
         key: 'updateSelected',
+        shouldProcess: () => true,
         process: (
           _dataMap,
           selected
