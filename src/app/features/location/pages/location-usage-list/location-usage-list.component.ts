@@ -23,6 +23,7 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 import { TeamModel } from '../../../../core/models/team.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
   selector: 'app-location-usage-list',
@@ -306,6 +307,11 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
           // contacts
           if (!ContactModel.canList(this.authUser)) {
             locationUsage.contact = [];
+          }
+
+          // contacts of contacts
+          if (!ContactOfContactModel.canList(this.authUser)) {
+            locationUsage.contactOfContact = [];
           }
 
           // cases

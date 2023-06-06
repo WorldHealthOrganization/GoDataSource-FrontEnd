@@ -7,11 +7,13 @@ import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-defau
 import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic } from './permission.interface';
 import { TeamModel } from './team.model';
+import { ContactOfContactModel } from './contact-of-contact.model';
 
 export class LocationUsageModel {
   followUp: FollowUpModel[];
   case: CaseModel[];
   contact: ContactModel[];
+  contactOfContact: ContactOfContactModel[];
   event: EventModel[];
   team: TeamModel[];
   outbreak: OutbreakModel[];
@@ -25,6 +27,9 @@ export class LocationUsageModel {
     });
     this.contact = _.map(_.get(data, 'contact', []), (contactData) => {
       return new ContactModel(contactData);
+    });
+    this.contactOfContact = _.map(_.get(data, 'contactOfContact', []), (contactData) => {
+      return new ContactOfContactModel(contactData);
     });
     this.event = _.map(_.get(data, 'event', []), (eventData) => {
       return new EventModel(eventData);
@@ -42,6 +47,7 @@ export enum UsageDetailsItemType {
   FOLLOW_UP = 'follow-up',
   EVENT = 'event',
   CONTACT = 'contact',
+  CONTACT_OF_CONTACT = 'contact-of-contact',
   CASE = 'case',
   TEAM = 'team',
   OUTBREAK = 'outbreak'
@@ -61,6 +67,9 @@ export class UsageDetailsItem {
         break;
       case UsageDetailsItemType.CONTACT:
         this._typePermissions = ContactModel;
+        break;
+      case UsageDetailsItemType.CONTACT_OF_CONTACT:
+        this._typePermissions = ContactOfContactModel;
         break;
       case UsageDetailsItemType.CASE:
         this._typePermissions = CaseModel;
@@ -148,6 +157,19 @@ export class UsageDetails {
         modifyUrl: `/contacts/${contact.id}/modify`,
         outbreakId: contact.outbreakId,
         outbreakName: outbreaks[contact.outbreakId] ? outbreaks[contact.outbreakId].name : ''
+      }));
+    });
+
+    // contacts of contacts
+    _.each(data.contactOfContact, (contactOfContact: ContactOfContactModel) => {
+      this.items.push(new UsageDetailsItem({
+        type: UsageDetailsItemType.CONTACT_OF_CONTACT,
+        typeLabel: 'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_CONTACT_OF_CONTACTS',
+        name: contactOfContact.name,
+        viewUrl: `/contacts-of-contacts/${contactOfContact.id}/view`,
+        modifyUrl: `/contacts-of-contacts/${contactOfContact.id}/modify`,
+        outbreakId: contactOfContact.outbreakId,
+        outbreakName: outbreaks[contactOfContact.outbreakId] ? outbreaks[contactOfContact.outbreakId].name : ''
       }));
     });
 
