@@ -25,6 +25,7 @@
 
 <!-- Menu -->
 <mat-accordion
+  #mainMenu
   class="gd-main-menu"
   [class.gd-version-not-visible]="!expanded || !versionData"
   [class.gd-mobile-device]="isTouchDevice"
@@ -120,7 +121,8 @@
               <!-- Icon -->
               <div
                 #levelOneTrigger="matMenuTrigger"
-                class="gd-main-menu-option gd-main-menu-option-margin-right"
+                class="gd-main-menu-option"
+                [class.gd-main-menu-option-margin-right]="mainMenu.scrollHeight <= mainMenu.clientHeight"
                 [matMenuTriggerFor]="menu"
                 (menuOpened)="mainMenuOpened(menuOption, levelOneTrigger)"
                 (menuClosed)="mainMenuClosed(menuOption)"
