@@ -806,7 +806,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Update website render mode
+   * Update main menu option margins
    */
   @HostListener('window:resize')
   updateMargins(): void {
