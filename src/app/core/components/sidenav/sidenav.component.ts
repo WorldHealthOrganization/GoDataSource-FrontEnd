@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, HostListener,
   Input,
   OnDestroy,
   OnInit,
@@ -803,5 +803,14 @@ export class SidenavComponent implements OnInit, OnDestroy {
       // close all main menus except the active one
       this.checkAndCloseMenusImmediate();
     }, 50);
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  updateMargins(): void {
+    // update
+    this.changeDetectorRef.detectChanges();
   }
 }
