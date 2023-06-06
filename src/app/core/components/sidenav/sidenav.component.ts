@@ -810,7 +810,6 @@ export class SidenavComponent implements OnInit, OnDestroy {
    */
   @HostListener('window:resize')
   updateMargins(): void {
-    // update
     this.changeDetectorRef.detectChanges();
   }
 }
