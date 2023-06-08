@@ -249,6 +249,16 @@ export class UserRoleModel
   static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_CREATE_CLONE) : false; }
 
   /**
+   * Static Permissions - IPermissionExportable
+   */
+  static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_EXPORT) : false; }
+
+  /**
+   * Static Permissions - IPermissionImportable
+   */
+  static canImport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_IMPORT) : false; }
+
+  /**
      * Constructor
      */
   constructor(data = null) {
@@ -280,6 +290,16 @@ export class UserRoleModel
      * Permissions - IPermissionCloneable
      */
   canClone(user: UserModel): boolean { return UserRoleModel.canClone(user); }
+
+  /**
+   * Permissions - IPermissionExportable
+   */
+  canExport(user: UserModel): boolean { return UserRoleModel.canExport(user); }
+
+  /**
+   * Permissions - IPermissionImportable
+   */
+  canImport(user: UserModel): boolean { return UserRoleModel.canImport(user); }
 }
 
 export class UserModel

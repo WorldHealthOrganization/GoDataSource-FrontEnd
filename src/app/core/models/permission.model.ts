@@ -72,6 +72,8 @@ export enum PERMISSION {
   USER_ROLE_MODIFY = 'user_role_modify',
   USER_ROLE_DELETE = 'user_role_delete',
   USER_ROLE_CREATE_CLONE = 'user_role_create_clone',
+  USER_ROLE_EXPORT = 'user_role_export',
+  USER_ROLE_IMPORT = 'user_role_import',
 
   // backups
   BACKUP_LIST = 'backup_list',
@@ -162,6 +164,8 @@ export enum PERMISSION {
   TEAM_CREATE = 'team_create',
   TEAM_MODIFY = 'team_modify',
   TEAM_DELETE = 'team_delete',
+  TEAM_EXPORT = 'team_export',
+  TEAM_IMPORT = 'team_import',
   TEAM_LIST_WORKLOAD = 'team_list_workload',
 
   // clusters

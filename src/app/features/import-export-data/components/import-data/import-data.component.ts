@@ -87,7 +87,9 @@ export enum ImportServerModelNames {
   EVENT = 'event',
   CONTACT = 'contact',
   CONTACT_OF_CONTACT = 'contactOfContact',
-  USER = 'user'
+  USER = 'user',
+  ROLE = 'role',
+  TEAM = 'team'
 }
 
 enum ImportServerErrorCodes {

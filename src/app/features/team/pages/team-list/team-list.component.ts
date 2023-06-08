@@ -20,12 +20,33 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import {
+  ExportDataExtension,
+  ExportDataMethod
+} from '../../../../core/services/helper/models/dialog-v2.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as momentOriginal from 'moment/moment';
 
 @Component({
   selector: 'app-team-list',
   templateUrl: './team-list.component.html'
 })
 export class TeamListComponent extends ListComponent<TeamModel> implements OnDestroy {
+  // team fields
+  teamFields: ILabelValuePairModel[] = [
+    { label: 'LNG_TEAM_FIELD_LABEL_NAME', value: 'name' },
+    { label: 'LNG_TEAM_FIELD_LABEL_USERS', value: 'userIds' },
+    { label: 'LNG_TEAM_FIELD_LABEL_LOCATIONS', value: 'locationIds' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+  ];
+
   /**
    * Constructor
    */
@@ -36,7 +57,8 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
     private locationDataService: LocationDataService,
-    private followUpsDataService: FollowUpsDataService
+    private followUpsDataService: FollowUpsDataService,
+    private i18nService: I18nService
   ) {
     // parent
     super(listHelperService);
@@ -317,9 +339,49 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return TeamModel.canListWorkload(this.authUser);
+        return TeamModel.canListWorkload(this.authUser) ||
+          TeamModel.canExport(this.authUser) ||
+          TeamModel.canImport(this.authUser);
       },
       menuOptions: [
+        // Export teams
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_TEAMS_EXPORT_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.exportTeams(this.queryBuilder);
+            }
+          },
+          visible: (): boolean => {
+            return TeamModel.canExport(this.authUser);
+          }
+        },
+
+        // Import teams
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_TEAMS_IMPORT_BUTTON'
+          },
+          action: {
+            link: () => ['/import-export-data', 'team-data', 'import']
+          },
+          visible: (): boolean => {
+            return TeamModel.canImport(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return (
+              TeamModel.canExport(this.authUser) ||
+              TeamModel.canImport(this.authUser)
+            );
+          }
+        },
+
         // Onset report
         {
           label: {
@@ -339,7 +401,45 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {}
+  protected initializeGroupActions(): void {
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => TeamModel.canExport(this.authUser),
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_TEAMS_GROUP_ACTION_EXPORT_SELECTED_TEAMS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect('id', selected, true, null);
+
+              // allow deleted records
+              qb.includeDeleted();
+
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
+              }
+
+              // export
+              this.exportTeams(qb);
+            }
+          },
+          visible: (): boolean => {
+            return TeamModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table add action
@@ -516,6 +616,45 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
       )
       .subscribe((response) => {
         this.pageCount = response;
+      });
+  }
+
+  /**
+   * Export selected records
+   */
+  private exportTeams(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_TEAMS_EXPORT_TITLE'
+        },
+        export: {
+          url: 'teams/export',
+          async: true,
+          method: ExportDataMethod.POST,
+          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_TEAMS_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
+          queryBuilder: qb,
+          allow: {
+            types: [
+              ExportDataExtension.CSV,
+              ExportDataExtension.XLS,
+              ExportDataExtension.XLSX,
+              ExportDataExtension.JSON,
+              ExportDataExtension.ODS,
+              ExportDataExtension.PDF
+            ],
+            encrypt: true,
+            anonymize: {
+              fields: this.teamFields
+            },
+            fields: {
+              options: this.teamFields
+            },
+            dbColumns: true,
+            dbValues: true,
+            jsonReplaceUndefinedWithNull: true
+          }
+        }
       });
   }
 }

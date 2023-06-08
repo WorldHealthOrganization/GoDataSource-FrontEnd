@@ -200,7 +200,39 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_IMPORT
       ],
-      savedImportPage: Constants.APP_IMPORT_PAGE.USER.value
+      savedImportPage: Constants.APP_IMPORT_PAGE.USER_DATA.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
+    }
+  },
+
+  // Import user role data
+  {
+    path: 'user-role-data/import',
+    component: fromPages.ImportUserRoleDataComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.USER_ROLE_IMPORT
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.ROLE_DATA.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
+    }
+  },
+
+  // Import team data
+  {
+    path: 'team-data/import',
+    component: fromPages.ImportTeamDataComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.TEAM_IMPORT
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.TEAM_DATA.value
     },
     resolve: {
       savedImportMapping: SavedImportMappingDataResolver

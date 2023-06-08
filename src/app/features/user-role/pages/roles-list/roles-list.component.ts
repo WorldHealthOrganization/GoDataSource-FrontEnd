@@ -17,12 +17,32 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { PermissionModel } from '../../../../core/models/permission.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import {
+  ExportDataExtension,
+  ExportDataMethod
+} from '../../../../core/services/helper/models/dialog-v2.model';
+import * as momentOriginal from 'moment/moment';
 
 @Component({
   selector: 'app-roles-list',
   templateUrl: './roles-list.component.html'
 })
 export class RolesListComponent extends ListComponent<UserRoleModel> implements OnDestroy {
+  // role fields
+  roleFields: ILabelValuePairModel[] = [
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_NAME', value: 'name' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS', value: 'permissionIds' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+  ];
+
   /**
    * Constructor
    */
@@ -315,12 +335,89 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
   /**
    * Initialize table quick actions
    */
-  protected initializeQuickActions(): void {}
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return UserRoleModel.canExport(this.authUser) ||
+          UserRoleModel.canImport(this.authUser);
+      },
+      menuOptions: [
+        // Export roles
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USER_ROLES_EXPORT_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.exportRoles(this.queryBuilder);
+            }
+          },
+          visible: (): boolean => {
+            return UserRoleModel.canExport(this.authUser);
+          }
+        },
+
+        // Import roles
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USER_ROLES_IMPORT_BUTTON'
+          },
+          action: {
+            link: () => ['/import-export-data', 'user-role-data', 'import']
+          },
+          visible: (): boolean => {
+            return UserRoleModel.canImport(this.authUser);
+          }
+        }
+      ]
+    };
+  }
+
 
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {}
+  protected initializeGroupActions(): void {
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => UserRoleModel.canExport(this.authUser),
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USER_ROLES_GROUP_ACTION_EXPORT_SELECTED_USER_ROLES'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect('id', selected, true, null);
+
+              // allow deleted records
+              qb.includeDeleted();
+
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
+              }
+
+              // export
+              this.exportRoles(qb);
+            }
+          },
+          visible: (): boolean => {
+            return UserRoleModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table add action
@@ -435,6 +532,45 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
         takeUntil(this.destroyed$)
       ).subscribe((response) => {
         this.pageCount = response;
+      });
+  }
+
+  /**
+   * Export selected records
+   */
+  private exportRoles(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_USER_ROLES_EXPORT_TITLE'
+        },
+        export: {
+          url: 'roles/export',
+          async: true,
+          method: ExportDataMethod.POST,
+          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_USER_ROLES_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
+          queryBuilder: qb,
+          allow: {
+            types: [
+              ExportDataExtension.CSV,
+              ExportDataExtension.XLS,
+              ExportDataExtension.XLSX,
+              ExportDataExtension.JSON,
+              ExportDataExtension.ODS,
+              ExportDataExtension.PDF
+            ],
+            encrypt: true,
+            anonymize: {
+              fields: this.roleFields
+            },
+            fields: {
+              options: this.roleFields
+            },
+            dbColumns: true,
+            dbValues: true,
+            jsonReplaceUndefinedWithNull: true
+          }
+        }
       });
   }
 }
