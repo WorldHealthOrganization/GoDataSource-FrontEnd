@@ -2057,6 +2057,14 @@ export class DialogV2Service {
                   handler.data.map.filters as IV2SideDialogConfigInputFilterList,
                   savedData.filterData
                 );
+
+                // update icons
+                item.suffixIconButtons = savedData.isPublic ?
+                  [{
+                    tooltip: this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_IS_PUBLIC_LABEL'),
+                    icon: 'public'
+                  }] :
+                  undefined;
               }
             }
           }, {
@@ -2105,6 +2113,7 @@ export class DialogV2Service {
           qb.fields(
             'id',
             'name',
+            'isPublic',
             'readOnly',
             'filterData',
             'userId',
@@ -2142,6 +2151,14 @@ export class DialogV2Service {
 
                 // infos
                 option.infos = [];
+
+                // set info icons - public ?
+                if (item.isPublic) {
+                  option.infos.push({
+                    label: this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_IS_PUBLIC_LABEL'),
+                    icon: 'public'
+                  });
+                }
 
                 // set info icons - readonly
                 if (item.readOnly) {

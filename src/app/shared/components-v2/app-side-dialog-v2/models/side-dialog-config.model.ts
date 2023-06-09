@@ -10,6 +10,7 @@ import { Moment } from '../../../../core/helperClasses/x-moment';
 import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
 import { IV2NumberRange } from '../../../forms-v2/components/app-form-number-range-v2/models/number.model';
 import { IV2DateRange } from '../../../forms-v2/components/app-form-date-range-v2/models/date.model';
+import { IAppFormIconButtonV2 } from '../../../forms-v2/core/app-form-icon-button-v2';
 
 /**
  * Side dialog config
@@ -222,6 +223,7 @@ export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogCon
   validators?: IV2SideDialogConfigInputValidator;
   clearable?: boolean;
   tooltip?: string;
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
