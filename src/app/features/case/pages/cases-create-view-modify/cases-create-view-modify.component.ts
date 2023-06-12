@@ -2500,6 +2500,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,

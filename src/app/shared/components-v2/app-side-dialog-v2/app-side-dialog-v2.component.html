@@ -712,6 +712,17 @@
                               [(ngModel)]="filter.value">
                             </app-form-select-groups-v2>
 
+                            <!-- Deleted select -->
+                            <app-form-select-single-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.DELETED"
+                              [ngModel]="filter.value === undefined ? '' : filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                              [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.yesNoAllOptions"
+                              allowDisabledToBeSelected="true"
+                              (ngModelChange)="filter.value = $event">
+                            </app-form-select-single-v2>
+
                             <!-- Questionnaire answers -->
                             <ng-container
                               *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS">

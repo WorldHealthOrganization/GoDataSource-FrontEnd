@@ -155,6 +155,7 @@ export class CaseModel
       occupation: ILabelValuePairModel[],
       risk: ILabelValuePairModel[],
       classification: ILabelValuePairModel[],
+      yesNoAll: ILabelValuePairModel[],
       yesNo: ILabelValuePairModel[],
       outcome: ILabelValuePairModel[],
       clusterLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void,
@@ -485,6 +486,20 @@ export class CaseModel
         field: 'dateRanges',
         label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION',
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'dateRanges.comments',
+        label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS',
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
       }
     ];
 
