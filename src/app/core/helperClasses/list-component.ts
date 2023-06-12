@@ -884,7 +884,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Apply the filters selected from the Side Filters section
    */
   applySideFilters(queryBuilder: RequestQueryBuilder) {
-    // clear query builder of conditions and sorting criterias
+    // clear query builder of conditions and sorting criteria
     this.clearQueryBuilder();
 
     // clear table filters
