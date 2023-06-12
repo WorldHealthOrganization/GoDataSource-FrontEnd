@@ -105,7 +105,8 @@ const routes: Routes = [
       vaccine: VaccineDataResolver,
       vaccineStatus: VaccineStatusDataResolver,
       investigationStatus: InvestigationStatusDataResolver,
-      documentType: DocumentTypeDataResolver
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver
     }
   },
   // Create Case

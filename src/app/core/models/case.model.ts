@@ -155,7 +155,8 @@ export class CaseModel
       vaccineStatus: ILabelValuePairModel[],
       user: ILabelValuePairModel[],
       investigationStatus: ILabelValuePairModel[],
-      documentType: ILabelValuePairModel[]
+      documentType: ILabelValuePairModel[],
+      addressType: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -401,6 +402,21 @@ export class CaseModel
         options: data.options.yesNo,
         sortable: true,
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'addresses.typeId',
+        label: 'LNG_ADDRESS_FIELD_LABEL_TYPE',
+        options: data.options.addressType,
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'addresses.date',
+        label: 'LNG_ADDRESS_FIELD_LABEL_DATE',
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+        sortable: true
       }
     ];
 
