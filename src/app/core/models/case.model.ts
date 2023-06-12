@@ -387,6 +387,12 @@ export class CaseModel
         field: 'documents.number',
         label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.emailAddress',
+        label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        sortable: true
       }
     ];
 
