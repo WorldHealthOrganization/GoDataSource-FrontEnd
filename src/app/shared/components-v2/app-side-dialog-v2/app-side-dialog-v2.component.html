@@ -474,7 +474,7 @@
 
                 <!-- Filter tab -->
                 <mat-tab
-                  [label]="'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE' | translate">
+                  [label]="'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE' | translate:{ no: input.filters ? input.filters.length : 0 }">
 
                   <!-- Operator -->
                   <app-form-toggle-v2
@@ -842,7 +842,7 @@
                 <!-- Sort tab -->
                 <mat-tab
                   *ngIf="input.sortableOptionsAsLabelValue?.length > 0"
-                  [label]="'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate">
+                  [label]="'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate:{ no: input.sorts ? input.sorts.length : 0 }">
 
                   <!-- Buttons -->
                   <div

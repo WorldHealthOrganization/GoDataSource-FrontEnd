@@ -11,6 +11,8 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
+    'LNG_SIDE_FILTERS_SECTION_SORT_TITLE': 'Sort ({{no}})',
+    'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE': 'Filter ({{no}})'
 
 
 

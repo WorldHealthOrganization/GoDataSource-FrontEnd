@@ -154,7 +154,8 @@ export class CaseModel
       vaccine: ILabelValuePairModel[],
       vaccineStatus: ILabelValuePairModel[],
       user: ILabelValuePairModel[],
-      investigationStatus: ILabelValuePairModel[]
+      investigationStatus: ILabelValuePairModel[],
+      documentType: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -373,6 +374,19 @@ export class CaseModel
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'vaccinesReceived.date',
         label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'documents.type',
+        label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
+        options: data.options.documentType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'documents.number',
+        label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
+        sortable: true
       }
     ];
 
