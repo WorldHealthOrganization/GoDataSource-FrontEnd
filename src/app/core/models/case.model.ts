@@ -11,25 +11,33 @@ import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import {
-  IPermissionBasic, IPermissionBasicBulk,
+  IPermissionBasic,
+  IPermissionBasicBulk,
   IPermissionCase,
   IPermissionChronology,
   IPermissionExportable,
   IPermissionImportable,
   IPermissionMovement,
   IPermissionRelatedContact,
-  IPermissionRelatedContactBulk, IPermissionRelatedLabResult,
+  IPermissionRelatedContactBulk,
+  IPermissionRelatedLabResult,
   IPermissionRelatedRelationship,
   IPermissionRestorable
 } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import {
+  V2AdvancedFilter,
+  V2AdvancedFilterType
+} from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { LocationModel } from './location.model';
-import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import {
+  IV2ColumnStatusFormType,
+  V2ColumnStatusForm
+} from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { ReferenceDataEntryModel } from './reference-data.model';
 import { SafeHtml } from '@angular/platform-browser';
 import { I18nService } from '../services/helper/i18n.service';
@@ -416,6 +424,28 @@ export class CaseModel
         field: 'addresses.date',
         label: 'LNG_ADDRESS_FIELD_LABEL_DATE',
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+        field: 'deathLocationId',
+        label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfBurial',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+        field: 'burialLocationId',
+        label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'burialPlaceName',
+        label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
         sortable: true
       }
     ];
