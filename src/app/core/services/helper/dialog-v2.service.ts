@@ -1505,7 +1505,9 @@ export class DialogV2Service {
               case V2AdvancedFilterComparatorType.LOCATION:
                 qb.filter.where({
                   [`${filterDefinition.field}.parentLocationIdFilter`]: {
-                    inq: appliedFilter.value
+                    inq: filterDefinition.type === V2AdvancedFilterType.LOCATION_SINGLE ?
+                      [appliedFilter.value] :
+                      appliedFilter.value
                   }
                 });
                 break;
