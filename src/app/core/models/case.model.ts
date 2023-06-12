@@ -164,7 +164,9 @@ export class CaseModel
       user: ILabelValuePairModel[],
       investigationStatus: ILabelValuePairModel[],
       documentType: ILabelValuePairModel[],
-      addressType: ILabelValuePairModel[]
+      addressType: ILabelValuePairModel[],
+      dateRangeType: ILabelValuePairModel[],
+      dateRangeCenter: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -412,7 +414,7 @@ export class CaseModel
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
       },
       {
-        type: V2AdvancedFilterType.SELECT,
+        type: V2AdvancedFilterType.MULTISELECT,
         field: 'addresses.typeId',
         label: 'LNG_ADDRESS_FIELD_LABEL_TYPE',
         options: data.options.addressType,
@@ -447,6 +449,42 @@ export class CaseModel
         field: 'burialPlaceName',
         label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'dateRanges.typeId',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID',
+        options: data.options.dateRangeType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateRanges.startDate',
+        label: 'LNG_FORM_RANGE_FIELD_LABEL_FROM',
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateRanges.endDate',
+        label: 'LNG_FORM_RANGE_FIELD_LABEL_TO',
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'dateRanges.centerName',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+        options: data.options.dateRangeCenter,
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+      },
+      {
+        // parentLocationIdFilter is appended by the component
+        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+        field: 'dateRanges',
+        label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION',
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
       }
     ];
 
