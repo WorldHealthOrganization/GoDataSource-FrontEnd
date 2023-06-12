@@ -393,6 +393,14 @@ export class CaseModel
         field: 'addresses.emailAddress',
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'addresses.geoLocationAccurate',
+        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        options: data.options.yesNo,
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
       }
     ];
 
