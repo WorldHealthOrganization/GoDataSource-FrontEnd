@@ -96,7 +96,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
     { label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
     { label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
-    { label: 'LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID', value: 'burialLocationId' },
+    { label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL', value: 'burialLocationId' },
     { label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME', value: 'burialPlaceName' },
     { label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
     { label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
@@ -1353,7 +1353,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       },
       {
         field: 'burialLocationId',
-        label: 'LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID',
+        label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
         format: {
           type: 'burialLocation.name'
         },
@@ -1376,6 +1376,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         }
+      },
+      {
+        field: 'safeBurial',
+        label: 'LNG_CASE_FIELD_LABEL_SAFE_BURIAL',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
       },
       {
         field: 'notACase',
@@ -2845,6 +2859,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'dateOfBurial',
       'burialLocationId',
       'burialPlaceName',
+      'safeBurial',
       'wasContact',
       'wasContactOfContact',
       'responsibleUserId',
