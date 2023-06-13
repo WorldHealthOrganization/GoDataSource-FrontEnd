@@ -990,6 +990,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'pregnancyStatus',
         label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+        notVisible: true,
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1060,6 +1061,18 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return data.deathLocation?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.deathLocation.id}/view` :
             undefined;
+        }
+      },
+      {
+        field: 'dob',
+        label: 'LNG_CASE_FIELD_LABEL_DOB',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
@@ -2725,6 +2738,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'outcomeId',
       'dateOfOutcome',
       'deathLocationId',
+      'dob',
       'age',
       'gender',
       'addresses',
