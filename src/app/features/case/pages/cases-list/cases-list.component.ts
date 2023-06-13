@@ -1049,6 +1049,30 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         }
       },
       {
+        field: 'dateBecomeCase',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'dateOfInfection',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
         field: 'deathLocationId',
         label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
         format: {
@@ -1272,6 +1296,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         },
         filter: {
           type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'isDateOfOnsetApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         },
         sortable: true
       },
@@ -2777,6 +2815,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'dateInvestigationCompleted',
       'outcomeId',
       'dateOfOutcome',
+      'dateBecomeCase',
+      'dateOfInfection',
       'deathLocationId',
       'dob',
       'age',
@@ -2785,6 +2825,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'documents',
       'vaccinesReceived',
       'dateOfOnset',
+      'isDateOfOnsetApproximate',
       'dateOfReporting',
       'dateOfBurial',
       'burialLocationId',
