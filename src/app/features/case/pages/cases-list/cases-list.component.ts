@@ -1314,6 +1314,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true
       },
       {
+        field: 'transferRefused',
+        label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
         field: 'dateOfReporting',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
         notVisible: true,
@@ -2826,6 +2840,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'vaccinesReceived',
       'dateOfOnset',
       'isDateOfOnsetApproximate',
+      'transferRefused',
       'dateOfReporting',
       'dateOfBurial',
       'burialLocationId',
