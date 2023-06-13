@@ -1200,6 +1200,21 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
           // finished
           break;
 
+        // deleted is always a special case
+        // - take in account the side filter cached value
+        case V2FilterType.DELETED:
+
+          // side filter takes precedence, deleted column shouldn't overwrite value
+          // - LNG_COMMON_MODEL_FIELD_LABEL_DELETED is used by side filters
+          const deletedKey: string = `${column.field}LNG_COMMON_MODEL_FIELD_LABEL_DELETED`;
+          const sideFilterValue = currentUserCacheForCurrentPath.sideFilters?.appliedFilters.find((item) => item.filter?.uniqueKey === deletedKey);
+          column.filter.value = sideFilterValue?.value !== undefined ?
+            sideFilterValue.value :
+            value;
+
+          // finished
+          break;
+
         default:
           column.filter.value = value;
       }
