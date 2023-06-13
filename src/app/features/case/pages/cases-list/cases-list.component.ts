@@ -43,6 +43,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { Location } from '@angular/common';
 import { Moment } from 'moment';
+import { DocumentModel } from '../../../../core/models/document.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -1394,6 +1395,25 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
+      },
+      {
+        field: 'documents',
+        label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+        format: {
+          type: (item: CaseModel): string => {
+            // must format ?
+            if (!item.uiDocuments) {
+              item.uiDocuments = DocumentModel.arrayToString(
+                this.i18nService,
+                item.documents
+              );
+            }
+
+            // finished
+            return item.uiDocuments;
+          }
+        },
+        notVisible: true
       }
     ];
 
@@ -2742,6 +2762,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'age',
       'gender',
       'addresses',
+      'documents',
       'dateOfOnset',
       'dateOfReporting',
       'dateOfBurial',

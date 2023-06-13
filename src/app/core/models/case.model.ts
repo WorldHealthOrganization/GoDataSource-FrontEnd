@@ -143,6 +143,7 @@ export class CaseModel
 
   // used by ui
   uiStatusForms: SafeHtml;
+  uiDocuments: string;
 
   /**
    * Advanced filters
