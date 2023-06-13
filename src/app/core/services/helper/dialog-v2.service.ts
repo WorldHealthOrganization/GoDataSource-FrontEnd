@@ -1505,7 +1505,9 @@ export class DialogV2Service {
               case V2AdvancedFilterComparatorType.LOCATION:
                 qb.filter.where({
                   [`${filterDefinition.field}.parentLocationIdFilter`]: {
-                    inq: appliedFilter.value
+                    inq: filterDefinition.type === V2AdvancedFilterType.LOCATION_SINGLE ?
+                      [appliedFilter.value] :
+                      appliedFilter.value
                   }
                 });
                 break;
@@ -1733,6 +1735,28 @@ export class DialogV2Service {
               false,
               null
             );
+
+            // finished
+            break;
+
+          // Deleted
+          case V2AdvancedFilterType.DELETED:
+            // FilterComparator.NONE
+            if (appliedFilter.value === false) {
+              qb.excludeDeleted();
+              qb.filter.remove('deleted');
+            } else {
+              qb.includeDeleted();
+              if (appliedFilter.value === true) {
+                qb.filter.where({
+                  deleted: {
+                    eq: true
+                  }
+                }, true);
+              } else {
+                qb.filter.remove('deleted');
+              }
+            }
 
             // finished
             break;

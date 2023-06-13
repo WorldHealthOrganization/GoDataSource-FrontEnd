@@ -58,6 +58,7 @@ const createViewModifyFoundation: Route = {
     vaccineStatus: VaccineStatusDataResolver,
     dateRangeType: PersonDateTypeDataResolver,
     dateRangeCenter: DateRangeCenterDataResolver,
+    yesNoAll: YesNoAllDataResolver,
     yesNo: YesNoDataResolver,
     personType: PersonTypeDataResolver,
     cluster: ClusterDataResolver,
@@ -66,7 +67,6 @@ const createViewModifyFoundation: Route = {
     exposureFrequency: ExposureFrequencyDataResolver,
     exposureDuration: ExposureDurationDataResolver,
     contextOfTransmission: ContextOfTransmissionDataResolver,
-    yesNoAll: YesNoAllDataResolver,
     labName: LabNameDataResolver,
     labSampleType: LabSampleTypeDataResolver,
     labTestType: LabTestTypeDataResolver,
@@ -104,7 +104,11 @@ const routes: Routes = [
       user: UserDataResolver,
       vaccine: VaccineDataResolver,
       vaccineStatus: VaccineStatusDataResolver,
-      investigationStatus: InvestigationStatusDataResolver
+      investigationStatus: InvestigationStatusDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver,
+      dateRangeType: PersonDateTypeDataResolver,
+      dateRangeCenter: DateRangeCenterDataResolver
     }
   },
   // Create Case

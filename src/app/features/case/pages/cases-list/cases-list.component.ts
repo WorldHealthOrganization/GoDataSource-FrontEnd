@@ -43,6 +43,9 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { Location } from '@angular/common';
 import { Moment } from 'moment';
+import { DocumentModel } from '../../../../core/models/document.model';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -94,7 +97,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
     { label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
     { label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
-    { label: 'LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID', value: 'burialLocationId' },
+    { label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL', value: 'burialLocationId' },
     { label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME', value: 'burialPlaceName' },
     { label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
     { label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
@@ -962,6 +965,17 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         }
       },
       {
+        field: 'pregnancyStatus',
+        label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
         field: 'investigationStatus',
         label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
         sortable: true,
@@ -1010,6 +1024,30 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         }
       },
       {
+        field: 'dateBecomeCase',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'dateOfInfection',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
         field: 'deathLocationId',
         label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
         format: {
@@ -1024,6 +1062,18 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return data.deathLocation?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.deathLocation.id}/view` :
             undefined;
+        }
+      },
+      {
+        field: 'dob',
+        label: 'LNG_CASE_FIELD_LABEL_DOB',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
@@ -1225,6 +1275,34 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true
       },
       {
+        field: 'isDateOfOnsetApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'transferRefused',
+        label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
         field: 'dateOfReporting',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
         notVisible: true,
@@ -1233,6 +1311,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         },
         filter: {
           type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         },
         sortable: true
       },
@@ -1250,7 +1342,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       },
       {
         field: 'burialLocationId',
-        label: 'LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID',
+        label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
         format: {
           type: 'burialLocation.name'
         },
@@ -1273,6 +1365,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         }
+      },
+      {
+        field: 'safeBurial',
+        label: 'LNG_CASE_FIELD_LABEL_SAFE_BURIAL',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
       },
       {
         field: 'notACase',
@@ -1345,6 +1451,63 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
+      },
+      {
+        field: 'documents',
+        label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+        format: {
+          type: (item: CaseModel): string => {
+            // must format ?
+            if (!item.uiDocuments) {
+              item.uiDocuments = DocumentModel.arrayToString(
+                this.i18nService,
+                item.documents
+              );
+            }
+
+            // finished
+            return item.uiDocuments;
+          }
+        },
+        notVisible: true
+      },
+      {
+        field: 'vaccinesReceived',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
+        format: {
+          type: (item: CaseModel): string => {
+            // must format ?
+            if (!item.uiVaccines) {
+              item.uiVaccines = VaccineModel.arrayToString(
+                this.i18nService,
+                item.vaccinesReceived
+              );
+            }
+
+            // finished
+            return item.uiVaccines;
+          }
+        },
+        notVisible: true
+      },
+      {
+        field: 'dateRanges',
+        label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
+        format: {
+          type: (item: CaseModel): string => {
+            // must format ?
+            if (!item.uiDateRanges) {
+              item.uiDateRanges = CaseCenterDateRangeModel.arrayToString(
+                this.i18nService,
+                item.dateRanges
+              );
+            }
+
+            // finished
+            return item.uiDateRanges;
+          }
+        },
+        notVisible: true
       }
     ];
 
@@ -1595,6 +1758,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -1638,7 +1802,19 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           undefined
         ),
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        dateRangeType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        dateRangeCenter: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }
@@ -2667,6 +2843,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'middleName',
       'visualId',
       'classification',
+      'pregnancyStatus',
       'riskLevel',
       'riskReason',
       'occupation',
@@ -2674,15 +2851,25 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'dateInvestigationCompleted',
       'outcomeId',
       'dateOfOutcome',
+      'dateBecomeCase',
+      'dateOfInfection',
       'deathLocationId',
+      'dob',
       'age',
       'gender',
       'addresses',
+      'documents',
+      'vaccinesReceived',
+      'dateRanges',
       'dateOfOnset',
+      'isDateOfOnsetApproximate',
+      'transferRefused',
       'dateOfReporting',
+      'isDateOfReportingApproximate',
       'dateOfBurial',
       'burialLocationId',
       'burialPlaceName',
+      'safeBurial',
       'wasContact',
       'wasContactOfContact',
       'responsibleUserId',

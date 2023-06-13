@@ -27,7 +27,8 @@ export enum V2AdvancedFilterType {
   PHONE_NUMBER = 'phone_number',
   QUESTIONNAIRE_ANSWERS = 'questionnaire_answers',
   FILE = 'file',
-  SELECT_GROUPS = 'select-groups'
+  SELECT_GROUPS = 'select-groups',
+  DELETED = 'deleted'
 }
 
 /**
@@ -238,6 +239,12 @@ export const V2AdvancedFilterComparatorOptions: {
 
   // select groups
   [V2AdvancedFilterType.SELECT_GROUPS]: [{
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE',
+    value: V2AdvancedFilterComparatorType.NONE
+  }],
+
+  // deleted
+  [V2AdvancedFilterType.DELETED]: [{
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE',
     value: V2AdvancedFilterComparatorType.NONE
   }]
@@ -458,8 +465,18 @@ interface IV2AdvancedFilterGroupsSelect extends IV2AdvancedFilterBase {
   ) => ISelectGroupOptionFormatResponse;
 }
 
+/**
+ * Advanced filter - Deleted select
+ */
+interface IV2AdvancedFilterDeleted extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.DELETED;
+  yesNoAllOptions: ILabelValuePairModel[];
+}
+
 // advanced filter
 export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterNumber | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
 | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
 | IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterDate | IV2AdvancedFilterNumberRange
-| IV2AdvancedFilterQuestionnaireAnswers | IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation | IV2AdvancedFilterGroupsSelect;
+| IV2AdvancedFilterQuestionnaireAnswers | IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation | IV2AdvancedFilterGroupsSelect
+| IV2AdvancedFilterDeleted;

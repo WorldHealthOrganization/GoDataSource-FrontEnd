@@ -884,7 +884,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Apply the filters selected from the Side Filters section
    */
   applySideFilters(queryBuilder: RequestQueryBuilder) {
-    // clear query builder of conditions and sorting criterias
+    // clear query builder of conditions and sorting criteria
     this.clearQueryBuilder();
 
     // clear table filters
@@ -1195,6 +1195,21 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
               !column.filter.options ||
               selectMap[item]
             ) :
+            value;
+
+          // finished
+          break;
+
+        // deleted is always a special case
+        // - take in account the side filter cached value
+        case V2FilterType.DELETED:
+
+          // side filter takes precedence, deleted column shouldn't overwrite value
+          // - LNG_COMMON_MODEL_FIELD_LABEL_DELETED is used by side filters
+          const deletedKey: string = `${column.field}LNG_COMMON_MODEL_FIELD_LABEL_DELETED`;
+          const sideFilterValue = currentUserCacheForCurrentPath.sideFilters?.appliedFilters.find((item) => item.filter?.uniqueKey === deletedKey);
+          column.filter.value = sideFilterValue?.value !== undefined ?
+            sideFilterValue.value :
             value;
 
           // finished
