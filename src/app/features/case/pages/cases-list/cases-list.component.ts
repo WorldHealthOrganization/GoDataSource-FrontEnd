@@ -45,6 +45,7 @@ import { Location } from '@angular/common';
 import { Moment } from 'moment';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -1340,6 +1341,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true
       },
       {
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
         field: 'dateOfBurial',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
         notVisible: true,
@@ -1497,6 +1512,25 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
 
             // finished
             return item.uiVaccines;
+          }
+        },
+        notVisible: true
+      },
+      {
+        field: 'dateRanges',
+        label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
+        format: {
+          type: (item: CaseModel): string => {
+            // must format ?
+            if (!item.uiDateRanges) {
+              item.uiDateRanges = CaseCenterDateRangeModel.arrayToString(
+                this.i18nService,
+                item.dateRanges
+              );
+            }
+
+            // finished
+            return item.uiDateRanges;
           }
         },
         notVisible: true
@@ -2852,10 +2886,12 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'addresses',
       'documents',
       'vaccinesReceived',
+      'dateRanges',
       'dateOfOnset',
       'isDateOfOnsetApproximate',
       'transferRefused',
       'dateOfReporting',
+      'isDateOfReportingApproximate',
       'dateOfBurial',
       'burialLocationId',
       'burialPlaceName',

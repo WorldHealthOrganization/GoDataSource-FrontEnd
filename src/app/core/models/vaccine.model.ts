@@ -25,7 +25,7 @@ export class VaccineModel {
     // create value
     let value: string = '';
     vaccines.forEach((vac) => {
-      value += `${value.length < 1 ? '' : ', '}${vac.vaccine?.length > 0 ? i18nService.instant(vac.vaccine) : vac.vaccine} - ${vac.date ? moment(vac.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '' }: ${vac.status?.length > 0 ? i18nService.instant(vac.status) : vac.status}`;
+      value += `${value.length < 1 ? '' : ', '}${vac.vaccine?.length > 0 ? i18nService.instant(vac.vaccine) : ''} - ${vac.date ? moment(vac.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '' }: ${vac.status?.length > 0 ? i18nService.instant(vac.status) : ''}`;
     });
 
     // finished

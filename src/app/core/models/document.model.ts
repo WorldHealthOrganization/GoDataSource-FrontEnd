@@ -21,7 +21,7 @@ export class DocumentModel {
     // create value
     let value: string = '';
     documents.forEach((doc) => {
-      value += `${value.length < 1 ? '' : ', '}${doc.type?.length > 0 ? i18nService.instant(doc.type) : doc.type}: ${doc.number}`;
+      value += `${value.length < 1 ? '' : ', '}${doc.type?.length > 0 ? i18nService.instant(doc.type) : ''}: ${doc.number ? doc.number : ''}`;
     });
 
     // finished

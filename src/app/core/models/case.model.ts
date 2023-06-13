@@ -145,6 +145,7 @@ export class CaseModel
   uiStatusForms: SafeHtml;
   uiDocuments: string;
   uiVaccines: string;
+  uiDateRanges: string;
 
   /**
    * Advanced filters
