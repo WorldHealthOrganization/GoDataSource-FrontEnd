@@ -222,13 +222,15 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'occupation',
         label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-        options: data.options.occupation
+        options: data.options.occupation,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'riskLevel',
         label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-        options: data.options.risk
+        options: data.options.risk,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
@@ -246,7 +248,8 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'classification',
         label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-        options: data.options.classification
+        options: data.options.classification,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -310,7 +313,8 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'investigationStatus',
         label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
-        options: data.options.investigationStatus
+        options: data.options.investigationStatus,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -322,7 +326,8 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'outcomeId',
         label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-        options: data.options.outcome
+        options: data.options.outcome,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
@@ -356,7 +361,8 @@ export class CaseModel
         label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
         relationshipPath: ['relationships'],
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER',
-        optionsLoad: data.options.clusterLoad
+        optionsLoad: data.options.clusterLoad,
+        sortable: true
       }, {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
@@ -374,18 +380,21 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'vaccinesReceived.vaccine',
         label: 'LNG_CASE_FIELD_LABEL_VACCINE',
-        options: data.options.vaccine
+        options: data.options.vaccine,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'vaccinesReceived.status',
         label: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
-        options: data.options.vaccineStatus
+        options: data.options.vaccineStatus,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'vaccinesReceived.date',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE'
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -514,23 +523,9 @@ export class CaseModel
         sortable: true
       },
       {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'createdBy',
-        label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
-        options: data.options.user,
-        sortable: true
-      },
-      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'createdAt',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'updatedBy',
-        label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
-        options: data.options.user,
         sortable: true
       },
       {
@@ -547,7 +542,20 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'responsibleUserId',
         label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
       });
     }
 
