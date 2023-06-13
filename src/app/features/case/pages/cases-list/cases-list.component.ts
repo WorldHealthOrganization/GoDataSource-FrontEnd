@@ -988,6 +988,16 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         }
       },
       {
+        field: 'pregnancyStatus',
+        label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
         field: 'investigationStatus',
         label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
         sortable: true,
@@ -2706,6 +2716,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'middleName',
       'visualId',
       'classification',
+      'pregnancyStatus',
       'riskLevel',
       'riskReason',
       'occupation',
