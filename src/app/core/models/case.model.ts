@@ -144,6 +144,7 @@ export class CaseModel
   // used by ui
   uiStatusForms: SafeHtml;
   uiDocuments: string;
+  uiVaccines: string;
 
   /**
    * Advanced filters

@@ -6,7 +6,9 @@ export class DocumentModel {
   type: string;
   number: string;
 
-  // ui - display list
+  /**
+   * Array to string
+   */
   static arrayToString(
     i18nService: I18nService,
     documents: DocumentModel[]

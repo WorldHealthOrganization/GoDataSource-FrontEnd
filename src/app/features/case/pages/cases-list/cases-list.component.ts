@@ -44,6 +44,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import { Location } from '@angular/common';
 import { Moment } from 'moment';
 import { DocumentModel } from '../../../../core/models/document.model';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -1414,6 +1415,25 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           }
         },
         notVisible: true
+      },
+      {
+        field: 'vaccinesReceived',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
+        format: {
+          type: (item: CaseModel): string => {
+            // must format ?
+            if (!item.uiVaccines) {
+              item.uiVaccines = VaccineModel.arrayToString(
+                this.i18nService,
+                item.vaccinesReceived
+              );
+            }
+
+            // finished
+            return item.uiVaccines;
+          }
+        },
+        notVisible: true
       }
     ];
 
@@ -2763,6 +2783,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'gender',
       'addresses',
       'documents',
+      'vaccinesReceived',
       'dateOfOnset',
       'dateOfReporting',
       'dateOfBurial',
