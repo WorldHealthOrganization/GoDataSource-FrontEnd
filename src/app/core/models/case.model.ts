@@ -512,6 +512,32 @@ export class CaseModel
         label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED',
         yesNoAllOptions: data.options.yesNoAll,
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_CASE_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
+        sortable: true
       }
     ];
 
