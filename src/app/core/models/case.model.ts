@@ -430,6 +430,18 @@ export class CaseModel
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.city',
+        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.postalCode',
+        label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.LOCATION_MULTIPLE,
         field: 'deathLocationId',
         label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID'
