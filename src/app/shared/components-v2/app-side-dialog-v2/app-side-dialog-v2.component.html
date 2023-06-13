@@ -207,6 +207,7 @@
               [clearable]="input.clearable"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              [suffixIconButtons]="input.suffixIconButtons"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-select-single-v2>
 
             <!-- Dropdown - multiple -->
