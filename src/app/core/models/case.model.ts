@@ -213,7 +213,8 @@ export class CaseModel
         type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
         field: 'addresses',
         label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true
+        isArray: true,
+        sortable: 'addresses.phoneNumber'
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,

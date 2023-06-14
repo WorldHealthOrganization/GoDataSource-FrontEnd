@@ -1426,7 +1426,8 @@ export class DialogV2Service {
                 qb.filter.byContainingText(
                   filterDefinition.field,
                   appliedFilter.value,
-                  false
+                  false,
+                  filterDefinition.useLike
                 );
 
                 // finished
