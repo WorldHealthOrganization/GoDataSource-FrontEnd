@@ -578,6 +578,32 @@ export class EventsListComponent
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
+      },
+      {
+        field: 'dateOfReporting',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
       }
     ];
 
@@ -1640,6 +1666,8 @@ export class EventsListComponent
       'endDate',
       'description',
       'address',
+      'dateOfReporting',
+      'isDateOfReportingApproximate',
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',
