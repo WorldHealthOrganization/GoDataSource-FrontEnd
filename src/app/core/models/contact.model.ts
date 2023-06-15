@@ -130,6 +130,7 @@ export class ContactModel
 
   // used by ui
   uiStatusForms: SafeHtml;
+  uiDocuments: string;
 
   /**
    * Advanced filters

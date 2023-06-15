@@ -48,6 +48,7 @@ import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-ca
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Moment } from 'moment';
+import { DocumentModel } from '../../../../core/models/document.model';
 
 @Component({
   selector: 'app-contacts-list',
@@ -952,6 +953,17 @@ export class ContactsListComponent
         }
       },
       {
+        field: 'pregnancyStatus',
+        label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
         field: 'location',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
         format: {
@@ -1130,6 +1142,19 @@ export class ContactsListComponent
         }
       },
       {
+        field: 'occupation',
+        label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
+        }
+      },
+      {
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
         notVisible: true,
@@ -1290,6 +1315,25 @@ export class ContactsListComponent
           defaultValue: ''
         },
         sortable: true
+      },
+      {
+        field: 'documents',
+        label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
+        format: {
+          type: (item: ContactModel): string => {
+            // must format ?
+            if (!item.uiDocuments) {
+              item.uiDocuments = DocumentModel.arrayToString(
+                this.i18nService,
+                item.documents
+              );
+            }
+
+            // finished
+            return item.uiDocuments;
+          }
+        },
+        notVisible: true
       },
       {
         field: 'responsibleUserId',
@@ -1537,7 +1581,7 @@ export class ContactsListComponent
           undefined
         ),
         followUpStatus: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        pregnancyStatus: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        pregnancyStatus: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         vaccine: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -2398,11 +2442,14 @@ export class ContactsListComponent
       'firstName',
       'middleName',
       'visualId',
+      'pregnancyStatus',
       'addresses',
+      'documents',
       'age',
       'dob',
       'gender',
       'riskLevel',
+      'occupation',
       'dateOfLastContact',
       'followUpTeamId',
       'followUp',

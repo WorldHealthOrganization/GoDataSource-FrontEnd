@@ -140,7 +140,7 @@ const routes: Routes = [
       ]
     },
     resolve: {
-      pregnancyStatus: PregnancyStatusDataResolver,
+      pregnancy: PregnancyStatusDataResolver,
       gender: GenderDataResolver,
       risk: RiskDataResolver,
       yesNoAll: YesNoAllDataResolver,
