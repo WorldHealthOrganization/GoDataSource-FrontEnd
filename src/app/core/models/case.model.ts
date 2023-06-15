@@ -470,7 +470,8 @@ export class CaseModel
       {
         type: V2AdvancedFilterType.LOCATION_MULTIPLE,
         field: 'burialLocationId',
-        label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL'
+        label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,

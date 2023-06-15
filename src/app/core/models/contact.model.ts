@@ -790,6 +790,82 @@ export class ContactModel
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.SELECT,
+          field: 'wasContact',
+          label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+          options: data.options.yesNo,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.SELECT,
+          field: 'wasContactOfContact',
+          label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
+          options: data.options.yesNo,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.SELECT,
+          field: 'safeBurial',
+          label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+          options: data.options.yesNo,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'documents.type',
+          label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
+          options: data.options.documentType,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'documents.number',
+          label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'addresses.emailAddress',
+          label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+          field: 'deathLocationId',
+          label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'dateOfBurial',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+          field: 'burialLocationId',
+          label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
         }
       );
 
