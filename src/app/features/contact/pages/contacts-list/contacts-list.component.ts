@@ -49,6 +49,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Moment } from 'moment';
 import { DocumentModel } from '../../../../core/models/document.model';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
 
 @Component({
   selector: 'app-contacts-list',
@@ -1345,6 +1346,25 @@ export class ContactsListComponent
         notVisible: true
       },
       {
+        field: 'vaccinesReceived',
+        label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
+        format: {
+          type: (item: ContactModel): string => {
+            // must format ?
+            if (!item.uiVaccines) {
+              item.uiVaccines = VaccineModel.arrayToString(
+                this.i18nService,
+                item.vaccinesReceived
+              );
+            }
+
+            // finished
+            return item.uiVaccines;
+          }
+        },
+        notVisible: true
+      },
+      {
         field: 'dateOfReporting',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
         notVisible: true,
@@ -2480,6 +2500,7 @@ export class ContactsListComponent
       'pregnancyStatus',
       'addresses',
       'documents',
+      'vaccinesReceived',
       'dateOfReporting',
       'isDateOfReportingApproximate',
       'age',
