@@ -138,6 +138,7 @@ export class ContactModel
    */
   static generateAdvancedFilters(data: {
     authUser: UserModel,
+    i18nService: I18nService,
     contactInvestigationTemplate: () => QuestionModel[],
     contactFollowUpTemplate: () => QuestionModel[],
     caseInvestigationTemplate: () => QuestionModel[],
@@ -159,7 +160,9 @@ export class ContactModel
       investigationStatus: ILabelValuePairModel[],
       classification: ILabelValuePairModel[],
       clusterLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void,
-      outcome: ILabelValuePairModel[]
+      outcome: ILabelValuePairModel[],
+      dateRangeType: ILabelValuePairModel[],
+      dateRangeCenter: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -865,6 +868,57 @@ export class ContactModel
           label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'dateRanges.typeId',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID',
+          options: data.options.dateRangeType,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'dateRanges.startDate',
+          label: 'LNG_FORM_RANGE_FIELD_LABEL_FROM',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: `${data.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${data.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'dateRanges.endDate',
+          label: 'LNG_FORM_RANGE_FIELD_LABEL_TO',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: `${data.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${data.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'dateRanges.centerName',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+          options: data.options.dateRangeCenter,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: `${data.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${data.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          extraConditions: caseCondition
+        },
+        {
+          // parentLocationIdFilter is appended by the component
+          type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+          field: 'dateRanges',
+          label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: `${data.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${data.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'dateRanges.comments',
+          label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: `${data.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${data.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         }
       );

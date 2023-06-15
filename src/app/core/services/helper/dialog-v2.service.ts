@@ -94,7 +94,7 @@ import { I18nService } from './i18n.service';
 export class DialogV2Service {
   // export dialog width
   private static readonly EXPORT_DIALOG_WIDTH: string = '50rem';
-  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '40rem';
+  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '50rem';
 
   // used to show and update side dialog
   private _sideDialogSubject$: Subject<IV2SideDialog> = new Subject<IV2SideDialog>();
