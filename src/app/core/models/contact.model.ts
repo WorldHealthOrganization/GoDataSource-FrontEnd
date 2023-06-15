@@ -403,6 +403,14 @@ export class ContactModel
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'clusterId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+        relationshipPath: ['relationships'],
+        optionsLoad: data.options.clusterLoad,
+        relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+      },
+      {
         type: V2AdvancedFilterType.DELETED,
         field: 'deleted',
         label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED',
@@ -597,12 +605,12 @@ export class ContactModel
           extraConditions: caseCondition
         },
         {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'clusterId',
-          label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
-          relationshipPath: ['relationships'],
-          relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER',
-          optionsLoad: data.options.clusterLoad
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'dateBecomeCase',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
         }
       );
 
