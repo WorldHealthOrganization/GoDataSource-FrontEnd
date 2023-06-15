@@ -110,7 +110,8 @@ const contactFoundation: Route = {
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
     entity: RelationshipPersonDataResolver,
-    investigationStatus: InvestigationStatusDataResolver
+    investigationStatus: InvestigationStatusDataResolver,
+    classification: ClassificationDataResolver
   }
 };
 
@@ -156,7 +157,8 @@ const routes: Routes = [
       team: TeamDataResolver,
       documentType: DocumentTypeDataResolver,
       addressType: AddressTypeDataResolver,
-      investigationStatus: InvestigationStatusDataResolver
+      investigationStatus: InvestigationStatusDataResolver,
+      classification: ClassificationDataResolver
     }
   },
   // Create Contact
