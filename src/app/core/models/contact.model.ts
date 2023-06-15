@@ -764,6 +764,32 @@ export class ContactModel
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'vaccinesReceived.vaccine',
+          label: 'LNG_CASE_FIELD_LABEL_VACCINE',
+          options: data.options.vaccine,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'vaccinesReceived.status',
+          label: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
+          options: data.options.vaccineStatus,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'vaccinesReceived.date',
+          label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
         }
       );
 
