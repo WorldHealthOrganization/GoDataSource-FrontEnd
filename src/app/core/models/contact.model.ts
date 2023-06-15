@@ -738,6 +738,32 @@ export class ContactModel
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.SELECT,
+          field: 'transferRefused',
+          label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+          options: data.options.yesNo,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'riskLevel',
+          label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+          options: data.options.risk,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'riskReason',
+          label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
         }
       );
 
