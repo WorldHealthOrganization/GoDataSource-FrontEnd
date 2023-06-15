@@ -284,4 +284,9 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
       action: null
     });
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 }

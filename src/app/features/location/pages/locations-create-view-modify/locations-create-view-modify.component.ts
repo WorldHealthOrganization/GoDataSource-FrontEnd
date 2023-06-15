@@ -214,6 +214,11 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

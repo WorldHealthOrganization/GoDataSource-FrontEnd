@@ -130,6 +130,11 @@ export class UpstreamServersCreateViewModifyComponent extends CreateViewModifyCo
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

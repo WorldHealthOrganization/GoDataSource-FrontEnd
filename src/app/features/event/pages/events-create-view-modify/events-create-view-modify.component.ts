@@ -237,6 +237,11 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

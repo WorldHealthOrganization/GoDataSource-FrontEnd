@@ -153,6 +153,11 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

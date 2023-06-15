@@ -170,6 +170,11 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

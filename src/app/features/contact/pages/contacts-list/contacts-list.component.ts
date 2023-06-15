@@ -48,6 +48,9 @@ import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-ca
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Moment } from 'moment';
+import { DocumentModel } from '../../../../core/models/document.model';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 @Component({
   selector: 'app-contacts-list',
@@ -149,7 +152,8 @@ export class ContactsListComponent
     private bulkCacheHelperService: BulkCacheHelperService,
     private referenceDataHelperService: ReferenceDataHelperService,
     private router: Router,
-    private relationshipDataService: RelationshipDataService
+    private relationshipDataService: RelationshipDataService,
+    private clusterDataService: ClusterDataService
   ) {
     super(
       listHelperService, {
@@ -952,6 +956,17 @@ export class ContactsListComponent
         }
       },
       {
+        field: 'pregnancyStatus',
+        label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
         field: 'location',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
         format: {
@@ -1130,6 +1145,28 @@ export class ContactsListComponent
         }
       },
       {
+        field: 'riskReason',
+        label: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'occupation',
+        label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
+        }
+      },
+      {
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
         notVisible: true,
@@ -1280,6 +1317,70 @@ export class ContactsListComponent
       {
         field: 'wasContactOfContact',
         label: 'LNG_CONTACT_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'documents',
+        label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
+        format: {
+          type: (item: ContactModel): string => {
+            // must format ?
+            if (!item.uiDocuments) {
+              item.uiDocuments = DocumentModel.arrayToString(
+                this.i18nService,
+                item.documents
+              );
+            }
+
+            // finished
+            return item.uiDocuments;
+          }
+        },
+        notVisible: true
+      },
+      {
+        field: 'vaccinesReceived',
+        label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
+        format: {
+          type: (item: ContactModel): string => {
+            // must format ?
+            if (!item.uiVaccines) {
+              item.uiVaccines = VaccineModel.arrayToString(
+                this.i18nService,
+                item.vaccinesReceived
+              );
+            }
+
+            // finished
+            return item.uiVaccines;
+          }
+        },
+        notVisible: true
+      },
+      {
+        field: 'dateOfReporting',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1527,6 +1628,7 @@ export class ContactsListComponent
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = ContactModel.generateAdvancedFilters({
       authUser: this.authUser,
+      i18nService: this.i18nService,
       contactInvestigationTemplate: () => this.selectedOutbreak.contactInvestigationTemplate,
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
@@ -1537,7 +1639,7 @@ export class ContactsListComponent
           undefined
         ),
         followUpStatus: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        pregnancyStatus: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         vaccine: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1548,11 +1650,63 @@ export class ContactsListComponent
           (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        risk: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        clusterLoad: (finished) => {
+          this.clusterDataService
+            .getResolveList(this.selectedOutbreak.id)
+            .pipe(
+              // handle error
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // not found
+                finished(null);
+
+                // send error down the road
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((data) => {
+              finished(data);
+            });
+        },
+        outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        dateRangeType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        dateRangeCenter: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }
@@ -2390,11 +2544,18 @@ export class ContactsListComponent
       'firstName',
       'middleName',
       'visualId',
+      'pregnancyStatus',
       'addresses',
+      'documents',
+      'vaccinesReceived',
+      'dateOfReporting',
+      'isDateOfReportingApproximate',
       'age',
       'dob',
       'gender',
       'riskLevel',
+      'riskReason',
+      'occupation',
       'dateOfLastContact',
       'followUpTeamId',
       'followUp',

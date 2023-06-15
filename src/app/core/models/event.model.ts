@@ -177,14 +177,16 @@ export class EventModel
         field: 'address.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         sortable: true,
-        useLike: true
+        useLike: true,
+        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         sortable: true,
-        useLike: true
+        useLike: true,
+        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
       },
       {
         type: V2AdvancedFilterType.SELECT,

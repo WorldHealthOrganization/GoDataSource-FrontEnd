@@ -179,6 +179,11 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

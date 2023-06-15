@@ -259,6 +259,7 @@
           <!-- Breadcrumbs -->
           <app-breadcrumb-v2
             [breadcrumbs]="breadcrumbs"
+            [infos]="breadcrumbInfos"
             (detectChanges)="resizeTable()"></app-breadcrumb-v2>
 
           <!-- Title & buttons -->
@@ -282,6 +283,7 @@
                 *ngIf="isModify && tabData.buttons.view && (!tabData.buttons.view.visible || tabData.buttons.view.visible())"
                 type="button"
                 mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_VIEW_DATA' | translate"
                 [routerLink]="tabData.buttons.view.link.link()"
                 [queryParams]="tabData.buttons.view.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.view.link.queryParams()) : selectedTabParams">
                 <mat-icon>visibility</mat-icon>
@@ -327,6 +329,7 @@
                 *ngIf="isSmallScreenMode && isModify && tabData.buttons.view && (!tabData.buttons.view.visible || tabData.buttons.view.visible())"
                 type="button"
                 mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_VIEW_DATA' | translate"
                 [routerLink]="tabData.buttons.view.link.link()"
                 [queryParams]="tabData.buttons.view.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.view.link.queryParams()) : selectedTabParams">
                 <mat-icon>visibility</mat-icon>
