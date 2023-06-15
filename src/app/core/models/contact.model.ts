@@ -158,7 +158,8 @@ export class ContactModel
       risk: ILabelValuePairModel[],
       investigationStatus: ILabelValuePairModel[],
       classification: ILabelValuePairModel[],
-      clusterLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void
+      clusterLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void,
+      outcome: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -682,6 +683,49 @@ export class ContactModel
           field: 'isDateOfReportingApproximate',
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
           options: data.options.yesNo,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_NUMBER,
+          field: 'numberOfContacts',
+          label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_NUMBER,
+          field: 'numberOfExposures',
+          label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'occupation',
+          label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+          options: data.options.occupation,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'outcomeId',
+          label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+          options: data.options.outcome,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+          field: 'addresses',
+          label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
+          isArray: true,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition

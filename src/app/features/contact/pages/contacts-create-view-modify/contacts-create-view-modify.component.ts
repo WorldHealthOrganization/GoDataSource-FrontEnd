@@ -2534,7 +2534,12 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             .subscribe((data) => {
               finished(data);
             });
-        }
+        },
+        outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }

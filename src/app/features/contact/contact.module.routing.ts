@@ -111,7 +111,8 @@ const contactFoundation: Route = {
     labSequenceResult: LabSequenceResultDataResolver,
     entity: RelationshipPersonDataResolver,
     investigationStatus: InvestigationStatusDataResolver,
-    classification: ClassificationDataResolver
+    classification: ClassificationDataResolver,
+    outcome: OutcomeDataResolver
   }
 };
 
@@ -158,7 +159,8 @@ const routes: Routes = [
       documentType: DocumentTypeDataResolver,
       addressType: AddressTypeDataResolver,
       investigationStatus: InvestigationStatusDataResolver,
-      classification: ClassificationDataResolver
+      classification: ClassificationDataResolver,
+      outcome: OutcomeDataResolver
     }
   },
   // Create Contact
