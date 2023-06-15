@@ -641,6 +641,11 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

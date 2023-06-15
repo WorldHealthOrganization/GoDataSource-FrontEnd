@@ -125,6 +125,11 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

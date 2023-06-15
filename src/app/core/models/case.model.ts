@@ -213,7 +213,8 @@ export class CaseModel
         type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
         field: 'addresses',
         label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true
+        isArray: true,
+        sortable: 'addresses.phoneNumber'
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -438,20 +439,22 @@ export class CaseModel
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'addresses.date',
         label: 'LNG_ADDRESS_FIELD_LABEL_DATE',
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-        sortable: true
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-        sortable: true
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
-        sortable: true
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
       },
       {
         type: V2AdvancedFilterType.LOCATION_MULTIPLE,
@@ -467,7 +470,8 @@ export class CaseModel
       {
         type: V2AdvancedFilterType.LOCATION_MULTIPLE,
         field: 'burialLocationId',
-        label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL'
+        label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,

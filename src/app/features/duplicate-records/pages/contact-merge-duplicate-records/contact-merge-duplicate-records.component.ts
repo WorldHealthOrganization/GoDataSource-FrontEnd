@@ -442,6 +442,11 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
      * Initialize tabs
      */
   protected initializeTabs(): void {

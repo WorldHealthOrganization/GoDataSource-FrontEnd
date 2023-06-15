@@ -273,4 +273,9 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
       }
     ];
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 }

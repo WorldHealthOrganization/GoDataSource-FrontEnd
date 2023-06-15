@@ -578,6 +578,32 @@ export class EventsListComponent
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
+      },
+      {
+        field: 'dateOfReporting',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
       }
     ];
 
@@ -903,9 +929,13 @@ export class EventsListComponent
    */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = EventModel.generateAdvancedFilters({
+      authUser: this.authUser,
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-        eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
       }
     });
   }
@@ -1636,6 +1666,8 @@ export class EventsListComponent
       'endDate',
       'description',
       'address',
+      'dateOfReporting',
+      'isDateOfReportingApproximate',
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',

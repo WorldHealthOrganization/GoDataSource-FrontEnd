@@ -40,6 +40,9 @@ import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 import { FollowUpGroupByDataResolver } from '../../core/services/resolvers/data/follow-up-group-by.resolver';
 import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
+import { InvestigationStatusDataResolver } from '../../core/services/resolvers/data/investigation-status.resolver';
+import { PersonDateTypeDataResolver } from '../../core/services/resolvers/data/person-date-type.resolver';
+import { DateRangeCenterDataResolver } from '../../core/services/resolvers/data/date-range-center.resolver';
 
 // Follow-ups list from a - contact / case
 const viewFollowUpsListFoundation: Route = {
@@ -90,6 +93,7 @@ const contactFoundation: Route = {
     vaccine: VaccineDataResolver,
     vaccineStatus: VaccineStatusDataResolver,
     followUpStatus: FinalFollowUpStatusDataResolver,
+    yesNoAll: YesNoAllDataResolver,
     yesNo: YesNoDataResolver,
     team: TeamDataResolver,
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
@@ -100,7 +104,6 @@ const contactFoundation: Route = {
     exposureFrequency: ExposureFrequencyDataResolver,
     exposureDuration: ExposureDurationDataResolver,
     contextOfTransmission: ContextOfTransmissionDataResolver,
-    yesNoAll: YesNoAllDataResolver,
     labName: LabNameDataResolver,
     labSampleType: LabSampleTypeDataResolver,
     labTestType: LabTestTypeDataResolver,
@@ -108,7 +111,12 @@ const contactFoundation: Route = {
     labResultProgress: LabProgressDataResolver,
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
-    entity: RelationshipPersonDataResolver
+    entity: RelationshipPersonDataResolver,
+    investigationStatus: InvestigationStatusDataResolver,
+    classification: ClassificationDataResolver,
+    outcome: OutcomeDataResolver,
+    dateRangeType: PersonDateTypeDataResolver,
+    dateRangeCenter: DateRangeCenterDataResolver
   }
 };
 
@@ -140,7 +148,7 @@ const routes: Routes = [
       ]
     },
     resolve: {
-      pregnancyStatus: PregnancyStatusDataResolver,
+      pregnancy: PregnancyStatusDataResolver,
       gender: GenderDataResolver,
       risk: RiskDataResolver,
       yesNoAll: YesNoAllDataResolver,
@@ -151,7 +159,14 @@ const routes: Routes = [
       vaccineStatus: VaccineStatusDataResolver,
       followUpStatus: FinalFollowUpStatusDataResolver,
       dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
-      team: TeamDataResolver
+      team: TeamDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver,
+      investigationStatus: InvestigationStatusDataResolver,
+      classification: ClassificationDataResolver,
+      outcome: OutcomeDataResolver,
+      dateRangeType: PersonDateTypeDataResolver,
+      dateRangeCenter: DateRangeCenterDataResolver
     }
   },
   // Create Contact

@@ -351,6 +351,33 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {
+    // nothing to do ?
+    if (this.isCreate) {
+      return;
+    }
+
+    // reset
+    this.breadcrumbInfos = [];
+
+    // was contact ?
+    if (this.itemData.wasContact) {
+      this.breadcrumbInfos.push({
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT'
+      });
+    }
+
+    // was contact of contact ?
+    if (this.itemData.wasContactOfContact) {
+      this.breadcrumbInfos.push({
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT'
+      });
+    }
+  }
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {
@@ -1270,6 +1297,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs - Contact Questionnaire
    */
   private initializeTabsQuestionnaireAsContact(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
@@ -1287,7 +1315,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         hideQuestionNumbers: () => {
           return this.hideContactQuestionNumbers;
         },
-        updateErrors: () => {}
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
       },
       visible: () => (this.isView || !this.selectedOutbreak.disableModifyingLegacyQuestionnaire) &&
         this.selectedOutbreak.contactInvestigationTemplate?.length > 0 &&

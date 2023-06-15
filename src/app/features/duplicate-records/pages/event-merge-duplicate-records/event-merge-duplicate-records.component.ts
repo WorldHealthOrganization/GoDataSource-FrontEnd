@@ -317,6 +317,11 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
     * Initialize tabs
     */
   protected initializeTabs(): void {

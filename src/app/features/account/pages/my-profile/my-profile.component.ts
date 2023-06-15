@@ -100,6 +100,11 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {
