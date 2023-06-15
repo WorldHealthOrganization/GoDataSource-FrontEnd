@@ -289,7 +289,8 @@ export class ContactModel
         type: V2AdvancedFilterType.TEXT,
         field: 'documents.number',
         label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
-        sortable: true
+        sortable: true,
+        useLike: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
