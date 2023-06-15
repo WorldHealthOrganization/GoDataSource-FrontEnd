@@ -144,7 +144,7 @@ export class ContactModel
     options: {
       occupation: ILabelValuePairModel[],
       followUpStatus: ILabelValuePairModel[],
-      pregnancyStatus: ILabelValuePairModel[],
+      pregnancy: ILabelValuePairModel[],
       vaccine: ILabelValuePairModel[],
       vaccineStatus: ILabelValuePairModel[],
       yesNoAll: ILabelValuePairModel[],
@@ -294,7 +294,7 @@ export class ContactModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'pregnancyStatus',
         label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-        options: data.options.pregnancyStatus,
+        options: data.options.pregnancy,
         sortable: true
       },
       {
@@ -726,6 +726,15 @@ export class ContactModel
           field: 'addresses',
           label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
           isArray: true,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'pregnancyStatus',
+          label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+          options: data.options.pregnancy,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
