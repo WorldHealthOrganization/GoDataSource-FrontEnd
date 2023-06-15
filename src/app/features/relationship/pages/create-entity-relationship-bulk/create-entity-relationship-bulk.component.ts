@@ -559,4 +559,9 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
       }
     ];
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 }

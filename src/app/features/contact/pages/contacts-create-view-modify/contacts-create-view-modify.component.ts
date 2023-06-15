@@ -364,6 +364,33 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {
+    // nothing to do ?
+    if (this.isCreate) {
+      return;
+    }
+
+    // reset
+    this.breadcrumbInfos = [];
+
+    // was case ?
+    if (this.itemData.wasCase) {
+      this.breadcrumbInfos.push({
+        label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
+      });
+    }
+
+    // was contact of contact ?
+    if (this.itemData.wasContactOfContact) {
+      this.breadcrumbInfos.push({
+        label: 'LNG_CONTACT_FIELD_LABEL_WAS_CONTACT_OF_CONTACT'
+      });
+    }
+  }
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

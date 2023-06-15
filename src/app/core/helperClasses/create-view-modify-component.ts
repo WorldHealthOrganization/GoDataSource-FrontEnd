@@ -1,5 +1,5 @@
 import { Observable, ReplaySubject, throwError } from 'rxjs';
-import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { IV2Breadcrumb, IV2BreadcrumbInfo } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel, UserSettings } from '../models/user.model';
 import { ICreateViewModifyV2, ICreateViewModifyV2Config } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
@@ -39,6 +39,7 @@ export abstract class CreateViewModifyComponent<T>
 
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[];
+  breadcrumbInfos: IV2BreadcrumbInfo[];
 
   // authenticated user data
   authUser: UserModel;
@@ -193,6 +194,11 @@ export abstract class CreateViewModifyComponent<T>
   protected abstract initializeBreadcrumbs(): void;
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected abstract initializeBreadcrumbInfos(): void;
+
+  /**
    * Initialize tabs
    */
   protected abstract initializeTabs(): void;
@@ -272,6 +278,9 @@ export abstract class CreateViewModifyComponent<T>
 
     // initialize breadcrumbs
     this.initializeBreadcrumbs();
+
+    // initialize breadcrumb infos
+    this.initializeBreadcrumbInfos();
 
     // initialize tabs
     this.initializeTabs();

@@ -351,6 +351,33 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {
+    // nothing to do ?
+    if (this.isCreate) {
+      return;
+    }
+
+    // reset
+    this.breadcrumbInfos = [];
+
+    // was contact ?
+    if (this.itemData.wasContact) {
+      this.breadcrumbInfos.push({
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT'
+      });
+    }
+
+    // was contact of contact ?
+    if (this.itemData.wasContactOfContact) {
+      this.breadcrumbInfos.push({
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT'
+      });
+    }
+  }
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {
