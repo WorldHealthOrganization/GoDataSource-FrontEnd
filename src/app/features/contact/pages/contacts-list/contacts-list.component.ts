@@ -1142,6 +1142,15 @@ export class ContactsListComponent
         }
       },
       {
+        field: 'riskReason',
+        label: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'occupation',
         label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
         sortable: true,
@@ -1334,6 +1343,32 @@ export class ContactsListComponent
           }
         },
         notVisible: true
+      },
+      {
+        field: 'dateOfReporting',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
       },
       {
         field: 'responsibleUserId',
@@ -2445,10 +2480,13 @@ export class ContactsListComponent
       'pregnancyStatus',
       'addresses',
       'documents',
+      'dateOfReporting',
+      'isDateOfReportingApproximate',
       'age',
       'dob',
       'gender',
       'riskLevel',
+      'riskReason',
       'occupation',
       'dateOfLastContact',
       'followUpTeamId',
