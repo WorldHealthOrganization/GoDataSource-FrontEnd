@@ -67,6 +67,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 /**
  * Component
@@ -130,6 +131,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     protected relationshipDataService: RelationshipDataService,
     protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
+    private clusterDataService: ClusterDataService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -2509,7 +2511,30 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
-        )
+        ),
+        clusterLoad: (finished) => {
+          this.clusterDataService
+            .getResolveList(this.selectedOutbreak.id)
+            .pipe(
+              // handle error
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // not found
+                finished(null);
+
+                // send error down the road
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((data) => {
+              finished(data);
+            });
+        }
       }
     });
   }

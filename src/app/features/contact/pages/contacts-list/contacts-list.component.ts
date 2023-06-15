@@ -50,6 +50,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { Moment } from 'moment';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 @Component({
   selector: 'app-contacts-list',
@@ -151,7 +152,8 @@ export class ContactsListComponent
     private bulkCacheHelperService: BulkCacheHelperService,
     private referenceDataHelperService: ReferenceDataHelperService,
     private router: Router,
-    private relationshipDataService: RelationshipDataService
+    private relationshipDataService: RelationshipDataService,
+    private clusterDataService: ClusterDataService
   ) {
     super(
       listHelperService, {
@@ -1665,7 +1667,30 @@ export class ContactsListComponent
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
-        )
+        ),
+        clusterLoad: (finished) => {
+          this.clusterDataService
+            .getResolveList(this.selectedOutbreak.id)
+            .pipe(
+              // handle error
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // not found
+                finished(null);
+
+                // send error down the road
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((data) => {
+              finished(data);
+            });
+        }
       }
     });
   }

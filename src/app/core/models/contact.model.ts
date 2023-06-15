@@ -157,7 +157,8 @@ export class ContactModel
       addressType: ILabelValuePairModel[],
       risk: ILabelValuePairModel[],
       investigationStatus: ILabelValuePairModel[],
-      classification: ILabelValuePairModel[]
+      classification: ILabelValuePairModel[],
+      clusterLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -594,6 +595,14 @@ export class ContactModel
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'clusterId',
+          label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER',
+          optionsLoad: data.options.clusterLoad
         }
       );
 
