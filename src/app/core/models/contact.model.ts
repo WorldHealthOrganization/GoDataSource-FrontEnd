@@ -912,6 +912,31 @@ export class ContactModel
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: `${data.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${data.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.DELETED,
+          field: 'deleted',
+          label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED',
+          yesNoAllOptions: data.options.yesNoAll,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'createdAt',
+          label: 'LNG_CASE_FIELD_LABEL_CREATED_AT',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'updatedAt',
+          label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
         }
       );
 
