@@ -151,7 +151,8 @@ const routes: Routes = [
       vaccineStatus: VaccineStatusDataResolver,
       followUpStatus: FinalFollowUpStatusDataResolver,
       dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
-      team: TeamDataResolver
+      team: TeamDataResolver,
+      documentType: DocumentTypeDataResolver
     }
   },
   // Create Contact

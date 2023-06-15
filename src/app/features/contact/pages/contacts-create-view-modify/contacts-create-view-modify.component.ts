@@ -1039,6 +1039,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Case Questionnaire
    */
   private initializeTabsQuestionnaireAsCase(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE,
@@ -1056,7 +1057,12 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         hideQuestionNumbers: () => {
           return this.hideCaseQuestionNumbers;
         },
-        updateErrors: () => {}
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
       },
       visible: () => (this.isView || !this.selectedOutbreak.disableModifyingLegacyQuestionnaire) &&
         this.selectedOutbreak.caseInvestigationTemplate?.length > 0 &&
@@ -2462,7 +2468,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }

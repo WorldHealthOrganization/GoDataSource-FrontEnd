@@ -149,7 +149,8 @@ export class ContactModel
       team: ILabelValuePairModel[],
       user: ILabelValuePairModel[],
       dailyFollowUpStatus: ILabelValuePairModel[],
-      gender: ILabelValuePairModel[]
+      gender: ILabelValuePairModel[],
+      documentType: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -276,6 +277,19 @@ export class ContactModel
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'vaccinesReceived.date',
         label: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'documents.type',
+        label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
+        options: data.options.documentType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'documents.number',
+        label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,

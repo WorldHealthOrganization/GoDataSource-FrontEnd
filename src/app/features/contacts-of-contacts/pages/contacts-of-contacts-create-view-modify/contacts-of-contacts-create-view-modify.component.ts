@@ -1064,6 +1064,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Initialize tabs - Case Questionnaire
    */
   private initializeTabsQuestionnaireAsCase(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: ContactsOfContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE,
@@ -1081,7 +1082,12 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         hideQuestionNumbers: () => {
           return this.hideCaseQuestionNumbers;
         },
-        updateErrors: () => {}
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
       },
       visible: () => (this.isView || !this.selectedOutbreak.disableModifyingLegacyQuestionnaire) &&
         this.selectedOutbreak.caseInvestigationTemplate?.length > 0 &&
@@ -1093,6 +1099,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Initialize tabs - Contact Questionnaire
    */
   private initializeTabsQuestionnaireAsContact(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: ContactsOfContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
@@ -1110,8 +1117,12 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         hideQuestionNumbers: () => {
           return this.hideContactQuestionNumbers;
         },
-        updateErrors: () => {
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
         }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
       },
       visible: () => (this.isView || !this.selectedOutbreak.disableModifyingLegacyQuestionnaire) &&
         this.selectedOutbreak.contactInvestigationTemplate?.length > 0 &&
