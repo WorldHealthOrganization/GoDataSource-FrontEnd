@@ -458,39 +458,39 @@ export class ContactModel
     if (FollowUpModel.canList(data.authUser)) {
       advancedFilters.push(
         {
+          type: V2AdvancedFilterType.RANGE_DATE,
           field: 'date',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-          type: V2AdvancedFilterType.RANGE_DATE,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         },
         {
+          type: V2AdvancedFilterType.RANGE_NUMBER,
           field: 'index',
           label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
-          type: V2AdvancedFilterType.RANGE_NUMBER,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         },
         {
+          type: V2AdvancedFilterType.SELECT,
           field: 'targeted',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-          type: V2AdvancedFilterType.SELECT,
           options: data.options.yesNo,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         },
         {
+          type: V2AdvancedFilterType.MULTISELECT,
           field: 'statusId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-          type: V2AdvancedFilterType.MULTISELECT,
           options: data.options.dailyFollowUpStatus,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         },
         {
+          type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
           field: 'questionnaireAnswers',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-          type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
           template: data.contactFollowUpTemplate,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
@@ -509,52 +509,102 @@ export class ContactModel
     if (CaseModel.canList(data.authUser)) {
       advancedFilters.push(
         {
+          type: V2AdvancedFilterType.TEXT,
           field: 'firstName',
           label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-          type: V2AdvancedFilterType.TEXT,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel:
-            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
         },
         {
+          type: V2AdvancedFilterType.TEXT,
           field: 'lastName',
           label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-          type: V2AdvancedFilterType.TEXT,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel:
-            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
         },
         {
+          type: V2AdvancedFilterType.MULTISELECT,
           field: 'gender',
           label: 'LNG_CASE_FIELD_LABEL_GENDER',
-          type: V2AdvancedFilterType.MULTISELECT,
           options: data.options.gender,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel:
-            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
         },
         {
+          type: V2AdvancedFilterType.RANGE_AGE,
           field: 'age',
           label: 'LNG_CASE_FIELD_LABEL_AGE',
-          type: V2AdvancedFilterType.RANGE_AGE,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel:
-            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
         },
         {
+          type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
           field: 'questionnaireAnswers',
           label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-          type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
           template: data.caseInvestigationTemplate,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.ADDRESS,
+          field: 'addresses',
+          label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+          isArray: true,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_AGE,
+          field: 'age',
+          label: 'LNG_CASE_FIELD_LABEL_AGE',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'visualId',
+          label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
         }
       );
+
+      // allowed to filter by responsible user ?
+      if (UserModel.canListForFilters(data.authUser)) {
+        advancedFilters.push({
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'responsibleUserId',
+          label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+          options: data.options.user,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'createdBy',
+          label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
+          options: data.options.user,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'updatedBy',
+          label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
+          options: data.options.user,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        });
+      }
     }
 
     // finished
