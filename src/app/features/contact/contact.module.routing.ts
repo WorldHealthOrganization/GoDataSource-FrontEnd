@@ -152,7 +152,8 @@ const routes: Routes = [
       followUpStatus: FinalFollowUpStatusDataResolver,
       dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
       team: TeamDataResolver,
-      documentType: DocumentTypeDataResolver
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver
     }
   },
   // Create Contact

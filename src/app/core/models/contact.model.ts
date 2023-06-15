@@ -150,7 +150,8 @@ export class ContactModel
       user: ILabelValuePairModel[],
       dailyFollowUpStatus: ILabelValuePairModel[],
       gender: ILabelValuePairModel[],
-      documentType: ILabelValuePairModel[]
+      documentType: ILabelValuePairModel[],
+      addressType: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -291,6 +292,52 @@ export class ContactModel
         label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
         sortable: true,
         useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.emailAddress',
+        label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        sortable: true,
+        useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'addresses.geoLocationAccurate',
+        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        options: data.options.yesNo,
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'addresses.typeId',
+        label: 'LNG_ADDRESS_FIELD_LABEL_TYPE',
+        options: data.options.addressType,
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'addresses.date',
+        label: 'LNG_ADDRESS_FIELD_LABEL_DATE',
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.city',
+        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        sortable: true,
+        useLike: true,
+        relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.postalCode',
+        label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        sortable: true,
+        useLike: true,
+        relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
       },
       {
         type: V2AdvancedFilterType.SELECT,
