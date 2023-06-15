@@ -529,6 +529,14 @@ export class ContactModel
         },
         {
           type: V2AdvancedFilterType.TEXT,
+          field: 'middleName',
+          label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
           field: 'lastName',
           label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
           relationshipPath: ['relationships', 'people'],
@@ -608,6 +616,72 @@ export class ContactModel
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateBecomeCase',
           label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'dob',
+          label: 'LNG_CASE_FIELD_LABEL_DOB',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'dateOfInfection',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'dateInvestigationCompleted',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'dateOfOnset',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.SELECT,
+          field: 'isDateOfOnsetApproximate',
+          label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+          options: data.options.yesNo,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'dateOfOutcome',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'dateOfReporting',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.SELECT,
+          field: 'isDateOfReportingApproximate',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+          options: data.options.yesNo,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
