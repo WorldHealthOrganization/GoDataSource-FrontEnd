@@ -583,14 +583,6 @@ export class ContactModel
           extraConditions: caseCondition
         },
         {
-          type: V2AdvancedFilterType.RANGE_AGE,
-          field: 'age',
-          label: 'LNG_CASE_FIELD_LABEL_AGE',
-          relationshipPath: ['relationships', 'people'],
-          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
-          extraConditions: caseCondition
-        },
-        {
           type: V2AdvancedFilterType.TEXT,
           field: 'visualId',
           label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
