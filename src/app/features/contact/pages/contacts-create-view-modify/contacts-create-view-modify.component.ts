@@ -2503,7 +2503,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
-        )
+        ),
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }

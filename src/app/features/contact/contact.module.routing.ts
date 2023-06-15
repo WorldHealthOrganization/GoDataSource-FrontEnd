@@ -40,6 +40,7 @@ import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 import { FollowUpGroupByDataResolver } from '../../core/services/resolvers/data/follow-up-group-by.resolver';
 import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
+import { InvestigationStatusDataResolver } from '../../core/services/resolvers/data/investigation-status.resolver';
 
 // Follow-ups list from a - contact / case
 const viewFollowUpsListFoundation: Route = {
@@ -108,7 +109,8 @@ const contactFoundation: Route = {
     labResultProgress: LabProgressDataResolver,
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
-    entity: RelationshipPersonDataResolver
+    entity: RelationshipPersonDataResolver,
+    investigationStatus: InvestigationStatusDataResolver
   }
 };
 
@@ -153,7 +155,8 @@ const routes: Routes = [
       dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
       team: TeamDataResolver,
       documentType: DocumentTypeDataResolver,
-      addressType: AddressTypeDataResolver
+      addressType: AddressTypeDataResolver,
+      investigationStatus: InvestigationStatusDataResolver
     }
   },
   // Create Contact

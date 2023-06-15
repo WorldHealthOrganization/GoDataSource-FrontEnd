@@ -155,7 +155,8 @@ export class ContactModel
       gender: ILabelValuePairModel[],
       documentType: ILabelValuePairModel[],
       addressType: ILabelValuePairModel[],
-      risk: ILabelValuePairModel[]
+      risk: ILabelValuePairModel[],
+      investigationStatus: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -571,6 +572,15 @@ export class ContactModel
           type: V2AdvancedFilterType.TEXT,
           field: 'visualId',
           label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'investigationStatus',
+          label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
+          options: data.options.investigationStatus,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
