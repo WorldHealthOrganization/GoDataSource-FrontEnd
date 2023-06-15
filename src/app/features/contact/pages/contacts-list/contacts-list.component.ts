@@ -55,6 +55,7 @@ import { Location } from '@angular/common';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { Moment } from 'moment';
 
 @Component({
   selector: 'app-contacts-list',
