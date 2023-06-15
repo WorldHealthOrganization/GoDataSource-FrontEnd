@@ -201,7 +201,8 @@ export class ContactModel
         field: 'gender',
         label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
         type: V2AdvancedFilterType.MULTISELECT,
-        options: data.options.gender
+        options: data.options.gender,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_AGE,
@@ -261,6 +262,12 @@ export class ContactModel
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'followUp.startDate',
+        label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_START_DATE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
         field: 'followUp.endDate',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
         sortable: true
@@ -288,18 +295,21 @@ export class ContactModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'vaccinesReceived.vaccine',
         label: 'LNG_CONTACT_FIELD_LABEL_VACCINE',
-        options: data.options.vaccine
+        options: data.options.vaccine,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'vaccinesReceived.status',
         label: 'LNG_CONTACT_FIELD_LABEL_VACCINE_STATUS',
-        options: data.options.vaccineStatus
+        options: data.options.vaccineStatus,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'vaccinesReceived.date',
-        label: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE'
+        label: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -414,7 +424,8 @@ export class ContactModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'followUpTeamId',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
-        options: data.options.team
+        options: data.options.team,
+        sortable: true
       });
     }
 
@@ -424,7 +435,8 @@ export class ContactModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user
+        options: data.options.user,
+        sortable: true
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'createdBy',
