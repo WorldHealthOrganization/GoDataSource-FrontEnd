@@ -145,7 +145,6 @@ export class ContactsListComponent
    */
   constructor(
     protected listHelperService: ListHelperService,
-    protected location: Location,
     private activatedRoute: ActivatedRoute,
     private contactDataService: ContactDataService,
     private locationDataService: LocationDataService,
@@ -159,7 +158,8 @@ export class ContactsListComponent
     private referenceDataHelperService: ReferenceDataHelperService,
     private router: Router,
     private relationshipDataService: RelationshipDataService,
-    private clusterDataService: ClusterDataService
+    private clusterDataService: ClusterDataService,
+    private location: Location
   ) {
     super(
       listHelperService, {

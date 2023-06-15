@@ -148,7 +148,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     private redirectService: RedirectService,
     private clusterDataService: ClusterDataService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    protected location: Location
+    private location: Location
   ) {
     super(
       listHelperService, {
