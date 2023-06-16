@@ -166,7 +166,12 @@ const routes: Routes = [
       classification: ClassificationDataResolver,
       outcome: OutcomeDataResolver,
       dateRangeType: PersonDateTypeDataResolver,
-      dateRangeCenter: DateRangeCenterDataResolver
+      dateRangeCenter: DateRangeCenterDataResolver,
+      certaintyLevel: CertaintyLevelDataResolver,
+      exposureType: ExposureTypeDataResolver,
+      exposureFrequency: ExposureFrequencyDataResolver,
+      exposureDuration: ExposureDurationDataResolver,
+      contextOfTransmission: ContextOfTransmissionDataResolver
     }
   },
   // Create Contact
