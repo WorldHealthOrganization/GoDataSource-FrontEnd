@@ -197,6 +197,13 @@ export class EventModel
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
       },
       {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_EVENT_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'createdAt',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
@@ -209,10 +216,9 @@ export class EventModel
         sortable: true
       },
       {
-        type: V2AdvancedFilterType.DELETED,
-        field: 'deleted',
-        label: 'LNG_EVENT_FIELD_LABEL_DELETED',
-        yesNoAllOptions: data.options.yesNoAll,
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_EVENT_FIELD_LABEL_DELETED_AT',
         sortable: true
       }
     ];

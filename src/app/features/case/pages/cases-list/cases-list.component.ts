@@ -1592,7 +1592,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       },
       {
         field: 'deletedAt',
-        label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT',
+        label: 'LNG_CASE_FIELD_LABEL_DELETED_AT',
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
