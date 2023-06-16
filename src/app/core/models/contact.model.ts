@@ -646,8 +646,63 @@ export class ContactModel
           template: data.contactFollowUpTemplate,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.DELETED,
+          field: 'deleted',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
+          yesNoAllOptions: data.options.yesNoAll,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'createdAt',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT',
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'updatedAt',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT',
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.DELETED_AT,
+          field: 'deletedAt',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT',
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         }
       );
+
+      // allowed to filter by responsible user ?
+      if (UserModel.canListForFilters(data.authUser)) {
+        advancedFilters.push({
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'responsibleUserId',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+          options: data.options.user,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'createdBy',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
+          options: data.options.user,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'updatedBy',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
+          options: data.options.user,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        });
+      }
     }
 
     // case condition
