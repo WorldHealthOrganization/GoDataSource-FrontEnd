@@ -525,7 +525,7 @@ export class CaseModel
       {
         type: V2AdvancedFilterType.DELETED,
         field: 'deleted',
-        label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED',
+        label: 'LNG_CASE_FIELD_LABEL_DELETED',
         yesNoAllOptions: data.options.yesNoAll,
         sortable: true
       },
@@ -544,7 +544,7 @@ export class CaseModel
       {
         type: V2AdvancedFilterType.DELETED_AT,
         field: 'deletedAt',
-        label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT',
+        label: 'LNG_CASE_FIELD_LABEL_DELETED_AT',
         sortable: true
       }
     ];

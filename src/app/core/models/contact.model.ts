@@ -414,7 +414,7 @@ export class ContactModel
       {
         type: V2AdvancedFilterType.DELETED,
         field: 'deleted',
-        label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED',
+        label: 'LNG_CONTACT_FIELD_LABEL_DELETED',
         yesNoAllOptions: data.options.yesNoAll,
         sortable: true
       },
@@ -433,80 +433,144 @@ export class ContactModel
       {
         type: V2AdvancedFilterType.DELETED_AT,
         field: 'deletedAt',
-        label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT',
+        label: 'LNG_CONTACT_FIELD_LABEL_DELETED_AT',
         sortable: true
       }
     ];
 
     // relationship
-    advancedFilters.push({
-      type: V2AdvancedFilterType.MULTISELECT,
-      field: 'clusterId',
-      label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-      relationshipPath: ['relationships'],
-      optionsLoad: data.options.clusterLoad,
-      relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
-    }, {
-      type: V2AdvancedFilterType.RANGE_DATE,
-      field: 'contactDate',
-      label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
-      relationshipPath: ['relationships'],
-      relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
-    }, {
-      type: V2AdvancedFilterType.SELECT,
-      field: 'contactDateEstimated',
-      label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
-      options: data.options.yesNo,
-      relationshipPath: ['relationships'],
-      relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
-    }, {
-      type: V2AdvancedFilterType.MULTISELECT,
-      field: 'certaintyLevelId',
-      label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
-      options: data.options.certaintyLevel,
-      relationshipPath: ['relationships'],
-      relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
-    }, {
-      type: V2AdvancedFilterType.MULTISELECT,
-      field: 'exposureTypeId',
-      label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
-      options: data.options.exposureType,
-      relationshipPath: ['relationships'],
-      relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
-    }, {
-      type: V2AdvancedFilterType.MULTISELECT,
-      field: 'exposureFrequencyId',
-      label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
-      options: data.options.exposureFrequency,
-      relationshipPath: ['relationships'],
-      relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
-    }, {
-      type: V2AdvancedFilterType.MULTISELECT,
-      field: 'exposureDurationId',
-      label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
-      options: data.options.exposureDuration,
-      relationshipPath: ['relationships'],
-      relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
-    }, {
-      type: V2AdvancedFilterType.MULTISELECT,
-      field: 'socialRelationshipTypeId',
-      label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
-      options: data.options.contextOfTransmission,
-      relationshipPath: ['relationships'],
-      relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
-    }, {
-      type: V2AdvancedFilterType.TEXT,
-      field: 'socialRelationshipDetail',
-      label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
-      relationshipPath: ['relationships'],
-      relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
-    }, {
-      type: V2AdvancedFilterType.TEXT,
-      field: 'comment',
-      label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
-      relationshipPath: ['relationships'],
-      relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
-    });
+    if (
+      ContactModel.canListRelationshipExposures(data.authUser) ||
+      ContactModel.canListRelationshipContacts(data.authUser)
+    ) {
+      advancedFilters.push(
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'clusterId',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+          relationshipPath: ['relationships'],
+          optionsLoad: data.options.clusterLoad,
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'contactDate',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.SELECT,
+          field: 'contactDateEstimated',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+          options: data.options.yesNo,
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'certaintyLevelId',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+          options: data.options.certaintyLevel,
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'exposureTypeId',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+          options: data.options.exposureType,
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'exposureFrequencyId',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+          options: data.options.exposureFrequency,
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'exposureDurationId',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+          options: data.options.exposureDuration,
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'socialRelationshipTypeId',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+          options: data.options.contextOfTransmission,
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'socialRelationshipDetail',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'comment',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.DELETED,
+          field: 'deleted',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED',
+          yesNoAllOptions: data.options.yesNoAll,
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'createdAt',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT',
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'updatedAt',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT',
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.DELETED_AT,
+          field: 'deletedAt',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED_AT',
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        }
+      );
+
+      // allowed to filter by responsible user ?
+      if (UserModel.canListForFilters(data.authUser)) {
+        advancedFilters.push({
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'createdBy',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY',
+          options: data.options.user,
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'updatedBy',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY',
+          options: data.options.user,
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        });
+      }
+    }
 
     // allowed to filter by follow-up team ?
     if (TeamModel.canList(data.authUser)) {
@@ -989,7 +1053,7 @@ export class ContactModel
         {
           type: V2AdvancedFilterType.DELETED,
           field: 'deleted',
-          label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED',
+          label: 'LNG_CASE_FIELD_LABEL_DELETED',
           yesNoAllOptions: data.options.yesNoAll,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
@@ -1007,6 +1071,14 @@ export class ContactModel
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'updatedAt',
           label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.DELETED_AT,
+          field: 'deletedAt',
+          label: 'LNG_CASE_FIELD_LABEL_DELETED_AT',
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition

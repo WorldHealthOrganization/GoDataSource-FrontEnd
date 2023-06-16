@@ -211,7 +211,7 @@ export class EventModel
       {
         type: V2AdvancedFilterType.DELETED,
         field: 'deleted',
-        label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED',
+        label: 'LNG_EVENT_FIELD_LABEL_DELETED',
         yesNoAllOptions: data.options.yesNoAll,
         sortable: true
       }
