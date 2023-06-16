@@ -47,10 +47,15 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { Moment } from 'moment';
+import {
+  ContactOfContactModel,
+  IContactOfContactIsolated
+} from '../../../../core/models/contact-of-contact.model';
+import { Location } from '@angular/common';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { Moment } from 'moment';
 
 @Component({
   selector: 'app-contacts-list',
@@ -153,7 +158,8 @@ export class ContactsListComponent
     private referenceDataHelperService: ReferenceDataHelperService,
     private router: Router,
     private relationshipDataService: RelationshipDataService,
-    private clusterDataService: ClusterDataService
+    private clusterDataService: ClusterDataService,
+    private location: Location
   ) {
     super(
       listHelperService, {
@@ -316,129 +322,101 @@ export class ContactsListComponent
               cssClasses: () => 'gd-list-table-actions-action-menu-warning',
               action: {
                 click: (item: ContactModel): void => {
-                  // show confirm dialog to confirm the action
-                  this.dialogV2Service
-                    .showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_CONVERT',
-                          data: () => ({
-                            name: item.name,
-                            type: this.i18nService.instant(EntityType.CASE)
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE',
-                          data: () => item as any
-                        }
-                      }
-                    })
-                    .subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
+                  // show loading
+                  let loading = this.dialogV2Service.showLoadingDialog();
 
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
+                  // determine if contact has at least one exposed contact (contact of contact)
+                  const qb = new RequestQueryBuilder();
+                  qb.filter.where({
+                    type: {
+                      'inq': [EntityType.CONTACT_OF_CONTACT]
+                    }
+                  });
+                  qb.limit(1);
+                  this.relationshipDataService
+                    .getEntityContacts(
+                      this.selectedOutbreak.id,
+                      item.type,
+                      item.id,
+                      qb
+                    )
+                    .pipe(
+                      catchError((err) => {
+                        // show error
+                        this.toastV2Service.error(err);
 
-                      // determine if contact has at least one exposed contact (contact of contact)
-                      const qb = new RequestQueryBuilder();
-                      qb.filter.where({
-                        type: {
-                          'inq': [EntityType.CONTACT_OF_CONTACT]
-                        }
-                      });
-                      qb.limit(1);
-                      this.relationshipDataService
-                        .getEntityContacts(
-                          this.selectedOutbreak.id,
-                          item.type,
-                          item.id,
-                          qb
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
+                        // hide loading
+                        loading.close();
 
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe((exposedContacts: EntityModel[]) => {
-                          // create a convert method
-                          const convertContact = () => {
-                            this.contactDataService
-                              .convertContactToCase(this.selectedOutbreak.id, item.id)
-                              .pipe(
-                                catchError((err) => {
-                                  // show error
-                                  this.toastV2Service.error(err);
-
-                                  // hide loading
-                                  loading.close();
-
-                                  // send error down the road
-                                  return throwError(err);
-                                })
-                              )
-                              .subscribe(() => {
-                                // success
-                                this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
-
-                                // hide loading
-                                loading.close();
-
-                                // reload data
-                                this.needsRefreshList(true);
-                              });
-                          };
-
-                          // show a warning if there is at least one contact of contact as contact
-                          if (exposedContacts?.length) {
-                            // show isolated contacts
-                            this.dialogV2Service.showConfirmDialog({
-                              config: {
-                                title: {
-                                  get: () => 'LNG_COMMON_LABEL_CONVERT',
-                                  data: () => ({
-                                    name: item.name,
-                                    type: this.i18nService.instant(EntityType.CASE)
-                                  })
-                                },
-                                message: {
-                                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE_CONTACTS_WARNING'
-                                }
-                              },
-                              yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
-                            }).subscribe((dialogResponse) => {
-                              // canceled ?
-                              if (dialogResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                                // hide loading
-                                loading.close();
-
-                                // finished
-                                return;
-                              }
-
-                              // convert contact
-                              convertContact();
-                            });
-                          } else {
-                            // convert contact
-                            convertContact();
-                          }
-                        });
-
+                        // send error down the road
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe((exposedContacts: EntityModel[]) => {
                       // hide loading
                       loading.close();
 
-                      return;
+                      // show warning if there is at least one contact of contact as contact ?
+                      const exposedContactsWarning: string = exposedContacts?.length ?
+                        this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE_CONTACTS_WARNING') :
+                        '';
+
+                      // show confirm dialog to confirm the action
+                      this.dialogV2Service
+                        .showConfirmDialog({
+                          config: {
+                            title: {
+                              get: () => 'LNG_COMMON_LABEL_CONVERT',
+                              data: () => ({
+                                name: item.name,
+                                type: this.i18nService.instant(EntityType.CASE)
+                              })
+                            },
+                            message: {
+                              get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE',
+                              data: () => ({
+                                name: item.name,
+                                warning: exposedContactsWarning
+                              })
+                            }
+                          }
+                        })
+                        .subscribe((response) => {
+                          // canceled ?
+                          if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                            // finished
+                            return;
+                          }
+
+                          // show loading
+                          loading = this.dialogV2Service.showLoadingDialog();
+
+                          // convert
+                          this.contactDataService
+                            .convertContactToCase(this.selectedOutbreak.id, item.id)
+                            .pipe(
+                              catchError((err) => {
+                                // show error
+                                this.toastV2Service.error(err);
+
+                                // hide loading
+                                loading.close();
+
+                                // send error down the road
+                                return throwError(err);
+                              })
+                            )
+                            .subscribe(() => {
+                              // success
+                              this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
+
+                              // hide loading
+                              loading.close();
+
+                              // reload data
+                              this.needsRefreshList(true);
+                            });
+                        });
                     });
                 }
               },
@@ -457,122 +435,150 @@ export class ContactsListComponent
               cssClasses: () => 'gd-list-table-actions-action-menu-warning',
               action: {
                 click: (item: ContactModel): void => {
-                  // show confirm dialog to confirm the action
-                  this.dialogV2Service
-                    .showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_CONVERT',
-                          data: () => ({
-                            name: item.name,
-                            type: this.i18nService.instant(EntityType.CONTACT_OF_CONTACT)
-                          })
+                  // show loading
+                  let loading = this.dialogV2Service.showLoadingDialog();
+
+                  // determine if contact has isolated contacts
+                  this.contactDataService
+                    .getIsolatedContactsForContact(this.selectedOutbreak.id, item.id)
+                    .pipe(
+                      catchError((err) => {
+                        // show error
+                        this.toastV2Service.error(err);
+
+                        // hide loading
+                        loading.close();
+
+                        // send error down the road
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe((isolatedContacts: { count: number, contacts: IContactOfContactIsolated[] }) => {
+                      // hide loading
+                      loading.close();
+
+                      // show isolated contacts ?
+                      let isolatedContactLinks: string = '';
+                      if (isolatedContacts?.count) {
+                        // get the isolated contacts
+                        isolatedContactLinks = this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_ACTION_ISOLATED_CONTACTS') +
+                          isolatedContacts.contacts
+                            .map((entity) => {
+                              // create contact full name
+                              const fullName = [entity.firstName, entity.middleName, entity.lastName]
+                                .filter(Boolean)
+                                .join(' ');
+
+                              // check rights
+                              if (!ContactOfContactModel.canView(this.authUser)) {
+                                return `${fullName} (${this.i18nService.instant(EntityType.CONTACT_OF_CONTACT)})`;
+                              }
+
+                              // create url
+                              const url = `contacts-of-contacts/${entity.id}/view`;
+
+                              // finished
+                              return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${fullName}</span></a>`;
+                            })
+                            .join(', ');
+                      }
+
+                      // show confirm dialog to confirm the action
+                      this.dialogV2Service.showConfirmDialog({
+                        config: {
+                          title: {
+                            get: () => 'LNG_COMMON_LABEL_CONVERT',
+                            data: () => ({
+                              name: item.name,
+                              type: this.i18nService.instant(EntityType.CONTACT_OF_CONTACT)
+                            })
+                          },
+                          message: {
+                            get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CONTACT_OF_CONTACT',
+                            data: () => ({
+                              name: item.name,
+                              isolatedContacts: isolatedContactLinks
+                            })
+                          }
                         },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CONTACT_OF_CONTACT',
-                          data: () => item as any
+                        yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
+                      }).subscribe((dialogResponse) => {
+                        // canceled ?
+                        if (dialogResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                          // finished
+                          return;
                         }
-                      }
-                    })
-                    .subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
 
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
+                        // show loading
+                        loading = this.dialogV2Service.showLoadingDialog();
 
-                      // check if there is at least one legacy exposure (case/event)
-                      const qb = new RequestQueryBuilder();
-                      qb.filter.where({
-                        type: {
-                          'inq': [EntityType.CONTACT]
-                        }
-                      });
-                      qb.limit(1);
-                      this.relationshipDataService
-                        .getEntityExposures(
-                          this.selectedOutbreak.id,
-                          item.type,
-                          item.id,
-                          qb
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
+                        // check if there is at least one legacy exposure (case/event)
+                        const qb = new RequestQueryBuilder();
+                        qb.filter.where({
+                          type: {
+                            'inq': [EntityType.CONTACT]
+                          }
+                        });
+                        qb.limit(1);
+                        this.relationshipDataService
+                          .getEntityExposures(
+                            this.selectedOutbreak.id,
+                            item.type,
+                            item.id,
+                            qb
+                          )
+                          .pipe(
+                            catchError((err) => {
+                              // show error
+                              this.toastV2Service.error(err);
 
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe((exposedContacts: EntityModel[]) => {
-                          // if there is no case/event as exposure, redirect to add exposures
-                          if (!exposedContacts?.length) {
-                            // show isolated contacts
-                            this.dialogV2Service.showConfirmDialog({
-                              config: {
-                                title: {
-                                  get: () => 'LNG_COMMON_LABEL_CONVERT',
-                                  data: () => ({
-                                    name: item.name,
-                                    type: this.i18nService.instant(EntityType.CONTACT_OF_CONTACT)
-                                  })
-                                },
-                                message: {
-                                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CONTACT_OF_CONTACT_RELATIONSHIP_WARNING'
-                                }
-                              },
-                              yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
-                            }).subscribe((dialogResponse) => {
                               // hide loading
                               loading.close();
 
-                              // canceled ?
-                              if (dialogResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                                // finished
-                                return;
-                              }
+                              // send error down the road
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe((exposedContacts: EntityModel[]) => {
+                            // if there is no case/event as exposure, redirect to add exposures
+                            if (!exposedContacts?.length) {
+                              // hide loading
+                              loading.close();
 
                               // redirect
                               this.router.navigate(
                                 [`/relationships/${item.type}/${item.id}/exposures/add`]
                               );
                               return;
-                            });
-                          } else {
-                            // convert
-                            this.contactDataService
-                              .convertContactToContactOfContact(this.selectedOutbreak.id, item.id)
-                              .pipe(
-                                catchError((err) => {
-                                  // show error
-                                  this.toastV2Service.error(err);
+                            } else {
+                              // convert
+                              this.contactDataService
+                                .convertContactToContactOfContact(this.selectedOutbreak.id, item.id)
+                                .pipe(
+                                  catchError((err) => {
+                                    // show error
+                                    this.toastV2Service.error(err);
+
+                                    // hide loading
+                                    loading.close();
+
+                                    // send error down the road
+                                    return throwError(err);
+                                  })
+                                )
+                                .subscribe(() => {
+                                  // success
+                                  this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
                                   // hide loading
                                   loading.close();
 
-                                  // send error down the road
-                                  return throwError(err);
-                                })
-                              )
-                              .subscribe(() => {
-                                // success
-                                this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
-
-                                // hide loading
-                                loading.close();
-
-                                // reload data
-                                this.needsRefreshList(true);
-                              });
-                          }
-                        });
+                                  // reload data
+                                  this.needsRefreshList(true);
+                                });
+                            }
+                          });
+                      });
                     });
                 }
               },
@@ -580,6 +586,7 @@ export class ContactsListComponent
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
                   ContactModel.canConvertToContactOfContact(this.authUser) &&
+                  ContactModel.canListIsolatedContacts(this.authUser) &&
                   this.selectedOutbreak.isContactsOfContactsActive &&
                   ContactModel.canList(this.authUser) &&
                   ContactModel.canView(this.authUser);

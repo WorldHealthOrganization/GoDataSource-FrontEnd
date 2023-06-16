@@ -24,6 +24,8 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-entity-relationships-list-add',
@@ -38,6 +40,9 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
   // relationship type
   private _relationshipType: RelationshipType;
 
+  // available entities as exposures
+  private _availableTypes: string[] = [];
+
   /**
    * Constructor
    */
@@ -48,11 +53,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
     protected entityHelperService: EntityHelperService,
+    protected toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private referenceDataHelperService: ReferenceDataHelperService
   ) {
     super(
       listHelperService, {
+        disableFilterCaching: true,
         initializeTableColumnsAfterSelectedOutbreakChanged: true,
         initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
       }
@@ -64,6 +71,30 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
     // retrieve entity related data
     this._entity = this.activatedRoute.snapshot.data.entity;
     this._relationshipType = this.activatedRoute.snapshot.data.relationshipType;
+
+    // get warning token and available entities as exposures. note that the entity type is before convert
+    let warningToken: string = '';
+    switch (this._entity.type) {
+      case EntityType.CONTACT:
+        // convert contact to contact of contact
+        this._availableTypes = [EntityType.CONTACT];
+        warningToken = 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CONTACT_OF_CONTACT_RELATIONSHIP_WARNING';
+
+        break;
+      case EntityType.CONTACT_OF_CONTACT:
+        // convert contact of contact to contact
+        this._availableTypes = [EntityType.EVENT, EntityType.CASE];
+        warningToken = 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CONTACT_RELATIONSHIP_WARNING';
+
+        break;
+    }
+
+    // show the warning messages
+    this.toastV2Service.notice(
+      warningToken,
+      undefined,
+      AppMessages.APP_MESSAGE_CONVERT_RELATIONSHIP_WARNING
+    );
 
     // clear queryBuilder
     this.clearQueryBuilder();
@@ -78,6 +109,9 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
 
     // enable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_CONVERT_RELATIONSHIP_WARNING);
   }
 
   /**
@@ -458,28 +492,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
     // clear query builder
     this.queryBuilder.clear();
 
-    // get available entities as exposures. note that the entity type is before convert
     // exclude root person
-    let availableTypes: EntityType[];
-    switch (this._entity.type) {
-      case EntityType.CONTACT:
-        // convert contact to contact of contact
-        availableTypes = [EntityType.CONTACT];
-
-        break;
-      case EntityType.CONTACT_OF_CONTACT:
-        // convert contact of contact to contact
-        availableTypes = [EntityType.EVENT, EntityType.CASE];
-
-        break;
-    }
-
     this.queryBuilder.filter.where({
       id: {
         neq: this._entity.id
       },
       type: {
-        inq: availableTypes
+        inq: this._availableTypes
       }
     });
   }
