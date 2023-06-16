@@ -27,8 +27,9 @@ export enum V2AdvancedFilterType {
   PHONE_NUMBER = 'phone_number',
   QUESTIONNAIRE_ANSWERS = 'questionnaire_answers',
   FILE = 'file',
-  SELECT_GROUPS = 'select-groups',
-  DELETED = 'deleted'
+  SELECT_GROUPS = 'select_groups',
+  DELETED = 'deleted',
+  DELETED_AT = 'deleted_at'
 }
 
 /**
@@ -247,6 +248,24 @@ export const V2AdvancedFilterComparatorOptions: {
   [V2AdvancedFilterType.DELETED]: [{
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE',
     value: V2AdvancedFilterComparatorType.NONE
+  }],
+
+  // deleted at
+  [V2AdvancedFilterType.DELETED_AT]: [{
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN',
+    value: V2AdvancedFilterComparatorType.BETWEEN
+  }, {
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE',
+    value: V2AdvancedFilterComparatorType.BEFORE
+  }, {
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER',
+    value: V2AdvancedFilterComparatorType.AFTER
+  }, {
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_HAS_VALUE',
+    value: V2AdvancedFilterComparatorType.HAS_VALUE
+  }, {
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE',
+    value: V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
   }]
 };
 
@@ -474,9 +493,17 @@ interface IV2AdvancedFilterDeleted extends IV2AdvancedFilterBase {
   yesNoAllOptions: ILabelValuePairModel[];
 }
 
+/**
+ * Advanced filter - Deleted at
+ */
+interface IV2AdvancedFilterDeletedAt extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.DELETED_AT;
+}
+
 // advanced filter
 export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterNumber | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
 | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
 | IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterDate | IV2AdvancedFilterNumberRange
 | IV2AdvancedFilterQuestionnaireAnswers | IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation | IV2AdvancedFilterGroupsSelect
-| IV2AdvancedFilterDeleted;
+| IV2AdvancedFilterDeleted | IV2AdvancedFilterDeletedAt;

@@ -682,6 +682,18 @@ export class EventsListComponent
         sortable: true
       },
       {
+        field: 'deletedAt',
+        label: 'LNG_EVENT_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
         notVisible: true,
@@ -1672,6 +1684,7 @@ export class EventsListComponent
       'numberOfContacts',
       'numberOfExposures',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdAt',
       'updatedBy',

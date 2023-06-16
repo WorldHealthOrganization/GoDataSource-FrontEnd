@@ -623,7 +623,7 @@
 
                             <!-- Date range -->
                             <app-form-date-range-v2
-                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_DATE
+                              *ngIf="(input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_DATE || input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.DELETED_AT)
                                 && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
                               [(ngModel)]="filter.value"
                               [name]="filter.name"

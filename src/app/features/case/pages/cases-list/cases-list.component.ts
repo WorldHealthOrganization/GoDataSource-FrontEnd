@@ -1591,6 +1591,18 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true
       },
       {
+        field: 'deletedAt',
+        label: 'LNG_CASE_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
         notVisible: true,
@@ -2877,6 +2889,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'numberOfExposures',
       'questionnaireAnswers',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdAt',
       'updatedBy',
