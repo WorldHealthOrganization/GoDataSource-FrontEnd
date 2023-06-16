@@ -540,6 +540,12 @@ export class CaseModel
         field: 'updatedAt',
         label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT',
+        sortable: true
       }
     ];
 

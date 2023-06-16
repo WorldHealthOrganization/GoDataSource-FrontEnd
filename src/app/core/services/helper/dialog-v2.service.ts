@@ -1638,6 +1638,8 @@ export class DialogV2Service {
             break;
 
           case V2AdvancedFilterType.RANGE_DATE:
+          case V2AdvancedFilterType.DELETED_AT:
+            // attach condition
             switch (appliedFilter.comparator.value) {
               case V2AdvancedFilterComparatorType.HAS_VALUE:
                 // filter
@@ -1664,6 +1666,11 @@ export class DialogV2Service {
                   appliedFilter.value,
                   false
                 );
+            }
+
+            // we need to search deleted records ?
+            if (filterDefinition.type === V2AdvancedFilterType.DELETED_AT) {
+              qb.includeDeleted();
             }
 
             // finished
