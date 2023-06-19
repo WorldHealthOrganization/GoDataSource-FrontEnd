@@ -1098,6 +1098,14 @@ export class DialogV2Service {
     filtersList.filters = [];
     filtersList.sorts = [];
 
+    // clean removed filters and sorts
+    advancedFiltersApplied.appliedFilters = advancedFiltersApplied.appliedFilters?.length ?
+      advancedFiltersApplied.appliedFilters.filter((appliedFilter) => !!filtersList.optionsAsLabelValueMap[appliedFilter.filter.uniqueKey]) :
+      advancedFiltersApplied.appliedFilters;
+    advancedFiltersApplied.appliedSort = advancedFiltersApplied.appliedSort?.length ?
+      advancedFiltersApplied.appliedSort.filter((sortCriteria) => !!filtersList.optionsAsLabelValueMap[sortCriteria.sort.uniqueKey]) :
+      advancedFiltersApplied.appliedSort;
+
     // add filters
     (advancedFiltersApplied.appliedFilters || []).forEach((appliedFilter) => {
       // add filter
