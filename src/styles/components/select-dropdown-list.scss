@@ -150,6 +150,8 @@
       }
 
       .mat-option-text {
+        @include flex_justify(space-between);
+
         .mat-tooltip-trigger {
           @include flex(flex);
           @include flex_align_items(center);

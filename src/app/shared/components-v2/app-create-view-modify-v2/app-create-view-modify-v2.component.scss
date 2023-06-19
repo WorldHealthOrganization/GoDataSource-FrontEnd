@@ -384,6 +384,10 @@
     }
 
     .gd-create-view-modify-top-title-buttons {
+      @include breakpoint('xs') {
+        margin-top: 0.4rem;
+      }
+
       .gd-create-view-modify-top-title-buttons-title {
         overflow: hidden;
 
