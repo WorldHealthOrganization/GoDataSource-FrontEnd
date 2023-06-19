@@ -683,6 +683,65 @@ export class ContactModel
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT',
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'address.typeId',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_TYPE',
+          options: data.options.addressType,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'address.date',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_DATE',
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'address.emailAddress',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+          field: 'address',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
+          isArray: false,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+          field: 'address',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_LOCATION',
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'address.city',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_CITY',
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'address.postalCode',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_POSTAL_CODE',
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.SELECT,
+          field: 'address.geoLocationAccurate',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
+          options: data.options.yesNo,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         }
       );
 
