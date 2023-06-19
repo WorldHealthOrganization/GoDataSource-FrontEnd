@@ -105,7 +105,7 @@ export class EventModel
       {
         type: V2AdvancedFilterType.ADDRESS,
         field: 'address',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
         isArray: false
       },
       {
@@ -147,7 +147,7 @@ export class EventModel
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'address.typeId',
-        label: 'LNG_ADDRESS_FIELD_LABEL_TYPE',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_TYPE',
         options: data.options.addressType,
         sortable: true,
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
@@ -155,14 +155,14 @@ export class EventModel
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'address.date',
-        label: 'LNG_ADDRESS_FIELD_LABEL_DATE',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_DATE',
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
         sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.emailAddress',
-        label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
         sortable: true
       },
       {
@@ -175,7 +175,7 @@ export class EventModel
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.city',
-        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_CITY',
         sortable: true,
         useLike: true,
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
@@ -183,7 +183,7 @@ export class EventModel
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.postalCode',
-        label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_POSTAL_CODE',
         sortable: true,
         useLike: true,
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
@@ -191,7 +191,7 @@ export class EventModel
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'address.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
         options: data.options.yesNo,
         sortable: true,
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
