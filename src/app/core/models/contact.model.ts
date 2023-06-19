@@ -328,28 +328,28 @@ export class ContactModel
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'documents.type',
-        label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
+        label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENT_TYPE',
         options: data.options.documentType,
         sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'documents.number',
-        label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
+        label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENT_NUMBER',
         sortable: true,
         useLike: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.emailAddress',
-        label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
         sortable: true,
         useLike: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'addresses.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
         options: data.options.yesNo,
         sortable: true,
         relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
@@ -357,7 +357,7 @@ export class ContactModel
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'addresses.typeId',
-        label: 'LNG_ADDRESS_FIELD_LABEL_TYPE',
+        label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_TYPE',
         options: data.options.addressType,
         sortable: true,
         relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
@@ -365,14 +365,14 @@ export class ContactModel
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'addresses.date',
-        label: 'LNG_ADDRESS_FIELD_LABEL_DATE',
+        label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_DATE',
         sortable: true,
         relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.city',
-        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_CITY',
         sortable: true,
         useLike: true,
         relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
@@ -380,7 +380,7 @@ export class ContactModel
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.postalCode',
-        label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_POSTAL_CODE',
         sortable: true,
         useLike: true,
         relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
@@ -644,6 +644,14 @@ export class ContactModel
           field: 'questionnaireAnswers',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
           template: data.contactFollowUpTemplate,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.ADDRESS,
+          field: 'address',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+          isArray: false,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         },
@@ -1008,7 +1016,7 @@ export class ContactModel
         {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'documents.type',
-          label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
+          label: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
           options: data.options.documentType,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
@@ -1017,7 +1025,7 @@ export class ContactModel
         {
           type: V2AdvancedFilterType.TEXT,
           field: 'documents.number',
-          label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
+          label: 'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER',
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
@@ -1025,7 +1033,7 @@ export class ContactModel
         {
           type: V2AdvancedFilterType.TEXT,
           field: 'addresses.emailAddress',
-          label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+          label: 'LNG_CASE_FIELD_LABEL_EMAIL',
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition
@@ -1066,7 +1074,7 @@ export class ContactModel
         {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateRanges.startDate',
-          label: 'LNG_FORM_RANGE_FIELD_LABEL_FROM',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_START_DATE',
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: `${data.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${data.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
@@ -1074,7 +1082,7 @@ export class ContactModel
         {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateRanges.endDate',
-          label: 'LNG_FORM_RANGE_FIELD_LABEL_TO',
+          label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_END_DATE',
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: `${data.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${data.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
