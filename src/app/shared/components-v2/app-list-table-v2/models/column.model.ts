@@ -425,7 +425,6 @@ export const applyFilterBy = (
 
   // filter accordingly
   switch (column.filter.type) {
-
     // text
     case V2FilterType.TEXT:
 
