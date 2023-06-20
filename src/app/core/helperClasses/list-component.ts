@@ -768,21 +768,11 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   }
 
   /**
-   * Called after query builder is cleared
-   */
-  clearedQueryBuilder() {
-    // NOTHING
-  }
-
-  /**
    * Clear query builder of conditions and sorting criterias
    */
   clearQueryBuilder() {
     // clear query filters
     this.queryBuilder.clear();
-
-    // cleared query builder
-    this.clearedQueryBuilder();
   }
 
   /**
@@ -851,7 +841,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     this.applyTableColumnFilters();
 
     // retrieve Side filters
-    let queryBuilder;
+    let queryBuilder: RequestQueryBuilder;
     if (
       this.tableV2Component &&
       (queryBuilder = this.tableV2Component.advancedFiltersQueryBuilder)
@@ -1321,7 +1311,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // needs to be here, otherwise DONT_LOAD_STATIC_FILTERS_KEY won't work properly, since this method is called twice...
     this._loadedCachedFilterPage = this.getCachedFilterPageKey();
 
-    // did we disabled loading cached filters for this page ?
+    // did we disable loading cached filters for this page ?
     if (this.listHelperService.route.snapshot.queryParams[Constants.DONT_LOAD_STATIC_FILTERS_KEY]) {
       // next time load the saved filters
       this.mergeQueryParamsToUrl({
