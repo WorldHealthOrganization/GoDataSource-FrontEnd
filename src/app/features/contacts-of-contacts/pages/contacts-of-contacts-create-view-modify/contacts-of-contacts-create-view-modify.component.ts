@@ -29,7 +29,7 @@ import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
@@ -56,6 +56,9 @@ import { Location } from '@angular/common';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
+import { TeamModel } from '../../../../core/models/team.model';
 
 /**
  * Component
@@ -118,7 +121,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     protected referenceDataHelperService: ReferenceDataHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
-    redirectService: RedirectService
+    redirectService: RedirectService,
+    private entityFollowUpHelperService: EntityFollowUpHelperService
   ) {
     // parent
     super(
@@ -374,7 +378,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
 
         // contacts and exposures ...
         this.initializeTabsContacts(),
-        this.initializeTabsExposures()
+        this.initializeTabsExposures(),
+        this.initializeTabsViewFollowUps()
       ],
 
       // create details
@@ -1464,6 +1469,142 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
   }
 
   /**
+   * Initialize tabs - Follow-ups
+   */
+  private initializeTabsViewFollowUps(): ICreateViewModifyV2TabTable {
+    // create tab
+    const newTab: ICreateViewModifyV2TabTable = {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'follow_ups_registered_as_contact',
+      label: 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
+      visible: () => this.isView &&
+        FollowUpModel.canList(this.authUser) &&
+        this.itemData.wasContact,
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
+        pageSettingsKey: UserSettings.CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS,
+        advancedFilterType: Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value,
+        tableColumnActions: this.entityFollowUpHelperService.retrieveTableColumnActions({
+          authUser: this.authUser,
+          entityData: this.itemData,
+          selectedOutbreak: () => this.selectedOutbreak,
+          selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+          team: this.activatedRoute.snapshot.data.team,
+          refreshList: () => {
+            // reload data
+            const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+            localTab.refresh(newTab);
+          }
+        }),
+        tableColumns: this.entityFollowUpHelperService.retrieveTableColumns({
+          authUser: this.authUser,
+          team: this.activatedRoute.snapshot.data.team,
+          user: this.activatedRoute.snapshot.data.user,
+          dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,
+          options: {
+            yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
+          }
+        }),
+        advancedFilters: this.entityFollowUpHelperService.generateAdvancedFilters({
+          authUser: this.authUser,
+          contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
+          options: {
+            team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+            yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+            dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          }
+        }),
+        queryBuilder: new RequestQueryBuilder(),
+        pageIndex: 0,
+        refresh: (tab) => {
+          // attach fields restrictions
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          const fields: string[] = this.entityFollowUpHelperService.refreshListFields();
+          if (fields.length > 0) {
+            localTab.queryBuilder.clearFields();
+            localTab.queryBuilder.fields(...fields);
+          }
+
+          // add contact id
+          localTab.queryBuilder.filter.byEquality(
+            'personId',
+            this.itemData.id
+          );
+
+          // make sure we always sort by something
+          // default by date asc
+          if (localTab.queryBuilder.sort.isEmpty()) {
+            localTab.queryBuilder.sort.by(
+              'date',
+              RequestSortDirection.ASC
+            );
+          }
+
+          // refresh data
+          localTab.records$ = this.entityFollowUpHelperService
+            .retrieveRecords(
+              this.selectedOutbreak,
+              localTab.queryBuilder
+            )
+            .pipe(
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            );
+
+          // count
+          localTab.refreshCount(tab);
+
+          // update ui
+          localTab.updateUI();
+        },
+        refreshCount: (
+          tab,
+          applyHasMoreLimit?: boolean
+        ) => {
+          // reset
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.pageCount = undefined;
+
+          // set apply value
+          if (applyHasMoreLimit !== undefined) {
+            localTab.applyHasMoreLimit = applyHasMoreLimit;
+          }
+
+          // remove paginator from query builder
+          const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
+          countQueryBuilder.paginator.clear();
+          countQueryBuilder.sort.clear();
+
+          // apply has more limit
+          if (localTab.applyHasMoreLimit) {
+            countQueryBuilder.flag(
+              'applyHasMoreLimit',
+              true
+            );
+          }
+
+          // count
+          this.entityFollowUpHelperService
+            .retrieveRecordsCount(
+              this.selectedOutbreak.id,
+              countQueryBuilder
+            )
+            .pipe(
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            ).subscribe((response) => {
+              localTab.pageCount = response;
+            });
+        }
+      }
+    };
+
+    // finished
+    return newTab;
+  }
+
+  /**
    * Initialize buttons
    */
   private initializeButtons(): ICreateViewModifyV2Buttons {
@@ -1547,12 +1688,23 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             visible: () => ContactOfContactModel.canListRelationshipExposures(this.authUser)
           },
 
+          // follow-ups
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
+            action: {
+              link: () => ['/contacts', 'contact-of-contact-related-follow-ups', this.itemData.id]
+            },
+            visible: () => FollowUpModel.canList(this.authUser)
+          },
+
           // Divider
           {
             type: CreateViewModifyV2MenuType.DIVIDER,
             visible: () => ContactOfContactModel.canList(this.authUser) ||
               ContactOfContactModel.canListRelationshipContacts(this.authUser) ||
-              ContactOfContactModel.canListRelationshipExposures(this.authUser)
+              ContactOfContactModel.canListRelationshipExposures(this.authUser) ||
+              FollowUpModel.canList(this.authUser)
           },
 
           // movement map

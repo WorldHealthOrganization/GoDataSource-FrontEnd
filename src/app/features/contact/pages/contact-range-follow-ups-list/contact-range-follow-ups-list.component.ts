@@ -36,6 +36,8 @@ import {
 } from '../follow-up-create-view-modify/follow-up-create-view-modify.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -55,6 +57,9 @@ export class ContactRangeFollowUpsListComponent
   // person type options
   private _personTypeOptions: ILabelValuePairModel[] = [
     {
+      label: EntityType.CONTACT_OF_CONTACT,
+      value: EntityType.CONTACT_OF_CONTACT
+    }, {
       label: EntityType.CONTACT,
       value: EntityType.CONTACT
     }, {
@@ -138,9 +143,7 @@ export class ContactRangeFollowUpsListComponent
           type: 'person.name'
         },
         link: (data) => {
-          return data.person.type === EntityType.CASE ?
-            (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
-            (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+          return data.person.canView(this.authUser) ? EntityModel.getPersonLink(data.person) : undefined;
         },
         filter: {
           type: V2FilterType.TEXT,
@@ -183,9 +186,7 @@ export class ContactRangeFollowUpsListComponent
           type: 'person.visualId'
         },
         link: (data) => {
-          return data.person.type === EntityType.CASE ?
-            (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
-            (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+          return data.person.canView(this.authUser) ? EntityModel.getPersonLink(data.person) : undefined;
         },
         pinned: IV2ColumnPinned.LEFT,
         filter: {
@@ -779,7 +780,7 @@ export class ContactRangeFollowUpsListComponent
             [date: string]: true
           } = {};
           const followUpsGroupedByContact: {
-            person: ContactModel | CaseModel,
+            person: ContactOfContactModel | ContactModel | CaseModel,
             followUps: {
               [date: string]: FollowUpModel[]
             }

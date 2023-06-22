@@ -42,6 +42,7 @@ import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-ta
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 /**
  * Component
@@ -56,7 +57,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
 
   // entity
-  private _entityData: ContactModel | CaseModel;
+  private _entityData: ContactOfContactModel | ContactModel | CaseModel;
 
   // history ?
   isHistory: boolean;
@@ -98,13 +99,17 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     this.origin = activatedRoute.snapshot.queryParams.origin;
 
     // display history follow-ups ?
-    if (this._entityData?.type === EntityType.CASE) {
+    if (
+      this._entityData?.type === EntityType.CASE ||
+      this._entityData?.type === EntityType.CONTACT_OF_CONTACT
+    ) {
       this.toastV2Service.notice(
         this.isHistory ?
           'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE' :
           'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO',
         {
-          personName: this._entityData.name
+          personName: this._entityData.name,
+          personType: this.i18nService.instant(this._entityData.type).toLowerCase()
         },
         AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS
       );
@@ -286,6 +291,46 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
           label: 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
           action: {
             link: ['/contacts', 'case-follow-ups', this._entityData.id]
+          }
+        });
+      }
+    } else if (this._entityData?.type === EntityType.CONTACT_OF_CONTACT) {
+      // parent list page
+      if (ContactOfContactModel.canList(this.authUser)) {
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+          action: {
+            link: ['/contacts-of-contacts']
+          }
+        });
+      }
+
+      // origin
+      if (FollowUpModel.canListDashboard(this.authUser)) {
+        this.breadcrumbs.push({
+          label: originLabel,
+          action: {
+            link: [originLink]
+          }
+        });
+      }
+
+      // view page
+      if (ContactOfContactModel.canView(this.authUser)) {
+        this.breadcrumbs.push({
+          label: this._entityData.name,
+          action: {
+            link: ['/contacts-of-contacts', this._entityData.id, 'view']
+          }
+        });
+      }
+
+      // list page
+      if (FollowUpModel.canList(this.authUser)) {
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+          action: {
+            link: ['/contacts', 'contact-of-contact-follow-ups', this._entityData.id]
           }
         });
       }

@@ -25,6 +25,8 @@ import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
+import { DailyFollowUpStatusDataResolver } from '../../core/services/resolvers/data/daily-follow-up-status.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -50,7 +52,9 @@ const createViewModifyFoundation: Route = {
     contextOfTransmission: ContextOfTransmissionDataResolver,
     yesNoAll: YesNoAllDataResolver,
     yesNo: YesNoDataResolver,
-    entity: RelationshipPersonDataResolver
+    entity: RelationshipPersonDataResolver,
+    team: TeamDataResolver,
+    dailyFollowUpStatus: DailyFollowUpStatusDataResolver
   }
 };
 

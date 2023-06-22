@@ -21,6 +21,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
   selector: 'app-contact-follow-ups-bulk-modify',
@@ -30,7 +31,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
   // data
   selectedFollowUps: FollowUpModel[] = [];
   futureFollowUps: boolean = false;
-  selectedContacts: (ContactModel | CaseModel)[] = [];
+  selectedContacts: (ContactOfContactModel | ContactModel | CaseModel)[] = [];
   followUpDates: string[] = [];
 
   /**

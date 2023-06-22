@@ -16,6 +16,7 @@ import { SafeHtml } from '@angular/platform-browser';
 import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from './reference-data.model';
 import { I18nService } from '../services/helper/i18n.service';
+import { ContactOfContactModel } from './contact-of-contact.model';
 
 export class FollowUpModel
   extends BaseModel
@@ -29,7 +30,7 @@ export class FollowUpModel
   date: string | Moment;
   address: AddressModel;
   personId: string;
-  person: ContactModel | CaseModel;
+  person: ContactOfContactModel | ContactModel | CaseModel;
   targeted: boolean;
   questionnaireAnswers: {
     [variable: string]: IAnswerData[];
@@ -231,10 +232,16 @@ export class FollowUpModel
         {}
       );
 
-      if (person.type === EntityType.CASE) {
-        this.person = new CaseModel(person);
-      } else {
-        this.person = new ContactModel(person);
+      switch (person.type) {
+        case EntityType.CASE:
+          this.person = new CaseModel(person);
+          break;
+        case EntityType.CONTACT:
+          this.person = new ContactModel(person);
+          break;
+        case EntityType.CONTACT_OF_CONTACT:
+          this.person = new ContactOfContactModel(person);
+          break;
       }
     }
 

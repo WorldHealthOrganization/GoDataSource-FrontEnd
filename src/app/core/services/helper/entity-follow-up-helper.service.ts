@@ -30,6 +30,7 @@ import { LocationDataService } from '../data/location.data.service';
 import * as moment from 'moment';
 import { ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { I18nService } from './i18n.service';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 
 @Injectable({
   providedIn: 'root'
@@ -51,7 +52,7 @@ export class EntityFollowUpHelperService {
    */
   retrieveTableColumnActions(definitions: {
     authUser: UserModel,
-    entityData: ContactModel | CaseModel,
+    entityData: ContactOfContactModel | ContactModel | CaseModel,
     selectedOutbreak: () => OutbreakModel,
     selectedOutbreakIsActive: () => boolean,
     team: IResolverV2ResponseModel<TeamModel>,

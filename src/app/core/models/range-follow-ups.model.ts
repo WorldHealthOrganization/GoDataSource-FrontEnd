@@ -3,20 +3,30 @@ import { ContactModel } from './contact.model';
 import { FollowUpModel } from './follow-up.model';
 import { CaseModel } from './case.model';
 import { EntityType } from './entity-type';
+import { ContactOfContactModel } from './contact-of-contact.model';
 
 /**
  * Model representing a Case, a Contact or an Event
  */
 export class RangeFollowUpsModel {
-  person: ContactModel | CaseModel;
+  person: ContactOfContactModel | ContactModel | CaseModel;
   followUps: FollowUpModel[];
 
   constructor(data = null) {
     const contactData = _.get(data, 'contact');
     if (contactData) {
-      this.person = contactData.type === EntityType.CASE ?
-        new CaseModel(contactData) :
-        new ContactModel(contactData);
+      // get entity
+      switch (contactData.type) {
+        case EntityType.CASE:
+          this.person = new CaseModel(contactData);
+          break;
+        case EntityType.CONTACT:
+          this.person = new ContactModel(contactData);
+          break;
+        case EntityType.CONTACT_OF_CONTACT:
+          this.person = new ContactOfContactModel(contactData);
+          break;
+      }
     }
     this.followUps = _.map(_.get(data, 'followUps'), (followUpData) => {
       return new FollowUpModel(followUpData, false);

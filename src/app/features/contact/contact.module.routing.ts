@@ -313,9 +313,29 @@ const routes: Routes = [
       ]
     }
   },
+  // Follow-ups list from a contact of contact
+  {
+    path: 'contact-of-contact-related-follow-ups/:contactOfContactId',
+    ...dailyFollowUpsListFoundation,
+    data: {
+      permissions: [
+        PERMISSION.FOLLOW_UP_LIST
+      ]
+    }
+  },
   // Follow-ups list from a contact
   {
     path: 'contact-related-follow-ups/:contactId',
+    ...viewFollowUpsListFoundation,
+    data: {
+      permissions: [
+        PERMISSION.FOLLOW_UP_LIST
+      ]
+    }
+  },
+  // Follow-ups list from a contact of contact
+  {
+    path: 'contact-of-contact-follow-ups/:contactOfContactId',
     ...viewFollowUpsListFoundation,
     data: {
       permissions: [
@@ -391,6 +411,18 @@ const routes: Routes = [
     canDeactivate: [
       PageChangeConfirmationGuard
     ]
+  },
+  // View History Follow Up
+  {
+    path: ':contactOfContactId/follow-ups/:followUpId/history',
+    ...followUpFoundation,
+    data: {
+      permissions: [
+        PERMISSION.FOLLOW_UP_VIEW
+      ],
+      action: CreateViewModifyV2Action.VIEW,
+      isHistory: true
+    }
   },
   // View History Follow Up
   {
