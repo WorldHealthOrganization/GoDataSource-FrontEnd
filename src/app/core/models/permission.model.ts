@@ -264,6 +264,7 @@ export enum PERMISSION {
   CONTACT_IMPORT_LAB_RESULT = 'contact_import_lab_result',
   CONTACT_EXPORT_LAB_RESULT = 'contact_export_lab_result',
   CONTACT_CREATE_CONTACT_OF_CONTACT = 'contact_create_contact_of_contact',
+  CONTACT_LIST_ISOLATED_CONTACTS = 'contact_list_isolated_contacts',
 
   // contacts of contact
   CONTACT_OF_CONTACT_LIST = 'contact_of_contact_list',
@@ -280,6 +281,9 @@ export enum PERMISSION {
   CONTACT_OF_CONTACT_BULK_MODIFY = 'contact_of_contact_bulk_modify',
   CONTACT_OF_CONTACT_GENERATE_VISUAL_ID = 'contact_of_contact_generate_visual_id',
   CONTACT_OF_CONTACT_LIST_RELATIONSHIP_CONTACTS = 'contact_of_contact_list_relationship_contacts',
+  CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_CONTACTS = 'contact_of_contact_view_relationship_contacts',
+  CONTACT_OF_CONTACT_MODIFY_RELATIONSHIP_CONTACTS = 'contact_of_contact_modify_relationship_contacts',
+  CONTACT_OF_CONTACT_DELETE_RELATIONSHIP_CONTACTS = 'contact_of_contact_delete_relationship_contacts',
   CONTACT_OF_CONTACT_LIST_RELATIONSHIP_EXPOSURES = 'contact_of_contact_list_relationship_exposures',
   CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_EXPOSURES = 'contact_of_contact_view_relationship_exposures',
   CONTACT_OF_CONTACT_CREATE_RELATIONSHIP_EXPOSURES = 'contact_of_contact_create_relationship_exposures',
@@ -289,6 +293,7 @@ export enum PERMISSION {
   CONTACT_OF_CONTACT_SHARE_RELATIONSHIPS = 'contact_of_contact_share_relationships',
   CONTACT_OF_CONTACT_CHANGE_SOURCE_RELATIONSHIP = 'contact_of_contact_change_source_relationships',
   CONTACT_OF_CONTACT_CHANGE_TARGET_RELATIONSHIP = 'contact_of_contact_change_target_relationships',
+  CONTACT_OF_CONTACT_BULK_DELETE_RELATIONSHIP_CONTACTS = 'contact_of_contact_bulk_delete_relationships_contacts',
   CONTACT_OF_CONTACT_BULK_DELETE_RELATIONSHIP_EXPOSURES = 'contact_of_contact_bulk_delete_relationships_exposures',
   CONTACT_OF_CONTACT_VIEW_MOVEMENT_MAP = 'contact_of_contact_view_movement_map',
   CONTACT_OF_CONTACT_EXPORT_MOVEMENT_MAP = 'contact_of_contact_export_movement_map',

@@ -226,6 +226,11 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
   * Initialize tabs
   */
   protected initializeTabs(): void {

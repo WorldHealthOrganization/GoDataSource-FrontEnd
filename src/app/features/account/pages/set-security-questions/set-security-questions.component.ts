@@ -114,6 +114,11 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

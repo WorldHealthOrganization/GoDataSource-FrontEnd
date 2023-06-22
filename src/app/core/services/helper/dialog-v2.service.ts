@@ -94,7 +94,7 @@ import { I18nService } from './i18n.service';
 export class DialogV2Service {
   // export dialog width
   private static readonly EXPORT_DIALOG_WIDTH: string = '50rem';
-  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '40rem';
+  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '50rem';
 
   // used to show and update side dialog
   private _sideDialogSubject$: Subject<IV2SideDialog> = new Subject<IV2SideDialog>();
@@ -1098,6 +1098,14 @@ export class DialogV2Service {
     filtersList.filters = [];
     filtersList.sorts = [];
 
+    // clean removed filters and sorts
+    advancedFiltersApplied.appliedFilters = advancedFiltersApplied.appliedFilters?.length ?
+      advancedFiltersApplied.appliedFilters.filter((appliedFilter) => !!filtersList.optionsAsLabelValueMap[appliedFilter.filter.uniqueKey]) :
+      advancedFiltersApplied.appliedFilters;
+    advancedFiltersApplied.appliedSort = advancedFiltersApplied.appliedSort?.length ?
+      advancedFiltersApplied.appliedSort.filter((sortCriteria) => !!filtersList.optionsAsLabelValueMap[sortCriteria.sort.uniqueKey]) :
+      advancedFiltersApplied.appliedSort;
+
     // add filters
     (advancedFiltersApplied.appliedFilters || []).forEach((appliedFilter) => {
       // add filter
@@ -1426,7 +1434,8 @@ export class DialogV2Service {
                 qb.filter.byContainingText(
                   filterDefinition.field,
                   appliedFilter.value,
-                  false
+                  false,
+                  filterDefinition.useLike
                 );
 
                 // finished
@@ -1505,7 +1514,9 @@ export class DialogV2Service {
               case V2AdvancedFilterComparatorType.LOCATION:
                 qb.filter.where({
                   [`${filterDefinition.field}.parentLocationIdFilter`]: {
-                    inq: appliedFilter.value
+                    inq: filterDefinition.type === V2AdvancedFilterType.LOCATION_SINGLE ?
+                      [appliedFilter.value] :
+                      appliedFilter.value
                   }
                 });
                 break;
@@ -1635,6 +1646,8 @@ export class DialogV2Service {
             break;
 
           case V2AdvancedFilterType.RANGE_DATE:
+          case V2AdvancedFilterType.DELETED_AT:
+            // attach condition
             switch (appliedFilter.comparator.value) {
               case V2AdvancedFilterComparatorType.HAS_VALUE:
                 // filter
@@ -1661,6 +1674,11 @@ export class DialogV2Service {
                   appliedFilter.value,
                   false
                 );
+            }
+
+            // we need to search deleted records ?
+            if (filterDefinition.type === V2AdvancedFilterType.DELETED_AT) {
+              qb.includeDeleted();
             }
 
             // finished
@@ -1733,6 +1751,28 @@ export class DialogV2Service {
               false,
               null
             );
+
+            // finished
+            break;
+
+          // Deleted
+          case V2AdvancedFilterType.DELETED:
+            // FilterComparator.NONE
+            if (appliedFilter.value === false) {
+              qb.excludeDeleted();
+              qb.filter.remove('deleted');
+            } else {
+              qb.includeDeleted();
+              if (appliedFilter.value === true) {
+                qb.filter.where({
+                  deleted: {
+                    eq: true
+                  }
+                }, true);
+              } else {
+                qb.filter.remove('deleted');
+              }
+            }
 
             // finished
             break;

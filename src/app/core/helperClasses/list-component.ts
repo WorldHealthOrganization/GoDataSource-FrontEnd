@@ -768,21 +768,11 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   }
 
   /**
-   * Called after query builder is cleared
-   */
-  clearedQueryBuilder() {
-    // NOTHING
-  }
-
-  /**
    * Clear query builder of conditions and sorting criterias
    */
   clearQueryBuilder() {
     // clear query filters
     this.queryBuilder.clear();
-
-    // cleared query builder
-    this.clearedQueryBuilder();
   }
 
   /**
@@ -851,7 +841,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     this.applyTableColumnFilters();
 
     // retrieve Side filters
-    let queryBuilder;
+    let queryBuilder: RequestQueryBuilder;
     if (
       this.tableV2Component &&
       (queryBuilder = this.tableV2Component.advancedFiltersQueryBuilder)
@@ -884,7 +874,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Apply the filters selected from the Side Filters section
    */
   applySideFilters(queryBuilder: RequestQueryBuilder) {
-    // clear query builder of conditions and sorting criterias
+    // clear query builder of conditions and sorting criteria
     this.clearQueryBuilder();
 
     // clear table filters
@@ -1200,6 +1190,21 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
           // finished
           break;
 
+        // deleted is always a special case
+        // - take in account the side filter cached value
+        case V2FilterType.DELETED:
+
+          // side filter takes precedence, deleted column shouldn't overwrite value
+          // - LNG_COMMON_MODEL_FIELD_LABEL_DELETED is used by side filters
+          const deletedKey: string = `${column.field}LNG_COMMON_MODEL_FIELD_LABEL_DELETED`;
+          const sideFilterValue = currentUserCacheForCurrentPath.sideFilters?.appliedFilters.find((item) => item.filter?.uniqueKey === deletedKey);
+          column.filter.value = sideFilterValue?.value !== undefined ?
+            sideFilterValue.value :
+            value;
+
+          // finished
+          break;
+
         default:
           column.filter.value = value;
       }
@@ -1306,7 +1311,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // needs to be here, otherwise DONT_LOAD_STATIC_FILTERS_KEY won't work properly, since this method is called twice...
     this._loadedCachedFilterPage = this.getCachedFilterPageKey();
 
-    // did we disabled loading cached filters for this page ?
+    // did we disable loading cached filters for this page ?
     if (this.listHelperService.route.snapshot.queryParams[Constants.DONT_LOAD_STATIC_FILTERS_KEY]) {
       // next time load the saved filters
       this.mergeQueryParamsToUrl({

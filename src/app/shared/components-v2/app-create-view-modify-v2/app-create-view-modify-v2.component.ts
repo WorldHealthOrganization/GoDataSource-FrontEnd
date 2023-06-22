@@ -11,7 +11,7 @@ import {
   ICreateViewModifyV2TabInputList,
   ICreateViewModifyV2TabTable, ICreateViewModifyV2TabTableRecordsList
 } from './models/tab.model';
-import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
+import { IV2Breadcrumb, IV2BreadcrumbInfo } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { NgForm } from '@angular/forms';
@@ -111,6 +111,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
+  @Input() breadcrumbInfos: IV2BreadcrumbInfo[];
 
   // title
   @Input() pageTitle: string;
@@ -1314,7 +1315,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // initialize query paginator
     tab.definition.queryBuilder.paginator.setPage({
-      pageSize: tab.definition.queryBuilder.paginator.limit,
+      pageSize: tab.definition.queryBuilder.paginator.limit ?
+        tab.definition.queryBuilder.paginator.limit :
+        Constants.DEFAULT_PAGE_SIZE,
       pageIndex: 0
     }, true);
 

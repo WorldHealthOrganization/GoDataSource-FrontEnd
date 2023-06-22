@@ -188,6 +188,11 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {

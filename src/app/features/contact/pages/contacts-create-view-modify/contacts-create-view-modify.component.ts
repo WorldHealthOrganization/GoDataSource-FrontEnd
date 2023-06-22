@@ -67,6 +67,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 
 /**
  * Component
@@ -130,6 +131,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     protected relationshipDataService: RelationshipDataService,
     protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
+    private clusterDataService: ClusterDataService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -359,6 +361,33 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           }
         ),
         action: null
+      });
+    }
+  }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {
+    // nothing to do ?
+    if (this.isCreate) {
+      return;
+    }
+
+    // reset
+    this.breadcrumbInfos = [];
+
+    // was case ?
+    if (this.itemData.wasCase) {
+      this.breadcrumbInfos.push({
+        label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE'
+      });
+    }
+
+    // was contact of contact ?
+    if (this.itemData.wasContactOfContact) {
+      this.breadcrumbInfos.push({
+        label: 'LNG_CONTACT_FIELD_LABEL_WAS_CONTACT_OF_CONTACT'
       });
     }
   }
@@ -1039,6 +1068,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Case Questionnaire
    */
   private initializeTabsQuestionnaireAsCase(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: ContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE,
@@ -1056,7 +1086,12 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         hideQuestionNumbers: () => {
           return this.hideCaseQuestionNumbers;
         },
-        updateErrors: () => {}
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
       },
       visible: () => (this.isView || !this.selectedOutbreak.disableModifyingLegacyQuestionnaire) &&
         this.selectedOutbreak.caseInvestigationTemplate?.length > 0 &&
@@ -2437,6 +2472,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = ContactModel.generateAdvancedFilters({
       authUser: this.authUser,
+      i18nService: this.i18nService,
       contactInvestigationTemplate: () => this.selectedOutbreak.contactInvestigationTemplate,
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
@@ -2447,7 +2483,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           undefined
         ),
         followUpStatus: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        pregnancyStatus: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         vaccine: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -2458,11 +2494,84 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        risk: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        clusterLoad: (finished) => {
+          this.clusterDataService
+            .getResolveList(this.selectedOutbreak.id)
+            .pipe(
+              // handle error
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // not found
+                finished(null);
+
+                // send error down the road
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((data) => {
+              finished(data);
+            });
+        },
+        outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        dateRangeType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        dateRangeCenter: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }

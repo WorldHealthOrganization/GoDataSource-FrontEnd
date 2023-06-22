@@ -351,6 +351,33 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {
+    // nothing to do ?
+    if (this.isCreate) {
+      return;
+    }
+
+    // reset
+    this.breadcrumbInfos = [];
+
+    // was contact ?
+    if (this.itemData.wasContact) {
+      this.breadcrumbInfos.push({
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT'
+      });
+    }
+
+    // was contact of contact ?
+    if (this.itemData.wasContactOfContact) {
+      this.breadcrumbInfos.push({
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT'
+      });
+    }
+  }
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {
@@ -1270,6 +1297,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs - Contact Questionnaire
    */
   private initializeTabsQuestionnaireAsContact(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
@@ -1287,7 +1315,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         hideQuestionNumbers: () => {
           return this.hideContactQuestionNumbers;
         },
-        updateErrors: () => {}
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
       },
       visible: () => (this.isView || !this.selectedOutbreak.disableModifyingLegacyQuestionnaire) &&
         this.selectedOutbreak.contactInvestigationTemplate?.length > 0 &&
@@ -2500,6 +2533,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -2521,7 +2555,19 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           undefined
         ),
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        dateRangeType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        dateRangeCenter: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }

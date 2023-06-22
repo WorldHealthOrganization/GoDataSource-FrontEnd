@@ -288,5 +288,12 @@ export class ContactDataService {
   getContactRelationshipsCount(outbreakId: string, contactId: string): Observable<any> {
     return this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}/relationships/filtered-count`);
   }
+
+  /**
+   * Get exposed/isolated contacts for a contact that user want to delete/convert
+   */
+  getIsolatedContactsForContact(outbreakId: string, contactId: string) {
+    return this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}/isolated-contacts`);
+  }
 }
 

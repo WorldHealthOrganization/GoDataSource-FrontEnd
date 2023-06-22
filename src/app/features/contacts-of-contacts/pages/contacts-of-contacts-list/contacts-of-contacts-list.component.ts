@@ -353,37 +353,14 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                         .subscribe((exposedContacts: EntityModel[]) => {
                           // if there is no case/event as exposure, redirect to add exposures
                           if (!exposedContacts?.length) {
-                            // show isolated contacts
-                            this.dialogV2Service.showConfirmDialog({
-                              config: {
-                                title: {
-                                  get: () => 'LNG_COMMON_LABEL_CONVERT',
-                                  data: () => ({
-                                    name: item.name,
-                                    type: this.i18nService.instant(EntityType.CONTACT)
-                                  })
-                                },
-                                message: {
-                                  get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CONTACT_RELATIONSHIP_WARNING'
-                                }
-                              },
-                              yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
-                            }).subscribe((dialogResponse) => {
-                              // hide loading
-                              loading.close();
+                            // hide loading
+                            loading.close();
 
-                              // canceled ?
-                              if (dialogResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                                // finished
-                                return;
-                              }
-
-                              // redirect
-                              this.router.navigate(
-                                [`/relationships/${item.type}/${item.id}/exposures/add`]
-                              );
-                              return;
-                            });
+                            // redirect
+                            this.router.navigate(
+                              [`/relationships/${item.type}/${item.id}/exposures/add`]
+                            );
+                            return;
                           } else {
                             // convert
                             this.contactsOfContactsDataService
