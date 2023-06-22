@@ -3,7 +3,6 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { TranslateService } from '@ngx-translate/core';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
@@ -31,6 +30,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -87,7 +87,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected caseDataService: CaseDataService,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected toastV2Service: ToastV2Service,
     protected dialogV2Service: DialogV2Service,
     protected entityDataService: EntityDataService,
@@ -265,14 +265,14 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             questionnaireAnswers: mergeRecords
               .filter((item) => (item.model as CaseModel).questionnaireAnswers && Object.keys((item.model as CaseModel).questionnaireAnswers).length > 0)
               .map((item, index) => ({
-                label: `${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE')} ${index + 1}`,
+                label: `${this.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE')} ${index + 1}`,
                 value: index,
                 data: (item.model as CaseModel).questionnaireAnswers
               })),
             questionnaireHistoryAnswers: mergeRecords
               .filter((item) => (item.model as CaseModel).questionnaireAnswersContact && Object.keys((item.model as CaseModel).questionnaireAnswersContact).length > 0)
               .map((item, index) => ({
-                label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()} ${index + 1}`,
+                label: `${this.i18nService.instant(EntityType.CONTACT)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()} ${index + 1}`,
                 value: index,
                 data: (item.model as CaseModel).questionnaireAnswersContact
               })),
@@ -641,6 +641,11 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {
@@ -807,7 +812,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'visualId',
               placeholder: () => 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-              description: () => this.translateService.instant(
+              description: () => this.i18nService.instant(
                 'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this.selectedOutbreak.caseIdMask
               ),
@@ -832,7 +837,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.translateService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.i18nService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -1204,7 +1209,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: '_selectedQuestionnaireHistoryAnswers',
-              placeholder: () => `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()}`,
+              placeholder: () => `${this.i18nService.instant(EntityType.CONTACT)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()}`,
               options: this._uniqueOptions.questionnaireHistoryAnswers,
               value: {
                 get: () => this._selectedQuestionnaireHistoryAnswers as any,
@@ -1349,7 +1354,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: 'questionnaire_as_contact',
-      label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.i18nService.instant(EntityType.CONTACT)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersContact',
@@ -1489,8 +1494,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
         mergeRecords,
-        this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-        this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
       );
       case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);

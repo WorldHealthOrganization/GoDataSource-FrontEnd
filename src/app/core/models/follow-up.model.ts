@@ -11,11 +11,11 @@ import { OutbreakModel } from './outbreak.model';
 import { EntityType } from './entity-type';
 import { CaseModel } from './case.model';
 import { Moment } from '../helperClasses/x-moment';
-import { TranslateService } from '@ngx-translate/core';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { SafeHtml } from '@angular/platform-browser';
 import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from './reference-data.model';
+import { I18nService } from '../services/helper/i18n.service';
 
 export class FollowUpModel
   extends BaseModel
@@ -135,7 +135,7 @@ export class FollowUpModel
     info: {
       // required
       item: FollowUpModel,
-      translateService: TranslateService,
+      i18nService: I18nService,
       dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>
     }
   ): V2ColumnStatusForm[] {
@@ -150,7 +150,7 @@ export class FollowUpModel
       forms.push({
         type: IV2ColumnStatusFormType.CIRCLE,
         color: info.dailyFollowUpStatus.map[info.item.statusId].getColorCode(),
-        tooltip: info.translateService.instant(info.item.statusId)
+        tooltip: info.i18nService.instant(info.item.statusId)
       });
     }
 
@@ -159,7 +159,7 @@ export class FollowUpModel
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     }
 

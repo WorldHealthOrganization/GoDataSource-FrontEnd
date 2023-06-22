@@ -21,7 +21,7 @@ export class ExposureFrequencyDataResolver implements IMapResolverV2<ReferenceDa
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_FREQUENCY)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_FREQUENCY)
       .pipe(
         map((data) => {
           // construct map

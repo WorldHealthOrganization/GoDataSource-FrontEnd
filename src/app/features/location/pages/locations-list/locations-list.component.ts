@@ -60,8 +60,10 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
     private dialogV2Service: DialogV2Service
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
     );
 
     // get data
@@ -564,6 +566,22 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
                     fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
                     allow: {
                       types: [ExportDataExtension.JSON]
+                    },
+                    inputs: {
+                      append: [
+                        {
+                          type: V2SideDialogConfigInputType.CHECKBOX,
+                          placeholder: 'LNG_PAGE_LIST_LOCATIONS_EXPORT_DELETED_INFORMATION',
+                          name: 'includeDeletedLocations',
+                          checked: false
+                        },
+                        {
+                          type: V2SideDialogConfigInputType.CHECKBOX,
+                          placeholder: 'LNG_PAGE_LIST_LOCATIONS_EXPORT_REPLACE_UPDATED_AT_AS_CURRENT_DATE',
+                          name: 'replaceUpdatedAtAsCurrentDate',
+                          checked: false
+                        }
+                      ]
                     }
                   }
                 });

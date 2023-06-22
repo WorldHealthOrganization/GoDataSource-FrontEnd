@@ -10,6 +10,7 @@ import { Moment } from '../../../../core/helperClasses/x-moment';
 import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
 import { IV2NumberRange } from '../../../forms-v2/components/app-form-number-range-v2/models/number.model';
 import { IV2DateRange } from '../../../forms-v2/components/app-form-date-range-v2/models/date.model';
+import { IAppFormIconButtonV2 } from '../../../forms-v2/core/app-form-icon-button-v2';
 
 /**
  * Side dialog config
@@ -38,6 +39,7 @@ export enum V2SideDialogConfigInputType {
   LOCATION_MULTIPLE,
   TOGGLE,
   TOGGLE_CHECKBOX,
+  COLOR,
   LINK,
   LINK_WITH_ACTION,
   GROUP,
@@ -221,6 +223,7 @@ export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogCon
   validators?: IV2SideDialogConfigInputValidator;
   clearable?: boolean;
   tooltip?: string;
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -289,6 +292,23 @@ export interface IV2SideDialogConfigInputToggleCheckbox extends IV2SideDialogCon
   type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX;
   placeholder: string;
   value: boolean;
+
+  // optional
+  tooltip?: string;
+}
+
+/**
+ * Side dialog input - color
+ */
+export interface IV2SideDialogConfigInputColor extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.COLOR;
+  placeholder: string;
+  value: string;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
+  tooltip?: string;
 }
 
 /**
@@ -504,7 +524,7 @@ export interface IV2SideDialogConfigInputSortList extends IV2SideDialogConfigInp
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputTextarea
 | IV2SideDialogConfigInputTimepicker | IV2SideDialogConfigInputDate | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown
 | IV2SideDialogConfigInputSingleLocation | IV2SideDialogConfigInputMultipleLocation | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputToggleCheckbox
-| IV2SideDialogConfigInputNumber;
+| IV2SideDialogConfigInputNumber | IV2SideDialogConfigInputColor;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputDateRange | IV2SideDialogConfigInputNumberRange
 | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink
 | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup | IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow

@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -27,6 +26,8 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { LocationIdentifierModel } from '../../../../core/models/location-identifier.model';
 import * as _ from 'lodash';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 
 /**
  * Component
@@ -46,7 +47,7 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected locationDataService: LocationDataService,
@@ -192,7 +193,7 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_LOCATION_TITLE', {
             name: this.itemData.name
           }
@@ -202,7 +203,7 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_LOCATION_TITLE', {
             name: this.itemData.name
           }
@@ -211,6 +212,11 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -226,8 +232,8 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -581,6 +587,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
             .getLocationUsageCount(this.itemData.id)
             .pipe(
               catchError((err) => {
+                // clear cache
+                AppFormLocationBaseV2.CACHE = {};
+
                 // show error
                 finished(err, undefined);
 
@@ -590,6 +599,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
             )
             .subscribe((usedEntitiesCount) => {
               if (!usedEntitiesCount?.count) {
+                // clear cache
+                AppFormLocationBaseV2.CACHE = {};
+
                 // finished with success
                 finished(undefined, item);
 
@@ -612,6 +624,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                 .subscribe((response) => {
                   // canceled ?
                   if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // clear cache
+                    AppFormLocationBaseV2.CACHE = {};
+
                     // finished with success
                     finished(undefined, item);
 
@@ -624,6 +639,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                     .propagateGeoLocation(this.itemData.id)
                     .pipe(
                       catchError((err) => {
+                        // clear cache
+                        AppFormLocationBaseV2.CACHE = {};
+
                         // show error
                         finished(err, undefined);
 
@@ -632,6 +650,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                       })
                     )
                     .subscribe(() => {
+                      // clear cache
+                      AppFormLocationBaseV2.CACHE = {};
+
                       // finished with success
                       finished(undefined, item);
 
@@ -641,6 +662,9 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                 });
             });
         } else {
+          // clear cache
+          AppFormLocationBaseV2.CACHE = {};
+
           // finished with success
           finished(undefined, item);
         }

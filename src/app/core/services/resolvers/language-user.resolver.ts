@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Resolve, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { I18nService } from '../helper/i18n.service';
 import { Observable, Subscriber } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -16,7 +15,6 @@ implements Resolve<any> {
    * Constructor
    */
   constructor(
-    private translateService: TranslateService,
     private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     private authDataService: AuthDataService,
@@ -28,7 +26,7 @@ implements Resolve<any> {
    */
   resolve(): Observable<any> {
     return new Observable((observer: Subscriber<void>) => {
-      if (this.translateService.currentLang) {
+      if (this.i18nService.currentLang) {
         observer.next();
         observer.complete();
       } else {

@@ -21,7 +21,7 @@ export class ContextOfTransmissionDataResolver implements IMapResolverV2<Referen
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION)
       .pipe(
         map((data) => {
           // construct map

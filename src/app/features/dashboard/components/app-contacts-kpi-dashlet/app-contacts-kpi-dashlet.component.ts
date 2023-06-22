@@ -11,7 +11,6 @@ import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { TranslateService } from '@ngx-translate/core';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { MetricContactsPerCaseModel } from '../../../../core/models/metrics/metric-contacts-per-case.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
@@ -26,6 +25,7 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { MetricContactsSeenEachDays } from '../../../../core/models/metrics/metric-contacts-seen-each-days.model';
 import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
 import { AppKpiDashletComponent } from '../app-kpi-dashlet/app-kpi-dashlet.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-contacts-kpi-dashlet',
@@ -43,7 +43,7 @@ export class AppContactsKpiDashletComponent
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private relationshipDataService: RelationshipDataService,
     private followUpsDataService: FollowUpsDataService,
     private caseDataService: CaseDataService,
@@ -146,7 +146,7 @@ export class AppContactsKpiDashletComponent
           _globalFilterLocationId,
           _globalFilterClassificationId
         ) => undefined,
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEAN_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEAN_TITLE_DESCRIPTION')
       },
 
       // Contacts per case median
@@ -217,7 +217,7 @@ export class AppContactsKpiDashletComponent
           _globalFilterLocationId,
           _globalFilterClassificationId
         ) => undefined,
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE_DESCRIPTION')
       },
 
       // Contacts on the follow-up list
@@ -312,7 +312,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE_DESCRIPTION')
       },
 
       // Contacts Lost to follow-up
@@ -396,7 +396,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP_DESCRIPTION')
       },
 
       // Contacts Not Seen
@@ -498,7 +498,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE_DESCRIPTION')
       },
 
       // Number of contacts becoming cases in period & location
@@ -633,7 +633,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_DESCRIPTION')
       },
 
       // Contacts seen each day
@@ -692,7 +692,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY_DESCRIPTION')
       },
 
       // Contacts with successful follow-ups
@@ -751,7 +751,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP_DESCRIPTION')
       }
     ];
 

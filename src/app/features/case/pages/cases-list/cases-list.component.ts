@@ -15,7 +15,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { ContactModel } from '../../../../core/models/contact.model';
+import { ContactModel, IContactIsolated } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
@@ -39,7 +39,13 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import * as moment from 'moment';
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { Location } from '@angular/common';
+import { Moment } from 'moment';
+import { DocumentModel } from '../../../../core/models/document.model';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -83,6 +89,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
     { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT', value: 'wasContact' },
     { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase' },
+    { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT', value: 'wasContactOfContact' },
     { label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS', value: 'investigationStatus' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED', value: 'dateInvestigationCompleted' },
     { label: 'LNG_CASE_FIELD_LABEL_OUTCOME_ID', value: 'outcomeId' },
@@ -90,7 +97,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
     { label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
     { label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
-    { label: 'LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID', value: 'burialLocationId' },
+    { label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL', value: 'burialLocationId' },
     { label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME', value: 'burialPlaceName' },
     { label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
     { label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
@@ -136,12 +143,19 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private entityHelperService: EntityHelperService,
     private redirectService: RedirectService,
-    private clusterDataService: ClusterDataService
+    private clusterDataService: ClusterDataService,
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private location: Location
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
+    );
   }
 
   /**
@@ -345,66 +359,119 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               cssClasses: () => 'gd-list-table-actions-action-menu-warning',
               action: {
                 click: (item: CaseModel): void => {
-                  // show confirm dialog to confirm the action
-                  this.dialogV2Service.showConfirmDialog({
-                    config: {
-                      title: {
-                        get: () => 'LNG_COMMON_LABEL_CONVERT',
-                        data: () => ({
-                          name: item.name,
-                          type: this.translateService.instant(EntityType.CONTACT)
-                        })
-                      },
-                      message: {
-                        get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT',
-                        data: () => item as any
-                      }
-                    }
-                  }).subscribe((response) => {
-                    // canceled ?
-                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                      // finished
-                      return;
-                    }
+                  // show loading
+                  let loading = this.dialogV2Service.showLoadingDialog();
 
-                    // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
-
-                    // convert
-                    this.caseDataService
-                      .convertToContact(
-                        this.selectedOutbreak.id,
-                        item.id
-                      )
-                      .pipe(
-                        catchError((err) => {
-                          // show error
-                          this.toastV2Service.error(err);
-
-                          // hide loading
-                          loading.close();
-
-                          // send error down the road
-                          return throwError(err);
-                        })
-                      )
-                      .subscribe(() => {
-                        // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+                  // determine if case has isolated contacts
+                  this.caseDataService
+                    .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
+                    .pipe(
+                      catchError((err) => {
+                        // show error
+                        this.toastV2Service.error(err);
 
                         // hide loading
                         loading.close();
 
-                        // reload data
-                        this.needsRefreshList(true);
+                        // send error down the road
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe((isolatedContacts: { count: number, contacts: IContactIsolated[] }) => {
+                      // hide loading
+                      loading.close();
+
+                      // show isolated contacts ?
+                      let isolatedContactLinks: string = '';
+                      if (isolatedContacts?.count) {
+                        // get the isolated contacts
+                        isolatedContactLinks = this.i18nService.instant('LNG_PAGE_LIST_CASES_ACTION_ISOLATED_CONTACTS') +
+                          isolatedContacts.contacts
+                            .map((entity) => {
+                              // create contact full name
+                              const fullName = [entity.firstName, entity.middleName, entity.lastName]
+                                .filter(Boolean)
+                                .join(' ');
+
+                              // check rights
+                              if (!ContactModel.canView(this.authUser)) {
+                                return `${fullName} (${this.i18nService.instant(EntityType.CONTACT)})`;
+                              }
+
+                              // create url
+                              const url = `contacts/${entity.id}/view`;
+
+                              // finished
+                              return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${fullName}</span></a>`;
+                            })
+                            .join(', ');
+                      }
+
+                      // show confirm dialog to confirm the action
+                      this.dialogV2Service.showConfirmDialog({
+                        config: {
+                          title: {
+                            get: () => 'LNG_COMMON_LABEL_CONVERT',
+                            data: () => ({
+                              name: item.name,
+                              type: this.i18nService.instant(EntityType.CONTACT)
+                            })
+                          },
+                          message: {
+                            get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT',
+                            data: () => ({
+                              name: item.name,
+                              isolatedContacts: isolatedContactLinks
+                            })
+                          }
+                        }
+                      }).subscribe((response) => {
+                        // canceled ?
+                        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                          // finished
+                          return;
+                        }
+
+                        // show loading
+                        loading = this.dialogV2Service.showLoadingDialog();
+
+                        // convert
+                        this.caseDataService
+                          .convertToContact(
+                            this.selectedOutbreak.id,
+                            item.id
+                          )
+                          .pipe(
+                            catchError((err) => {
+                              // show error
+                              this.toastV2Service.error(err);
+
+                              // hide loading
+                              loading.close();
+
+                              // send error down the road
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe(() => {
+                            // success
+                            this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+
+                            // hide loading
+                            loading.close();
+
+                            // reload data
+                            this.needsRefreshList(true);
+                          });
                       });
-                  });
+                    });
                 }
               },
               visible: (item: CaseModel): boolean => {
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
-                  CaseModel.canConvertToContact(this.authUser);
+                  CaseModel.canConvertToContact(this.authUser) &&
+                  CaseModel.canListIsolatedCases(this.authUser);
               }
             },
 
@@ -651,7 +718,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       url: `outbreaks/${this.selectedOutbreak.id}/cases/${item.id}/export-empty-case-investigation`,
                       async: false,
                       method: ExportDataMethod.GET,
-                      fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                      fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
                       allow: {
                         types: [
                           ExportDataExtension.ZIP
@@ -805,13 +872,17 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           // classification
           {
             title: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-            items: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+            items: this.referenceDataHelperService.filterPerOutbreak(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).list
+            ).map((item) => {
               return {
                 form: {
                   type: IV2ColumnStatusFormType.CIRCLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           },
@@ -819,13 +890,17 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           // outcome
           {
             title: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-            items: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+            items: this.referenceDataHelperService.filterPerOutbreak(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).list
+            ).map((item) => {
               return {
                 form: {
                   type: IV2ColumnStatusFormType.TRIANGLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           },
@@ -838,13 +913,14 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                 type: IV2ColumnStatusFormType.STAR,
                 color: 'var(--gd-danger)'
               },
-              label: ' '
+              label: ' ',
+              order: undefined
             }]
           }
         ],
         forms: (_column, data: CaseModel): V2ColumnStatusForm[] => CaseModel.getStatusForms({
           item: data,
-          translateService: this.translateService,
+          i18nService: this.i18nService,
           classification: this.activatedRoute.snapshot.data.classification,
           outcome: this.activatedRoute.snapshot.data.outcome
         })
@@ -855,7 +931,11 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           search: (column: IV2Column) => {
             // create condition
             const values: string[] = (column.filter as IV2FilterMultipleSelect).value;
@@ -882,6 +962,17 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               this.needsRefreshList();
             }
           }
+        }
+      },
+      {
+        field: 'pregnancyStatus',
+        label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
         }
       },
       {
@@ -912,13 +1003,41 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           includeNoValue: true
         }
       },
       {
         field: 'dateOfOutcome',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'dateBecomeCase',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'dateOfInfection',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -943,6 +1062,18 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return data.deathLocation?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.deathLocation.id}/view` :
             undefined;
+        }
+      },
+      {
+        field: 'dob',
+        label: 'LNG_CASE_FIELD_LABEL_DOB',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
@@ -973,7 +1104,11 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
@@ -991,7 +1126,11 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
@@ -1136,6 +1275,34 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true
       },
       {
+        field: 'isDateOfOnsetApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'transferRefused',
+        label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
         field: 'dateOfReporting',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
         notVisible: true,
@@ -1144,6 +1311,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         },
         filter: {
           type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         },
         sortable: true
       },
@@ -1161,7 +1342,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       },
       {
         field: 'burialLocationId',
-        label: 'LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID',
+        label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
         format: {
           type: 'burialLocation.name'
         },
@@ -1184,6 +1365,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         }
+      },
+      {
+        field: 'safeBurial',
+        label: 'LNG_CASE_FIELD_LABEL_SAFE_BURIAL',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
       },
       {
         field: 'notACase',
@@ -1223,6 +1418,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true
       },
       {
+        field: 'wasContactOfContact',
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
         field: 'responsibleUserId',
         label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
         notVisible: true,
@@ -1242,6 +1451,63 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
+      },
+      {
+        field: 'documents',
+        label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+        format: {
+          type: (item: CaseModel): string => {
+            // must format ?
+            if (!item.uiDocuments) {
+              item.uiDocuments = DocumentModel.arrayToString(
+                this.i18nService,
+                item.documents
+              );
+            }
+
+            // finished
+            return item.uiDocuments;
+          }
+        },
+        notVisible: true
+      },
+      {
+        field: 'vaccinesReceived',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
+        format: {
+          type: (item: CaseModel): string => {
+            // must format ?
+            if (!item.uiVaccines) {
+              item.uiVaccines = VaccineModel.arrayToString(
+                this.i18nService,
+                item.vaccinesReceived
+              );
+            }
+
+            // finished
+            return item.uiVaccines;
+          }
+        },
+        notVisible: true
+      },
+      {
+        field: 'dateRanges',
+        label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
+        format: {
+          type: (item: CaseModel): string => {
+            // must format ?
+            if (!item.uiDateRanges) {
+              item.uiDateRanges = CaseCenterDateRangeModel.arrayToString(
+                this.i18nService,
+                item.dateRanges
+              );
+            }
+
+            // finished
+            return item.uiDateRanges;
+          }
+        },
+        notVisible: true
       }
     ];
 
@@ -1325,6 +1591,18 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true
       },
       {
+        field: 'deletedAt',
+        label: 'LNG_CASE_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
         notVisible: true,
@@ -1396,7 +1674,67 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
   /**
    * Initialize process data
    */
-  protected initializeProcessSelectedData(): void {}
+  protected initializeProcessSelectedData(): void {
+    this.processSelectedData = [
+      // all selected records were not deleted ?
+      {
+        key: 'allNotDeleted',
+        shouldProcess: () => CaseModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive,
+        process: (
+          dataMap: {
+            [id: string]: CaseModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allNotDeleted: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (dataMap[selected[index]]?.deleted) {
+              // at least one not deleted
+              allNotDeleted = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allNotDeleted;
+        }
+      },
+
+      // all selected records were deleted ?
+      {
+        key: 'allDeleted',
+        shouldProcess: () => CaseModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive,
+        process: (
+          dataMap: {
+            [id: string]: CaseModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allDeleted: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (!dataMap[selected[index]]?.deleted) {
+              // at least one not deleted
+              allDeleted = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allDeleted;
+        }
+      }
+    ];
+  }
 
   /**
    * Initialize table infos
@@ -1417,11 +1755,28 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
         gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        risk: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        classification: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        risk: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        outcome: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         clusterLoad: (finished) => {
           this.clusterDataService
             .getResolveList(
@@ -1448,10 +1803,30 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             });
         },
         pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        vaccineStatus: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        vaccine: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        vaccineStatus: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        dateRangeType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        dateRangeCenter: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }
@@ -1584,7 +1959,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `outbreaks/${this.selectedOutbreak.id}/cases/export-investigation-template`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
                   allow: {
                     types: [
                       ExportDataExtension.ZIP
@@ -1683,7 +2058,15 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       type: V2ActionType.GROUP_ACTIONS,
       visible: () => CaseModel.canExport(this.authUser) ||
         CaseModel.canExportDossier(this.authUser) ||
-        CaseModel.canExportRelationships(this.authUser),
+        CaseModel.canExportRelationships(this.authUser) ||
+        (
+          CaseModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
+        (
+          CaseModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
       actions: [
         {
           label: {
@@ -1740,7 +2123,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
                   async: false,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                   extraFormData: {
                     append: {
                       cases: selected
@@ -1804,6 +2187,257 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           },
           disable: (selected: string[]): boolean => {
             return selected.length < 1;
+          }
+        },
+
+        // Divider
+        {
+          visible: () => (
+            CaseModel.canExport(this.authUser) ||
+            CaseModel.canExportDossier(this.authUser) ||
+            CaseModel.canExportRelationships(this.authUser)
+          ) && (
+            (
+              CaseModel.canBulkDelete(this.authUser) ||
+              CaseModel.canBulkRestore(this.authUser)
+            ) &&
+            this.selectedOutbreakIsActive
+          )
+        },
+
+        // bulk delete
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_DELETE_SELECTED_CASES'
+          },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_DELETE_SELECTED_CASES_DESCRIPTION') :
+            undefined,
+          action: {
+            click: (selected: string[]) => {
+              // ask for confirmation
+              this.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_DELETE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_CASES'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // show loading
+                  const loading = this.dialogV2Service.showLoadingDialog();
+                  loading.message({
+                    message: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_SELECTED_CASES_WAIT_MESSAGE',
+                    messageData: {
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
+                      date: '—'
+                    }
+                  });
+
+                  // delete - we can't use bulk here since deleting cases triggers many hooks
+                  let startTime: Moment;
+                  const selectedShallowClone: string[] = [...selected];
+                  const nextDelete = () => {
+                    // finished ?
+                    if (selectedShallowClone.length < 1) {
+                      this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SELECTED_CASES_SUCCESS_MESSAGE');
+                      loading.close();
+                      this.needsRefreshList(true);
+                      return;
+                    }
+
+                    // delete
+                    this.caseDataService
+                      .deleteCase(
+                        this.selectedOutbreak.id,
+                        selectedShallowClone.shift()
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // hide loading
+                          loading.close();
+
+                          // error
+                          this.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // determine estimated end time
+                        let estimatedEndDate: Moment;
+
+                        // initialize start time if necessary
+                        if (!startTime) {
+                          startTime = moment();
+                        }
+
+                        // determine estimated time
+                        const processed: number = selected.length - selectedShallowClone.length;
+                        const total: number = selected.length;
+                        if (processed > 0) {
+                          const processedSoFarTimeMs: number = moment().diff(startTime);
+                          const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
+                          const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
+                          estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                        }
+
+                        // update progress
+                        loading.message({
+                          message: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_SELECTED_CASES_WAIT_MESSAGE',
+                          messageData: {
+                            no: processed.toLocaleString('en'),
+                            total: total.toLocaleString('en'),
+                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                          }
+                        });
+
+                        // next
+                        nextDelete();
+                      });
+                  };
+
+                  // start delete
+                  nextDelete();
+                });
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canBulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
+          }
+        },
+
+        // bulk restore
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_RESTORE_SELECTED_CASES'
+          },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allDeleted ?
+            this.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_RESTORE_SELECTED_CASES_DESCRIPTION') :
+            undefined,
+          action: {
+            click: (selected: string[]) => {
+              // ask for confirmation
+              this.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_RESTORE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_CASES'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // show loading
+                  const loading = this.dialogV2Service.showLoadingDialog();
+                  loading.message({
+                    message: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_SELECTED_CASES_WAIT_MESSAGE',
+                    messageData: {
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
+                      date: '—'
+                    }
+                  });
+
+                  // restore - we can't use bulk here since restoring cases triggers many hooks
+                  let startTime: Moment;
+                  const selectedShallowClone: string[] = [...selected];
+                  const nextRestore = () => {
+                    // finished ?
+                    if (selectedShallowClone.length < 1) {
+                      this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SELECTED_CASES_SUCCESS_MESSAGE');
+                      loading.close();
+                      this.needsRefreshList(true);
+                      return;
+                    }
+
+                    // restore
+                    this.caseDataService
+                      .restoreCase(
+                        this.selectedOutbreak.id,
+                        selectedShallowClone.shift()
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // hide loading
+                          loading.close();
+
+                          // error
+                          this.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // determine estimated end time
+                        let estimatedEndDate: Moment;
+
+                        // initialize start time if necessary
+                        if (!startTime) {
+                          startTime = moment();
+                        }
+
+                        // determine estimated time
+                        const processed: number = selected.length - selectedShallowClone.length;
+                        const total: number = selected.length;
+                        if (processed > 0) {
+                          const processedSoFarTimeMs: number = moment().diff(startTime);
+                          const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
+                          const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
+                          estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                        }
+
+                        // update progress
+                        loading.message({
+                          message: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_SELECTED_CASES_WAIT_MESSAGE',
+                          messageData: {
+                            no: processed.toLocaleString('en'),
+                            total: total.toLocaleString('en'),
+                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                          }
+                        });
+
+                        // next
+                        nextRestore();
+                      });
+                  };
+
+                  // start restore
+                  nextRestore();
+                });
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canBulkRestore(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allDeleted;
           }
         }
       ]
@@ -1919,14 +2553,20 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               values = values.sort((item1, item2) => {
                 // if same order, compare labels
                 if (item1.order === item2.order) {
-                  return this.translateService.instant(item1.label).localeCompare(this.translateService.instant(item2.label));
+                  return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
                 }
 
                 // format order
                 let order1: number = Number.MAX_SAFE_INTEGER;
-                try { order1 = parseInt(item1.order, 10); } catch (e) {}
+                try {
+                  order1 = typeof item1.order === 'number' ? item1.order : parseInt(item1.order, 10);
+                  order1 = isNaN(order1) ? Number.MAX_SAFE_INTEGER : order1;
+                } catch (e) {}
                 let order2: number = Number.MAX_SAFE_INTEGER;
-                try { order2 = parseInt(item2.order, 10); } catch (e) {}
+                try {
+                  order2 = typeof item2.order === 'number' ? item2.order : parseInt(item2.order, 10);
+                  order2 = isNaN(order2) ? Number.MAX_SAFE_INTEGER : order2;
+                } catch (e) {}
 
                 // compare order
                 return order1 - order2;
@@ -1998,7 +2638,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `/outbreaks/${this.selectedOutbreak.id}/cases/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -2032,6 +2672,13 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                         placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION',
                         tooltip: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_INFORMATION_DESCRIPTION',
                         name: 'includeContactFields',
+                        checked: false
+                      },
+                      {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_OF_CONTACT_INFORMATION',
+                        tooltip: 'LNG_PAGE_LIST_CASES_EXPORT_CONTACT_OF_CONTACT_INFORMATION_DESCRIPTION',
+                        name: 'includeContactOfContactFields',
                         checked: false
                       }
                     ]
@@ -2088,7 +2735,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -2208,6 +2855,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'middleName',
       'visualId',
       'classification',
+      'pregnancyStatus',
       'riskLevel',
       'riskReason',
       'occupation',
@@ -2215,21 +2863,33 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'dateInvestigationCompleted',
       'outcomeId',
       'dateOfOutcome',
+      'dateBecomeCase',
+      'dateOfInfection',
       'deathLocationId',
+      'dob',
       'age',
       'gender',
       'addresses',
+      'documents',
+      'vaccinesReceived',
+      'dateRanges',
       'dateOfOnset',
+      'isDateOfOnsetApproximate',
+      'transferRefused',
       'dateOfReporting',
+      'isDateOfReportingApproximate',
       'dateOfBurial',
       'burialLocationId',
       'burialPlaceName',
+      'safeBurial',
       'wasContact',
+      'wasContactOfContact',
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',
       'questionnaireAnswers',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdAt',
       'updatedBy',

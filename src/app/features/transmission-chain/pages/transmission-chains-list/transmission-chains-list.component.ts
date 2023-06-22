@@ -29,8 +29,9 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
   }
 

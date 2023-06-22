@@ -3,27 +3,34 @@ import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { BaseModel } from './base.model';
 import { CaseModel } from './case.model';
-import { Constants } from './constants';
 import { ContactModel } from './contact.model';
 import { EntityType } from './entity-type';
 import { LabResultSequenceModel } from './lab-result-sequence.model';
 import { OutbreakModel } from './outbreak.model';
-import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRestorable } from './permission.interface';
+import {
+  IPermissionBasic,
+  IPermissionBasicBulk,
+  IPermissionExportable,
+  IPermissionImportable,
+  IPermissionRestorable
+} from './permission.interface';
 import { PERMISSION } from './permission.model';
 import { IAnswerData, QuestionModel } from './question.model';
 import { UserModel } from './user.model';
 import { Moment } from '../helperClasses/x-moment';
-import { TranslateService } from '@ngx-translate/core';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { SafeHtml } from '@angular/platform-browser';
+import { I18nService } from '../services/helper/i18n.service';
+import { Constants } from './constants';
 
 export class LabResultModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRestorable,
-        IPermissionImportable,
-        IPermissionExportable {
+    IPermissionBasic,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionImportable,
+    IPermissionExportable {
   id: string;
   sampleIdentifier: string;
   dateSampleTaken: string | Moment;
@@ -219,7 +226,7 @@ export class LabResultModel
     info: {
       // required
       item: LabResultModel,
-      translateService: TranslateService
+      i18nService: I18nService
     }
   ): V2ColumnStatusForm[] {
     // construct list of forms that we need to display
@@ -230,7 +237,7 @@ export class LabResultModel
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     }
 
@@ -248,9 +255,12 @@ export class LabResultModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionBasicBulk
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
   static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_MODIFY) : false); }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_RESTORE) : false); }
 
   /**
      * Static Permissions - IPermissionRestorable
@@ -291,7 +301,7 @@ export class LabResultModel
     this.testType = _.get(data, 'testType');
     this.result = _.get(data, 'result');
     this.notes = _.get(data, 'notes');
-    this.status = _.get(data, 'status', Constants.PROGRESS_OPTIONS.IN_PROGRESS.value);
+    this.status = _.get(data, 'status', Constants.LAB_TEST_RESULT_STATUS.IN_PROGRESS);
     this.quantitativeResult = _.get(data, 'quantitativeResult');
     this.personId = _.get(data, 'personId');
     this.personType = _.get(data, 'personType');
@@ -315,7 +325,10 @@ export class LabResultModel
   /**
    * Permissions - IPermissionBasicBulk
    */
+  canBulkCreate(): boolean { return LabResultModel.canBulkCreate(); }
   canBulkModify(user: UserModel): boolean { return LabResultModel.canBulkModify(user); }
+  canBulkDelete(user: UserModel): boolean { return LabResultModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return LabResultModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionRestorable

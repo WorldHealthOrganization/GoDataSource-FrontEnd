@@ -3,7 +3,6 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
-import { TranslateService } from '@ngx-translate/core';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -40,7 +39,6 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
     protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected helpDataService: HelpDataService,
-    protected translateService: TranslateService,
     protected toastV2Service: ToastV2Service,
     protected dialogV2Service: DialogV2Service,
     protected i18nService: I18nService,
@@ -134,7 +132,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
 
     // add info accordingly to page type
     this.breadcrumbs.push({
-      label: this.translateService.instant(this.selectedCategory.name),
+      label: this.i18nService.instant(this.selectedCategory.name),
       action: {
         link: [`/help/categories/${this.selectedCategory.id}/view`]
       }
@@ -158,7 +156,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_HELP_ITEM_TITLE', {
             name: this.itemData.title
           }
@@ -168,7 +166,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_HELP_ITEM_TITLE', {
             name: this.itemData.title
           }
@@ -177,6 +175,11 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -192,8 +195,8 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_ITEM_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_ITEM_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             { name: this.itemData.title }
           )
@@ -245,7 +248,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
               description: () => 'LNG_HELP_ITEM_FIELD_LABEL_TITLE_DESCRIPTION',
               value: {
                 get: () => this.itemData.title ?
-                  this.translateService.instant(this.itemData.title) :
+                  this.i18nService.instant(this.itemData.title) :
                   this.itemData.title,
                 set: (value) => {
                   this.itemData.title = value;
@@ -278,7 +281,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
               name: 'content',
               value: {
                 get: () => this.itemData.content ?
-                  this.translateService.instant(this.itemData.content) :
+                  this.i18nService.instant(this.itemData.content) :
                   this.itemData.content,
                 set: (value) => {
                   this.itemData.content = value;
@@ -292,7 +295,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
               description: () => 'LNG_HELP_ITEM_FIELD_LABEL_COMMENT_DESCRIPTION',
               value: {
                 get: () => this.itemData.comment ?
-                  this.translateService.instant(this.itemData.comment) :
+                  this.i18nService.instant(this.itemData.comment) :
                   this.itemData.comment,
                 set: (value) => {
                   this.itemData.comment = value;
@@ -306,7 +309,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
               description: () => 'LNG_HELP_ITEM_FIELD_LABEL_PAGE_DESCRIPTION',
               value: {
                 get: () => this.itemData.page ?
-                  this.translateService.instant(this.itemData.page) :
+                  this.i18nService.instant(this.itemData.page) :
                   this.itemData.page,
                 set: (value) => {
                   this.itemData.page = value;
@@ -453,7 +456,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       link: (item: HelpItemModel) => [`/help/categories/${this.selectedCategory.id}/items/${item.id}/view`],
       get: {
         text: (item: HelpItemModel) => item.title ?
-          this.translateService.instant(item.title) :
+          this.i18nService.instant(item.title) :
           item.title
       }
     };

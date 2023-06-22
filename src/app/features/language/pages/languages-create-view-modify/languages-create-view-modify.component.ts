@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -22,6 +21,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -37,7 +37,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected languageDataService: LanguageDataService,
@@ -142,7 +142,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_LANGUAGE_TITLE', {
             name: this.itemData.name
           }
@@ -152,7 +152,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_LANGUAGE_TITLE', {
             name: this.itemData.name
           }
@@ -161,6 +161,11 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -176,8 +181,8 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )

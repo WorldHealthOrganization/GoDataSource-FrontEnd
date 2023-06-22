@@ -10,7 +10,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { TranslateService } from '@ngx-translate/core';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
@@ -27,7 +26,6 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
     protected userDataService: UserDataService,
-    protected translateService: TranslateService,
     protected i18nService: I18nService,
     protected dialogV2Service: DialogV2Service,
     authDataService: AuthDataService,
@@ -100,6 +98,11 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
       action: null
     });
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -198,7 +201,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
               },
               noValueLabel: () => this.itemData.outbreakIds?.length > 0 ?
                 undefined :
-                this.translateService.instant('LNG_USER_FIELD_LABEL_ALL_OUTBREAKS')
+                this.i18nService.instant('LNG_USER_FIELD_LABEL_ALL_OUTBREAKS')
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'activeOutbreakId',

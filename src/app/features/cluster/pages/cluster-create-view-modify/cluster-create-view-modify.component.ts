@@ -3,7 +3,6 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -23,6 +22,7 @@ import {
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { MAT_ICONS } from '../../../../shared/forms-v2/core/mat-icons-v2';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -39,7 +39,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
     private router: Router,
     private clusterDataService: ClusterDataService,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
@@ -141,7 +141,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_CLUSTER_TITLE', {
             name: this.itemData.name
           }
@@ -151,7 +151,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_CLUSTER_TITLE', {
             name: this.itemData.name
           }
@@ -160,6 +160,11 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -175,8 +180,8 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )

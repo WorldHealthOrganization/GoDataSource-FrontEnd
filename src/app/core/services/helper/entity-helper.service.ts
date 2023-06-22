@@ -26,7 +26,6 @@ import { ClusterModel } from '../../models/cluster.model';
 import { UserModel } from '../../models/user.model';
 import { V2ActionType } from '../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { TranslateService } from '@ngx-translate/core';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { v4 as uuid } from 'uuid';
@@ -113,6 +112,15 @@ export class EntityHelperService {
         label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
         link: '/contacts-of-contacts',
         can: {
+          contacts: {
+            view: ContactOfContactModel.canViewRelationshipContacts,
+            create: ContactOfContactModel.canCreateRelationshipContacts,
+            modify: ContactOfContactModel.canModifyRelationshipContacts,
+            delete: ContactOfContactModel.canDeleteRelationshipContacts,
+            share: ContactOfContactModel.canShareRelationship,
+            changeSource: ContactOfContactModel.canChangeSource,
+            bulkDelete: ContactOfContactModel.canBulkDeleteRelationshipContacts
+          },
           exposures: {
             view: ContactOfContactModel.canViewRelationshipExposures,
             create: ContactOfContactModel.canCreateRelationshipExposures,
@@ -158,7 +166,6 @@ export class EntityHelperService {
     private relationshipDataService: RelationshipDataService,
     private i18nService: I18nService,
     private toastV2Service: ToastV2Service,
-    private translateService: TranslateService,
     private authDataService: AuthDataService
   ) {}
 
@@ -916,7 +923,8 @@ export class EntityHelperService {
                   type: IV2ColumnStatusFormType.CIRCLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           }
@@ -933,7 +941,7 @@ export class EntityHelperService {
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: definitions.personType.map[data.type].getColorCode(),
-              tooltip: this.translateService.instant(data.type)
+              tooltip: this.i18nService.instant(data.type)
             });
           }
 
@@ -958,7 +966,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
         format: {
           type: (item) => item.relationship?.certaintyLevelId ?
-            this.translateService.instant(item.relationship?.certaintyLevelId) :
+            this.i18nService.instant(item.relationship?.certaintyLevelId) :
             item.relationship?.certaintyLevelId
         },
         filter: {
@@ -973,7 +981,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
         format: {
           type: (item) => item.relationship?.exposureTypeId ?
-            this.translateService.instant(item.relationship?.exposureTypeId) :
+            this.i18nService.instant(item.relationship?.exposureTypeId) :
             item.relationship?.exposureTypeId
         },
         filter: {
@@ -988,7 +996,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
         format: {
           type: (item) => item.relationship?.exposureFrequencyId ?
-            this.translateService.instant(item.relationship?.exposureFrequencyId) :
+            this.i18nService.instant(item.relationship?.exposureFrequencyId) :
             item.relationship?.exposureFrequencyId
         },
         filter: {
@@ -1003,7 +1011,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
         format: {
           type: (item) => item.relationship?.exposureDurationId ?
-            this.translateService.instant(item.relationship?.exposureDurationId) :
+            this.i18nService.instant(item.relationship?.exposureDurationId) :
             item.relationship?.exposureDurationId
         },
         filter: {
@@ -1018,7 +1026,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
         format: {
           type: (item) => item.relationship?.socialRelationshipTypeId ?
-            this.translateService.instant(item.relationship?.socialRelationshipTypeId) :
+            this.i18nService.instant(item.relationship?.socialRelationshipTypeId) :
             item.relationship?.socialRelationshipTypeId
         },
         filter: {

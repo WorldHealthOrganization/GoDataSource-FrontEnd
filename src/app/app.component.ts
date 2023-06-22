@@ -2,12 +2,13 @@ import { Component, HostListener, OnInit, ViewContainerRef, ViewEncapsulation } 
 import { I18nService } from './core/services/helper/i18n.service';
 import { SystemSettingsDataService } from './core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from './core/models/system-settings-version.model';
+import { BulkCacheHelperService } from './core/services/helper/bulk-cache-helper.service';
 
 @Component({
   selector: 'app-root',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.less']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
   // instance configuration
@@ -19,6 +20,7 @@ export class AppComponent implements OnInit {
   constructor(
     private i18nService: I18nService,
     private systemSettingsDataService: SystemSettingsDataService,
+    protected bulkCacheHelperService: BulkCacheHelperService,
     // used by ngx color picker - to display as popup
     // ngx-color-picker.mjs:1352 You are using cpUseRootViewContainer, but the root component is not exposing viewContainerRef!Please expose it by adding 'public vcRef: ViewContainerRef' to the constructor.
     public viewContainerRef: ViewContainerRef
@@ -40,6 +42,9 @@ export class AppComponent implements OnInit {
       .subscribe((systemSettingsVersion) => {
         this.systemSettingsVersion = systemSettingsVersion;
       });
+
+    // clear expired cache data
+    this.bulkCacheHelperService.clearBulkSelected(true);
   }
 
   /**

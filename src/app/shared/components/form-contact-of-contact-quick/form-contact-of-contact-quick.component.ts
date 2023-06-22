@@ -13,7 +13,8 @@ import { IResolverV2ResponseModel } from '../../../core/services/resolvers/data/
 import { ActivatedRoute } from '@angular/router';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-form-contact-of-contact-quick',
@@ -90,7 +91,8 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
     private outbreakDataService: OutbreakDataService,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService
+    private i18nService: I18nService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     super(controlContainer, validators, asyncValidators);
   }
@@ -106,8 +108,6 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
 
     // reference data
     this.genderOptions = (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
-    this.riskOptions = (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
-    this.occupationsOptions = (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
 
     // subscribe to the Selected Outbreak
     this.outbreakSubscriber = this.outbreakDataService
@@ -115,8 +115,15 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
 
+        if (!this.selectedOutbreak?.id) {
+          return;
+        }
+
+        // refresh ref data options
+        this.refreshReferenceData();
+
         // set visual ID translate data
-        this.visualIDTooltip = this.translateService.instant(
+        this.visualIDTooltip = this.i18nService.instant(
           'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION', {
             mask: ContactOfContactModel.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask)
           }
@@ -133,6 +140,16 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+  }
+
+  /**
+   * Write value
+   */
+  writeValue(value: ContactOfContactModel) {
+    super.writeValue(value);
+
+    // refresh ref data options
+    this.refreshReferenceData();
   }
 
   /**
@@ -157,4 +174,20 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
     return dirtyControls;
   }
 
+  /**
+   * Refresh ref data options
+   */
+  private refreshReferenceData(): void {
+    // reference data
+    this.riskOptions = this.referenceDataHelperService.filterPerOutbreakOptions(
+      this.selectedOutbreak,
+      (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      this.contactOfContact?.riskLevel
+    );
+    this.occupationsOptions = this.referenceDataHelperService.filterPerOutbreakOptions(
+      this.selectedOutbreak,
+      (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      this.contactOfContact?.occupation
+    );
+  }
 }

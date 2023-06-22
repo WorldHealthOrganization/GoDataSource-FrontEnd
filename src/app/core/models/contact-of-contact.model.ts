@@ -28,20 +28,28 @@ import { SafeHtml } from '@angular/platform-browser';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from './reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../services/helper/i18n.service';
+import { IAnswerData } from './question.model';
+
+export interface IContactOfContactIsolated {
+  id: string,
+  firstName: string,
+  middleName: string,
+  lastName: string
+}
 
 export class ContactOfContactModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionExportable,
-        IPermissionImportable,
-        IPermissionBasicBulk,
-        IPermissionRestorable,
-        IPermissionRelatedRelationship,
-        IPermissionMovement,
-        IPermissionChronology,
-        IPermissionContactOfContacts {
+    IPermissionBasic,
+    IPermissionExportable,
+    IPermissionImportable,
+    IPermissionBasicBulk,
+    IPermissionRestorable,
+    IPermissionRelatedRelationship,
+    IPermissionMovement,
+    IPermissionChronology,
+    IPermissionContactOfContacts {
   id: string;
   firstName: string;
   middleName: string;
@@ -57,9 +65,22 @@ export class ContactOfContactModel
   dateOfLastContact: string;
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
-  dateBecomeContact: string;
   visualId: string;
+  wasCase: boolean;
+  dateBecomeCase: string | Moment;
+  wasContact: boolean;
+  dateBecomeContact: string | Moment;
+  wasContactOfContact: boolean;
+  dateBecomeContactOfContact: string | Moment;
 
+  questionnaireAnswersCase: {
+    [variable: string]: IAnswerData[];
+  };
+  questionnaireAnswersContact: {
+    [variable: string]: IAnswerData[];
+  };
+
+  numberOfContacts: number;
   numberOfExposures: number;
 
   dob: string | Moment;
@@ -86,7 +107,8 @@ export class ContactOfContactModel
     authUser: UserModel,
     options: {
       occupation: ILabelValuePairModel[],
-      user: ILabelValuePairModel[]
+      user: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -160,6 +182,26 @@ export class ContactOfContactModel
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasCase',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasContact',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfContacts',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfExposures',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
@@ -188,7 +230,7 @@ export class ContactOfContactModel
     info: {
       // required
       item: ContactOfContactModel,
-      translateService: TranslateService,
+      i18nService: I18nService,
       risk: IResolverV2ResponseModel<ReferenceDataEntryModel>
     }
   ): V2ColumnStatusForm[] {
@@ -203,7 +245,7 @@ export class ContactOfContactModel
       forms.push({
         type: IV2ColumnStatusFormType.TRIANGLE,
         color: info.risk.map[info.item.riskLevel].getColorCode(),
-        tooltip: info.translateService.instant(info.item.riskLevel)
+        tooltip: info.i18nService.instant(info.item.riskLevel)
       });
     }
 
@@ -248,12 +290,12 @@ export class ContactOfContactModel
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_IMPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionBasicBulk
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
   static canBulkCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE) : false); }
   static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY) : false); }
-  static canBulkDelete(): boolean { return false; }
-  static canBulkRestore(): boolean { return false; }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_RESTORE) : false); }
 
   /**
      * Static Permissions - IPermissionRestorable
@@ -263,11 +305,11 @@ export class ContactOfContactModel
   /**
      * Static Permissions - IPermissionRelatedRelationship
      */
-  static canListRelationshipContacts(): boolean { return false; }
-  static canViewRelationshipContacts(): boolean { return false; }
+  static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_RELATIONSHIP_CONTACTS) : false); }
+  static canViewRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_CONTACTS) : false); }
   static canCreateRelationshipContacts(): boolean { return false; }
-  static canModifyRelationshipContacts(): boolean { return false; }
-  static canDeleteRelationshipContacts(): boolean { return false; }
+  static canModifyRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_MODIFY_RELATIONSHIP_CONTACTS) : false); }
+  static canDeleteRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE_RELATIONSHIP_CONTACTS) : false); }
   static canListRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_RELATIONSHIP_EXPOSURES) : false); }
   static canViewRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_EXPOSURES) : false); }
   static canCreateRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE_RELATIONSHIP_EXPOSURES) : false); }
@@ -278,7 +320,7 @@ export class ContactOfContactModel
   static canExportRelationships(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_RELATIONSHIPS) : false); }
   static canShareRelationship(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_SHARE_RELATIONSHIPS) : false); }
   static canChangeSource(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CHANGE_SOURCE_RELATIONSHIP) : false); }
-  static canBulkDeleteRelationshipContacts(): boolean { return false; }
+  static canBulkDeleteRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_DELETE_RELATIONSHIP_CONTACTS) : false); }
   static canBulkDeleteRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_DELETE_RELATIONSHIP_EXPOSURES) : false); }
 
   /**
@@ -297,6 +339,7 @@ export class ContactOfContactModel
      */
   static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_GENERATE_VISUAL_ID) : false); }
   static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_DOSSIER) : false); }
+  static canConvertToContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT) : false); }
 
   /**
      * Constructor
@@ -343,6 +386,7 @@ export class ContactOfContactModel
       }
     );
 
+    this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
 
     // vaccines received
@@ -357,8 +401,17 @@ export class ContactOfContactModel
     this.dateOfReporting = _.get(data, 'dateOfReporting');
     this.dateOfLastContact = _.get(data, 'dateOfLastContact');
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
-    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
     this.visualId = _.get(data, 'visualId', '');
+
+    this.wasCase = _.get(data, 'wasCase');
+    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
+    this.wasContact = _.get(data, 'wasContact');
+    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+    this.wasContactOfContact = _.get(data, 'wasContactOfContact');
+    this.dateBecomeContactOfContact = _.get(data, 'dateBecomeContactOfContact');
+
+    this.questionnaireAnswersCase = _.get(data, 'questionnaireAnswersCase', {});
+    this.questionnaireAnswersContact = _.get(data, 'questionnaireAnswersContact', {});
 
     this.inconsistencies = _.get(data, 'inconsistencies', []);
     _.each(this.inconsistencies, (inconsistency, index) => {
@@ -403,8 +456,8 @@ export class ContactOfContactModel
      */
   canBulkCreate(user: UserModel): boolean { return ContactOfContactModel.canBulkCreate(user); }
   canBulkModify(user: UserModel): boolean { return ContactOfContactModel.canBulkModify(user); }
-  canBulkDelete(): boolean { return ContactOfContactModel.canBulkDelete(); }
-  canBulkRestore(): boolean { return ContactOfContactModel.canBulkRestore(); }
+  canBulkDelete(user: UserModel): boolean { return ContactOfContactModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return ContactOfContactModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionRestorable
@@ -414,11 +467,11 @@ export class ContactOfContactModel
   /**
      * Permissions - IPermissionRelatedRelationship
      */
-  canListRelationshipContacts(): boolean { return ContactOfContactModel.canListRelationshipContacts(); }
-  canViewRelationshipContacts(): boolean { return ContactOfContactModel.canViewRelationshipContacts(); }
+  canListRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canListRelationshipContacts(user); }
+  canViewRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canViewRelationshipContacts(user); }
   canCreateRelationshipContacts(): boolean { return ContactOfContactModel.canCreateRelationshipContacts(); }
-  canModifyRelationshipContacts(): boolean { return ContactOfContactModel.canModifyRelationshipContacts(); }
-  canDeleteRelationshipContacts(): boolean { return ContactOfContactModel.canDeleteRelationshipContacts(); }
+  canModifyRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canModifyRelationshipContacts(user); }
+  canDeleteRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canDeleteRelationshipContacts(user); }
   canListRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canListRelationshipExposures(user); }
   canViewRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canViewRelationshipExposures(user); }
   canCreateRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canCreateRelationshipExposures(user); }
@@ -429,7 +482,7 @@ export class ContactOfContactModel
   canExportRelationships(user: UserModel): boolean { return ContactOfContactModel.canExportRelationships(user); }
   canShareRelationship(user: UserModel): boolean { return ContactOfContactModel.canShareRelationship(user); }
   canChangeSource(user: UserModel): boolean { return ContactOfContactModel.canChangeSource(user); }
-  canBulkDeleteRelationshipContacts(): boolean { return ContactOfContactModel.canBulkDeleteRelationshipContacts(); }
+  canBulkDeleteRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canBulkDeleteRelationshipContacts(user); }
   canBulkDeleteRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canBulkDeleteRelationshipExposures(user); }
 
   /**
@@ -448,6 +501,7 @@ export class ContactOfContactModel
      */
   canGenerateVisualId(user: UserModel): boolean { return ContactOfContactModel.canGenerateVisualId(user); }
   canExportDossier(user: UserModel): boolean { return ContactOfContactModel.canExportDossier(user); }
+  canConvertToContact(user: UserModel): boolean { return ContactOfContactModel.canConvertToContact(user); }
 
   /**
    * Contact Of Contact Name

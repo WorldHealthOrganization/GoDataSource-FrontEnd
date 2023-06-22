@@ -11,20 +11,30 @@ import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
-import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRelatedContact, IPermissionRelatedContactBulk, IPermissionRelatedRelationship, IPermissionRestorable } from './permission.interface';
+import {
+  IPermissionBasic,
+  IPermissionBasicBulk,
+  IPermissionExportable,
+  IPermissionImportable,
+  IPermissionRelatedContact,
+  IPermissionRelatedContactBulk,
+  IPermissionRelatedRelationship,
+  IPermissionRestorable
+} from './permission.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 export class EventModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRelatedRelationship,
-        IPermissionRestorable,
-        IPermissionImportable,
-        IPermissionExportable,
-        IPermissionRelatedContact,
-        IPermissionRelatedContactBulk {
+    IPermissionBasic,
+    IPermissionRelatedRelationship,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionImportable,
+    IPermissionExportable,
+    IPermissionRelatedContact,
+    IPermissionRelatedContactBulk {
   id: string;
   name: string;
   date: string | Moment;
@@ -56,9 +66,13 @@ export class EventModel
    * Advanced filters
    */
   static generateAdvancedFilters(data: {
+    authUser: UserModel,
     options: {
       user: ILabelValuePairModel[],
-      eventCategory: ILabelValuePairModel[]
+      eventCategory: ILabelValuePairModel[],
+      addressType: ILabelValuePairModel[],
+      yesNoAll: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -79,7 +93,8 @@ export class EventModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'eventCategory',
         label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
-        options: data.options.eventCategory
+        options: data.options.eventCategory,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
@@ -90,13 +105,14 @@ export class EventModel
       {
         type: V2AdvancedFilterType.ADDRESS,
         field: 'address',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
         isArray: false
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfReporting',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING'
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -107,7 +123,8 @@ export class EventModel
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'endDate',
-        label: 'LNG_EVENT_FIELD_LABEL_END_DATE'
+        label: 'LNG_EVENT_FIELD_LABEL_END_DATE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
@@ -129,11 +146,105 @@ export class EventModel
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user
+        field: 'address.typeId',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_TYPE',
+        options: data.options.addressType,
+        sortable: true,
+        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'address.date',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_DATE',
+        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.emailAddress',
+        label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+        field: 'address',
+        label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
+        isArray: false,
+        sortable: 'address.phoneNumber'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.city',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_CITY',
+        sortable: true,
+        useLike: true,
+        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.postalCode',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_POSTAL_CODE',
+        sortable: true,
+        useLike: true,
+        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'address.geoLocationAccurate',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
+        options: data.options.yesNo,
+        sortable: true,
+        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_EVENT_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_EVENT_FIELD_LABEL_DELETED_AT',
+        sortable: true
       }
     ];
+
+    // allowed to filter by responsible user ?
+    if (UserModel.canListForFilters(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'responsibleUserId',
+        label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
+      });
+    }
 
     // finished
     return advancedFilters;
@@ -174,6 +285,14 @@ export class EventModel
      * Static Permissions - IPermissionRestorable
      */
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_RESTORE) : false); }
+
+  /**
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
+  static canBulkModify(): boolean { return false; }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_BULK_RESTORE) : false); }
 
   /**
      * Static Permissions - IPermissionImportable
@@ -283,6 +402,14 @@ export class EventModel
      * Permissions - IPermissionRestorable
      */
   canRestore(user: UserModel): boolean { return EventModel.canRestore(user); }
+
+  /**
+   * Permissions - IPermissionBasicBulk
+   */
+  canBulkCreate(): boolean { return EventModel.canBulkCreate(); }
+  canBulkModify(): boolean { return EventModel.canBulkModify(); }
+  canBulkDelete(user: UserModel): boolean { return EventModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return EventModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionImportable

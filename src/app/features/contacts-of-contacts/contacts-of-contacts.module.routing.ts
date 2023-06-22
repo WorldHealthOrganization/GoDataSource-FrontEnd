@@ -49,6 +49,7 @@ const createViewModifyFoundation: Route = {
     exposureDuration: ExposureDurationDataResolver,
     contextOfTransmission: ContextOfTransmissionDataResolver,
     yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
     entity: RelationshipPersonDataResolver
   }
 };
@@ -64,6 +65,7 @@ const routes: Routes = [
       user: UserDataResolver,
       gender: GenderDataResolver,
       yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
       occupation: OccupationDataResolver
     }
   },

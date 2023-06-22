@@ -31,8 +31,10 @@ export class HelpCategoriesListComponent extends ListComponent<HelpCategoryModel
     private dialogV2Service: DialogV2Service
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
     );
   }
 

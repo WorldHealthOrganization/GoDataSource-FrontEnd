@@ -596,6 +596,14 @@
               position: absolute;
               width: calc(100% + 3.2rem);
             }
+
+            &.gd-app-side-dialog-v2-content-middle-item-input-row-flex {
+              @include flex_wrap(nowrap);
+
+              > .gd-app-side-dialog-v2-content-middle-item-input {
+                width: 100%;
+              }
+            }
           }
 
           /* Sort List */
@@ -693,10 +701,6 @@
       .gd-app-side-dialog-v2-content-bottom {
         border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
         padding: 1.6rem;
-
-        .gd-app-side-dialog-v2-content-bottom-button {
-          text-transform: capitalize;
-        }
       }
 
       /* Slide-in panel loading spinner */

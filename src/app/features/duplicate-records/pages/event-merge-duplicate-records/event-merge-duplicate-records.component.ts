@@ -14,11 +14,11 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { TranslateService } from '@ngx-translate/core';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
@@ -47,7 +47,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
   constructor(
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private locationDataService: LocationDataService,
     protected toastV2Service: ToastV2Service,
     authDataService: AuthDataService,
@@ -317,6 +317,11 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
     * Initialize tabs
     */
   protected initializeTabs(): void {
@@ -541,7 +546,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'visualId',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
-            description: () => this.translateService.instant(
+            description: () => this.i18nService.instant(
               'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
               this.selectedOutbreak.eventIdMask
             ),
@@ -566,7 +571,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             },
             replace: {
               condition: () => !UserModel.canListForFilters(this.authUser),
-              html: this.translateService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
+              html: this.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,

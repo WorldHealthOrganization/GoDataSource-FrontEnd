@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType, CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
@@ -24,6 +23,7 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { LanguageModel } from '../../../../core/models/language.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -43,7 +43,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
     protected userDataService: UserDataService,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     authDataService: AuthDataService,
@@ -147,7 +147,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_USER_TITLE', {
             name: this.itemData.name
           }
@@ -157,7 +157,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_USER_TITLE', {
             name: this.itemData.name
           }
@@ -166,6 +166,11 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -181,8 +186,8 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -373,7 +378,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               },
               replace: {
                 condition: () => !OutbreakModel.canList(this.authUser),
-                html: this.translateService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ALL_OUTBREAKS')
+                html: this.i18nService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ALL_OUTBREAKS')
               }
             },
             {
@@ -394,7 +399,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               },
               replace: {
                 condition: () => !OutbreakModel.canList(this.authUser),
-                html: this.translateService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ACTIVE_OUTBREAK')
+                html: this.i18nService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ACTIVE_OUTBREAK')
               }
             },
             {

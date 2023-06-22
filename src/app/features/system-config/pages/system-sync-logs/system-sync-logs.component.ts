@@ -46,7 +46,11 @@ export class SystemSyncLogsComponent
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**
@@ -620,11 +624,14 @@ export class SystemSyncLogsComponent
         hideInputFilter: true,
 
         // inputs
+        width: '65rem',
         inputs: [
           {
             type: V2SideDialogConfigInputType.HTML,
             name: 'error',
-            placeholder: `<code><pre>${ JSON.stringify(errJson, null, 1) }</pre></code>`
+            placeholder: errJson ?
+              `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>` :
+              `<code>${error}</code>`
           }
         ],
 
@@ -758,7 +765,6 @@ export class SystemSyncLogsComponent
         async: false,
         method: ExportDataMethod.GET,
         fileName: `${ this.i18nService.instant('LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE') } - ${ moment().format('YYYY-MM-DD') }`,
-        queryBuilder: this.queryBuilder,
         allow: {
           types: [ExportDataExtension.ZIP],
           encrypt: false

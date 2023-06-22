@@ -259,6 +259,7 @@
           <!-- Breadcrumbs -->
           <app-breadcrumb-v2
             [breadcrumbs]="breadcrumbs"
+            [infos]="breadcrumbInfos"
             (detectChanges)="resizeTable()"></app-breadcrumb-v2>
 
           <!-- Title & buttons -->
@@ -268,6 +269,7 @@
 
             <!-- Title & view button -->
             <div
+              *ngIf="!isSmallScreenMode"
               fxFlex fxFlex.lt-md="none" fxLayoutAlign="start center" fxLayoutGap="1.6rem"
               class="gd-create-view-modify-top-title-buttons-title">
 
@@ -276,11 +278,12 @@
                 {{pageTitle | translate:pageTitleData}}
               </span>
 
-              <!-- View button -->
+              <!-- Large screen - View button -->
               <a
                 *ngIf="isModify && tabData.buttons.view && (!tabData.buttons.view.visible || tabData.buttons.view.visible())"
                 type="button"
                 mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_VIEW_DATA' | translate"
                 [routerLink]="tabData.buttons.view.link.link()"
                 [queryParams]="tabData.buttons.view.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.view.link.queryParams()) : selectedTabParams">
                 <mat-icon>visibility</mat-icon>
@@ -320,6 +323,17 @@
                 </ng-template>
 
               </ng-container>
+
+              <!-- Small screen - View button -->
+              <a
+                *ngIf="isSmallScreenMode && isModify && tabData.buttons.view && (!tabData.buttons.view.visible || tabData.buttons.view.visible())"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_VIEW_DATA' | translate"
+                [routerLink]="tabData.buttons.view.link.link()"
+                [queryParams]="tabData.buttons.view.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.view.link.queryParams()) : selectedTabParams">
+                <mat-icon>visibility</mat-icon>
+              </a>
 
               <!-- Quick Actions -->
               <ng-container
@@ -498,6 +512,7 @@
                   [class.gd-create-view-modify-bottom-section-content-input-has-address]="input.type === CreateViewModifyV2TabInputType.ADDRESS"
                   [class.gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-tree-editor]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR"
                   [class.gd-create-view-modify-bottom-section-content-input-has-select-groups]="input.type === CreateViewModifyV2TabInputType.SELECT_GROUPS"
                   [class.gd-create-view-modify-bottom-section-content-input-has-wysiwyg]="input.type === CreateViewModifyV2TabInputType.WYSIWYG"
                   [class.gd-create-view-modify-bottom-section-content-input-has-label]="input.type === CreateViewModifyV2TabInputType.LABEL"
@@ -513,6 +528,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [viewOnly]="isView || !input.value.set"
                     [selectedTab]="selectedTab === tab"
+                    [outbreak]="input.outbreak"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-edit-questionnaire-v2>
 
                   <!-- Fill questionnaire -->
@@ -529,6 +545,20 @@
                     app-questionnaire-answers-validator
                     (ngModelChange)="input.value.set($event, parentItemIndex)"
                     (errorsChanged)="input.updateErrors($event)"></app-form-fill-questionnaire-v2>
+
+                  <!-- Tree editor -->
+                  <app-form-tree-editor-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [viewOnly]="isView || !input.value.set"
+                    [selectedTab]="selectedTab === tab"
+                    [options]="input.options"
+                    [emptyLabel]="input.emptyLabel"
+                    [addNewItemVisible]="input.add && (!input.add.visible || input.add.visible())"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"
+                    (addNewItem)="input.add ? input.add.callback($event) : undefined"></app-form-tree-editor-v2>
 
                   <!-- Text -->
                   <app-form-input-v2
@@ -641,7 +671,7 @@
                     [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [viewOnly]="isView || !input.value.set"
                     [options]="input.options"
-                    [clearable]="true"
+                    [clearable]="input.clearable === undefined || input.clearable"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     [suffixIconButtons]="input.suffixIconButtons"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
@@ -1641,6 +1671,12 @@
                 [ngTemplateOutlet]="formRender"
                 [ngTemplateOutletContext]="{ tab }"></ng-template>
 
+              <!-- Tree editor -->
+              <ng-template
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR"
+                [ngTemplateOutlet]="formRender"
+                [ngTemplateOutletContext]="{ tab }"></ng-template>
+
             </ng-container>
           </ng-template>
 
@@ -1698,6 +1734,7 @@
                   class="gd-create-view-modify-bottom-content"
                   [class.gd-create-view-modify-bottom-content-edit-questionnaire]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-content-fill-questionnaire]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
+                  [class.gd-create-view-modify-bottom-content-tree-editor]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR"
                   [ngSwitch]="tab.type">
 
                   <!-- Tab -->

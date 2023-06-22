@@ -5,12 +5,13 @@ import {
   Host,
   Input, OnDestroy,
   Optional,
-  SkipSelf, ViewEncapsulation
+  SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ColorPickerDirective } from 'ngx-color-picker';
 
 @Component({
   selector: 'app-form-color-v2',
@@ -26,6 +27,31 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 })
 export class AppFormColorV2Component
   extends AppFormBaseV2<string> implements OnDestroy {
+
+  // color picker directive used to fix jumping dialog effect
+  // - IMPORTANT: don't set static to true
+  private _ngxColorPicker: ColorPickerDirective;
+  @ViewChild('ngxColorPicker') set ngxColorPicker(ngxColorPicker: ColorPickerDirective) {
+    // same ?
+    if (this.ngxColorPicker === ngxColorPicker) {
+      return;
+    }
+
+    // set data
+    this._ngxColorPicker = ngxColorPicker;
+
+    // nothing to do ?
+    if (!this.ngxColorPicker) {
+      return;
+    }
+
+    // fix
+    this.ngxColorPicker.openDialog();
+    this.ngxColorPicker.closeDialog();
+  }
+  get ngxColorPicker(): ColorPickerDirective {
+    return this._ngxColorPicker;
+  }
 
   // view only
   @Input() viewOnly: boolean;
@@ -43,7 +69,7 @@ export class AppFormColorV2Component
 
     // translate tooltip
     this.tooltipTranslated = this._tooltip ?
-      this.translateService.instant(this._tooltip) :
+      this.i18nService.instant(this._tooltip) :
       this._tooltip;
 
     // add / remove tooltip icon
@@ -62,12 +88,12 @@ export class AppFormColorV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }

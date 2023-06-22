@@ -44,12 +44,12 @@
 
       .gd-top-right-user-menu-option-user {
         padding: 0.8rem 1.6rem;
-  
+
         .gd-top-right-user-menu-option-user-name {
           font-weight: 500;
           text-transform: uppercase;
         }
-    
+
         .gd-top-right-user-menu-option-user-email {
           color: var(--gd-secondary);
         }
@@ -59,7 +59,7 @@
         background: rgba(var(--gd-primary-rgb), 0.1);
         color: var(--gd-primary);
       }
-  
+
       .gd-top-right-user-menu-option-danger {
         color: var(--gd-danger);
         @include transition(0.4s ease);
@@ -67,6 +67,21 @@
         &:hover {
           background: rgba(var(--gd-danger-rgb), 0.1);
           color: var(--gd-danger);
+        }
+      }
+
+      .gd-list-table-actions-action-menu-button,
+      .gd-list-table-selection-header-button {
+        &.gd-list-table-actions-action-menu-warning,
+        &.gd-list-table-selection-header-button-warning {
+          &:not([aria-disabled=true]) {
+            color: var(--gd-danger);
+
+            &:hover {
+              background: rgba(var(--gd-danger-rgb), 0.1);
+              color: var(--gd-danger);
+            }
+          }
         }
       }
     }

@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
@@ -17,10 +16,10 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import * as _ from 'lodash';
 import { Constants } from '../../../../core/models/constants';
 import { catchError } from 'rxjs/operators';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -37,7 +36,7 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
     protected systemSettingsDataService: SystemSettingsDataService,
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected router: Router,
     authDataService: AuthDataService,
     renderer2: Renderer2,
@@ -123,6 +122,11 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {
@@ -136,8 +140,8 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )

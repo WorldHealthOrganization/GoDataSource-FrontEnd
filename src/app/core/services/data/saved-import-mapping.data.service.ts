@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder/request-query-builder';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { Observable } from 'rxjs';
 import { SavedImportMappingModel } from '../../models/saved-import-mapping.model';
 import { ModelHelperService } from '../helper/model-helper.service';

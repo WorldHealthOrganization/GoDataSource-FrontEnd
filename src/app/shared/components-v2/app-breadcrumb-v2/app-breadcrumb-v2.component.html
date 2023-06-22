@@ -1,5 +1,7 @@
 <div
   class="gd-breadcrumbs">
+
+  <!-- Breadcrumb -->
   <span
     *ngFor="let bread of breadcrumbs; let breadIndex = index;"
     class="gd-breadcrumbs-bread">
@@ -17,5 +19,17 @@
       [queryParams]="bread.action && bread.action.linkQueryParams ? bread.action.linkQueryParams : undefined">
       {{bread.label | translate}}
     </a>
+  </span>
+
+  <!-- Additional icon infos -->
+  <span
+    *ngFor="let breadInfo of infos"
+    class="gd-breadcrumbs-bread-infos">
+
+    <!-- Info pill -->
+    <span
+      class="gd-breadcrumbs-bread-infos-info">
+      {{breadInfo.label | translate}}
+    </span>
   </span>
 </div>

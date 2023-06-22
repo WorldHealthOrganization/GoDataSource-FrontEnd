@@ -1,6 +1,6 @@
 {
   "name": "go-data-front-end",
-  "version": "2.46.0",
+  "version": "2.48.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -30,7 +30,7 @@
     "@angular/router": "14.2.12",
     "@ngx-translate/core": "14.0.0",
     "@popperjs/core": "2.11.6",
-    "billboard.js": "3.7.5",
+    "billboard.js": "3.8.0",
     "buffer": "6.0.3",
     "cytoscape": "3.23.0",
     "cytoscape-cola": "2.5.1",

@@ -18,13 +18,29 @@ import {
   V2SideDialogConfigInput,
   V2SideDialogConfigInputType
 } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { ExportButtonKey, ExportDataExtension, ExportDataMethod, IV2ExportDataConfig, IV2ExportDataConfigLoaderConfig, IV2ExportDataConfigProgressAnswer } from './models/dialog-v2.model';
-import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import {
+  ExportButtonKey,
+  ExportDataExtension,
+  ExportDataMethod,
+  IV2ExportDataConfig,
+  IV2ExportDataConfigLoaderConfig,
+  IV2ExportDataConfigProgressAnswer
+} from './models/dialog-v2.model';
+import {
+  IV2LoadingDialogHandler
+} from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { AppLoadingDialogV2Component } from '../../../shared/components-v2/app-loading-dialog-v2/app-loading-dialog-v2.component';
+import {
+  AppLoadingDialogV2Component
+} from '../../../shared/components-v2/app-loading-dialog-v2/app-loading-dialog-v2.component';
 import { ImportExportDataService } from '../data/import-export.data.service';
 import { FormHelperService } from './form-helper.service';
-import { RequestFilterGenerator, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
+import {
+  RequestFilterGenerator,
+  RequestFilterOperator,
+  RequestQueryBuilder,
+  RequestSortDirection
+} from '../../helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { catchError } from 'rxjs/operators';
 import * as FileSaver from 'file-saver';
@@ -33,10 +49,23 @@ import { Moment } from 'moment';
 import { Constants, ExportStatusStep } from '../../models/constants';
 import { ExportLogDataService } from '../data/export-log.data.service';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
-import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
-import { IV2BottomDialogConfig, IV2BottomDialogConfigButtonType, IV2BottomDialogConfigData, IV2BottomDialogHandler, IV2BottomDialogResponse } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import {
+  AppBottomDialogV2Component
+} from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
+import {
+  IV2BottomDialogConfig,
+  IV2BottomDialogConfigButtonType,
+  IV2BottomDialogConfigData,
+  IV2BottomDialogHandler,
+  IV2BottomDialogResponse
+} from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ToastV2Service } from './toast-v2.service';
-import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort, SavedFilterModel } from '../../models/saved-filters.model';
+import {
+  SavedFilterData,
+  SavedFilterDataAppliedFilter,
+  SavedFilterDataAppliedSort,
+  SavedFilterModel
+} from '../../models/saved-filters.model';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import {
   IV2AdvancedFilterAddress,
@@ -49,21 +78,23 @@ import {
 } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { UserModel } from '../../models/user.model';
 import { SavedFiltersService } from '../data/saved-filters.data.service';
-import { TranslateService } from '@ngx-translate/core';
 import { AnswerModel, QuestionModel } from '../../models/question.model';
 import { AddressModel } from '../../models/address.model';
 import { IV2DateRange } from '../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { AuthDataService } from '../data/auth.data.service';
 import { BaseModel } from '../../models/base.model';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
-import { AppFormSelectGroupsV2Component } from '../../../shared/forms-v2/components/app-form-select-groups-v2/app-form-select-groups-v2.component';
+import {
+  AppFormSelectGroupsV2Component
+} from '../../../shared/forms-v2/components/app-form-select-groups-v2/app-form-select-groups-v2.component';
 import { ErrorModel } from '../../models/error.model';
+import { I18nService } from './i18n.service';
 
 @Injectable()
 export class DialogV2Service {
   // export dialog width
   private static readonly EXPORT_DIALOG_WIDTH: string = '50rem';
-  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '40rem';
+  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '50rem';
 
   // used to show and update side dialog
   private _sideDialogSubject$: Subject<IV2SideDialog> = new Subject<IV2SideDialog>();
@@ -92,7 +123,7 @@ export class DialogV2Service {
     private matBottomSheet: MatBottomSheet,
     private toastV2Service: ToastV2Service,
     private savedFiltersService: SavedFiltersService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private authDataService: AuthDataService
   ) {}
 
@@ -1067,6 +1098,14 @@ export class DialogV2Service {
     filtersList.filters = [];
     filtersList.sorts = [];
 
+    // clean removed filters and sorts
+    advancedFiltersApplied.appliedFilters = advancedFiltersApplied.appliedFilters?.length ?
+      advancedFiltersApplied.appliedFilters.filter((appliedFilter) => !!filtersList.optionsAsLabelValueMap[appliedFilter.filter.uniqueKey]) :
+      advancedFiltersApplied.appliedFilters;
+    advancedFiltersApplied.appliedSort = advancedFiltersApplied.appliedSort?.length ?
+      advancedFiltersApplied.appliedSort.filter((sortCriteria) => !!filtersList.optionsAsLabelValueMap[sortCriteria.sort.uniqueKey]) :
+      advancedFiltersApplied.appliedSort;
+
     // add filters
     (advancedFiltersApplied.appliedFilters || []).forEach((appliedFilter) => {
       // add filter
@@ -1094,6 +1133,32 @@ export class DialogV2Service {
 
       // filter value
       advancedFilter.value = appliedFilter.value;
+
+      // filter outbreak specific data
+      // only multi-selects are of interest
+      // - IMPORTANT: for now we don't need to handle single selects since they are used only for yes/no dropdowns and follow-ups status
+      if (
+        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value].data.type === V2AdvancedFilterType.MULTISELECT &&
+        // none = LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE
+        advancedFilter.comparator.value === V2AdvancedFilterComparatorType.NONE &&
+        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value].data.options?.length &&
+        advancedFilter.value?.length &&
+        Array.isArray(advancedFilter.value)
+      ) {
+        // map
+        const selectMap: {
+          [id: string]: true
+        } = {};
+        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value].data.options.forEach((option) => {
+          selectMap[option.value] = true;
+        });
+
+        // get value
+        advancedFilter.value = advancedFilter.value.filter((item) =>
+          typeof item !== 'string' ||
+          selectMap[item]
+        );
+      }
 
       // if questionnaire then we need further process
       // - or within address...
@@ -1175,7 +1240,7 @@ export class DialogV2Service {
           (prefixOrder + '.') :
           ''
       ) + question.order;
-      const label: string = `${orderLabel} ${this.translateService.instant(question.text)}`;
+      const label: string = `${orderLabel} ${this.i18nService.instant(question.text)}`;
 
       // create option
       const options = {
@@ -1369,7 +1434,8 @@ export class DialogV2Service {
                 qb.filter.byContainingText(
                   filterDefinition.field,
                   appliedFilter.value,
-                  false
+                  false,
+                  filterDefinition.useLike
                 );
 
                 // finished
@@ -1448,7 +1514,9 @@ export class DialogV2Service {
               case V2AdvancedFilterComparatorType.LOCATION:
                 qb.filter.where({
                   [`${filterDefinition.field}.parentLocationIdFilter`]: {
-                    inq: appliedFilter.value
+                    inq: filterDefinition.type === V2AdvancedFilterType.LOCATION_SINGLE ?
+                      [appliedFilter.value] :
+                      appliedFilter.value
                   }
                 });
                 break;
@@ -1578,6 +1646,8 @@ export class DialogV2Service {
             break;
 
           case V2AdvancedFilterType.RANGE_DATE:
+          case V2AdvancedFilterType.DELETED_AT:
+            // attach condition
             switch (appliedFilter.comparator.value) {
               case V2AdvancedFilterComparatorType.HAS_VALUE:
                 // filter
@@ -1604,6 +1674,11 @@ export class DialogV2Service {
                   appliedFilter.value,
                   false
                 );
+            }
+
+            // we need to search deleted records ?
+            if (filterDefinition.type === V2AdvancedFilterType.DELETED_AT) {
+              qb.includeDeleted();
             }
 
             // finished
@@ -1676,6 +1751,28 @@ export class DialogV2Service {
               false,
               null
             );
+
+            // finished
+            break;
+
+          // Deleted
+          case V2AdvancedFilterType.DELETED:
+            // FilterComparator.NONE
+            if (appliedFilter.value === false) {
+              qb.excludeDeleted();
+              qb.filter.remove('deleted');
+            } else {
+              qb.includeDeleted();
+              if (appliedFilter.value === true) {
+                qb.filter.where({
+                  deleted: {
+                    eq: true
+                  }
+                }, true);
+              } else {
+                qb.filter.remove('deleted');
+              }
+            }
 
             // finished
             break;
@@ -1864,7 +1961,7 @@ export class DialogV2Service {
                   query.date = dateQuery;
                 }
 
-                // add extra check if date not provided and we need to retrieve all records that don't have a value
+                // add extra check if date not provided, and we need to retrieve all records that don't have a value
                 if (
                   !dateQuery &&
                   extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
@@ -2000,6 +2097,14 @@ export class DialogV2Service {
                   handler.data.map.filters as IV2SideDialogConfigInputFilterList,
                   savedData.filterData
                 );
+
+                // update icons
+                item.suffixIconButtons = savedData.isPublic ?
+                  [{
+                    tooltip: this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_IS_PUBLIC_LABEL'),
+                    icon: 'public'
+                  }] :
+                  undefined;
               }
             }
           }, {
@@ -2048,6 +2153,7 @@ export class DialogV2Service {
           qb.fields(
             'id',
             'name',
+            'isPublic',
             'readOnly',
             'filterData',
             'userId',
@@ -2086,10 +2192,18 @@ export class DialogV2Service {
                 // infos
                 option.infos = [];
 
+                // set info icons - public ?
+                if (item.isPublic) {
+                  option.infos.push({
+                    label: this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_IS_PUBLIC_LABEL'),
+                    icon: 'public'
+                  });
+                }
+
                 // set info icons - readonly
                 if (item.readOnly) {
                   option.infos.push({
-                    label: this.translateService.instant(
+                    label: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL', {
                         name: item.createdByUser?.name ?
                           item.createdByUser?.name :
@@ -2103,7 +2217,7 @@ export class DialogV2Service {
                 // updated at
                 if (item.updatedAt) {
                   option.infos.push({
-                    label: this.translateService.instant(
+                    label: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
                         datetime: moment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
                       }

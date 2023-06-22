@@ -1,9 +1,13 @@
 import { Component, OnDestroy } from '@angular/core';
-import { takeUntil, tap } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IconModel } from '../../../../core/models/icon.model';
-import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import {
+  ReferenceDataCategory,
+  ReferenceDataCategoryModel,
+  ReferenceDataEntryModel
+} from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -12,6 +16,8 @@ import { ExportDataExtension, ExportDataMethod } from '../../../../core/services
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as moment from 'moment';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-reference-data-categories-list',
@@ -20,6 +26,18 @@ import * as moment from 'moment';
 export class ReferenceDataCategoriesListComponent
   extends ListComponent<ReferenceDataCategoryModel>
   implements OnDestroy {
+
+  // hidden categories
+  private _hiddenCategories: {
+    [category: string]: true
+  } = {
+      [ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE]: true,
+      [ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM]: true,
+
+      // IMPORTANT: required since this exists in db because it was removed at a later stage without a migration script to remove existing values from db
+      'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_INTENSITY': true
+    };
+
   /**
    * Constructor
    */
@@ -27,11 +45,14 @@ export class ReferenceDataCategoriesListComponent
     protected listHelperService: ListHelperService,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private activatedRoute: ActivatedRoute
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
     );
   }
 
@@ -93,6 +114,15 @@ export class ReferenceDataCategoriesListComponent
         pinned: IV2ColumnPinned.LEFT
       },
       {
+        field: 'entriesCount',
+        label: 'LNG_REFERENCE_DATA_CATEGORY_LABEL_ENTRIES_COUNT',
+        format: {
+          type: (item: ReferenceDataCategoryModel) => (this.activatedRoute.snapshot.data.diseaseSpecificCategories as IResolverV2ResponseModel<ReferenceDataCategoryModel>)?.map[item.id] ?
+            `${item.systemWideCount ? item.systemWideCount : 0} / ${item.entries?.length ? item.entries.length : 0}` :
+            item.entries.length.toString()
+        }
+      },
+      {
         field: 'entries',
         label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES',
         format: {
@@ -107,16 +137,8 @@ export class ReferenceDataCategoriesListComponent
                 null
             };
           }) :
-          []
-      },
-      {
-        field: 'entriesCount',
-        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES_COUNT',
-        format: {
-          type: (item: ReferenceDataCategoryModel) => item.entries?.length ?
-            item.entries.length.toString() :
-            '0'
-        }
+          [],
+        width: 700
       }
     ];
   }
@@ -272,12 +294,18 @@ export class ReferenceDataCategoriesListComponent
     this.records$ = this.referenceDataDataService
       .getReferenceData()
       .pipe(
-        // update page count
-        tap((entities) => {
+        map((entities) => {
+          // shallow clone
+          const filteredEntities = entities.filter((entity) => !this._hiddenCategories[entity.id]);
+
+          // update page count
           this.pageCount = {
-            count: entities.length,
+            count: filteredEntities.length,
             hasMore: false
           };
+
+          // finished
+          return filteredEntities;
         }),
 
         // should be the last pipe

@@ -21,7 +21,7 @@ export class LabSequenceResultDataResolver implements IMapResolverV2<ReferenceDa
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.LAB_SEQUENCE_RESULT)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_RESULT)
       .pipe(
         map((data) => {
           // construct map

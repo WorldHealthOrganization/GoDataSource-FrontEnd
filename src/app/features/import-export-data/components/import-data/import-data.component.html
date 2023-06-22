@@ -461,14 +461,15 @@
                                 <div
                                     fxFlex="1 1" fxLayout="column">
                                     <!-- input -->
-                                    <app-form-select-vscroll
+                                    <app-form-select-single-v2
                                         name="mapObjectSource"
                                         required="true"
                                         [ngModel]="item.sourceField"
                                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                                         [options]="importableObject.fileHeadersKeyValue"
-                                        (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'sourceField', $event)">
-                                    </app-form-select-vscroll>
+                                        [clearable]="true"
+                                        (ngModelChange)="setSourceDestinationValueAndDetermineOptions(item, 'sourceField', $event)">
+                                    </app-form-select-single-v2>
 
                                     <!-- Duplicate source ? -->
                                     <div
@@ -487,15 +488,16 @@
                                 <!-- Destination -->
                                 <div
                                     fxFlex="1 1">
-                                    <app-form-select-vscroll
+                                    <app-form-select-single-v2
                                         name="mapObjectDestination"
                                         required="true"
                                         [ngModel]="item.destinationField"
                                         [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                                         [options]="importableObject.modelPropertiesKeyValue"
-                                        (optionChanged)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)"
-                                        [disabled]="item.readonly">
-                                    </app-form-select-vscroll>
+                                        [disabled]="item.readonly"
+                                        [clearable]="true"
+                                        (ngModelChange)="setSourceDestinationValueAndDetermineOptions(item, 'destinationField', $event)">
+                                    </app-form-select-single-v2>
                                 </div>
 
                                 <!-- Array indexes -->
@@ -507,14 +509,15 @@
                                         <div
                                             *ngFor="let levelMatch of item.numberOfMaxLevels; let levelIndex = index;"
                                             fxFlex>
-                                            <app-form-select-vscroll
+                                            <app-form-select-single-v2
                                                 [name]="'sourceDestinationLevel[' + levelIndex + ']'"
                                                 required="true"
                                                 [ngModel]="item.getSourceDestinationLevel(levelIndex)"
                                                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE_DESTINATION_LEVEL' | translate"
                                                 [options]="possibleSourceDestinationLevels"
-                                                (optionChanged)="setDestinationLevel(item, levelIndex, $event)">
-                                            </app-form-select-vscroll>
+                                                [clearable]="true"
+                                                (ngModelChange)="setDestinationLevel(item, levelIndex, $event)">
+                                            </app-form-select-single-v2>
                                         </div>
                                     </div>
                                 </div>
@@ -686,15 +689,16 @@
                                             <!-- Source Option -->
                                             <div
                                                 fxFlex="1 1" fxLayout="column">
-                                                <app-form-select-vscroll
+                                                <app-form-select-single-v2
                                                     name="mapObjectOptionsSource"
                                                     required="true"
                                                     [ngModel]="mappedOpt.sourceOption"
                                                     [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_SOURCE' | translate"
                                                     [options]="mappedOpt.readOnly ? item.getOptionsForReadOnlySource(mappedOpt) : distinctValuesCache[item.sourceFieldWithoutIndexes]"
-                                                    (optionChanged)="setMapOptionValue(mappedOpt, true, $event)"
-                                                    [disabled]="mappedOpt.readOnly">
-                                                </app-form-select-vscroll>
+                                                    [disabled]="mappedOpt.readOnly"
+                                                    [clearable]="true"
+                                                    (ngModelChange)="setMapOptionValue(mappedOpt, true, $event)">
+                                                </app-form-select-single-v2>
 
                                                 <!-- Duplicate source ? -->
                                                 <div
@@ -717,17 +721,17 @@
                                                 fxFlex="1 1">
 
                                                 <!-- Not location ? -->
-                                                <app-form-select-vscroll
+                                                <app-form-select-single-v2
                                                     *ngIf="!addressFields || !addressFields[item.destinationField]; else addressLocation"
                                                     name="mapObjectOptionsDestination"
                                                     required="true"
                                                     [ngModel]="mappedOpt.destinationOption"
                                                     [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                                                     [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
-                                                    optionValueKey="id"
-                                                    (optionChanged)="setMapOptionValue(mappedOpt, false, $event)"
-                                                    [disabled]="mappedOpt.readOnly">
-                                                </app-form-select-vscroll>
+                                                    [clearable]="true"
+                                                    [disabled]="mappedOpt.readOnly"
+                                                    (ngModelChange)="setMapOptionValue(mappedOpt, false, $event)">
+                                                </app-form-select-single-v2>
 
                                                 <!-- Location -->
                                                 <ng-template

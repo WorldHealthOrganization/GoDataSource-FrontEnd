@@ -115,7 +115,7 @@
                 <a
                   *ngIf="menuOption.action.link; else notLink"
                   mat-menu-item
-                  class="gd-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
+                  class="gd-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses ? menuOption.cssClasses(null) : ''}}"
                   [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(null)) ? menuOption.action.link(null) : undefined"
                   [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(null) : undefined"
                   [disabled]="menuOption.disable && menuOption.disable(null)">
@@ -128,7 +128,7 @@
                   <button
                     type="button"
                     mat-menu-item
-                    class="gd-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
+                    class="gd-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses ? menuOption.cssClasses(null) : ''}}"
                     [disabled]="menuOption.disable && menuOption.disable(null)"
                     (click)="menuOption.action.click ? menuOption.action.click(null) : undefined">
                     {{menuOption.label.get(null) | translate:(menuOption.label.data ? menuOption.label.data(null) : undefined)}}
@@ -273,17 +273,30 @@
           <!-- Text -->
           <div
             class="gd-list-table-header-left-text">
-            {{ (pageCount.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (pageCount.count | number) + (' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate)) }}
+            <!-- {{ (pageCount.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (pageCount.count | number) + (' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate)) }} -->
+            <div
+              *ngIf="pageCount.hasMore"
+              class="gd-list-table-header-left-counter-label">
+              {{ 'LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate }}
+            </div>
+            <div
+              class="gd-list-table-header-left-counter-value">
+              {{ pageCount.count | number }}
+            </div>
+            <div
+              class="gd-list-table-header-left-counter-label">
+              {{ 'LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate }}
+            </div>
           </div>
 
           <!-- Determine total -->
           <ng-container
             *ngIf="pageCount.hasMore">
-            (<button
+            <button
               class="gd-list-table-header-left-show-total"
               type="button"
               mat-flat-button color="text"
-              (click)="refreshDataCountHandler()">{{'LNG_COMMON_LABEL_PAGINATOR_SHOW_EXACT_COUNT' | translate}}</button>)
+              (click)="refreshDataCountHandler()">{{'LNG_COMMON_LABEL_PAGINATOR_SHOW_EXACT_COUNT' | translate}}</button>
           </ng-container>
         </div>
       </ng-template>

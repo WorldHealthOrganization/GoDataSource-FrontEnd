@@ -1,5 +1,5 @@
 import { Observable, ReplaySubject, throwError } from 'rxjs';
-import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { IV2Breadcrumb, IV2BreadcrumbInfo } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel, UserSettings } from '../models/user.model';
 import { ICreateViewModifyV2, ICreateViewModifyV2Config } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
@@ -39,6 +39,7 @@ export abstract class CreateViewModifyComponent<T>
 
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[];
+  breadcrumbInfos: IV2BreadcrumbInfo[];
 
   // authenticated user data
   authUser: UserModel;
@@ -95,6 +96,10 @@ export abstract class CreateViewModifyComponent<T>
   // click listener
   private _clickListener: () => void;
 
+  // timers
+  private _createNewItemTimer: number;
+  private _retrieveItemTimer: number;
+
   // constants
   Constants = Constants;
   UserSettings = UserSettings;
@@ -131,7 +136,10 @@ export abstract class CreateViewModifyComponent<T>
     this.loadingPage = true;
     if (this.isCreate) {
       // create
-      setTimeout(() => {
+      this._createNewItemTimer = setTimeout(() => {
+        // reset
+        this._createNewItemTimer = undefined;
+
         // initialize item
         this.itemData = this.createNewItem();
 
@@ -145,7 +153,11 @@ export abstract class CreateViewModifyComponent<T>
     } else {
       // view / modify
       // retrieve item data
-      setTimeout(() => {
+      this._retrieveItemTimer = setTimeout(() => {
+        // reset
+        this._retrieveItemTimer = undefined;
+
+        // retrieve
         this.getData(this.retrieveItem());
       });
     }
@@ -180,6 +192,11 @@ export abstract class CreateViewModifyComponent<T>
    * Initialize breadcrumbs
    */
   protected abstract initializeBreadcrumbs(): void;
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected abstract initializeBreadcrumbInfos(): void;
 
   /**
    * Initialize tabs
@@ -223,6 +240,30 @@ export abstract class CreateViewModifyComponent<T>
       this._clickListener();
       this._clickListener = undefined;
     }
+
+    // stop timers
+    this.stopCreateNewItemTimer();
+    this.stopRetrieveItemTimer();
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopCreateNewItemTimer(): void {
+    if (this._createNewItemTimer) {
+      clearTimeout(this._createNewItemTimer);
+      this._createNewItemTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopRetrieveItemTimer(): void {
+    if (this._retrieveItemTimer) {
+      clearTimeout(this._retrieveItemTimer);
+      this._retrieveItemTimer = undefined;
+    }
   }
 
   /**
@@ -237,6 +278,9 @@ export abstract class CreateViewModifyComponent<T>
 
     // initialize breadcrumbs
     this.initializeBreadcrumbs();
+
+    // initialize breadcrumb infos
+    this.initializeBreadcrumbInfos();
 
     // initialize tabs
     this.initializeTabs();

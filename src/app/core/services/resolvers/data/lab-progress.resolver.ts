@@ -3,42 +3,46 @@ import { Observable, throwError } from 'rxjs';
 import { IMapResolverV2, IResolverV2ResponseModel } from './models/resolver-response.model';
 import { catchError, map } from 'rxjs/operators';
 import { ToastV2Service } from '../../helper/toast-v2.service';
-import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { GenericDataService } from '../../data/generic.data.service';
+import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../models/reference-data.model';
+import { ReferenceDataDataService } from '../../data/reference-data.data.service';
 
 @Injectable()
-export class LabProgressDataResolver implements IMapResolverV2<ILabelValuePairModel> {
+export class LabProgressDataResolver implements IMapResolverV2<ReferenceDataEntryModel> {
   /**
    * Constructor
    */
   constructor(
-    private genericDataService: GenericDataService,
+    private referenceDataDataService: ReferenceDataDataService,
     private toastV2Service: ToastV2Service
   ) {}
 
   /**
    * Retrieve data
    */
-  resolve(): Observable<IResolverV2ResponseModel<ILabelValuePairModel>> {
-    return this.genericDataService
-      .getProgressOptionsList()
+  resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
+    return this.referenceDataDataService
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS)
       .pipe(
         map((data) => {
           // construct map
-          const response: IResolverV2ResponseModel<ILabelValuePairModel> = {
-            list: data,
+          const entries: ReferenceDataEntryModel[] = data.entries || [];
+          const response: IResolverV2ResponseModel<ReferenceDataEntryModel> = {
+            list: entries,
             map: {},
             options: []
           };
-          data.forEach((item) => {
+          entries.forEach((item) => {
             // map
-            response.map[item.value] = item;
+            response.map[item.id] = item;
 
             // add option
             response.options.push({
               label: item.value,
-              value: item.value,
-              data: item
+              value: item.id,
+              iconUrl: item.iconUrl,
+              data: item,
+              disabled: !item.active,
+              order: item.order
             });
           });
 

@@ -10,6 +10,9 @@ import { Constants } from './constants';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { Moment } from '../helperClasses/x-moment';
+import {
+  ITreeEditorDataValue
+} from '../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 
 export class OutbreakModel
   extends BaseModel
@@ -42,6 +45,7 @@ export class OutbreakModel
   caseIdMask: string;
   contactIdMask: string;
   contactOfContactIdMask: string;
+  allowedRefDataItems: ITreeEditorDataValue;
 
   // countries
   private _countries: {
@@ -279,6 +283,7 @@ export class OutbreakModel
     this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
     this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
     this.generateFollowUpsDateOfLastContact = _.get(data, 'generateFollowUpsDateOfLastContact', false);
+    this.allowedRefDataItems = _.get(data, 'allowedRefDataItems');
 
     // CASE INVESTIGATION TEMPLATE
     this.caseInvestigationTemplate = _.map(

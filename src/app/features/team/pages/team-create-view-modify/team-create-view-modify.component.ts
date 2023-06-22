@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -28,6 +27,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Location } from '@angular/common';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -46,7 +46,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected teamDataService: TeamDataService,
@@ -158,7 +158,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_TEAM_TITLE', {
             name: this.itemData.name
           }
@@ -168,7 +168,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_TEAM_TITLE', {
             name: this.itemData.name
           }
@@ -177,6 +177,11 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -192,8 +197,8 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )

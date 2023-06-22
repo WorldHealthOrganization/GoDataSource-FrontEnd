@@ -142,6 +142,13 @@ import { EventCategoryDataResolver } from './resolvers/data/event-category.resol
 import { FollowUpGroupByDataResolver } from './resolvers/data/follow-up-group-by.resolver';
 import { FontResolver } from './resolvers/font-resolver';
 import { ImageResolver } from './resolvers/image-resolver';
+import { ReferenceDataDiseaseSpecificCategoriesResolver } from './resolvers/data/reference-data-disease-specific-categories.resolver';
+import { ReferenceDataHelperService } from './helper/reference-data-helper.service';
+import { BulkCacheHelperService } from './helper/bulk-cache-helper.service';
+import { RestoreLogDataService } from './data/restore-log.data.service';
+import {
+  SyncPackageStatusStepBackupRestoreResolver
+} from './resolvers/data/sync-package-status-step-backup-restore.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -152,6 +159,7 @@ export const services: any[] = [
   BackupModuleDataResolver,
   BackupStatusDataResolver,
   BackupTypesDataResolver,
+  BulkCacheHelperService,
   CertaintyLevelDataResolver,
   ClassificationDataResolver,
   ClusterDataResolver,
@@ -211,6 +219,7 @@ export const services: any[] = [
   QuestionnaireAnswerTypeDataResolver,
   QuestionnaireQuestionCategoryDataResolver,
   ReferenceDataCategoryDataResolver,
+  ReferenceDataDiseaseSpecificCategoriesResolver,
   RelationshipPersonDataResolver,
   RiskDataResolver,
   SavedImportMappingDataResolver,
@@ -224,6 +233,7 @@ export const services: any[] = [
   SyncPackageExportTypeDataResolver,
   SyncPackageModuleDataResolver,
   SyncPackageStatusDataResolver,
+  SyncPackageStatusStepBackupRestoreResolver,
   TeamDataResolver,
   UpstreamServersDataResolver,
   UserDataResolver,
@@ -274,6 +284,7 @@ export const services: any[] = [
   ImportLogDataService,
   ImportResultDataService,
   ExportLogDataService,
+  RestoreLogDataService,
 
   // guard services
   AuthGuard,
@@ -295,5 +306,6 @@ export const services: any[] = [
   EntityHelperService,
   ListHelperService,
   RedirectService,
+  ReferenceDataHelperService,
   ToastV2Service
 ];

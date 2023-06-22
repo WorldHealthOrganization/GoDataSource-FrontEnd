@@ -21,7 +21,7 @@ export class PersonDateTypeDataResolver implements IMapResolverV2<ReferenceDataE
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.PERSON_DATE_TYPE)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE)
       .pipe(
         map((data) => {
           // construct map

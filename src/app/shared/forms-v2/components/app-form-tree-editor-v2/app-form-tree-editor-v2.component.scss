@@ -1,0 +1,341 @@
+@import 'mixins';
+
+/* Tree Editor */
+.gd-form-tree-editor-v2 {
+  height: 100%;
+
+  /* Editor Top Section */
+  .gd-form-tree-editor-v2-top {
+    border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 1.6rem;
+
+    @include breakpoint('xs') {
+      padding: 0.4rem;
+    }
+
+    button.mat-flat-button,
+    a.mat-flat-button {
+      @include breakpoint('xxs') {
+        padding: 0.8rem;
+      }
+    }
+
+    /* Search */
+    app-form-input-v2 {
+      .mat-form-field-wrapper {
+        .mat-form-field-subscript-wrapper {
+          min-height: 0;
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  /* Editor List */
+  .gd-form-tree-editor-v2-list {
+    height: calc(100% - 11.2rem);
+    min-height: 19rem;
+
+    @include breakpoint('xs') {
+      height: calc(100% - 8.8rem);
+      min-height: 10rem;
+    }
+
+    .cdk-virtual-scroll-viewport {
+      height: 100%;
+      overflow-y: overlay;
+      overflow-x: hidden;
+
+      .cdk-virtual-scroll-content-wrapper {
+        width: 100%;
+      }
+
+      .gd-form-tree-editor-v2-list-item {
+        border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        height: 3.1rem;
+
+        &.gd-form-tree-editor-v2-list-item-expanded {
+          background: rgba(var(--gd-warning-rgb), 0.2);
+          font-weight: 700;
+        }
+
+        &.gd-form-tree-editor-v2-list-item-child {
+          .gd-form-tree-editor-v2-list-category-column {
+            background: rgba(var(--gd-warning-rgb), 0.1);
+            height: 100%;
+            line-height: 1;
+            padding: 0 1.6rem 0 6.4rem;
+
+            @include breakpoint('xs') {
+              padding-left: 4rem;
+            }
+          }
+
+          .gd-form-tree-editor-v2-list-category-info {
+            color: var(--gd-primary);
+            height: 100%;
+            padding: 0 1.6rem 0 6.4rem;
+
+            @include breakpoint('xs') {
+              padding-left: 4rem;
+            }
+          }
+        }
+
+        .gd-form-tree-editor-v2-list-category-column {
+          .gd-form-tree-editor-v2-list-category-column-item {
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+
+        .gd-form-tree-editor-v2-list-category-column-color,
+        .gd-form-tree-editor-v2-list-category-column-icon,
+        .gd-form-tree-editor-v2-list-category-column-order {
+          font-weight: 700;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 10rem;
+
+          @include breakpoint('xs') {
+            min-width: 3rem;
+            width: 3rem;
+          }
+        }
+
+        .gd-form-tree-editor-v2-list-category-column-system-wide {
+          font-weight: 700;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 13rem;
+
+          @include breakpoint('xs') {
+            min-width: 5rem;
+            width: 5rem;
+          }
+        }
+
+        .gd-form-tree-editor-v2-list-category-content {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .gd-form-tree-editor-v2-list-category-item {
+          background: rgba(var(--gd-warning-rgb), 0.01);
+          height: 100%;
+          padding: 0 1.6rem 0 6.4rem;
+
+          @include breakpoint('xs') {
+            padding-left: 4rem;
+          }
+
+          &:hover {
+            background: rgba(var(--gd-warning-rgb), 0.05);
+          }
+
+          /* Flash when new item is added */
+          &.gd-form-tree-editor-v2-list-category-item-flash {
+            -webkit-animation-duration: 3s;
+            animation-duration: 3s;
+            -webkit-animation-fill-mode: both;
+            animation-fill-mode: both;
+            animation-name: gd-flash;
+          }
+
+          &.gd-form-tree-editor-v2-list-category-item-is-system-wide {
+            .gd-form-checkbox-v2 {
+              .mat-checkbox {
+                &.mat-checkbox-indeterminate,
+                &.mat-checkbox-checked {
+                  &.mat-checkbox-disabled {
+                    opacity: 0.5;
+
+                    .mat-checkbox-frame {
+                      border-color: var(--gd-primary);
+                    }
+
+                    .mat-checkbox-background {
+                      background-color: var(--gd-primary);
+                    }
+
+                    .mat-checkbox-label {
+                      color: var(--gd-primary);
+                      font-weight: 700;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          .gd-form-tree-editor-v2-list-category-item-system-wide {
+            .mat-icon {
+              color: var(--gd-primary);
+              font-size: 2.4rem;
+            }
+          }
+
+          .gd-form-tree-editor-v2-list-category-item-color > div {
+            @include border-radius(0.4rem);
+            display: block;
+            height: 2rem;
+            margin-top: 0.2rem;
+            margin-right: 0.8rem;
+            width: 2rem;
+          }
+
+          .gd-form-tree-editor-v2-list-category-item-icon > img {
+            display: inline-block;
+            height: 2rem;
+            vertical-align: middle;
+          }
+
+          .gd-form-tree-editor-v2-list-category-item-order {
+            font-weight: normal;
+          }
+        }
+
+        .gd-form-tree-editor-v2-list-category-column-item {
+          flex: 100%;
+          margin-right: 1.6rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .gd-form-tree-editor-v2-list-category {
+          padding: 0.3rem 1.6rem;
+
+          @include breakpoint('xs') {
+            padding: 0.3rem 0.8rem;
+          }
+
+          > .mat-icon {
+            background: rgba(var(--gd-secondary-rgb), 0.35);
+            border-radius: 0.4rem;
+            color: var(--gd-text);
+            cursor: pointer;
+            font-size: 1.6rem;
+            height: 2.4rem;
+            line-height: 1;
+            margin-right: 0.8rem;
+            min-width: 2.4rem;
+            padding: 0.4rem;
+            text-align: center;
+            width: 2.4rem;
+          }
+
+          .gd-form-tree-editor-v2-list-category-checked-no {
+            margin-right: 1.6rem;
+            text-align: right;
+          }
+
+          .gd-form-tree-editor-v2-list-category-buttons {
+            @include flex_align_items(center);
+            @include flex(flex);
+            @include flex_direction(row);
+            gap: 0.8rem;
+
+            @include breakpoint('xs') {
+              gap: 0.4rem;
+              padding-right: 0.4rem;
+            }
+
+            .mat-icon-button {
+              font-size: 1.6rem;
+              height: 2.4rem;
+              min-width: 2.4rem;
+              padding: 0.4rem;
+              width: 2.4rem;
+
+              .mat-icon {
+                font-size: 1.6rem;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &.gd-form-tree-editor-v2-list-copy-value {
+      cursor: copy;
+
+      app-form-checkbox-v2 {
+        mat-checkbox {
+          cursor: copy;
+        }
+      }
+    }
+  }
+
+  /* Editor Legend Section */
+  .gd-form-tree-editor-v2-legend {
+    border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 0.8rem 0;
+
+    .gd-form-tree-editor-v2-legend-title {
+      color: var(--gd-secondary);
+      font-size: 1.2rem;
+      margin-left: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .gd-form-tree-editor-v2-legend-items {
+      .gd-form-tree-editor-v2-legend-items-item {
+        @include flex_align_items(center);
+        @include flex(flex);
+        @include flex_direction(row);
+        font-size: 1.2rem;
+        margin-left: 0.8rem;
+
+        .mat-icon {
+          font-size: 2.4rem;
+          height: 2.2rem;
+          margin-right: 0.4rem;
+          width: 2.2rem;
+        }
+      }
+    }
+  }
+
+  /* Empty */
+  .gd-form-tree-editor-v2-list-empty {
+    height: 100%;
+
+    .gd-form-tree-editor-v2-list-empty-image {
+      background-image: url(../../../../../assets/images/nothing-found.svg);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 25rem;
+      width: 25rem;
+
+      @include breakpoint('xs') {
+        height: 15rem;
+        width: 15rem;
+      }
+    }
+
+    .gd-form-tree-editor-v2-list-empty-text {
+      color: var(--gd-secondary);
+      font-size: 1.6rem;
+      margin-top: 2rem;
+
+      @include breakpoint('xs') {
+        font-size: 1.4rem;
+      }
+    }
+  }
+}
+
+/* Exclude legend on view */
+.gd-create-view-modify-view {
+  .gd-form-tree-editor-v2-list {
+    height: calc(100% - 7.3rem);
+  }
+}

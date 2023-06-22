@@ -7,7 +7,12 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { LocationUsageModel, UsageDetails, UsageDetailsItem } from '../../../../core/models/location-usage.model';
+import {
+  LocationUsageModel,
+  UsageDetails,
+  UsageDetailsItem,
+  UsageDetailsItemType
+} from '../../../../core/models/location-usage.model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
@@ -17,6 +22,8 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
+import { TeamModel } from '../../../../core/models/team.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
   selector: 'app-location-usage-list',
@@ -41,6 +48,7 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
     protected activatedRoute: ActivatedRoute,
     protected i18nService: I18nService
   ) {
+    // parent
     super(listHelperService);
 
     // get location for which we need to retrieve usages
@@ -65,12 +73,8 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
       return;
     }
 
-    // hack to redo buttons visibility
-    const oldTableColumns = this.tableColumns;
-    this.tableColumns = [];
-    setTimeout(() => {
-      this.tableColumns = oldTableColumns;
-    });
+    // redo buttons visibility
+    this.tableV2Component.agTable?.api.redrawRows();
   }
 
   /**
@@ -106,10 +110,17 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
           visible: (item: UsageDetailsItem): boolean => {
             return item.typePermissions &&
               item.typePermissions.canView(this.authUser) &&
-              !!item.outbreakId &&
-              !!item.outbreakName &&
-              this.selectedOutbreak?.id &&
-              item.outbreakId === this.selectedOutbreak.id;
+              (
+                (
+                  item.type === UsageDetailsItemType.OUTBREAK ||
+                  item.type === UsageDetailsItemType.TEAM
+                ) || (
+                  !!item.outbreakId &&
+                  !!item.outbreakName &&
+                  this.selectedOutbreak?.id &&
+                  item.outbreakId === this.selectedOutbreak.id
+                )
+              );
           }
         },
 
@@ -126,11 +137,18 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
           visible: (item: UsageDetailsItem): boolean => {
             return item.typePermissions &&
               item.typePermissions.canModify(this.authUser) &&
-              !!item.outbreakId &&
-              !!item.outbreakName &&
-              this.selectedOutbreak?.id &&
-              item.outbreakId === this.selectedOutbreak.id &&
-              item.outbreakId === this.authUser.activeOutbreakId;
+              (
+                (
+                  item.type === UsageDetailsItemType.OUTBREAK ||
+                  item.type === UsageDetailsItemType.TEAM
+                ) || (
+                  !!item.outbreakId &&
+                  !!item.outbreakName &&
+                  this.selectedOutbreak?.id &&
+                  item.outbreakId === this.selectedOutbreak.id &&
+                  item.outbreakId === this.authUser.activeOutbreakId
+                )
+              );
           }
         }
       ]
@@ -291,9 +309,24 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
             locationUsage.contact = [];
           }
 
+          // contacts of contacts
+          if (!ContactOfContactModel.canList(this.authUser)) {
+            locationUsage.contactOfContact = [];
+          }
+
           // cases
           if (!CaseModel.canList(this.authUser)) {
             locationUsage.case = [];
+          }
+
+          // teams
+          if (!TeamModel.canList(this.authUser)) {
+            locationUsage.team = [];
+          }
+
+          // outbreaks
+          if (!OutbreakModel.canList(this.authUser)) {
+            locationUsage.outbreak = [];
           }
 
           // create usage

@@ -148,6 +148,15 @@ export class ImportExportDataService {
       delete data.includeUpdatedByUser;
     }
 
+    // add flag includeContactOfContactFields
+    if (!_.isUndefined(data.includeContactOfContactFields)) {
+      queryBuilder.filter.flag(
+        'includeContactOfContactFields',
+        data.includeContactOfContactFields
+      );
+      delete data.includeContactOfContactFields;
+    }
+
     // add flag includeContactFields
     if (!_.isUndefined(data.includeContactFields)) {
       queryBuilder.filter.flag(
@@ -182,6 +191,24 @@ export class ImportExportDataService {
         data.retrieveOldestExposure
       );
       delete data.retrieveOldestExposure;
+    }
+
+    // add flag includeDeletedLocations
+    if (!_.isUndefined(data.includeDeletedLocations)) {
+      queryBuilder.filter.flag(
+        'includeDeletedLocations',
+        data.includeDeletedLocations
+      );
+      delete data.includeDeletedLocations;
+    }
+
+    // add flag replaceUpdatedAtAsCurrentDate
+    if (!_.isUndefined(data.replaceUpdatedAtAsCurrentDate)) {
+      queryBuilder.filter.flag(
+        'replaceUpdatedAtAsCurrentDate',
+        data.replaceUpdatedAtAsCurrentDate
+      );
+      delete data.replaceUpdatedAtAsCurrentDate;
     }
 
     // add other custom fields caused by API inconsistencies...
@@ -307,6 +334,15 @@ export class ImportExportDataService {
       delete data.includeUpdatedByUser;
     }
 
+    // add flag includeContactOfContactFields
+    if (!_.isUndefined(data.includeContactOfContactFields)) {
+      queryBuilder.filter.flag(
+        'includeContactOfContactFields',
+        data.includeContactOfContactFields
+      );
+      delete data.includeContactOfContactFields;
+    }
+
     // add flag includeContactFields
     if (!_.isUndefined(data.includeContactFields)) {
       queryBuilder.filter.flag(
@@ -341,6 +377,24 @@ export class ImportExportDataService {
         data.retrieveOldestExposure
       );
       delete data.retrieveOldestExposure;
+    }
+
+    // add flag includeDeletedLocations
+    if (!_.isUndefined(data.includeDeletedLocations)) {
+      queryBuilder.filter.flag(
+        'includeDeletedLocations',
+        data.includeDeletedLocations
+      );
+      delete data.includeDeletedLocations;
+    }
+
+    // add flag replaceUpdatedAtAsCurrentDate
+    if (!_.isUndefined(data.replaceUpdatedAtAsCurrentDate)) {
+      queryBuilder.filter.flag(
+        'replaceUpdatedAtAsCurrentDate',
+        data.replaceUpdatedAtAsCurrentDate
+      );
+      delete data.replaceUpdatedAtAsCurrentDate;
     }
 
     // filter ?

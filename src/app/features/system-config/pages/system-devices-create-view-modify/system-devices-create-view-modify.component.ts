@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
@@ -20,6 +19,7 @@ import { DeviceDataService } from '../../../../core/services/data/device.data.se
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -35,7 +35,7 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected deviceDataService: DeviceDataService,
     protected dialogV2Service: DialogV2Service,
@@ -132,7 +132,7 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
     // add info accordingly to page type
     if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE', {
             name: this.itemData.name
           }
@@ -142,7 +142,7 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE', {
             name: this.itemData.name
           }
@@ -151,6 +151,11 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs

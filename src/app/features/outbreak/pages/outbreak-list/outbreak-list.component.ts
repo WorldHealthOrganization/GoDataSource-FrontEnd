@@ -46,7 +46,11 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**
@@ -652,6 +656,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
           type: (column: OutbreakModel) => {
             return column &&
               column.id &&
+              this.selectedOutbreak &&
               this.selectedOutbreak.id &&
               column.id === this.authUser.activeOutbreakId ?
               this.i18nService.instant('LNG_COMMON_LABEL_YES') :

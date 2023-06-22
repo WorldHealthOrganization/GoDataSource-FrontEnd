@@ -68,6 +68,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { IV2NumberRange } from '../../../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -144,18 +145,18 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
   // reference data categories needed for filters
   referenceDataCategories: any = [
-    ReferenceDataCategory.PERSON_TYPE,
-    ReferenceDataCategory.GENDER,
-    ReferenceDataCategory.CASE_CLASSIFICATION,
-    ReferenceDataCategory.RISK_LEVEL,
-    ReferenceDataCategory.CONTEXT_OF_TRANSMISSION,
-    ReferenceDataCategory.CERTAINTY_LEVEL,
-    ReferenceDataCategory.EXPOSURE_TYPE,
-    ReferenceDataCategory.EXPOSURE_FREQUENCY,
-    ReferenceDataCategory.EXPOSURE_DURATION,
-    ReferenceDataCategory.OCCUPATION,
-    ReferenceDataCategory.OUTCOME,
-    ReferenceDataCategory.LAB_SEQUENCE_RESULT
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_GENDER,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_FREQUENCY,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_DURATION,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OCCUPATION,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OUTCOME,
+    ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_RESULT
   ];
     // reference data entries per category
   referenceDataEntries: any = [];
@@ -163,47 +164,47 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   referenceDataLabelMap: any = {
     type: {
       label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ENTITY_TYPE_LABEL',
-      refDataCateg: ReferenceDataCategory.PERSON_TYPE
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE
     },
     gender: {
       label: 'LNG_CASE_FIELD_LABEL_GENDER',
-      refDataCateg: ReferenceDataCategory.GENDER
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_GENDER
     },
     classification: {
       label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-      refDataCateg: ReferenceDataCategory.CASE_CLASSIFICATION
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION
     },
     riskLevel: {
       label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-      refDataCateg: ReferenceDataCategory.RISK_LEVEL
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL
     },
     certaintyLevelId: {
       label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
-      refDataCateg: ReferenceDataCategory.CERTAINTY_LEVEL
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL
     },
     socialRelationshipTypeId: {
       label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
-      refDataCateg: ReferenceDataCategory.CONTEXT_OF_TRANSMISSION
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION
     },
     exposureTypeId: {
       label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
-      refDataCateg: ReferenceDataCategory.EXPOSURE_TYPE
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE
     },
     exposureFrequencyId: {
       label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
-      refDataCateg: ReferenceDataCategory.EXPOSURE_FREQUENCY
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_FREQUENCY
     },
     exposureDurationId: {
       label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
-      refDataCateg: ReferenceDataCategory.EXPOSURE_DURATION
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_DURATION
     },
     occupation: {
       label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-      refDataCateg: ReferenceDataCategory.OCCUPATION
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OCCUPATION
     },
     outcomeId: {
       label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-      refDataCateg: ReferenceDataCategory.OUTCOME
+      refDataCateg: ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OUTCOME
     }
   };
 
@@ -496,7 +497,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
   // keep snapshot update subscription
   private _updateSnapshotsSubscription: Subscription;
-  private _updateSnapshotsTimer: any;
+  private _updateSnapshotsTimer: number;
+
+  // timers
+  private _renderGraphTimer: number;
+  private _updateViewTimer: number;
 
   // show snapshot filters
   showSnapshotFilters: boolean = false;
@@ -542,7 +547,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private importExportDataService: ImportExportDataService,
     private elementRef: ElementRef,
     private entityHelperService: EntityHelperService,
-    private relationshipDataService: RelationshipDataService
+    private relationshipDataService: RelationshipDataService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     // update render mode
     this.updateRenderMode();
@@ -859,6 +865,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // release cyto
     this.destroyCytoscape();
+
+    // stop timers
+    this.stopUpdateViewTimer();
   }
 
   /**
@@ -1133,7 +1142,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.originalLegend.nodeNameColorKeys = Object.keys(this.originalLegend.nodeNameColor);
 
     // get lab results sequence keys
-    const labSequenceColorReferenceDataEntries = _.get(this.referenceDataEntries[ReferenceDataCategory.LAB_SEQUENCE_RESULT], 'entries', []);
+    const labSequenceColorReferenceDataEntries = _.get(this.referenceDataEntries[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_RESULT], 'entries', []);
     _.forEach(labSequenceColorReferenceDataEntries, (value) => {
       this.originalLegend.labSequenceColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
     });
@@ -1208,7 +1217,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // gender translations
     if (this.originalLegend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
       this.originalLegend.nodeLabelValues = [];
-      const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
+      const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_GENDER], 'entries', []);
       _.forEach(nodeLabelValues, (value) => {
         // get gender transcriptions
         this.originalLegend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
@@ -1217,7 +1226,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // occupation translations
     if (this.originalLegend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
       this.originalLegend.nodeLabelValues = [];
-      const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OCCUPATION], 'entries', []);
+      const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OCCUPATION], 'entries', []);
       _.forEach(nodeLabelValues, (value) => {
         // get gender transcriptions
         this.originalLegend.nodeLabelValues[value.value] = this.i18nService.instant(value.value);
@@ -1226,21 +1235,21 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // populate nodeLabelValues with gender / classification / outcome values as they need to be translated
     if (this.originalLegend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
       this.originalLegend.genderValues = [];
-      const genderValues = _.get(this.referenceDataEntries[ReferenceDataCategory.GENDER], 'entries', []);
+      const genderValues = _.get(this.referenceDataEntries[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_GENDER], 'entries', []);
       _.forEach(genderValues, (value) => {
         // get gender transcriptions
         this.originalLegend.genderValues[value.value] = this.i18nService.instant(value.value);
       });
 
       this.originalLegend.classificationValues = [];
-      const classificationValues = _.get(this.referenceDataEntries[ReferenceDataCategory.CASE_CLASSIFICATION], 'entries', []);
+      const classificationValues = _.get(this.referenceDataEntries[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION], 'entries', []);
       _.forEach(classificationValues, (value) => {
         // get classification transcriptions
         this.originalLegend.classificationValues[value.value] = this.i18nService.instant(value.value);
       });
 
       this.originalLegend.outcomeValues = [];
-      const outcomeValues = _.get(this.referenceDataEntries[ReferenceDataCategory.OUTCOME], 'entries', []);
+      const outcomeValues = _.get(this.referenceDataEntries[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OUTCOME], 'entries', []);
       _.forEach(outcomeValues, (value) => {
         // get outcome values transcriptions
         this.originalLegend.outcomeValues[value.value] = this.i18nService.instant(value.value);
@@ -1318,6 +1327,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Release resources
      */
   destroyCytoscape() {
+    // stop timer
+    if (this._renderGraphTimer) {
+      clearTimeout(this._renderGraphTimer);
+      this._renderGraphTimer = undefined;
+    }
+
     // release cyto
     if (this.cy) {
       this.cy.destroy();
@@ -1365,11 +1380,15 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.configureGraphViewType();
 
     // release cyto
+    // - this stops this._renderGraphTimer timer too
     this.destroyCytoscape();
 
     // display loading
     const loadingDialog = this.dialogV2Service.showLoadingDialog();
-    setTimeout(() => {
+    this._renderGraphTimer = setTimeout(() => {
+      // reset
+      this._renderGraphTimer = undefined;
+
       // initialize the cytoscape object
       this.cy = cytoscape(Object.assign(
         {
@@ -1601,11 +1620,27 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop timer
+   */
+  private stopUpdateViewTimer(): void {
+    if (this._updateViewTimer) {
+      clearTimeout(this._updateViewTimer);
+      this._updateViewTimer = undefined;
+    }
+  }
+
+  /**
      * re-render the layout on view type change
      */
   updateView() {
+    // stop previous
+    this.stopUpdateViewTimer();
+
     // wait for binding
-    setTimeout(() => {
+    this._updateViewTimer = setTimeout(() => {
+      // reset
+      this._updateViewTimer = undefined;
+
       // refresh chain to load the new criteria
       this.graphElements = this.transmissionChainDataService.convertChainToGraphElements(
         this.chainGroup,
@@ -1934,9 +1969,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // determine map nodes
     forkJoin([
-      this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE),
-      this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CERTAINTY_LEVEL),
-      this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
+      this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE),
+      this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL),
+      this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION)
     ]).subscribe(([
       personTypes,
       certaintyLevels,
@@ -2391,6 +2426,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // update
     this._updateSnapshotsTimer = setTimeout(() => {
+      // reset
+      this._updateSnapshotsTimer = undefined;
+
+      // update
       this.updateSnapshotsInProgress(finishedCallback);
     }, 3000);
   }
@@ -2601,6 +2640,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       }
       if (!usedMap['genderLNG_ENTITY_FIELD_LABEL_GENDER']) {
         this.snapshotFilters.gender = undefined;
+      }
+      if (!usedMap['clusterIdLNG_ENTITY_FIELD_LABEL_CLUSTER']) {
+        this.snapshotFilters.cluster = undefined;
       }
       if (!usedMap['ageLNG_ENTITY_FIELD_LABEL_AGE']) {
         this.snapshotFilters.age = undefined;
@@ -3041,19 +3083,31 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
                     name: 'classificationId',
                     placeholder: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-                    options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                    options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                      this.selectedOutbreak,
+                      (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                      undefined
+                    ),
                     values: this.filters.classificationId
                   }, {
                     type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
                     name: 'occupation',
                     placeholder: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-                    options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                    options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                      this.selectedOutbreak,
+                      (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                      undefined
+                    ),
                     values: this.filters.occupation
                   }, {
                     type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
                     name: 'outcomeId',
                     placeholder: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-                    options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                    options: this.referenceDataHelperService.filterPerOutbreakOptions(
+                      this.selectedOutbreak,
+                      (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                      undefined
+                    ),
                     values: this.filters.outcomeId
                   }, {
                     type: V2SideDialogConfigInputType.TEXT,
@@ -3254,7 +3308,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'labSeqResult',
           label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL',
-          options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           allowedComparators: [
             _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
           ],
@@ -3270,7 +3328,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'classification',
           label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           allowedComparators: [
             _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
           ],
@@ -3286,7 +3348,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'occupation',
           label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-          options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           allowedComparators: [
             _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
           ],
@@ -3302,7 +3368,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'outcomeId',
           label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-          options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           allowedComparators: [
             _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
           ],

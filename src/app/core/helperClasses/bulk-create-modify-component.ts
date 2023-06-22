@@ -1,7 +1,7 @@
 import { Observable, Subscription } from 'rxjs';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { OutbreakModel } from '../models/outbreak.model';
-import { Directive } from '@angular/core';
+import { Directive, ViewChild } from '@angular/core';
 import { OutbreakDataService } from '../services/data/outbreak.data.service';
 import { UserModel } from '../models/user.model';
 import { AuthDataService } from '../services/data/auth.data.service';
@@ -10,6 +10,9 @@ import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-
 import { IV2SpreadsheetEditorEventSave } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/event.model';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
+import {
+  AppSpreadsheetEditorV2Component
+} from '../../shared/components-v2/app-spreadsheet-editor-v2/app-spreadsheet-editor-v2.component';
 
 /**
  * Bulk create / modify component
@@ -40,6 +43,9 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
   // records
   records$: Observable<T[]>;
 
+  // retrieve table handler
+  @ViewChild(AppSpreadsheetEditorV2Component, { static: true }) spreadsheetEditorV2Component: AppSpreadsheetEditorV2Component;
+
   // page type
   // - determined from route data
   readonly action: CreateViewModifyV2Action.CREATE | CreateViewModifyV2Action.MODIFY;
@@ -53,9 +59,12 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
   // page title
   pageTitle: string;
 
+  // initialize table columns after outbreak changed ?
+  private _initializeTableColumnAfterOutbreakSelected: boolean = false;
+
   // timers
-  private _initializeTimer: any;
-  private _initializeRecordsTimer: any;
+  private _initializeTimer: number;
+  private _initializeRecordsTimer: number;
 
   /**
    * Constructor
@@ -63,7 +72,10 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
   protected constructor(
     protected activatedRoute: ActivatedRoute,
     protected authDataService: AuthDataService,
-    protected outbreakDataService: OutbreakDataService
+    protected outbreakDataService: OutbreakDataService,
+    private _config: {
+      initializeTableColumnsAfterRecordsInitialized: boolean
+    }
   ) {
     // parent
     super();
@@ -86,6 +98,7 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
       this.initializeBreadcrumbs();
 
       // initialize table columns
+      // IMPORTANT: we need to call this even if this._config.initializeTableColumnsAfterRecordsInitialized is true because otherwise location columns aren't determined and locations aren't retrieved resulting in displaying ids instead of labels
       this.initializeTableColumns();
 
       // initialize ignore groups
@@ -114,6 +127,15 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
 
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
+
+        // initialize table columns after outbreak changed ?
+        if (this._initializeTableColumnAfterOutbreakSelected) {
+          this.initializeTableColumns();
+          this._initializeTableColumnAfterOutbreakSelected = false;
+        }
+
+        // timer - records
+        this.stopInitializeRecordsTimer();
 
         // trigger outbreak selection changed
         // - wait for binding
@@ -176,6 +198,17 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
   abstract save(event: IV2SpreadsheetEditorEventSave);
 
   /**
+   * Stop timer
+   */
+  private stopInitializeRecordsTimer(): void {
+    // timer - records
+    if (this._initializeRecordsTimer) {
+      clearTimeout(this._initializeRecordsTimer);
+      this._initializeRecordsTimer = undefined;
+    }
+  }
+
+  /**
    * Release subscribers
    */
   private releaseSubscribers() {
@@ -192,9 +225,22 @@ export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges 
     }
 
     // timer - records
-    if (this._initializeRecordsTimer) {
-      clearTimeout(this._initializeRecordsTimer);
-      this._initializeRecordsTimer = undefined;
+    this.stopInitializeRecordsTimer();
+  }
+
+  /**
+   * Records initialized
+   */
+  recordsInitialized(): void {
+    // initialize table columns
+    if (this._config.initializeTableColumnsAfterRecordsInitialized) {
+      // outbreak initialized ?
+      if (this.selectedOutbreak?.id) {
+        this.initializeTableColumns();
+      } else {
+        // wait for outbreak to initialize
+        this._initializeTableColumnAfterOutbreakSelected = true;
+      }
     }
   }
 }

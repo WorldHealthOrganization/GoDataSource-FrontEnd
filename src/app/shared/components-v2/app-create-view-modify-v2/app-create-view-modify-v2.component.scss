@@ -62,6 +62,10 @@
               @include breakpoint('gt-lg') {
                 text-orientation: upright;
                 writing-mode: vertical-lr;
+
+                @include safari {
+                  word-spacing: 1rem;
+                }
               }
             }
 
@@ -380,6 +384,10 @@
     }
 
     .gd-create-view-modify-top-title-buttons {
+      @include breakpoint('xs') {
+        margin-top: 0.4rem;
+      }
+
       .gd-create-view-modify-top-title-buttons-title {
         overflow: hidden;
 
@@ -658,7 +666,8 @@
 
       > form,
       .gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire,
-      .gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire {
+      .gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire,
+      .gd-create-view-modify-bottom-section-content-input-has-tree-editor {
         height: 100%;
       }
     }

@@ -12,42 +12,51 @@ import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import {
   IPermissionBasic,
+  IPermissionBasicBulk,
   IPermissionCase,
   IPermissionChronology,
   IPermissionExportable,
   IPermissionImportable,
   IPermissionMovement,
   IPermissionRelatedContact,
-  IPermissionRelatedContactBulk, IPermissionRelatedLabResult,
+  IPermissionRelatedContactBulk,
+  IPermissionRelatedLabResult,
   IPermissionRelatedRelationship,
   IPermissionRestorable
 } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import {
+  V2AdvancedFilter,
+  V2AdvancedFilterType
+} from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { LocationModel } from './location.model';
-import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import {
+  IV2ColumnStatusFormType,
+  V2ColumnStatusForm
+} from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { ReferenceDataEntryModel } from './reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
 import { SafeHtml } from '@angular/platform-browser';
+import { I18nService } from '../services/helper/i18n.service';
 
 export class CaseModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRelatedRelationship,
-        IPermissionRestorable,
-        IPermissionImportable,
-        IPermissionExportable,
-        IPermissionRelatedContact,
-        IPermissionRelatedContactBulk,
-        IPermissionMovement,
-        IPermissionChronology,
-        IPermissionCase,
-        IPermissionRelatedLabResult {
+    IPermissionBasic,
+    IPermissionRelatedRelationship,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionImportable,
+    IPermissionExportable,
+    IPermissionRelatedContact,
+    IPermissionRelatedContactBulk,
+    IPermissionMovement,
+    IPermissionChronology,
+    IPermissionCase,
+    IPermissionRelatedLabResult {
   id: string;
   firstName: string;
   middleName: string;
@@ -66,7 +75,6 @@ export class CaseModel
   dateOfOnset: string | Moment;
   isDateOfOnsetApproximate: boolean;
   dateOfOutcome: string | Moment;
-  dateBecomeCase: string | Moment;
   safeBurial: boolean;
   dateOfBurial: string | Moment;
   dateRanges: CaseCenterDateRangeModel[];
@@ -88,8 +96,12 @@ export class CaseModel
   investigationStatus: string;
   dateInvestigationCompleted: string | Moment;
   outcomeId: string;
-  dateBecomeContact: string;
+  wasCase: boolean;
+  dateBecomeCase: string | Moment;
   wasContact: boolean;
+  dateBecomeContact: string | Moment;
+  wasContactOfContact: boolean;
+  dateBecomeContactOfContact: string | Moment;
 
   numberOfContacts: number;
   numberOfExposures: number;
@@ -131,6 +143,9 @@ export class CaseModel
 
   // used by ui
   uiStatusForms: SafeHtml;
+  uiDocuments: string;
+  uiVaccines: string;
+  uiDateRanges: string;
 
   /**
    * Advanced filters
@@ -143,6 +158,7 @@ export class CaseModel
       occupation: ILabelValuePairModel[],
       risk: ILabelValuePairModel[],
       classification: ILabelValuePairModel[],
+      yesNoAll: ILabelValuePairModel[],
       yesNo: ILabelValuePairModel[],
       outcome: ILabelValuePairModel[],
       clusterLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void,
@@ -150,7 +166,11 @@ export class CaseModel
       vaccine: ILabelValuePairModel[],
       vaccineStatus: ILabelValuePairModel[],
       user: ILabelValuePairModel[],
-      investigationStatus: ILabelValuePairModel[]
+      investigationStatus: ILabelValuePairModel[],
+      documentType: ILabelValuePairModel[],
+      addressType: ILabelValuePairModel[],
+      dateRangeType: ILabelValuePairModel[],
+      dateRangeCenter: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -193,7 +213,8 @@ export class CaseModel
         type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
         field: 'addresses',
         label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true
+        isArray: true,
+        sortable: 'addresses.phoneNumber'
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -205,13 +226,15 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'occupation',
         label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-        options: data.options.occupation
+        options: data.options.occupation,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'riskLevel',
         label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-        options: data.options.risk
+        options: data.options.risk,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
@@ -229,7 +252,8 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'classification',
         label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-        options: data.options.classification
+        options: data.options.classification,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -293,7 +317,8 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'investigationStatus',
         label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
-        options: data.options.investigationStatus
+        options: data.options.investigationStatus,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -305,12 +330,20 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'outcomeId',
         label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-        options: data.options.outcome
+        options: data.options.outcome,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'wasContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasContactOfContact',
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
         options: data.options.yesNo,
         sortable: true
       },
@@ -332,7 +365,8 @@ export class CaseModel
         label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
         relationshipPath: ['relationships'],
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER',
-        optionsLoad: data.options.clusterLoad
+        optionsLoad: data.options.clusterLoad,
+        sortable: true
       }, {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
@@ -350,18 +384,168 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'vaccinesReceived.vaccine',
         label: 'LNG_CASE_FIELD_LABEL_VACCINE',
-        options: data.options.vaccine
+        options: data.options.vaccine,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'vaccinesReceived.status',
         label: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
-        options: data.options.vaccineStatus
+        options: data.options.vaccineStatus,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'vaccinesReceived.date',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE'
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'documents.type',
+        label: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
+        options: data.options.documentType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'documents.number',
+        label: 'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.emailAddress',
+        label: 'LNG_CASE_FIELD_LABEL_EMAIL',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'addresses.geoLocationAccurate',
+        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
+        options: data.options.yesNo,
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'addresses.typeId',
+        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_TYPE',
+        options: data.options.addressType,
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'addresses.date',
+        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_DATE',
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.city',
+        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_CITY',
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.postalCode',
+        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_POSTAL_CODE',
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+        field: 'deathLocationId',
+        label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfBurial',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+        field: 'burialLocationId',
+        label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'burialPlaceName',
+        label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'dateRanges.typeId',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID',
+        options: data.options.dateRangeType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateRanges.startDate',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_START_DATE',
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateRanges.endDate',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_END_DATE',
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'dateRanges.centerName',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+        options: data.options.dateRangeCenter,
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+      },
+      {
+        // parentLocationIdFilter is appended by the component
+        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+        field: 'dateRanges',
+        label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION',
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'dateRanges.comments',
+        label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS',
+        sortable: true,
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_CASE_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_CASE_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_CASE_FIELD_LABEL_DELETED_AT',
+        sortable: true
       }
     ];
 
@@ -371,7 +555,20 @@ export class CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'responsibleUserId',
         label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
       });
     }
 
@@ -386,7 +583,7 @@ export class CaseModel
     info: {
       // required
       item: CaseModel,
-      translateService: TranslateService,
+      i18nService: I18nService,
       classification: IResolverV2ResponseModel<ReferenceDataEntryModel>,
       outcome: IResolverV2ResponseModel<ReferenceDataEntryModel>
     }
@@ -402,7 +599,7 @@ export class CaseModel
       forms.push({
         type: IV2ColumnStatusFormType.CIRCLE,
         color: info.classification.map[info.item.classification].getColorCode(),
-        tooltip: info.translateService.instant(info.item.classification)
+        tooltip: info.i18nService.instant(info.item.classification)
       });
     }
 
@@ -414,7 +611,7 @@ export class CaseModel
       forms.push({
         type: IV2ColumnStatusFormType.TRIANGLE,
         color: info.outcome.map[info.item.outcomeId].getColorCode(),
-        tooltip: info.translateService.instant(info.item.outcomeId)
+        tooltip: info.i18nService.instant(info.item.outcomeId)
       });
     }
 
@@ -423,7 +620,7 @@ export class CaseModel
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     }
 
@@ -482,6 +679,14 @@ export class CaseModel
      * Static Permissions - IPermissionRestorable
      */
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_RESTORE) : false); }
+
+  /**
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
+  static canBulkModify(): boolean { return false; }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_RESTORE) : false); }
 
   /**
      * Static Permissions - IPermissionImportable
@@ -592,7 +797,6 @@ export class CaseModel
     this.dateOfInfection = _.get(data, 'dateOfInfection');
     this.dateOfOnset = _.get(data, 'dateOfOnset');
     this.dateOfOutcome = _.get(data, 'dateOfOutcome');
-    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
     this.dateOfBurial = _.get(data, 'dateOfBurial');
     this.safeBurial = _.get(data, 'safeBurial');
     this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
@@ -623,8 +827,12 @@ export class CaseModel
     this.questionnaireAnswersContact = _.get(data, 'questionnaireAnswersContact', {});
 
     this.relationships = _.get(data, 'relationships', []);
-    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+    this.wasCase = _.get(data, 'wasCase');
+    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
     this.wasContact = _.get(data, 'wasContact');
+    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+    this.wasContactOfContact = _.get(data, 'wasContactOfContact');
+    this.dateBecomeContactOfContact = _.get(data, 'dateBecomeContactOfContact');
 
     this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
@@ -685,6 +893,14 @@ export class CaseModel
      * Permissions - IPermissionRestorable
      */
   canRestore(user: UserModel): boolean { return CaseModel.canRestore(user); }
+
+  /**
+   * Permissions - IPermissionBasicBulk
+   */
+  canBulkCreate(): boolean { return CaseModel.canBulkCreate(); }
+  canBulkModify(): boolean { return CaseModel.canBulkModify(); }
+  canBulkDelete(user: UserModel): boolean { return CaseModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return CaseModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionImportable

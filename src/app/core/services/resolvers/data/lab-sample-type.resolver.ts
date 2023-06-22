@@ -21,7 +21,7 @@ export class LabSampleTypeDataResolver implements IMapResolverV2<ReferenceDataEn
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.TYPE_OF_SAMPLE)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE)
       .pipe(
         map((data) => {
           // construct map

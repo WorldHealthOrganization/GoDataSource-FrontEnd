@@ -6,7 +6,7 @@ import { DialogV2Service } from '../helper/dialog-v2.service';
 @Injectable()
 export class FontResolver implements Resolve<any>, OnDestroy {
   // timeout
-  private _checkTimeout: any;
+  private _checkTimeout: number;
 
   // required fonts
   private _loadingKey: string = 'font';
@@ -51,6 +51,9 @@ export class FontResolver implements Resolve<any>, OnDestroy {
 
     // start
     this._checkTimeout = setTimeout(() => {
+      // reset
+      this._checkTimeout = undefined;
+
       // determine if required fonts were loaded
       let fontsLoaded: boolean = true;
       document.fonts.forEach((font) => {
@@ -68,9 +71,6 @@ export class FontResolver implements Resolve<any>, OnDestroy {
           }
         }
       });
-
-      // clear
-      this._checkTimeout = undefined;
 
       // finished ?
       if (fontsLoaded) {

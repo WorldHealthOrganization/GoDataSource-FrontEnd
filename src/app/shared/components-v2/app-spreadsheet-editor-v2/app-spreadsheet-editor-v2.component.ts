@@ -51,6 +51,7 @@ import { CdkContextMenuTrigger } from '@angular/cdk/menu';
 import { AppSpreadsheetEditorV2CellRowNoRendererModel } from './models/app-spreadsheet-editor-v2-cell-row-no-renderer.model';
 import { AppSpreadsheetEditorV2CellBasicHeaderModel } from './models/app-spreadsheet-editor-v2-cell-basic-header.model';
 import { AppSpreadsheetEditorV2CellBasicHeaderPivotComponent } from './components/header-pivot/app-spreadsheet-editor-v2-cell-basic-header-pivot.component';
+import { AppMessages } from '../../../core/enums/app-messages.enum';
 
 /**
  * Component
@@ -112,7 +113,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
   // columns
   private _locationColumns: string[];
-  private _columns: V2SpreadsheetEditorColumn[];
+  private _columns: V2SpreadsheetEditorColumn[] = [];
   @Input() set columns(columns: V2SpreadsheetEditorColumn[]) {
     // set data
     this._columns = (columns || [])
@@ -148,11 +149,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // save
   @Output() save: EventEmitter<IV2SpreadsheetEditorEventSave> = new EventEmitter<IV2SpreadsheetEditorEventSave>();
 
+  // records initialized
+  @Output() recordsInitialized: EventEmitter<void> = new EventEmitter<void>();
+
   // is mac ?
   isMac: boolean = determineIfMacDevice();
-
-  // paste from context menu doesn't work if clipboard.readtext doesn't exist (only ctrl+v has a chance that it could work)
-  showPasteMenuOption: boolean = !!navigator.clipboard?.readText;
 
   // form dirty ?
   private _formDirty: boolean = false;
@@ -392,10 +393,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   };
 
   // timers
-  private _timerCellSelectFocused: any;
-  private _waitForAsyncToFinish: any;
-  private _scrollTimer: any;
-  private _pasteTimer: any;
+  private _timerCellSelectFocused: number;
+  private _waitForAsyncToFinish: number;
+  private _scrollTimer: number;
+  private _pasteTimer: number;
+  private _languageChangeTimer: number;
 
   // constants
   AppSpreadsheetEditorV2LoadingComponent = AppSpreadsheetEditorV2LoadingComponent;
@@ -437,23 +439,18 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // stop async request
     this.stopAsyncRequests();
 
-    // stop timers - cellSelectFocused
-    if (this._timerCellSelectFocused) {
-      clearTimeout(this._timerCellSelectFocused);
-      this._timerCellSelectFocused = undefined;
-    }
-
-    // stop timers - waitForAsyncToFinish
-    this.stopWaitForAsyncToFinish();
-
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
 
-    // stop scroll timer
+    // stop timers
     this.stopScrollTimer();
-
-    // stop paste timer
     this.stopPasteTimer();
+    this.stopLanguageChangeTimer();
+    this.stopTimerCellSelectFocused();
+    this.stopWaitForAsyncToFinish();
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_PASTE_WARNING);
   }
 
   /**
@@ -461,6 +458,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   detectChanges(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopTimerCellSelectFocused(): void {
+    // stop timers - cellSelectFocused
+    if (this._timerCellSelectFocused) {
+      clearTimeout(this._timerCellSelectFocused);
+      this._timerCellSelectFocused = undefined;
+    }
   }
 
   /**
@@ -479,8 +487,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // update ui
         this.changeDetectorRef.detectChanges();
 
+        // stop previous
+        this.stopLanguageChangeTimer();
+
         // wait for column bind to take effect
-        setTimeout(() => {
+        this._languageChangeTimer = setTimeout(() => {
+          // reset
+          this._languageChangeTimer = undefined;
+
           // redraw
           this._agTable.api.refreshCells({
             force: true,
@@ -685,6 +699,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // unselect everything
         this._agTable.api.deselectAll();
 
+        // records initialized
+        this.recordsInitialized.emit();
+
         // re-render page
         this.detectChanges();
 
@@ -695,7 +712,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // - fix for first render issue (necessary to render css properly from this.validateAllRows)
         if (
           this.action === CreateViewModifyV2Action.MODIFY &&
-          data.length > 0
+          data.length > 0 &&
+          this.columns?.length
         ) {
           // start edit
           this._agTable.api.startEditingCell({
@@ -759,7 +777,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     delete this._callWhenReady.updateColumnDefinitions;
 
     // nothing to do ?
-    if (!this._columns) {
+    if (!this.columns?.length) {
       // reset
       this._agTable.api.setColumnDefs(undefined);
 
@@ -796,7 +814,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }];
 
     // process columns in default order
-    this._columns.forEach((column, index) => {
+    this.columns.forEach((column, index) => {
       // column key
       const columnKey: string = column.field;
 
@@ -3601,9 +3619,32 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Context menu option - paste
    */
-  cellPaste(): void {
+  cellPaste(calledFromContextMenu: boolean): void {
     // nothing to do ?
     if (this.editor.selection.selected.ranges.length !== 1) {
+      return;
+    }
+
+    // check if we can use context menu paste
+    if (
+      calledFromContextMenu &&
+      // paste from context menu doesn't work if clipboard.readtext doesn't exist (only ctrl+v has a chance that it could work)
+      // on https websites it should work or on localhost
+      !navigator.clipboard?.readText
+    ) {
+      // show message that user must use
+      // just as google sheets, docs etc does if it doesn't have access by using its own plugin
+      this.toastV2Service.notice(
+        'LNG_GENERIC_WARNING_NO_PASTE_USING_CONTEXT_MENU',
+        {
+          shortcut: this.isMac ?
+            '⌘+V' :
+            'Ctrl+V'
+        },
+        AppMessages.APP_MESSAGE_PASTE_WARNING
+      );
+
+      // finished
       return;
     }
 
@@ -4063,11 +4104,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     ) {
       // allow bubble
 
+      // stop previous
+      this.stopTimerCellSelectFocused();
+
       // update focused selection after focused cell is changed by ag-grid (return false)
       this._timerCellSelectFocused = setTimeout(() => {
+        // reset
+        this._timerCellSelectFocused = undefined;
+
         // update focused selection
         this.cellSelectFocused();
-        this._timerCellSelectFocused = undefined;
       });
 
       // don't block caller
@@ -4190,7 +4236,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       }
 
       // paste
-      this.cellPaste();
+      this.cellPaste(false);
 
       // block caller
       return true;
@@ -4623,5 +4669,30 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       clearTimeout(this._pasteTimer);
       this._pasteTimer = undefined;
     }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopLanguageChangeTimer(): void {
+    if (this._languageChangeTimer) {
+      clearTimeout(this._languageChangeTimer);
+      this._languageChangeTimer = undefined;
+    }
+  }
+
+  /**
+   * Retrieve all rows data
+   */
+  getRecords<T>(): T[] {
+    // get visible rows
+    const rowsNo = this._agTable?.api?.getDisplayedRowCount() || 0;
+    const rowsData: T[] = [];
+    for (let rowIndex = 0; rowIndex < rowsNo; rowIndex++) {
+      rowsData.push(this._agTable.api.getDisplayedRowAtIndex(rowIndex).data);
+    }
+
+    // finished
+    return rowsData;
   }
 }

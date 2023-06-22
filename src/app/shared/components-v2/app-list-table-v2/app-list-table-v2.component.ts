@@ -511,6 +511,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     }
   }
 
+  // timers
+  private _resizeTableTimer: number;
+
   // constants
   AppListTableV2LoadingComponent = AppListTableV2LoadingComponent;
   AppListTableV2NoDataComponent = AppListTableV2NoDataComponent;
@@ -704,6 +707,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
+
+    // stop previous
+    this.stopResizeTableTimer();
   }
 
   /**
@@ -1084,11 +1090,35 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(legend.title)}</span><span class="gd-list-table-bottom-left-legend-items">`;
 
           // render legend
-          legend.items.forEach((legendItem) => {
-            html += `<span class="gd-list-table-bottom-left-legend-items-item">
-              ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.i18nService.instant(legendItem.label)}
-            </span>`;
-          });
+          legend.items
+            .sort((item1, item2) => {
+              // if same order, compare labels
+              if (item1.order === item2.order) {
+                return this.i18nService
+                  .instant(item1.label)
+                  .localeCompare(this.i18nService.instant(item2.label));
+              }
+
+              // format order
+              let order1: number = Number.MAX_SAFE_INTEGER;
+              try {
+                order1 = typeof item1.order === 'number' ? item1.order : parseInt(item1.order, 10);
+                order1 = isNaN(order1) ? Number.MAX_SAFE_INTEGER : order1;
+              } catch (e) {}
+              let order2: number = Number.MAX_SAFE_INTEGER;
+              try {
+                order2 = typeof item2.order === 'number' ? item2.order : parseInt(item2.order, 10);
+                order2 = isNaN(order2) ? Number.MAX_SAFE_INTEGER : order2;
+              } catch (e) {}
+
+              // compare order
+              return order1 - order2;
+            })
+            .forEach((legendItem) => {
+              html += `<span class="gd-list-table-bottom-left-legend-items-item">
+                ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.i18nService.instant(legendItem.label)}
+              </span>`;
+            });
 
           // close items list
           html += '</span>';
@@ -1742,6 +1772,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop resize table timer
+   */
+  private stopResizeTableTimer(): void {
+    if (this._resizeTableTimer) {
+      clearTimeout(this._resizeTableTimer);
+      this._resizeTableTimer = undefined;
+    }
+  }
+
+  /**
    * Should update height of table
    */
   resizeTable(): void {
@@ -2002,6 +2042,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this._processedSelectedResults = {};
     if (this.processSelectedData?.length > 0) {
       this.processSelectedData.forEach((processor) => {
+        // no need to execute?
+        if (!processor.shouldProcess(
+          this._recordsDataMap,
+          this._selected
+        )) {
+          return;
+        }
+
+        // process
         this._processedSelectedResults[processor.key] = processor.process(
           this._recordsDataMap,
           this._selected
@@ -2268,8 +2317,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // this.detectChanges / this.resizeTable() are called by resize layout by updateColumnDefinitions
       this.updateColumnDefinitions();
 
+      // stop previous
+      this.stopResizeTableTimer();
+
       // wait for html to be rendered since isSmallScreenMode was changed
-      setTimeout(() => {
+      this._resizeTableTimer = setTimeout(() => {
+        // reset
+        this._resizeTableTimer = undefined;
+
+        // update
         this.resizeTable();
       });
     } else {

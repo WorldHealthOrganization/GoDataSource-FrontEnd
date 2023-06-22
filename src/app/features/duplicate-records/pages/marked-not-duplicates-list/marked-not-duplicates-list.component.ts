@@ -1,6 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
 import { Observable, of } from 'rxjs';
 import { throwError } from 'rxjs/internal/observable/throwError';
@@ -34,6 +33,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-cases-list',
@@ -64,7 +64,7 @@ export class MarkedNotDuplicatesListComponent
     private contactDataService: ContactDataService,
     private contactOfContactDataService: ContactsOfContactsDataService,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     private locationDataService: LocationDataService
   ) {
@@ -507,7 +507,7 @@ export class MarkedNotDuplicatesListComponent
       // view / modify
       if (this.recordData) {
         this.breadcrumbs.push({
-          label: this.translateService.instant(
+          label: this.i18nService.instant(
             'LNG_PAGE_VIEW_CASE_TITLE',
             { name: this.recordData.name }
           ),
@@ -528,7 +528,7 @@ export class MarkedNotDuplicatesListComponent
       // view / modify
       if (this.recordData) {
         this.breadcrumbs.push({
-          label: this.translateService.instant(
+          label: this.i18nService.instant(
             'LNG_PAGE_VIEW_CONTACT_TITLE',
             { name: this.recordData.name }
           ),
@@ -547,7 +547,7 @@ export class MarkedNotDuplicatesListComponent
       // view / modify
       if (this.recordData) {
         this.breadcrumbs.push({
-          label: this.translateService.instant(
+          label: this.i18nService.instant(
             'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE',
             { name: this.recordData.name }
           ),

@@ -14,7 +14,7 @@ import * as moment from 'moment';
 import { catchError, share } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { ControlContainer } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Location
@@ -211,7 +211,7 @@ export abstract class AppFormLocationBaseV2<T>
   constructor(
     protected multipleSelect: boolean,
     protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef,
     protected locationDataService: LocationDataService,
     protected outbreakDataService: OutbreakDataService,
@@ -219,7 +219,7 @@ export abstract class AppFormLocationBaseV2<T>
   ) {
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }

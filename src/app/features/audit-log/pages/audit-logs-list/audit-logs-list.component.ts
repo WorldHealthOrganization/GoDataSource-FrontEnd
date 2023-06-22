@@ -15,7 +15,6 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { IV2ColumnPinned, V2ColumnExpandRowType, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { TranslateService } from '@ngx-translate/core';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
@@ -23,6 +22,7 @@ import { Constants } from '../../../../core/models/constants';
 import { ChangeValue, ChangeValueArray, ChangeValueObject, ChangeValueType } from '../../../../shared/components-v2/app-changes-v2/models/change.model';
 import * as momentOriginal from 'moment';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-audit-logs-list',
@@ -58,10 +58,14 @@ export class AuditLogsListComponent
     private auditLogDataService: AuditLogDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**
@@ -121,7 +125,7 @@ export class AuditLogsListComponent
         sortable: true,
         format: {
           type: (item) => (this.activatedRoute.snapshot.data.auditLogModule as IResolverV2ResponseModel<ILabelValuePairModel>).map[item.modelName] ?
-            this.translateService.instant((this.activatedRoute.snapshot.data.auditLogModule as IResolverV2ResponseModel<ILabelValuePairModel>).map[item.modelName].label) :
+            this.i18nService.instant((this.activatedRoute.snapshot.data.auditLogModule as IResolverV2ResponseModel<ILabelValuePairModel>).map[item.modelName].label) :
             item.modelName
         },
         filter: {
@@ -426,7 +430,7 @@ export class AuditLogsListComponent
           url: '/audit-logs/export',
           async: true,
           method: ExportDataMethod.POST,
-          fileName: `${ this.translateService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
+          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
           queryBuilder: qb,
           allow: {
             types: [

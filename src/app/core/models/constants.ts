@@ -16,6 +16,19 @@ export enum ExportStatusStep {
 }
 
 /**
+ * Restore db backup steps
+ */
+export enum RestoreStatusStep {
+  LNG_STATUS_STEP_PREPARING_RESTORE = 'LNG_STATUS_STEP_PREPARING_RESTORE',
+  LNG_STATUS_STEP_UNZIPPING = 'LNG_STATUS_STEP_UNZIPPING',
+  LNG_STATUS_STEP_DECRYPTING = 'LNG_STATUS_STEP_DECRYPTING',
+  LNG_STATUS_STEP_UNZIPPING_COLLECTIONS = 'LNG_STATUS_STEP_UNZIPPING_COLLECTIONS',
+  LNG_STATUS_STEP_RESTORING = 'LNG_STATUS_STEP_RESTORING',
+  LNG_STATUS_STEP_MIGRATING_DATABASE = 'LNG_STATUS_STEP_MIGRATING_DATABASE',
+  LNG_STATUS_STEP_RESTORE_FINISHED = 'LNG_STATUS_STEP_RESTORE_FINISHED'
+}
+
+/**
  * Apply List Filter
  */
 export enum ApplyListFilter {
@@ -230,6 +243,10 @@ export class Constants {
     PEOPLE_TO_SHARE_RELATIONSHIPS_WITH: {
       label: 'LNG_APP_PAGE_PEOPLE_TO_SHARE_RELATIONSHIPS_WITH',
       value: 'LNG_APP_PAGE_PEOPLE_TO_SHARE_RELATIONSHIPS_WITH'
+    },
+    AVAILABLE_ENTITIES_FOR_ADD_EXPOSURE: {
+      label: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_ADD_EXPOSURE',
+      value: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_ADD_EXPOSURE'
     },
     CASES: {
       label: 'LNG_APP_PAGE_CASES',
@@ -466,6 +483,40 @@ export class Constants {
     }
   };
 
+  /**
+   * System sync log status step - backup restore
+   */
+  static SYSTEM_SYNC_LOG_STATUS_STEP_BACKUP_RESTORE = {
+    PREPARING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_PREPARING_RESTORE,
+      value: RestoreStatusStep.LNG_STATUS_STEP_PREPARING_RESTORE
+    },
+    UNZIPPING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING,
+      value: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING
+    },
+    DECRYPTING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_DECRYPTING,
+      value: RestoreStatusStep.LNG_STATUS_STEP_DECRYPTING
+    },
+    UNZIPPING_COLLECTIONS: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING_COLLECTIONS,
+      value: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING_COLLECTIONS
+    },
+    RESTORING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_RESTORING,
+      value: RestoreStatusStep.LNG_STATUS_STEP_RESTORING
+    },
+    MIGRATING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_MIGRATING_DATABASE,
+      value: RestoreStatusStep.LNG_STATUS_STEP_MIGRATING_DATABASE
+    },
+    FINISHED: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_RESTORE_FINISHED,
+      value: RestoreStatusStep.LNG_STATUS_STEP_RESTORE_FINISHED
+    }
+  };
+
   // keep functionality
   static APPLY_LIST_FILTER = ApplyListFilter;
 
@@ -485,15 +536,12 @@ export class Constants {
     }
   };
 
-  static PROGRESS_OPTIONS = {
-    IN_PROGRESS: {
-      label: 'LNG_PROGRESS_OPTION_LABEL_IN_PROGRESS',
-      value: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_IN_PROGRESS'
-    },
-    COMPLETED: {
-      label: 'LNG_PROGRESS_OPTION_LABEL_COMPLETED',
-      value: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_COMPLETED'
-    }
+  /**
+   * Lab result status
+   */
+  static LAB_TEST_RESULT_STATUS = {
+    IN_PROGRESS: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_IN_PROGRESS',
+    COMPLETED: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_COMPLETED'
   };
 
   /**

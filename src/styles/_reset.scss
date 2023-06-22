@@ -59,6 +59,17 @@ body {
   }
 }
 
+/* Keyframes */
+@keyframes gd-flash {
+  0%, 50%, 100% {
+    background: rgba(var(--gd-primary-rgb), 0.15);
+  }
+
+  25%, 75% {
+    background: transparent;
+  }
+}
+
 /* Links */
 a {
   color: var(--gd-primary);

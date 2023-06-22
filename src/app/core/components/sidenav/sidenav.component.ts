@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, HostListener,
   Input,
   OnDestroy,
   OnInit,
@@ -42,8 +42,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
 
   // current active main menu
   private _activeMainMenuId: string;
-  private _menuPositionTimer: any;
-  private _menuCloseTimer: any;
+  private _menuPositionTimer: number;
+  private _menuCloseTimer: number;
 
   // check if this is a touch device
   isTouchDevice: boolean = determineIfTouchDevice();
@@ -803,5 +803,13 @@ export class SidenavComponent implements OnInit, OnDestroy {
       // close all main menus except the active one
       this.checkAndCloseMenusImmediate();
     }, 50);
+  }
+
+  /**
+   * Update main menu option margins
+   */
+  @HostListener('window:resize')
+  updateMargins(): void {
+    this.changeDetectorRef.detectChanges();
   }
 }
