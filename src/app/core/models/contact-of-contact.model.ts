@@ -188,7 +188,8 @@ export class ContactOfContactModel
         type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
         field: 'addresses',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true
+        isArray: true,
+        sortable: 'addresses.phoneNumber'
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -362,7 +363,8 @@ export class ContactOfContactModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user
+        options: data.options.user,
+        sortable: true
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'createdBy',
