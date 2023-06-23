@@ -108,7 +108,11 @@ export class ContactOfContactModel
     options: {
       occupation: ILabelValuePairModel[],
       user: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[]
+      yesNo: ILabelValuePairModel[],
+      gender: ILabelValuePairModel[],
+      pregnancy: ILabelValuePairModel[],
+      documentType: ILabelValuePairModel[],
+      addressType: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -206,6 +210,80 @@ export class ContactOfContactModel
         field: 'numberOfExposures',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'gender',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
+        options: data.options.gender,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'pregnancyStatus',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+        options: data.options.pregnancy,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'documents.type',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENT_TYPE',
+        options: data.options.documentType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'documents.number',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENT_NUMBER',
+        sortable: true,
+        useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.emailAddress',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_EMAIL',
+        sortable: true,
+        useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'addresses.geoLocationAccurate',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
+        options: data.options.yesNo,
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'addresses.typeId',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_TYPE',
+        options: data.options.addressType,
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'addresses.date',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_DATE',
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.city',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_CITY',
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
+        useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.postalCode',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_POSTAL_CODE',
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
+        useLike: true
       }
     ];
 

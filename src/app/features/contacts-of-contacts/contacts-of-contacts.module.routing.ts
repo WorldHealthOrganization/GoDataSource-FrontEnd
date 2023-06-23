@@ -66,7 +66,10 @@ const routes: Routes = [
       gender: GenderDataResolver,
       yesNoAll: YesNoAllDataResolver,
       yesNo: YesNoDataResolver,
-      occupation: OccupationDataResolver
+      occupation: OccupationDataResolver,
+      pregnancy: PregnancyStatusDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver
     }
   },
   // Create contact of contact
