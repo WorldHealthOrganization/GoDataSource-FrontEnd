@@ -99,6 +99,8 @@ export class ContactOfContactModel
 
   // used by ui
   uiStatusForms: SafeHtml;
+  uiDocuments: string;
+  uiVaccines: string;
 
   /**
    * Advanced filters
