@@ -69,7 +69,9 @@ const routes: Routes = [
       occupation: OccupationDataResolver,
       pregnancy: PregnancyStatusDataResolver,
       documentType: DocumentTypeDataResolver,
-      addressType: AddressTypeDataResolver
+      addressType: AddressTypeDataResolver,
+      vaccine: VaccineDataResolver,
+      vaccineStatus: VaccineStatusDataResolver
     }
   },
   // Create contact of contact
