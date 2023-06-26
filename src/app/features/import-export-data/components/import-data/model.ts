@@ -281,6 +281,7 @@ export class ImportableFileModel {
             data.modelPropertyToRefCategory &&
             data.modelPropertyToRefCategory[impLVPair.value] &&
             selectedOutbreak.allowedRefDataItems[data.modelPropertyToRefCategory[impLVPair.value]] &&
+            Object.keys(selectedOutbreak.allowedRefDataItems[data.modelPropertyToRefCategory[impLVPair.value]]).length > 0 &&
             !selectedOutbreak.allowedRefDataItems[data.modelPropertyToRefCategory[impLVPair.value]][propValue.value]
           );
 
