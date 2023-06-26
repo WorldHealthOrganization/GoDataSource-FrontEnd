@@ -365,14 +365,20 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // was contact ?
     if (this.itemData.wasContact) {
       this.breadcrumbInfos.push({
-        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT'
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+        tooltip: this.itemData.dateBecomeCase ?
+          `${this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          undefined
       });
     }
 
     // was contact of contact ?
     if (this.itemData.wasContactOfContact) {
       this.breadcrumbInfos.push({
-        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT'
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
+        tooltip: this.itemData.dateBecomeCase ?
+          `${this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          undefined
       });
     }
   }
