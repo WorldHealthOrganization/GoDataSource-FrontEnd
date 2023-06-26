@@ -40,6 +40,8 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { EventModel } from '../../../../core/models/event.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { Moment } from 'moment';
+import { DocumentModel } from '../../../../core/models/document.model';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 
 @Component({
@@ -693,6 +695,30 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         })
       },
       {
+        field: 'pregnancyStatus',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'occupation',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
+        }
+      },
+      {
         field: 'location',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
         format: {
@@ -808,6 +834,18 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         sortable: true
       },
       {
+        field: 'dob',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
         field: 'age',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
         format: {
@@ -855,6 +893,15 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             undefined
           ),
           includeNoValue: true
+        }
+      },
+      {
+        field: 'riskReason',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
         }
       },
       {
@@ -974,6 +1021,70 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipExposures(this.authUser)
       },
       {
+        field: 'dateOfReporting',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'documents',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS',
+        format: {
+          type: (item: ContactOfContactModel): string => {
+            // must format ?
+            if (!item.uiDocuments) {
+              item.uiDocuments = DocumentModel.arrayToString(
+                this.i18nService,
+                item.documents
+              );
+            }
+
+            // finished
+            return item.uiDocuments;
+          }
+        },
+        notVisible: true
+      },
+      {
+        field: 'vaccinesReceived',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
+        format: {
+          type: (item: ContactOfContactModel): string => {
+            // must format ?
+            if (!item.uiVaccines) {
+              item.uiVaccines = VaccineModel.arrayToString(
+                this.i18nService,
+                item.vaccinesReceived
+              );
+            }
+
+            // finished
+            return item.uiVaccines;
+          }
+        },
+        notVisible: true
+      },
+      {
         field: 'deleted',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED',
         notVisible: true,
@@ -984,6 +1095,18 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           type: V2FilterType.DELETED,
           value: false,
           defaultValue: false
+        },
+        sortable: true
+      },
+      {
+        field: 'deletedAt',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
         },
         sortable: true
       },
@@ -1139,7 +1262,27 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           undefined
         ),
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        risk: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        vaccine: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        vaccineStatus: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }
@@ -2097,17 +2240,26 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
       'middleName',
       'firstName',
       'visualId',
+      'pregnancyStatus',
+      'occupation',
       'addresses',
+      'documents',
+      'vaccinesReceived',
+      'dob',
       'age',
       'gender',
       'riskLevel',
+      'riskReason',
       'dateOfLastContact',
+      'dateOfReporting',
+      'isDateOfReportingApproximate',
       'wasCase',
       'wasContact',
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdAt',
       'updatedBy',

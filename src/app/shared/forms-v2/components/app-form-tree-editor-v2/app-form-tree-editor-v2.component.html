@@ -20,6 +20,7 @@
       type="button"
       mat-flat-button
       color="text"
+      [disabled]="!!searchValue"
       (click)="collapseExpandAll(false, true)">
       {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_EXPAND_ALL' | translate}}
     </button>
@@ -29,6 +30,7 @@
       type="button"
       mat-flat-button
       color="text"
+      [disabled]="!!searchValue"
       (click)="collapseExpandAll(true, true)">
       {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL' | translate}}
     </button>

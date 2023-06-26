@@ -106,6 +106,8 @@ export class ContactOfContactModel
 
   // used by ui
   uiStatusForms: SafeHtml;
+  uiDocuments: string;
+  uiVaccines: string;
 
   /**
    * Advanced filters
@@ -115,7 +117,15 @@ export class ContactOfContactModel
     options: {
       occupation: ILabelValuePairModel[],
       user: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[]
+      yesNoAll: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[],
+      gender: ILabelValuePairModel[],
+      pregnancy: ILabelValuePairModel[],
+      documentType: ILabelValuePairModel[],
+      addressType: ILabelValuePairModel[],
+      risk: ILabelValuePairModel[],
+      vaccine: ILabelValuePairModel[],
+      vaccineStatus: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -159,6 +169,13 @@ export class ContactOfContactModel
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dob',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
@@ -180,7 +197,8 @@ export class ContactOfContactModel
         type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
         field: 'addresses',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true
+        isArray: true,
+        sortable: 'addresses.phoneNumber'
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -213,6 +231,138 @@ export class ContactOfContactModel
         field: 'numberOfExposures',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'gender',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
+        options: data.options.gender,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'pregnancyStatus',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+        options: data.options.pregnancy,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'documents.type',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENT_TYPE',
+        options: data.options.documentType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'documents.number',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENT_NUMBER',
+        sortable: true,
+        useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.emailAddress',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_EMAIL',
+        sortable: true,
+        useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'addresses.geoLocationAccurate',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
+        options: data.options.yesNo,
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'addresses.typeId',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_TYPE',
+        options: data.options.addressType,
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'addresses.date',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_DATE',
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.city',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_CITY',
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
+        useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.postalCode',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_POSTAL_CODE',
+        sortable: true,
+        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
+        useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'riskLevel',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
+        options: data.options.risk,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'riskReason',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'vaccinesReceived.vaccine',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINE',
+        options: data.options.vaccine,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'vaccinesReceived.status',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINE_STATUS',
+        options: data.options.vaccineStatus,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'vaccinesReceived.date',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINE_DATE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED_AT',
+        sortable: true
       }
     ];
 
@@ -222,7 +372,20 @@ export class ContactOfContactModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
       });
     }
 

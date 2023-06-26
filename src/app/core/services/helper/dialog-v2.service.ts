@@ -2099,12 +2099,46 @@ export class DialogV2Service {
                 );
 
                 // update icons
-                item.suffixIconButtons = savedData.isPublic ?
-                  [{
+                item.suffixIconButtons = [];
+
+                // public
+                if (savedData.isPublic) {
+                  item.suffixIconButtons.push({
                     tooltip: this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_IS_PUBLIC_LABEL'),
                     icon: 'public'
-                  }] :
-                  undefined;
+                  });
+                }
+
+                // readonly
+                if (savedData.readOnly) {
+                  item.suffixIconButtons.push({
+                    tooltip: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL', {
+                        name: savedData.createdByUser?.name ?
+                          savedData.createdByUser?.name :
+                          ''
+                      }
+                    ),
+                    icon: 'edit_off'
+                  });
+                }
+
+                // updated at
+                if (savedData.updatedAt) {
+                  item.suffixIconButtons.push({
+                    tooltip: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
+                        datetime: moment(savedData.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
+                      }
+                    ),
+                    icon: 'history'
+                  });
+                }
+
+                // nothing ?
+                if (item.suffixIconButtons.length < 1) {
+                  item.suffixIconButtons = undefined;
+                }
               }
             }
           }, {
