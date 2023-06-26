@@ -340,14 +340,20 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     // was case ?
     if (this.itemData.wasCase) {
       this.breadcrumbInfos.push({
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE'
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE',
+        tooltip: this.itemData.dateBecomeContactOfContact ?
+          `${this.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${moment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          undefined
       });
     }
 
     // was contact ?
     if (this.itemData.wasContact) {
       this.breadcrumbInfos.push({
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT'
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT',
+        tooltip: this.itemData.dateBecomeContactOfContact ?
+          `${this.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${moment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          undefined
       });
     }
   }

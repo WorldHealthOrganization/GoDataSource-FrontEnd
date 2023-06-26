@@ -26,4 +26,7 @@ export interface IV2Breadcrumb {
 export interface IV2BreadcrumbInfo {
   // required
   label: string;
+
+  // optional
+  tooltip?: string;
 }
