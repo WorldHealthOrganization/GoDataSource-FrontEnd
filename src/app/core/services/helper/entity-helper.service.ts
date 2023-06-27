@@ -1209,7 +1209,8 @@ export class EntityHelperService {
       exposureFrequency: ILabelValuePairModel[],
       exposureDuration: ILabelValuePairModel[],
       contextOfTransmission: ILabelValuePairModel[],
-      cluster: ILabelValuePairModel[]
+      cluster: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -1236,6 +1237,19 @@ export class EntityHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'contactDate',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+        childQueryBuilderKey: 'relationship'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfFirstContact',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
+        childQueryBuilderKey: 'relationship'
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'contactDateEstimated',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+        options: data.options.yesNo,
         childQueryBuilderKey: 'relationship'
       },
       {
@@ -1284,6 +1298,12 @@ export class EntityHelperService {
         field: 'clusterId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
         options: data.options.cluster,
+        childQueryBuilderKey: 'relationship'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'comment',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
         childQueryBuilderKey: 'relationship'
       }
     ];
