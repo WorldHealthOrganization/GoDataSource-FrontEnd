@@ -245,7 +245,7 @@
 
   <!-- Legend -->
   <div
-    *ngIf="!viewOnly"
+    *ngIf="!viewOnly && !isSmallScreenMode"
     class="gd-form-tree-editor-v2-legend"
     fxLayout="row" fxLayoutAlign="start center">
 
@@ -280,6 +280,12 @@
         class="gd-form-tree-editor-v2-legend-items-item">
         <mat-icon>playlist_add</mat-icon>
         <span>{{'LNG_COMMON_BUTTON_ADD' | translate}}</span>
+      </div>
+
+      <!-- No option selected info -->
+      <div
+        class="gd-form-tree-editor-v2-legend-items-item">
+        <span>{{'LNG_COMMON_BUTTON_ALL_BECAUSE_NONE_SELECTED' | translate}}</span>
       </div>
 
     </div>
