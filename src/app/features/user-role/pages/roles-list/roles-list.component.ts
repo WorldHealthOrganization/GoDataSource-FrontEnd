@@ -351,7 +351,13 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
           },
           action: {
             click: () => {
-              this.exportRoles(this.queryBuilder);
+              // remove the includeUsers flag because users are exported separately
+              const qb: RequestQueryBuilder = new RequestQueryBuilder();
+              qb.merge(this.queryBuilder);
+              qb.filter.removeFlag('includeUsers');
+
+              // export
+              this.exportRoles(qb);
             }
           },
           visible: (): boolean => {
@@ -559,7 +565,6 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
               ExportDataExtension.ODS,
               ExportDataExtension.PDF
             ],
-            encrypt: true,
             anonymize: {
               fields: this.roleFields
             },

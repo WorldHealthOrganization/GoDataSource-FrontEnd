@@ -643,7 +643,6 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
               ExportDataExtension.ODS,
               ExportDataExtension.PDF
             ],
-            encrypt: true,
             anonymize: {
               fields: this.teamFields
             },
