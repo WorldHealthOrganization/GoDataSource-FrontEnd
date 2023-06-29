@@ -30,6 +30,7 @@ const createViewModifyFoundation: Route = {
   canActivate: [AuthGuard],
   resolve: {
     yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
     labName: LabNameDataResolver,
     labSampleType: LabSampleTypeDataResolver,
     labTestType: LabTestTypeDataResolver,
@@ -38,7 +39,6 @@ const createViewModifyFoundation: Route = {
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
     user: UserDataResolver,
-    yesNo: YesNoDataResolver,
     entityData: PersonDataResolver,
     outbreak: SelectedOutbreakDataResolver
   }
@@ -50,6 +50,7 @@ const entityLabResultsFoundation = {
   canActivate: [AuthGuard],
   resolve: {
     yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
     labName: LabNameDataResolver,
     labSampleType: LabSampleTypeDataResolver,
     labTestType: LabTestTypeDataResolver,
@@ -58,7 +59,6 @@ const entityLabResultsFoundation = {
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
     user: UserDataResolver,
-    yesNo: YesNoDataResolver,
     entityData: PersonDataResolver,
     classification: ClassificationDataResolver
   }
@@ -83,6 +83,7 @@ const routes: Routes = [
     },
     resolve: {
       yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
       classification: ClassificationDataResolver,
       labName: LabNameDataResolver,
       labSampleType: LabSampleTypeDataResolver,

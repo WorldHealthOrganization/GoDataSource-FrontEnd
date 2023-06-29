@@ -70,7 +70,10 @@ export class LabResultModel
       labTestResult: ILabelValuePairModel[],
       labResultProgress: ILabelValuePairModel[],
       yesNoAll: ILabelValuePairModel[],
-      user: ILabelValuePairModel[]
+      yesNo: ILabelValuePairModel[],
+      user: ILabelValuePairModel[],
+      labSequenceLaboratory: ILabelValuePairModel[],
+      labSequenceResult: ILabelValuePairModel[]
     }
   }) {
     // initialize
@@ -163,6 +166,51 @@ export class LabResultModel
         field: 'notes',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'sequence.hasSequence',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+        options: data.options.yesNo,
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'sequence.dateSampleSent',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'sequence.labId',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+        options: data.options.labSequenceLaboratory,
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'sequence.dateResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'sequence.resultId',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+        options: data.options.labSequenceResult,
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'sequence.noSequenceReason',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
       },
       {
         type: V2AdvancedFilterType.DELETED,
