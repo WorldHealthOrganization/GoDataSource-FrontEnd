@@ -37,9 +37,10 @@ import {
   IV2SideDialogConfigInputToggleCheckbox,
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { UserSettings } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 /**
  * Component
@@ -1002,6 +1003,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    */
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = LabResultModel.generateAdvancedFilters({
+      authUser: this.authUser,
       selectedOutbreak: () => this.selectedOutbreak,
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -1023,7 +1025,10 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
-        )
+        ),
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }

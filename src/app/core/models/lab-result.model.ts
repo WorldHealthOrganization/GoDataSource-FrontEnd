@@ -61,12 +61,16 @@ export class LabResultModel
    * Advanced filters
    */
   static generateAdvancedFilters(data: {
+    authUser: UserModel,
     selectedOutbreak: () => OutbreakModel,
     options: {
       labName: ILabelValuePairModel[],
       labSampleType: ILabelValuePairModel[],
       labTestType: ILabelValuePairModel[],
       labTestResult: ILabelValuePairModel[],
+      labResultProgress: ILabelValuePairModel[],
+      yesNoAll: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
     }
   }) {
     // initialize
@@ -120,7 +124,8 @@ export class LabResultModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'result',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-        options: data.options.labTestResult
+        options: data.options.labTestResult,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
@@ -133,8 +138,75 @@ export class LabResultModel
         field: 'questionnaireAnswers',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         template: () => data.selectedOutbreak().labResultsTemplate
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateTesting',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'status',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+        options: data.options.labResultProgress,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'quantitativeResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'notes',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
+        sortable: true
       }
     ];
+
+    // allowed to filter by responsible user ?
+    if (UserModel.canListForFilters(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
+      });
+    }
 
     // finished
     return advancedFilters;
