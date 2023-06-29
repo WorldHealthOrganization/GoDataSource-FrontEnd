@@ -376,6 +376,26 @@ export class EntityLabResultService {
         }
       },
       {
+        field: 'notes',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'dateTesting',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
         field: 'labName',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
         sortable: true,
@@ -734,7 +754,8 @@ export class EntityLabResultService {
         type: V2AdvancedFilterType.TEXT,
         field: 'sequence.noSequenceReason',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-        useLike: true
+        useLike: true,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -888,7 +909,9 @@ export class EntityLabResultService {
       'updatedAt',
       'updatedByUser',
       'questionnaireAnswers',
-      'quantitativeResult'
+      'quantitativeResult',
+      'notes',
+      'dateTesting'
     ];
   }
 }
