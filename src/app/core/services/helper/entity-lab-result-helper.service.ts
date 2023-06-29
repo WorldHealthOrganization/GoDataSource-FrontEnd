@@ -430,6 +430,15 @@ export class EntityLabResultService {
         }
       },
       {
+        field: 'quantitativeResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'sequence.hasSequence',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
         notVisible: true,
@@ -737,6 +746,12 @@ export class EntityLabResultService {
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         template: data.labResultsTemplate,
         useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'quantitativeResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+        sortable: true
       }
     ];
 
@@ -821,7 +836,8 @@ export class EntityLabResultService {
       'updatedBy',
       'updatedAt',
       'updatedByUser',
-      'questionnaireAnswers'
+      'questionnaireAnswers',
+      'quantitativeResult'
     ];
   }
 }
