@@ -40,7 +40,8 @@ const createViewModifyFoundation: Route = {
     labSequenceResult: LabSequenceResultDataResolver,
     user: UserDataResolver,
     entityData: PersonDataResolver,
-    outbreak: SelectedOutbreakDataResolver
+    outbreak: SelectedOutbreakDataResolver,
+    classification: ClassificationDataResolver
   }
 };
 

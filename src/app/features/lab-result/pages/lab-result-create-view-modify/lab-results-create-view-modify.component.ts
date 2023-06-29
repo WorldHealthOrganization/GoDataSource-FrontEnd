@@ -1039,6 +1039,11 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
+        ),
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
         )
       }
     });

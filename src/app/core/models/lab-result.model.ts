@@ -73,11 +73,41 @@ export class LabResultModel
       yesNo: ILabelValuePairModel[],
       user: ILabelValuePairModel[],
       labSequenceLaboratory: ILabelValuePairModel[],
-      labSequenceResult: ILabelValuePairModel[]
+      labSequenceResult: ILabelValuePairModel[],
+      classification: ILabelValuePairModel[]
     }
   }) {
     // initialize
     const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID',
+        relationshipPath: ['person'],
+        sortable: 'person.visualId'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_LAST_NAME',
+        relationshipPath: ['person'],
+        sortable: 'person.lastName'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_FIRST_NAME',
+        relationshipPath: ['person'],
+        sortable: 'person.firstName'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'classification',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
+        options: data.options.classification,
+        relationshipPath: ['person'],
+        sortable: 'person.classification'
+      },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'sampleIdentifier',
