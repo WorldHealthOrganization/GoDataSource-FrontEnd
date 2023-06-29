@@ -593,6 +593,18 @@ export class EntityLabResultService {
         filter: {
           type: V2FilterType.DATE_RANGE
         }
+      },
+      {
+        field: 'deletedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
 
@@ -603,6 +615,7 @@ export class EntityLabResultService {
    * Advanced filters
    */
   generateAdvancedFilters(data: {
+    authUser: UserModel,
     labResultsTemplate: () => QuestionModel[],
     options: {
       labName: ILabelValuePairModel[],
@@ -612,7 +625,9 @@ export class EntityLabResultService {
       labResultProgress: ILabelValuePairModel[],
       labSequenceLaboratory: ILabelValuePairModel[],
       labSequenceResult: ILabelValuePairModel[],
+      yesNoAll: ILabelValuePairModel[],
       yesNo: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -722,13 +737,6 @@ export class EntityLabResultService {
         useLike: true
       },
       {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'deleted',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
-        sortable: true,
-        options: data.options.yesNo
-      },
-      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateTesting',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
@@ -752,8 +760,50 @@ export class EntityLabResultService {
         field: 'quantitativeResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
+        sortable: true
       }
     ];
+
+    // allowed to filter by user ?
+    if (UserModel.canListForFilters(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
+      });
+    }
 
     // finished
     return advancedFilters;
@@ -830,6 +880,7 @@ export class EntityLabResultService {
       'testedFor',
       'sequence',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdAt',
       'createdByUser',
