@@ -37,6 +37,7 @@ import { Moment } from 'moment/moment';
 import * as momentOriginal from 'moment/moment';
 import { Constants } from '../../../../core/models/constants';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-entity-lab-results-list',
@@ -267,6 +268,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = this.entityLabResultService.generateAdvancedFilters({
+      authUser: this.authUser,
       labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -300,7 +302,9 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
           (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
-        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }
