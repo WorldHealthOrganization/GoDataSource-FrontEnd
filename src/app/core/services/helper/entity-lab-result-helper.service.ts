@@ -376,6 +376,26 @@ export class EntityLabResultService {
         }
       },
       {
+        field: 'notes',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'dateTesting',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
         field: 'labName',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
         sortable: true,
@@ -423,6 +443,15 @@ export class EntityLabResultService {
       {
         field: 'testedFor',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'quantitativeResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -584,6 +613,18 @@ export class EntityLabResultService {
         filter: {
           type: V2FilterType.DATE_RANGE
         }
+      },
+      {
+        field: 'deletedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
 
@@ -594,6 +635,7 @@ export class EntityLabResultService {
    * Advanced filters
    */
   generateAdvancedFilters(data: {
+    authUser: UserModel,
     labResultsTemplate: () => QuestionModel[],
     options: {
       labName: ILabelValuePairModel[],
@@ -603,7 +645,9 @@ export class EntityLabResultService {
       labResultProgress: ILabelValuePairModel[],
       labSequenceLaboratory: ILabelValuePairModel[],
       labSequenceResult: ILabelValuePairModel[],
+      yesNoAll: ILabelValuePairModel[],
       yesNo: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -710,14 +754,8 @@ export class EntityLabResultService {
         type: V2AdvancedFilterType.TEXT,
         field: 'sequence.noSequenceReason',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-        useLike: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'deleted',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
-        sortable: true,
-        options: data.options.yesNo
+        useLike: true,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -737,8 +775,56 @@ export class EntityLabResultService {
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         template: data.labResultsTemplate,
         useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'quantitativeResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
+        sortable: true
       }
     ];
+
+    // allowed to filter by user ?
+    if (UserModel.canListForFilters(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
+      });
+    }
 
     // finished
     return advancedFilters;
@@ -815,13 +901,17 @@ export class EntityLabResultService {
       'testedFor',
       'sequence',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdAt',
       'createdByUser',
       'updatedBy',
       'updatedAt',
       'updatedByUser',
-      'questionnaireAnswers'
+      'questionnaireAnswers',
+      'quantitativeResult',
+      'notes',
+      'dateTesting'
     ];
   }
 }

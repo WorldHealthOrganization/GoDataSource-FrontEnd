@@ -39,6 +39,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { Location } from '@angular/common';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -322,15 +323,28 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       redirectAfterCreateUpdate: (data: RelationshipModel | RelationshipModel[]) => {
         // bulk create ?
         if (Array.isArray(data)) {
-          // redirect to view
-          this.router.navigate([
-            '/relationships',
-            this._entity.type,
-            this._entity.id,
-            this.relationshipType === RelationshipType.CONTACT ?
-              'contacts' :
-              'exposures'
-          ]);
+          // redirect to list / view ?
+          if (data.length === 1) {
+            this.router.navigate([
+              '/relationships',
+              this._entity.type,
+              this._entity.id,
+              this.relationshipType === RelationshipType.CONTACT ?
+                'contacts' :
+                'exposures',
+              data[0].id,
+              'view'
+            ]);
+          } else {
+            this.router.navigate([
+              '/relationships',
+              this._entity.type,
+              this._entity.id,
+              this.relationshipType === RelationshipType.CONTACT ?
+                'contacts' :
+                'exposures'
+            ]);
+          }
 
           // finished
           return;
@@ -867,7 +881,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
           (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
-        cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+        cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
       }
     });
   }

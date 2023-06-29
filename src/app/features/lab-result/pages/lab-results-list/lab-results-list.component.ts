@@ -666,6 +666,35 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         }
       },
       {
+        field: 'dateTesting',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'quantitativeResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'notes',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'deleted',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
         notVisible: true,
@@ -678,6 +707,18 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           value: false,
           defaultValue: false
         }
+      },
+      {
+        field: 'deletedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       },
       {
         field: 'createdBy',
@@ -841,6 +882,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
    */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = LabResultModel.generateAdvancedFilters({
+      authUser: this.authUser,
       selectedOutbreak: () => this.selectedOutbreak,
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -861,6 +903,25 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         )
       }
@@ -1338,18 +1399,22 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       'dateOfResult',
       'labName',
       'sampleType',
+      'dateTesting',
       'testType',
       'result',
       'status',
       'testedFor',
       'sequence',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdAt',
       'updatedBy',
       'updatedAt',
       'personType',
-      'questionnaireAnswers'
+      'questionnaireAnswers',
+      'quantitativeResult',
+      'notes'
     ];
   }
 
