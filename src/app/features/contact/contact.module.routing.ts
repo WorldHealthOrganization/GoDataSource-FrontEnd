@@ -16,8 +16,8 @@ import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolv
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
-import { VaccineStatusDataResolver } from './../../core/services/resolvers/data/vaccine-status.resolver';
-import { VaccineDataResolver } from './../../core/services/resolvers/data/vaccine.resolver';
+import { VaccineStatusDataResolver } from '../../core/services/resolvers/data/vaccine-status.resolver';
+import { VaccineDataResolver } from '../../core/services/resolvers/data/vaccine.resolver';
 import * as fromPages from './pages';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { DocumentTypeDataResolver } from '../../core/services/resolvers/data/document-type.resolver';
@@ -50,11 +50,12 @@ const viewFollowUpsListFoundation: Route = {
   canActivate: [AuthGuard],
   resolve: {
     yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
     team: TeamDataResolver,
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
     user: UserDataResolver,
     entityData: PersonDataResolver,
-    yesNo: YesNoDataResolver
+    addressType: AddressTypeDataResolver
   }
 };
 
@@ -64,16 +65,17 @@ const dailyFollowUpsListFoundation: Route = {
   canActivate: [AuthGuard],
   resolve: {
     yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
     team: TeamDataResolver,
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
     risk: RiskDataResolver,
     user: UserDataResolver,
-    yesNo: YesNoDataResolver,
     gender: GenderDataResolver,
     occupation: OccupationDataResolver,
     classification: ClassificationDataResolver,
     outcome: OutcomeDataResolver,
-    entityData: PersonDataResolver
+    entityData: PersonDataResolver,
+    addressType: AddressTypeDataResolver
   }
 };
 
@@ -131,7 +133,8 @@ const followUpFoundation: Route = {
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
     team: TeamDataResolver,
     addressType: AddressTypeDataResolver,
-    yesNoAll: YesNoAllDataResolver
+    yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver
   }
 };
 

@@ -755,8 +755,10 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       options: {
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }

@@ -238,8 +238,10 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
       options: {
         team: (this.route.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         yesNoAll: (this.route.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.route.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         dailyFollowUpStatus: (this.route.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        user: (this.route.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        user: (this.route.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        addressType: (this.route.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }
