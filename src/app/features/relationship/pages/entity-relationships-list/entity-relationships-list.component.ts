@@ -25,6 +25,7 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
 import { UserModel } from '../../../../core/models/user.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-entity-relationships-list',
@@ -186,7 +187,8 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
           (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
-        cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+        cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
       }
     });
   }

@@ -4,7 +4,7 @@ import {
   Component,
   EventEmitter,
   forwardRef,
-  Host,
+  Host, HostListener,
   Input,
   OnDestroy,
   Optional,
@@ -23,6 +23,7 @@ import { v4 as uuid } from 'uuid';
 import {
   ICreateViewModifyV2TabTableTreeAddNewItem
 } from '../../../components-v2/app-create-view-modify-v2/models/tab.model';
+import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
 
 /**
  * Flatten type
@@ -160,6 +161,9 @@ export class AppFormTreeEditorV2Component
   // copy checkbox value on drag
   copyCheckbox: boolean;
 
+  // small screen mode ?
+  isSmallScreenMode: boolean = false;
+
   // timers
   private _filterTimer: number;
   private _startCopyTimer: number;
@@ -189,6 +193,9 @@ export class AppFormTreeEditorV2Component
       i18nService,
       changeDetectorRef
     );
+
+    // update render mode
+    this.updateRenderMode();
 
     // subscribe to language change
     this.initializeLanguageChangeListener();
@@ -953,5 +960,14 @@ export class AppFormTreeEditorV2Component
 
     // update ui
     this.detectChanges();
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // small screen mode ?
+    this.isSmallScreenMode = determineIfSmallScreenMode();
   }
 }

@@ -61,16 +61,53 @@ export class LabResultModel
    * Advanced filters
    */
   static generateAdvancedFilters(data: {
+    authUser: UserModel,
     selectedOutbreak: () => OutbreakModel,
     options: {
       labName: ILabelValuePairModel[],
       labSampleType: ILabelValuePairModel[],
       labTestType: ILabelValuePairModel[],
       labTestResult: ILabelValuePairModel[],
+      labResultProgress: ILabelValuePairModel[],
+      yesNoAll: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[],
+      user: ILabelValuePairModel[],
+      labSequenceLaboratory: ILabelValuePairModel[],
+      labSequenceResult: ILabelValuePairModel[],
+      classification: ILabelValuePairModel[]
     }
   }) {
     // initialize
     const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID',
+        relationshipPath: ['person'],
+        sortable: 'person.visualId'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_LAST_NAME',
+        relationshipPath: ['person'],
+        sortable: 'person.lastName'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_FIRST_NAME',
+        relationshipPath: ['person'],
+        sortable: 'person.firstName'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'classification',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
+        options: data.options.classification,
+        relationshipPath: ['person'],
+        sortable: 'person.classification'
+      },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'sampleIdentifier',
@@ -120,7 +157,8 @@ export class LabResultModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'result',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-        options: data.options.labTestResult
+        options: data.options.labTestResult,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
@@ -133,8 +171,120 @@ export class LabResultModel
         field: 'questionnaireAnswers',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         template: () => data.selectedOutbreak().labResultsTemplate
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateTesting',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'status',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+        options: data.options.labResultProgress,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'quantitativeResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'notes',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'sequence.hasSequence',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+        options: data.options.yesNo,
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'sequence.dateSampleSent',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'sequence.labId',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+        options: data.options.labSequenceLaboratory,
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'sequence.dateResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'sequence.resultId',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+        options: data.options.labSequenceResult,
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'sequence.noSequenceReason',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
+        sortable: true
       }
     ];
+
+    // allowed to filter by user ?
+    if (UserModel.canListForFilters(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
+      });
+    }
 
     // finished
     return advancedFilters;
