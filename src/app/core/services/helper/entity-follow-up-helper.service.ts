@@ -930,25 +930,29 @@ export class EntityFollowUpHelperService {
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'teamId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-        options: data.options.team
+        options: data.options.team,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'targeted',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-        options: data.options.yesNoAll
+        options: data.options.yesNoAll,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'statusId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-        options: data.options.dailyFollowUpStatus
+        options: data.options.dailyFollowUpStatus,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.NUMBER,
@@ -967,6 +971,12 @@ export class EntityFollowUpHelperService {
           _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.DATE], { value: V2AdvancedFilterComparatorType.DATE })
         ],
         flagIt: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'index',
+        label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
