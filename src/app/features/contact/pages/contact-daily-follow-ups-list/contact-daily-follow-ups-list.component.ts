@@ -1175,6 +1175,18 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       },
       {
+        field: 'deletedAt',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
         notVisible: true,
@@ -1379,17 +1391,106 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'questionnaireAnswers',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         template: (): QuestionModel[] => this.selectedOutbreak.contactFollowUpTemplate
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.emailAddress',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'address.geoLocationAccurate',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
+        options: this.activatedRoute.snapshot.data.yesNo.options,
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'address.typeId',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_TYPE',
+        options: this.activatedRoute.snapshot.data.addressType.options,
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'address.date',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_DATE',
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.city',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_CITY',
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.postalCode',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_POSTAL_CODE',
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+        field: 'address',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
+        isArray: false,
+        sortable: 'address.phoneNumber'
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
+        yesNoAllOptions: this.activatedRoute.snapshot.data.yesNoAll.options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT',
+        sortable: true
       }
     ];
 
-    // allowed to filter by responsible user ?
+    // allowed to filter by user ?
     if (UserModel.canListForFilters(this.authUser)) {
       this.advancedFilters.push(
         {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'responsibleUserId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
-          options: this.activatedRoute.snapshot.data.user.options
+          options: this.activatedRoute.snapshot.data.user.options,
+          sortable: true
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'createdBy',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
+          options: this.activatedRoute.snapshot.data.user.options,
+          sortable: true
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'updatedBy',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
+          options: this.activatedRoute.snapshot.data.user.options,
+          sortable: true
         }
       );
     }
