@@ -54,7 +54,8 @@ const viewFollowUpsListFoundation: Route = {
     team: TeamDataResolver,
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
     user: UserDataResolver,
-    entityData: PersonDataResolver
+    entityData: PersonDataResolver,
+    addressType: AddressTypeDataResolver
   }
 };
 
@@ -132,7 +133,8 @@ const followUpFoundation: Route = {
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
     team: TeamDataResolver,
     addressType: AddressTypeDataResolver,
-    yesNoAll: YesNoAllDataResolver
+    yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver
   }
 };
 
