@@ -1423,7 +1423,8 @@ export class DialogV2Service {
                   filterDefinition.field,
                   appliedFilter.value,
                   false,
-                  true
+                  true,
+                  filterDefinition.useLike
                 );
 
                 // finished
