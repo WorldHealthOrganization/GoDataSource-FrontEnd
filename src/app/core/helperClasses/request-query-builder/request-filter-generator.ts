@@ -166,6 +166,7 @@ export class RequestFilterGenerator {
   static hasValue(field: string) {
     // since some mongo filters don't work with $neq null / $eq null, we need to find different solution
     return {
+      // needs to be an object with just one property otherwise loopback sends to mongo when using find only the first property and its value and ignores all others, this is why we need to use $and
       $and: [
         {
           [field]: {
@@ -201,7 +202,7 @@ export class RequestFilterGenerator {
           }
         }, {
           [field]: {
-            $type: 'null'
+            $eq: null
           }
         }, {
           [field]: {
@@ -217,7 +218,7 @@ export class RequestFilterGenerator {
           }
         }, {
           [field]: {
-            type: 'null'
+            eq: null
           }
         }, {
           [field]: {
