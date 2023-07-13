@@ -699,16 +699,15 @@ export class RequestFilter {
   }
 
   /**
-     * Filter all records that have a value on a specific field
-     * @param property
-     */
-  byHasValue(
-    property: string
-  ): RequestFilter {
+   * Filter all records that have a value on a specific field
+   */
+  byHasValue(property: string): RequestFilter {
     // filter no values
-    this.where({
-      [property]: RequestFilterGenerator.hasValue()
-    }, false, false);
+    this.where(
+      RequestFilterGenerator.hasValue(property),
+      false,
+      false
+    );
 
     // trigger change
     this.triggerChangeListener();

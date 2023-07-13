@@ -161,16 +161,26 @@ export class RequestFilterGenerator {
   }
 
   /**
-     * Check if field has value
-     */
-  static hasValue() {
+   * Check if field has value
+   */
+  static hasValue(field: string) {
     // since some mongo filters don't work with $neq null / $eq null, we need to find different solution
     return {
-      exists: true,
-      not: {
-        $type: 'null'
-      },
-      $ne: ''
+      $and: [
+        {
+          [field]: {
+            $exists: true
+          }
+        }, {
+          [field]: {
+            $ne: null
+          }
+        }, {
+          [field]: {
+            $ne: ''
+          }
+        }
+      ]
     };
   }
 
