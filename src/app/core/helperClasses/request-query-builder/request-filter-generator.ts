@@ -14,27 +14,38 @@ export class RequestFilterGenerator {
   }
 
   /**
-     * Text is exactly the provided value ( case insensitive )
-     * @param value
-     */
-  static textIs(value: string): any {
-    return {
-      regexp: '/^' +
-        RequestFilterGenerator.escapeStringForRegex(value)
-          .replace(/%/g, '.*')
-          .replace(/\\\?/g, '.')
-          .replace(/&/g, '%26')
-          .replace(/#/g, '%23')
-          .replace(/\+/g, '%2B') +
-        '$/i'
-    };
+   * Text is exactly the provided value ( case-insensitive )
+   */
+  static textIs(
+    value: string,
+    useLike?: boolean
+  ): any {
+    return useLike ?
+      {
+        like: '^' +
+          RequestFilterGenerator.escapeStringForRegex(value)
+            .replace(/%/g, '.*')
+            .replace(/\\\?/g, '.')
+            .replace(/&/g, '%26')
+            .replace(/#/g, '%23')
+            .replace(/\+/g, '%2B') +
+          '$',
+        options: 'i'
+      } : {
+        regexp: '/^' +
+          RequestFilterGenerator.escapeStringForRegex(value)
+            .replace(/%/g, '.*')
+            .replace(/\\\?/g, '.')
+            .replace(/&/g, '%26')
+            .replace(/#/g, '%23')
+            .replace(/\+/g, '%2B') +
+          '$/i'
+      };
   }
 
   /**
-     * Text contains the provided value ( case insensitive )
-     * @param value
-     * @param useLike
-     */
+   * Text contains the provided value ( case-insensitive )
+   */
   static textContains(
     value: string,
     useLike?: boolean
@@ -150,16 +161,27 @@ export class RequestFilterGenerator {
   }
 
   /**
-     * Check if field has value
-     */
-  static hasValue() {
+   * Check if field has value
+   */
+  static hasValue(field: string) {
     // since some mongo filters don't work with $neq null / $eq null, we need to find different solution
     return {
-      exists: true,
-      not: {
-        $type: 'null'
-      },
-      $ne: ''
+      // needs to be an object with just one property otherwise loopback sends to mongo when using find only the first property and its value and ignores all others, this is why we need to use $and
+      $and: [
+        {
+          [field]: {
+            $exists: true
+          }
+        }, {
+          [field]: {
+            $ne: null
+          }
+        }, {
+          [field]: {
+            $ne: ''
+          }
+        }
+      ]
     };
   }
 
@@ -180,7 +202,7 @@ export class RequestFilterGenerator {
           }
         }, {
           [field]: {
-            $type: 'null'
+            $eq: null
           }
         }, {
           [field]: {
@@ -196,7 +218,7 @@ export class RequestFilterGenerator {
           }
         }, {
           [field]: {
-            type: 'null'
+            eq: null
           }
         }, {
           [field]: {
