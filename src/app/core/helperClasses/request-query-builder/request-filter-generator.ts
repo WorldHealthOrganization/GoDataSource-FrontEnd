@@ -180,6 +180,12 @@ export class RequestFilterGenerator {
           [field]: {
             $ne: ''
           }
+        }, {
+          [field]: {
+            $not: {
+              $size: 0
+            }
+          }
         }
       ]
     };
