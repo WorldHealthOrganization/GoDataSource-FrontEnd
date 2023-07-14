@@ -306,7 +306,8 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
         link: (user: UserModel) => {
           return user.activeOutbreakId &&
             OutbreakModel.canView(this.authUser) &&
-            (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId] ?
+            (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId] &&
+            !(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId].deleted ?
             `/outbreaks/${user.activeOutbreakId}/view` :
             undefined;
         },
@@ -328,7 +329,8 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
             .map((outbreakId) => {
               return {
                 label: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].name,
-                href: OutbreakModel.canView(this.authUser) ?
+                href: OutbreakModel.canView(this.authUser) &&
+                  !(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].deleted ?
                   `/outbreaks/${outbreakId}/view` :
                   null
               };

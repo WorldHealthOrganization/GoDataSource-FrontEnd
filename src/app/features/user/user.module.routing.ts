@@ -38,7 +38,8 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.USER_LIST
-      ]
+      ],
+      outbreakIncludeDeleted: true
     },
     resolve: {
       team: TeamDataResolver,
