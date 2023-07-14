@@ -69,7 +69,8 @@ export class OutbreakDataResolver implements IMapResolverV2<OutbreakModel> {
             response.options.push({
               label: item.name,
               value: item.id,
-              data: item
+              data: item,
+              disabled: !!item.deleted
             });
           });
 
