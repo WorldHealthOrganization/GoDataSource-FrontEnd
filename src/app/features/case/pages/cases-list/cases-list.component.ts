@@ -1527,7 +1527,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
-          buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
+          buttonLabel: (item) => item.numberOfContacts === 0 ?
+            item.numberOfContacts.toLocaleString('en') :
+            (item.numberOfContacts || '').toLocaleString('en'),
           color: 'text',
           click: (item) => {
             // if we do not have contacts return
@@ -1555,7 +1557,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
-          buttonLabel: (item) => (item.numberOfExposures || '').toLocaleString('en'),
+          buttonLabel: (item) => item.numberOfExposures === 0 ?
+            item.numberOfExposures.toLocaleString('en') :
+            (item.numberOfExposures || '').toLocaleString('en'),
           color: 'text',
           click: (item) => {
             // if we do not have exposures return
