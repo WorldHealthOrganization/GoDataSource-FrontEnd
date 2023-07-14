@@ -1617,7 +1617,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
-                  true,
+                  false,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
