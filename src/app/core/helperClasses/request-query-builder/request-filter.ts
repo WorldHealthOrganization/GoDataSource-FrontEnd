@@ -721,12 +721,14 @@ export class RequestFilter {
    */
   byNotHavingValue(
     property: string,
+    checkForEmptyString: boolean,
     forMongo: boolean = false
   ): RequestFilter {
     // filter no values
     this.where(
       RequestFilterGenerator.doesntHaveValue(
         property,
+        checkForEmptyString,
         forMongo
       ),
       false,

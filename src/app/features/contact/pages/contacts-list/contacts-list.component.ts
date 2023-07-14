@@ -2445,7 +2445,10 @@ export class ContactsListComponent
           item.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED'
         ) {
           // clear
-          this.queryBuilder.filter.byNotHavingValue('riskLevel');
+          this.queryBuilder.filter.byNotHavingValue(
+            'riskLevel',
+            true
+          );
         } else {
           // search
           this.queryBuilder.filter.byEquality(

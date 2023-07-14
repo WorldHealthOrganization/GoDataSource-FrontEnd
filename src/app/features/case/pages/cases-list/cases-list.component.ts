@@ -2487,7 +2487,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           );
         } else if (item.label === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED') {
           // clear
-          this.queryBuilder.filter.byNotHavingValue('classification');
+          this.queryBuilder.filter.byNotHavingValue(
+            'classification',
+            true
+          );
         } else {
           // search
           this.queryBuilder.filter.byEquality(

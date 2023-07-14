@@ -1453,6 +1453,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  true,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1616,6 +1617,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  true,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1661,6 +1663,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  false,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1720,6 +1723,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  true,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1926,7 +1930,10 @@ export class DialogV2Service {
                   query[key] = condition[key];
                 } else if (extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE) {
                   // handle no value case
-                  const condition: any = RequestFilterGenerator.doesntHaveValue(`${filterDefinition.field}.${question.variable}.0.value`);
+                  const condition: any = RequestFilterGenerator.doesntHaveValue(
+                    `${filterDefinition.field}.${question.variable}.0.value`,
+                    true
+                  );
                   const key: string = Object.keys(condition)[0];
                   query[key] = condition[key];
                 }
@@ -1946,6 +1953,7 @@ export class DialogV2Service {
                   // handle no value case
                   const condition: any = RequestFilterGenerator.doesntHaveValue(
                     'value',
+                    true,
                     true
                   );
                   const key: string = Object.keys(condition)[0];
