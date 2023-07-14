@@ -1819,7 +1819,10 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.FREE_TEXT.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.IS:
-                        valueQuery = RequestFilterGenerator.textIs(value);
+                        valueQuery = RequestFilterGenerator.textIs(
+                          value,
+                          filterDefinition.useLike
+                        );
                         break;
                       case V2AdvancedFilterComparatorType.CONTAINS_TEXT:
                         valueQuery = RequestFilterGenerator.textContains(
