@@ -258,6 +258,18 @@ export class OutbreakModel
         field: 'periodOfFollowup',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'frequencyOfFollowUpPerDay',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'intervalOfFollowUp',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS',
+        sortable: true
       }
     ];
 

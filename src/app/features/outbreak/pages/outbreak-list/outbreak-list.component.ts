@@ -917,6 +917,25 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         notVisible: true
       },
       {
+        field: 'frequencyOfFollowUpPerDay',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'intervalOfFollowUp',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'deleted',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
         sortable: true,
@@ -1110,6 +1129,8 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'applyGeographicRestrictions',
       'isContactsOfContactsActive',
       'periodOfFollowup',
+      'frequencyOfFollowUpPerDay',
+      'intervalOfFollowUp',
       'deleted',
       'createdBy',
       'createdAt',
