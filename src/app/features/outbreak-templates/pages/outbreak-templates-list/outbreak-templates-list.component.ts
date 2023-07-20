@@ -610,6 +610,7 @@ export class OutbreakTemplatesListComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     this.outbreakTemplateDataService
       .getOutbreakTemplatesCount(countQueryBuilder)

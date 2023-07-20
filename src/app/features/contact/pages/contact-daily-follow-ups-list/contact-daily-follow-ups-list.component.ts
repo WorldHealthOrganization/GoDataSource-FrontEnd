@@ -2565,6 +2565,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     const countQueryBuilder = _.cloneDeep(qb);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
