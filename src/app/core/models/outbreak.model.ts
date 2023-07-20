@@ -282,6 +282,30 @@ export class OutbreakModel
         field: 'noDaysInChains',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'noDaysNotSeen',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'noLessContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'longPeriodsBetweenCaseOnset',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'noDaysNewContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT',
+        sortable: true
       }
     ];
 

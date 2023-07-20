@@ -956,6 +956,46 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         notVisible: true
       },
       {
+        field: 'noDaysNotSeen',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noLessContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'longPeriodsBetweenCaseOnset',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noDaysNewContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
         field: 'deleted',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
         sortable: true,
@@ -1153,6 +1193,10 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'intervalOfFollowUp',
       'noDaysAmongContacts',
       'noDaysInChains',
+      'noDaysNotSeen',
+      'noLessContacts',
+      'longPeriodsBetweenCaseOnset',
+      'noDaysNewContacts',
       'deleted',
       'createdBy',
       'createdAt',
