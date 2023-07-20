@@ -252,6 +252,12 @@ export class OutbreakModel
         label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE',
         options: data.options.yesNo,
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'periodOfFollowup',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS',
+        sortable: true
       }
     ];
 

@@ -907,6 +907,16 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
+        field: 'periodOfFollowup',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
         field: 'deleted',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
         sortable: true,
@@ -1099,6 +1109,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'contactOfContactIdMask',
       'applyGeographicRestrictions',
       'isContactsOfContactsActive',
+      'periodOfFollowup',
       'deleted',
       'createdBy',
       'createdAt',
