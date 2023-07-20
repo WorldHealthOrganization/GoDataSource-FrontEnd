@@ -1691,6 +1691,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
         // inputs
         inputs: checkboxInputs,
+        width: '55rem',
 
         // buttons
         bottomButtons: [{
