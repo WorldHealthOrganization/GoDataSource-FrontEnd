@@ -849,9 +849,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // already called
     delete this._callWhenReady.updateColumnDefinitions;
 
-    // reset data
-    this.legends = [];
-
     // nothing to do ?
     if (!this._columns) {
       // reset
@@ -1078,7 +1075,47 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         lockPosition: column.lockPosition,
         headerComponent: AppListTableV2ColumnHeaderComponent
       });
+    };
 
+    // keep order of columns
+    if (
+      visibleColumns &&
+      visibleColumns.length > 0
+    ) {
+      // render column in order of visibility
+      // - order changed by user
+      visibleColumns.forEach((field) => {
+        // not found in definitions ?
+        if (!visibleColumnsMap[field]) {
+          // don't render it
+          // - it might've been removed from definitions
+          return;
+        }
+
+        // render column
+        renderColumn(visibleColumnsMap[field]);
+      });
+
+      // render always visible columns too
+      this._columns.forEach((column) => {
+        // no always visible ?
+        if (!column.alwaysVisible) {
+          return;
+        }
+
+        // render column
+        renderColumn(column);
+      });
+    } else {
+      // process columns in default order
+      this._columns.forEach((column) => {
+        renderColumn(column);
+      });
+    }
+
+    // legends should always be visible no matter if the column is visible because legends might contain information from other columns too and not only from the one that isn't visible
+    this.legends = [];
+    this._columns.forEach((column) => {
       // update legends
       if (column.format?.type === V2ColumnFormat.STATUS) {
         // get column def
@@ -1129,43 +1166,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           });
         });
       }
-    };
-
-    // keep order of columns
-    if (
-      visibleColumns &&
-      visibleColumns.length > 0
-    ) {
-      // render column in order of visibility
-      // - order changed by user
-      visibleColumns.forEach((field) => {
-        // not found in definitions ?
-        if (!visibleColumnsMap[field]) {
-          // don't render it
-          // - it might've been removed from definitions
-          return;
-        }
-
-        // render column
-        renderColumn(visibleColumnsMap[field]);
-      });
-
-      // render always visible columns too
-      this._columns.forEach((column) => {
-        // no always visible ?
-        if (!column.alwaysVisible) {
-          return;
-        }
-
-        // render column
-        renderColumn(column);
-      });
-    } else {
-      // process columns in default order
-      this._columns.forEach((column) => {
-        renderColumn(column);
-      });
-    }
+    });
 
     // attach actions column to the start or to the end depending on if small or big screen
     if (this.columnActions) {
