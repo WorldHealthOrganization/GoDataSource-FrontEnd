@@ -879,6 +879,20 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
+        field: 'applyGeographicRestrictions',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
         field: 'deleted',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
         sortable: true,
@@ -1069,6 +1083,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'caseIdMask',
       'contactIdMask',
       'contactOfContactIdMask',
+      'applyGeographicRestrictions',
       'deleted',
       'createdBy',
       'createdAt',

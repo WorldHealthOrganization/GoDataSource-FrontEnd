@@ -238,6 +238,13 @@ export class OutbreakModel
         field: 'contactOfContactIdMask',
         label: 'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'applyGeographicRestrictions',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS',
+        options: data.options.yesNo,
+        sortable: true
       }
     ];
 
