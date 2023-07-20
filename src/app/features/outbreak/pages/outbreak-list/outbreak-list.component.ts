@@ -936,6 +936,26 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
+        field: 'noDaysAmongContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noDaysInChains',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
         field: 'deleted',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
         sortable: true,
@@ -1131,6 +1151,8 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'periodOfFollowup',
       'frequencyOfFollowUpPerDay',
       'intervalOfFollowUp',
+      'noDaysAmongContacts',
+      'noDaysInChains',
       'deleted',
       'createdBy',
       'createdAt',
