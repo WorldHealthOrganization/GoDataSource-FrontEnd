@@ -208,6 +208,36 @@ export class OutbreakModel
         type: V2AdvancedFilterType.LOCATION_MULTIPLE,
         field: 'locationIds',
         label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATIONS'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'description',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'eventIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_EVENT_ID_MASK',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'caseIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contactIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contactOfContactIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK',
+        sortable: true
       }
     ];
 

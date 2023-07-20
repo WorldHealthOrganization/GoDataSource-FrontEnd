@@ -834,6 +834,51 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
+        field: 'description',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'eventIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_EVENT_ID_MASK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'caseIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'contactIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'contactOfContactIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'deleted',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
         sortable: true,
@@ -1019,6 +1064,11 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'isDateOfOnsetRequired',
       'generateFollowUpsDateOfLastContact',
       'locationIds',
+      'description',
+      'eventIdMask',
+      'caseIdMask',
+      'contactIdMask',
+      'contactOfContactIdMask',
       'deleted',
       'createdBy',
       'createdAt',
