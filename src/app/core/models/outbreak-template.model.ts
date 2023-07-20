@@ -53,10 +53,12 @@ export class OutbreakTemplateModel
    * Advanced filters
    */
   static generateAdvancedFilters(data: {
+    authUser: UserModel,
     options: {
       disease: ILabelValuePairModel[],
       followUpGenerationTeamAssignmentAlgorithm: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[]
+      yesNo: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -203,8 +205,35 @@ export class OutbreakTemplateModel
         field: 'noDaysNewContacts',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_UPDATED_AT',
+        sortable: true
       }
     ];
+
+    // allowed to filter by user ?
+    if (UserModel.canListForFilters(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_CREATED_BY',
+        options: data.options.user
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user
+      });
+    }
 
     // finished
     return advancedFilters;

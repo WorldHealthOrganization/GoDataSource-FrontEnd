@@ -36,6 +36,7 @@ import {
   IV2BottomDialogConfigButtonType
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import * as _ from 'lodash';
+import { UserModel } from '../../../../core/models/user.model';
 
 /**
  * Component
@@ -978,10 +979,12 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
    */
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = OutbreakTemplateModel.generateAdvancedFilters({
+      authUser: this.authUser,
       options: {
         disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }

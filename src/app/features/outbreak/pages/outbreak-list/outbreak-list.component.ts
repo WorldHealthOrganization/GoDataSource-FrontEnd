@@ -1025,6 +1025,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         field: 'createdBy',
         label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY',
         notVisible: true,
+        sortable: true,
         format: {
           type: 'createdByUser.name'
         },
@@ -1058,6 +1059,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         field: 'updatedBy',
         label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
+        sortable: true,
         format: {
           type: 'updatedByUser.name'
         },
