@@ -119,6 +119,16 @@ a.mat-icon-button {
     }
   }
 
+  &.gd-form-select-single-v2-suffix-button-no-click {
+    &:hover {
+      cursor: default;
+
+      .mat-button-focus-overlay {
+        @include opacity(0);
+      }
+    }
+  }
+
   .mat-button-wrapper {
     @include flex(flex);
     @include flex_align_items(center);

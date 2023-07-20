@@ -174,23 +174,3 @@
     }
   }
 }
-
-.gd-create-view-modify-view {
-  .gd-create-view-modify-bottom {
-    .mat-tab-group {
-      .mat-tab-header {
-        @include breakpoint('lg') {
-          padding-left: 6rem;
-        }
-
-        @include breakpoint('lt-md') {
-          padding-left: 7.2rem;
-        }
-
-        @include breakpoint('xs') {
-          padding-left: 4rem;
-        }
-      }
-    }
-  }
-}
