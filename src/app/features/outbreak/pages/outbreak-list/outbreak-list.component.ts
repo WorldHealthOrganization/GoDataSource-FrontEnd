@@ -1010,6 +1010,18 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
+        field: 'deletedAt',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY',
         notVisible: true,
@@ -1198,6 +1210,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'longPeriodsBetweenCaseOnset',
       'noDaysNewContacts',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdAt',
       'updatedBy',
