@@ -267,6 +267,10 @@
     }
 
     &.gd-form-tree-editor-v2-list-copy-value {
+      .gd-form-tree-editor-v2-list-item-child {
+        cursor: copy;
+      }
+
       .gd-form-checkbox-v2 {
         .mat-checkbox {
           cursor: copy;
