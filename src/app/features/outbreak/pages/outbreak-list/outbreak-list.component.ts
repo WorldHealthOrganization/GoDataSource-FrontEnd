@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel } from '../../../../core/models/user.model';
 import * as _ from 'lodash';
@@ -26,6 +26,9 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, V2SideDial
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { LocationModel } from '../../../../core/models/location.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
 
 @Component({
   selector: 'app-outbreak-list',
@@ -44,7 +47,8 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
     private i18nService: I18nService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private locationDataService: LocationDataService
   ) {
     super(
       listHelperService, {
@@ -807,6 +811,29 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
+        field: 'locationIds',
+        label: 'LNG_TEAM_FIELD_LABEL_LOCATIONS',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: OutbreakModel) => item.locations?.length > 0 ?
+          item.locations.map((location) => {
+            return {
+              label: location.name,
+              href: LocationModel.canView(this.authUser) ?
+                `/locations/${location.id}/view` :
+                null
+            };
+          }) :
+          [],
+        width: 700,
+        filter: {
+          type: V2FilterType.MULTIPLE_LOCATION,
+          useOutbreakLocations: true,
+          field: 'locationIds.parentLocationIdFilter'
+        }
+      },
+      {
         field: 'deleted',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
         sortable: true,
@@ -991,6 +1018,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'isContactLabResultsActive',
       'isDateOfOnsetRequired',
       'generateFollowUpsDateOfLastContact',
+      'locationIds',
       'deleted',
       'createdBy',
       'createdAt',
@@ -1010,6 +1038,67 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
     // retrieve the list of Outbreaks
     this.records$ = this.outbreakDataService
       .getOutbreaksList(this.queryBuilder)
+      .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true;
+          } = {};
+          data.forEach((item) => {
+            (item.locationIds || []).forEach((locationId) => {
+              // nothing to add ?
+              if (!locationId) {
+                return;
+              }
+
+              // add location to list
+              locationsIdsMap[locationId] = true;
+            });
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect('id', locationIds, false, null);
+
+          // retrieve locations
+          return this.locationDataService.getLocationsList(qb).pipe(
+            map((locations) => {
+              // map locations
+              const locationsMap: {
+                [locationId: string]: LocationModel;
+              } = {};
+              locations.forEach((location) => {
+                locationsMap[location.id] = location;
+              });
+
+              // set locations
+              data.forEach((item) => {
+                item.locations = [];
+                (item.locationIds || []).forEach((locationId) => {
+                  // not found ?
+                  if (!locationsMap[locationId]) {
+                    return;
+                  }
+
+                  // add to list
+                  item.locations.push(locationsMap[locationId]);
+                });
+              });
+
+              // finished
+              return data;
+            })
+          );
+        })
+      )
       .pipe(
         // should be the last pipe
         takeUntil(this.destroyed$)
