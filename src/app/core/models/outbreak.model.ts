@@ -203,6 +203,11 @@ export class OutbreakModel
         label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
         options: data.options.yesNo,
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+        field: 'locationIds',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATIONS'
       }
     ];
 

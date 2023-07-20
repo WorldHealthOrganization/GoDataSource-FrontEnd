@@ -812,7 +812,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       },
       {
         field: 'locationIds',
-        label: 'LNG_TEAM_FIELD_LABEL_LOCATIONS',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATIONS',
         format: {
           type: V2ColumnFormat.LINK_LIST
         },
