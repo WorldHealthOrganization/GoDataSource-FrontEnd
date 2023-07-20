@@ -2327,7 +2327,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           );
         } else if (item.label === 'LNG_PAGE_LIST_FOLLOW_UPS_NO_TEAM_LABEL') {
           // clear
-          this.queryBuilder.filter.byNotHavingValue('teamId');
+          this.queryBuilder.filter.byNotHavingValue(
+            'teamId',
+            true
+          );
         } else {
           // search
           this.queryBuilder.filter.byEquality(
@@ -2562,6 +2565,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     const countQueryBuilder = _.cloneDeep(qb);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

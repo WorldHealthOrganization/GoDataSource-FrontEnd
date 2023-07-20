@@ -306,13 +306,14 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
         link: (user: UserModel) => {
           return user.activeOutbreakId &&
             OutbreakModel.canView(this.authUser) &&
-            (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId] ?
+            (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId] &&
+            !(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId].deleted ?
             `/outbreaks/${user.activeOutbreakId}/view` :
             undefined;
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
+          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options.filter((item) => !item.data.deleted),
           includeNoValue: true
         }
       },
@@ -324,11 +325,14 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
         },
         links: (item: UserModel) => item.outbreakIds?.length > 0 ?
           item.outbreakIds
-            .filter((outbreakId) => !!(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId])
             .map((outbreakId) => {
               return {
-                label: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].name,
-                href: OutbreakModel.canView(this.authUser) ?
+                label: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId] ?
+                  (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].name :
+                  outbreakId,
+                href: OutbreakModel.canView(this.authUser) &&
+                  (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId] &&
+                  !(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].deleted ?
                   `/outbreaks/${outbreakId}/view` :
                   null
               };
@@ -336,7 +340,7 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
           [],
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options
+          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options.filter((item) => !item.data.deleted)
         }
       },
       {
@@ -444,7 +448,7 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
       options: {
         institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options,
-        outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
+        outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options.filter((item) => !item.data.deleted),
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         language: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options
       }
@@ -573,6 +577,7 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

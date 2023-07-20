@@ -443,6 +443,7 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

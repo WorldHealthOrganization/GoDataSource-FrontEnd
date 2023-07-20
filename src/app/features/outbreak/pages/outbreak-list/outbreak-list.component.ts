@@ -1032,6 +1032,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // add includeDeletedRecords if deleted is enabled
     if (this.queryBuilder.isDeletedEnabled()) {

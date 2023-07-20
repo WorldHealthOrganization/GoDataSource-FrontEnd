@@ -732,6 +732,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
     const countQueryBuilder = _.cloneDeep(qb);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

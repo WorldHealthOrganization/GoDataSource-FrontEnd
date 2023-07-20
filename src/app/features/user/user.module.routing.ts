@@ -38,7 +38,8 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.USER_LIST
-      ]
+      ],
+      outbreakIncludeDeleted: true
     },
     resolve: {
       team: TeamDataResolver,
@@ -57,7 +58,8 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_CREATE
       ],
-      action: CreateViewModifyV2Action.CREATE
+      action: CreateViewModifyV2Action.CREATE,
+      outbreakIncludeDeleted: true
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -71,7 +73,8 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_VIEW
       ],
-      action: CreateViewModifyV2Action.VIEW
+      action: CreateViewModifyV2Action.VIEW,
+      outbreakIncludeDeleted: true
     }
   },
   // Edit user
@@ -82,7 +85,8 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_MODIFY
       ],
-      action: CreateViewModifyV2Action.MODIFY
+      action: CreateViewModifyV2Action.MODIFY,
+      outbreakIncludeDeleted: true
     },
     canDeactivate: [
       PageChangeConfirmationGuard

@@ -350,6 +350,7 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
       const countQueryBuilder = _.cloneDeep(this.queryBuilder);
       countQueryBuilder.paginator.clear();
       countQueryBuilder.sort.clear();
+      countQueryBuilder.clearFields();
       this.clusterDataService
         .getClustersCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(

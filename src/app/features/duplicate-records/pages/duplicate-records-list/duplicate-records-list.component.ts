@@ -231,6 +231,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
     this.duplicatesListCount$ = this.outbreakDataService
       .getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder)
       .pipe(

@@ -180,17 +180,23 @@ export class RequestFilterGenerator {
           [field]: {
             $ne: ''
           }
+        }, {
+          [field]: {
+            $not: {
+              $size: 0
+            }
+          }
         }
       ]
     };
   }
 
   /**
-     * Check if field doesn't have value
-     * @param field
-     */
+   * Check if field doesn't have value
+   */
   static doesntHaveValue(
     field: string,
+    checkForEmptyString: boolean,
     forMongo: boolean = false
   ) {
     // since some mongo filters don't work with $neq null / $eq null, we need to find different solution
@@ -204,11 +210,16 @@ export class RequestFilterGenerator {
           [field]: {
             $eq: null
           }
-        }, {
-          [field]: {
-            $eq: ''
-          }
-        }
+        },
+        ...(
+          checkForEmptyString ?
+            [{
+              [field]: {
+                $eq: ''
+              }
+            }] :
+            []
+        )
       ]
     } : {
       or: [
@@ -220,11 +231,16 @@ export class RequestFilterGenerator {
           [field]: {
             eq: null
           }
-        }, {
-          [field]: {
-            eq: ''
-          }
-        }
+        },
+        ...(
+          checkForEmptyString ?
+            [{
+              [field]: {
+                eq: ''
+              }
+            }] :
+            []
+        )
       ]
     };
   }

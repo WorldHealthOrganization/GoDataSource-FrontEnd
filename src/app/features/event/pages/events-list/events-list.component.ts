@@ -623,7 +623,8 @@ export class EventsListComponent
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
-          buttonLabel: (item) =>
+          buttonLabel: (item) => item.numberOfContacts === 0 ?
+            item.numberOfContacts.toLocaleString('en') :
             (item.numberOfContacts || '').toLocaleString('en'),
           color: 'text',
           click: (item) => {
@@ -649,7 +650,8 @@ export class EventsListComponent
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
-          buttonLabel: (item) =>
+          buttonLabel: (item) => item.numberOfExposures === 0 ?
+            item.numberOfExposures.toLocaleString('en') :
             (item.numberOfExposures || '').toLocaleString('en'),
           color: 'text',
           click: (item) => {
@@ -1792,6 +1794,7 @@ export class EventsListComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

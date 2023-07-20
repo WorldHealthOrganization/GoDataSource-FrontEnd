@@ -1412,6 +1412,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
           countQueryBuilder.paginator.clear();
           countQueryBuilder.sort.clear();
+          countQueryBuilder.clearFields();
 
           // apply has more limit
           if (localTab.applyHasMoreLimit) {
@@ -1566,6 +1567,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
           countQueryBuilder.paginator.clear();
           countQueryBuilder.sort.clear();
+          countQueryBuilder.clearFields();
 
           // apply has more limit
           if (localTab.applyHasMoreLimit) {
@@ -1748,6 +1750,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
           countQueryBuilder.paginator.clear();
           countQueryBuilder.sort.clear();
+          countQueryBuilder.clearFields();
 
           // apply has more limit
           if (localTab.applyHasMoreLimit) {
@@ -1887,6 +1890,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
           countQueryBuilder.paginator.clear();
           countQueryBuilder.sort.clear();
+          countQueryBuilder.clearFields();
 
           // apply has more limit
           if (localTab.applyHasMoreLimit) {

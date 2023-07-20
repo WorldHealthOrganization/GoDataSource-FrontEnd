@@ -170,7 +170,8 @@ export class LabResultModel
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        template: () => data.selectedOutbreak().labResultsTemplate
+        template: () => data.selectedOutbreak().labResultsTemplate,
+        useLike: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
