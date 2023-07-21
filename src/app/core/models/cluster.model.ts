@@ -43,12 +43,14 @@ export class ClusterModel extends BaseModel
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'createdAt',
-        label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_AT'
+        label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_AT',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'updatedAt',
-        label: 'LNG_CLUSTER_FIELD_LABEL_UPDATED_AT'
+        label: 'LNG_CLUSTER_FIELD_LABEL_UPDATED_AT',
+        sortable: true
       }
     ];
 
