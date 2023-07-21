@@ -36,7 +36,8 @@ const routes: Routes = [
       ]
     },
     resolve: {
-      yesNoAll: YesNoAllDataResolver
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver
     }
   },
   // Create Cluster

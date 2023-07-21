@@ -226,12 +226,14 @@ export class OutbreakTemplateModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'createdBy',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_CREATED_BY',
-        options: data.options.user
+        options: data.options.user,
+        sortable: true
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'updatedBy',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_UPDATED_BY',
-        options: data.options.user
+        options: data.options.user,
+        sortable: true
       });
     }
 
