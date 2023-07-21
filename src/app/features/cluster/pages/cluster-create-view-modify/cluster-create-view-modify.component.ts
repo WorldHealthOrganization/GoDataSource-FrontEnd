@@ -23,6 +23,8 @@ import {
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { MAT_ICONS } from '../../../../shared/forms-v2/core/mat-icons-v2';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { UserModel } from '../../../../core/models/user.model';
 
 /**
  * Component
@@ -432,7 +434,12 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = ClusterModel.generateAdvancedFilters();
+    this.expandListAdvancedFilters = ClusterModel.generateAdvancedFilters({
+      authUser: this.authUser,
+      options: {
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      }
+    });
   }
 
   /**

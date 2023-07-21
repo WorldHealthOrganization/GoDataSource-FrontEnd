@@ -316,7 +316,12 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
    */
   protected initializeTableAdvancedFilters(): void {
     // Cluster
-    this.advancedFilters = ClusterModel.generateAdvancedFilters();
+    this.advancedFilters = ClusterModel.generateAdvancedFilters({
+      authUser: this.authUser,
+      options: {
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      }
+    });
   }
 
   /**
