@@ -605,7 +605,8 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
         outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         language: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options,
-        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }

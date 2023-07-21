@@ -50,7 +50,8 @@ const routes: Routes = [
       institution: InstitutionDataResolver,
       userRole: UserRoleDataResolver,
       outbreak: OutbreakDataResolver,
-      language: LanguageDataResolver
+      language: LanguageDataResolver,
+      user: UserDataResolver
     }
   },
   // Create User

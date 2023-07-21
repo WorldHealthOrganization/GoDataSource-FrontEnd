@@ -356,7 +356,8 @@ export class UserModel
       outbreak: ILabelValuePairModel[],
       team: ILabelValuePairModel[],
       language: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[]
+      yesNo: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -431,6 +432,32 @@ export class UserModel
         field: 'dontCacheFilters',
         label: 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS',
         options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_USER_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_USER_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
         sortable: true
       }
     ];
