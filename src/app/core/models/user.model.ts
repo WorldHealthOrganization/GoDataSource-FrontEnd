@@ -384,12 +384,14 @@ export class UserModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'institutionName',
         label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME',
-        options: data.options.institution
+        options: data.options.institution,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.PHONE_NUMBER,
         field: `telephoneNumbers.${PhoneNumberType.PRIMARY_PHONE_NUMBER}`,
-        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
+        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -401,7 +403,8 @@ export class UserModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'activeOutbreakId',
         label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK',
-        options: data.options.outbreak
+        options: data.options.outbreak,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -413,7 +416,8 @@ export class UserModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'languageId',
         label: 'LNG_USER_FIELD_LABEL_LANGUAGE',
-        options: data.options.language
+        options: data.options.language,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
