@@ -58,12 +58,14 @@ export class ClusterModel extends BaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'createdBy',
         label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_BY',
-        options: data.options.user
+        options: data.options.user,
+        sortable: true
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'updatedBy',
         label: 'LNG_CLUSTER_FIELD_LABEL_UPDATED_BY',
-        options: data.options.user
+        options: data.options.user,
+        sortable: true
       });
     }
 
