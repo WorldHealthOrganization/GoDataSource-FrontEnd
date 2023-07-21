@@ -245,18 +245,6 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
               }
             },
             {
-              type: CreateViewModifyV2TabInputType.TEXTAREA,
-              name: 'description',
-              placeholder: () => 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION',
-              description: () => 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
-              value: {
-                get: () => this.itemData.description,
-                set: (value) => {
-                  this.itemData.description = value;
-                }
-              }
-            },
-            {
               type: CreateViewModifyV2TabInputType.COLOR,
               name: 'colorCode',
               placeholder: () => 'LNG_CLUSTER_FIELD_LABEL_COLOR',
@@ -282,6 +270,18 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
                 get: () => this.itemData.icon,
                 set: (value) => {
                   this.itemData.icon = value;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'description',
+              placeholder: () => 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION',
+              description: () => 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+              value: {
+                get: () => this.itemData.description,
+                set: (value) => {
+                  this.itemData.description = value;
                 }
               }
             }

@@ -14,6 +14,9 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-clusters-list',
@@ -27,7 +30,8 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
     protected listHelperService: ListHelperService,
     private clusterDataService: ClusterDataService,
     private toastV2Service: ToastV2Service,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private activatedRoute: ActivatedRoute
   ) {
     super(listHelperService);
   }
@@ -233,6 +237,66 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
         format: {
           type: V2ColumnFormat.COLOR
         }
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: 'createdByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        link: (data) => {
+          return data.createdBy && UserModel.canView(this.authUser) ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_CLUSTER_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        link: (data) => {
+          return data.updatedBy && UserModel.canView(this.authUser) ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_CLUSTER_FIELD_LABEL_UPDATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
   }
@@ -317,7 +381,11 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
       'name',
       'description',
       'colorCode',
-      'icon'
+      'icon',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
     ];
   }
 
@@ -325,6 +393,11 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
    * Re(load) the Clusters list, based on the applied filter, sort criterias
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
+    // retrieve the list of Contacts
     this.records$ = this.clusterDataService
       .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
