@@ -236,6 +236,11 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
         noColorLabel: 'LNG_PAGE_LIST_CLUSTERS_LABEL_NO_COLOR',
         format: {
           type: V2ColumnFormat.COLOR
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
         }
       },
       {

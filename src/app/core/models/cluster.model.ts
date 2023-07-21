@@ -41,6 +41,12 @@ export class ClusterModel extends BaseModel
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'colorCode',
+        label: 'LNG_CLUSTER_FIELD_LABEL_COLOR',
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'createdAt',
         label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_AT',
