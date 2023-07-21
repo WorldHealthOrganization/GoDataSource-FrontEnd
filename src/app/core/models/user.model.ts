@@ -355,7 +355,8 @@ export class UserModel
       userRole: ILabelValuePairModel[],
       outbreak: ILabelValuePairModel[],
       team: ILabelValuePairModel[],
-      language: ILabelValuePairModel[]
+      language: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -413,6 +414,20 @@ export class UserModel
         field: 'languageId',
         label: 'LNG_USER_FIELD_LABEL_LANGUAGE',
         options: data.options.language
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'disregardGeographicRestrictions',
+        label: 'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'dontCacheFilters',
+        label: 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS',
+        options: data.options.yesNo,
+        sortable: true
       }
     ];
 

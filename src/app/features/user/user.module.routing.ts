@@ -13,6 +13,7 @@ import { UserCreateViewModifyComponent } from './pages';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -24,7 +25,8 @@ const createViewModifyFoundation: Route = {
     outbreak: OutbreakDataResolver,
     team: TeamDataResolver,
     user: UserDataResolver,
-    language: LanguageDataResolver
+    language: LanguageDataResolver,
+    yesNo: YesNoDataResolver
   }
 };
 
@@ -44,6 +46,7 @@ const routes: Routes = [
     resolve: {
       team: TeamDataResolver,
       yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
       institution: InstitutionDataResolver,
       userRole: UserRoleDataResolver,
       outbreak: OutbreakDataResolver,
