@@ -407,7 +407,7 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
     this.queryBuilder.include('createdByUser', true);
     this.queryBuilder.include('updatedByUser', true);
 
-    // retrieve the list of Contacts
+    // retrieve the list of clusters
     this.records$ = this.clusterDataService
       .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
