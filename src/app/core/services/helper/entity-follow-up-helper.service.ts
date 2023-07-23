@@ -767,6 +767,18 @@ export class EntityFollowUpHelperService {
         }
       },
       {
+        field: 'deletedAt',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
         notVisible: true,
@@ -851,8 +863,10 @@ export class EntityFollowUpHelperService {
     options: {
       team: ILabelValuePairModel[],
       yesNoAll: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[],
       dailyFollowUpStatus: ILabelValuePairModel[],
-      user: ILabelValuePairModel[]
+      user: ILabelValuePairModel[],
+      addressType: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -861,30 +875,85 @@ export class EntityFollowUpHelperService {
         type: V2AdvancedFilterType.ADDRESS,
         field: 'address',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
-        isArray: true
+        isArray: false
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.emailAddress',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'address.geoLocationAccurate',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
+        options: data.options.yesNo,
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'address.typeId',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_TYPE',
+        options: data.options.addressType,
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'address.date',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_DATE',
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.city',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_CITY',
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.postalCode',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_POSTAL_CODE',
+        sortable: true,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+        field: 'address',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
+        isArray: false,
+        sortable: 'address.phoneNumber'
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'teamId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-        options: data.options.team
+        options: data.options.team,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'targeted',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-        options: data.options.yesNoAll
+        options: data.options.yesNoAll,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'statusId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-        options: data.options.dailyFollowUpStatus
+        options: data.options.dailyFollowUpStatus,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.NUMBER,
@@ -905,21 +974,65 @@ export class EntityFollowUpHelperService {
         flagIt: true
       },
       {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'index',
+        label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         template: data.contactFollowUpTemplate
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT',
+        sortable: true
       }
     ];
 
-    // allowed to filter by responsible user ?
+    // allowed to filter by user ?
     if (UserModel.canListForFilters(data.authUser)) {
       advancedFilters.push(
         {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'responsibleUserId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
-          options: data.options.user
+          options: data.options.user,
+          sortable: true
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'createdBy',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
+          options: data.options.user,
+          sortable: true
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'updatedBy',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
+          options: data.options.user,
+          sortable: true
         }
       );
     }
@@ -1044,6 +1157,7 @@ export class EntityFollowUpHelperService {
       'responsibleUser',
       'responsibleUserId',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdByUser',
       'createdAt',

@@ -3637,6 +3637,7 @@ export class ImportDataComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // retrieve only import results from a specific import
     countQueryBuilder.filter.byEquality(

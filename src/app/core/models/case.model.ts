@@ -549,7 +549,7 @@ export class CaseModel
       }
     ];
 
-    // allowed to filter by responsible user ?
+    // allowed to filter by user ?
     if (UserModel.canListForFilters(data.authUser)) {
       advancedFilters.push({
         type: V2AdvancedFilterType.MULTISELECT,

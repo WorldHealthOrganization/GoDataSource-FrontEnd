@@ -59,7 +59,8 @@ const routes: Routes = [
       disease: DiseaseDataResolver,
       followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
       yesNo: YesNoDataResolver,
-      yesNoAll: YesNoAllDataResolver
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver
     }
   },
   // create outbreak template
