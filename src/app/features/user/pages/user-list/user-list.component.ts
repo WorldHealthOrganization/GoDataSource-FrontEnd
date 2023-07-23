@@ -21,7 +21,6 @@ import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/c
 import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import {
   ExportDataExtension,
   ExportDataMethod
