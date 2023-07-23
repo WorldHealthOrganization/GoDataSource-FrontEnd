@@ -553,6 +553,7 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

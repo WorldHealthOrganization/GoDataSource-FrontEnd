@@ -34,6 +34,7 @@ const createViewModifyFoundation: Route = {
     country: CountryDataResolver,
     geographicalLevel: LocationGeographicalLevelDataResolver,
     followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
+    yesNoAll: YesNoAllDataResolver,
     yesNo: YesNoDataResolver,
     mapVectorType: MapVectorTypeDataResolver,
     user: UserDataResolver,
@@ -62,8 +63,8 @@ const routes: Routes = [
       disease: DiseaseDataResolver,
       country: CountryDataResolver,
       geographicalLevel: LocationGeographicalLevelDataResolver,
-      yesNo: YesNoDataResolver,
       yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
       followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
       user: UserDataResolver
     }

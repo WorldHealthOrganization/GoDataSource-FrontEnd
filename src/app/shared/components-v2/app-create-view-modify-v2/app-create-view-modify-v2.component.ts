@@ -1371,7 +1371,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // initialize query paginator
     tab.definition.queryBuilder.paginator.setPage({
-      pageSize: tab.definition.queryBuilder.paginator.limit,
+      pageSize: tab.definition.queryBuilder.paginator.limit ?
+        tab.definition.queryBuilder.paginator.limit :
+        Constants.DEFAULT_PAGE_SIZE,
       pageIndex: 0
     }, true);
 

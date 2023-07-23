@@ -182,6 +182,7 @@
         .mat-form-field-suffix {
           @include flex(flex);
           @include flex_align_items(center);
+          gap: 0.4rem;
           top: 0;
 
           .mat-progress-spinner {

@@ -1423,7 +1423,8 @@ export class DialogV2Service {
                   filterDefinition.field,
                   appliedFilter.value,
                   false,
-                  true
+                  true,
+                  filterDefinition.useLike
                 );
 
                 // finished
@@ -1452,6 +1453,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  true,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1615,6 +1617,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  false,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1660,6 +1663,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  false,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1719,6 +1723,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  true,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1814,7 +1819,10 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.FREE_TEXT.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.IS:
-                        valueQuery = RequestFilterGenerator.textIs(value);
+                        valueQuery = RequestFilterGenerator.textIs(
+                          value,
+                          filterDefinition.useLike
+                        );
                         break;
                       case V2AdvancedFilterComparatorType.CONTAINS_TEXT:
                         valueQuery = RequestFilterGenerator.textContains(
@@ -1823,10 +1831,8 @@ export class DialogV2Service {
                         );
                         break;
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1845,10 +1851,8 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.DATE_TIME.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1865,10 +1869,8 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1886,10 +1888,8 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.NUMERIC.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1906,10 +1906,8 @@ export class DialogV2Service {
                     // neq: null / $eq null doesn't work due to a mongodb bug ( the issue occurs when trying to filter an element from an array which is this case )
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
                     }
@@ -1928,9 +1926,17 @@ export class DialogV2Service {
                 // do we need to attach a value condition as well ?
                 if (valueQuery) {
                   query[`${filterDefinition.field}.${question.variable}.0.value`] = valueQuery;
+                } else if (extraComparator === V2AdvancedFilterComparatorType.HAS_VALUE) {
+                  // handle has value case
+                  const condition: any = RequestFilterGenerator.hasValue(`${filterDefinition.field}.${question.variable}.0.value`);
+                  const key: string = Object.keys(condition)[0];
+                  query[key] = condition[key];
                 } else if (extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE) {
                   // handle no value case
-                  const condition: any = RequestFilterGenerator.doesntHaveValue(`${filterDefinition.field}.${question.variable}.0.value`);
+                  const condition: any = RequestFilterGenerator.doesntHaveValue(
+                    `${filterDefinition.field}.${question.variable}.0.value`,
+                    true
+                  );
                   const key: string = Object.keys(condition)[0];
                   query[key] = condition[key];
                 }
@@ -1950,6 +1956,7 @@ export class DialogV2Service {
                   // handle no value case
                   const condition: any = RequestFilterGenerator.doesntHaveValue(
                     'value',
+                    true,
                     true
                   );
                   const key: string = Object.keys(condition)[0];

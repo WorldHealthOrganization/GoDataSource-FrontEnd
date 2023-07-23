@@ -7,6 +7,7 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../../helperClasse
 import { AuthDataService } from '../../data/auth.data.service';
 import { OutbreakModel } from '../../../models/outbreak.model';
 import { OutbreakDataService } from '../../data/outbreak.data.service';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 @Injectable()
 export class OutbreakDataResolver implements IMapResolverV2<OutbreakModel> {
@@ -22,7 +23,7 @@ export class OutbreakDataResolver implements IMapResolverV2<OutbreakModel> {
   /**
    * Retrieve data
    */
-  resolve(): Observable<IResolverV2ResponseModel<OutbreakModel>> {
+  resolve(route: ActivatedRouteSnapshot): Observable<IResolverV2ResponseModel<OutbreakModel>> {
     // user doesn't have rights ?
     if (!OutbreakModel.canList(this.authDataService.getAuthenticatedUser())) {
       return of({
@@ -36,8 +37,14 @@ export class OutbreakDataResolver implements IMapResolverV2<OutbreakModel> {
     const qb = new RequestQueryBuilder();
     qb.fields(
       'id',
-      'name'
+      'name',
+      'deleted'
     );
+
+    // do we need to retrieve deleted outbreaks ?
+    if (route.data?.outbreakIncludeDeleted) {
+      qb.includeDeleted();
+    }
 
     // sort them
     qb.sort
@@ -62,7 +69,8 @@ export class OutbreakDataResolver implements IMapResolverV2<OutbreakModel> {
             response.options.push({
               label: item.name,
               value: item.id,
-              data: item
+              data: item,
+              disabled: !!item.deleted
             });
           });
 

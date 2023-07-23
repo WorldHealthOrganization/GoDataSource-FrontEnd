@@ -226,6 +226,32 @@ export class UserRoleModel
         groupPartialTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION',
         groupOptionHiddenKey: 'hidden',
         defaultValues: PermissionModel.HIDDEN_PERMISSIONS
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
       }
     ];
 
@@ -375,7 +401,9 @@ export class UserModel
       userRole: ILabelValuePairModel[],
       outbreak: ILabelValuePairModel[],
       team: ILabelValuePairModel[],
-      language: ILabelValuePairModel[]
+      language: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -403,12 +431,14 @@ export class UserModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'institutionName',
         label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME',
-        options: data.options.institution
+        options: data.options.institution,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.PHONE_NUMBER,
         field: `telephoneNumbers.${PhoneNumberType.PRIMARY_PHONE_NUMBER}`,
-        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
+        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -420,7 +450,8 @@ export class UserModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'activeOutbreakId',
         label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK',
-        options: data.options.outbreak
+        options: data.options.outbreak,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -432,7 +463,48 @@ export class UserModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'languageId',
         label: 'LNG_USER_FIELD_LABEL_LANGUAGE',
-        options: data.options.language
+        options: data.options.language,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'disregardGeographicRestrictions',
+        label: 'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'dontCacheFilters',
+        label: 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_USER_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_USER_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
       }
     ];
 

@@ -942,6 +942,7 @@ export class ContactRangeFollowUpsListComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // count
     this.followUpsDataService
