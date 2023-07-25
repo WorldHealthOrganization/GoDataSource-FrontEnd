@@ -236,11 +236,12 @@ export class FollowUpModel
         case EntityType.CASE:
           this.person = new CaseModel(person);
           break;
-        case EntityType.CONTACT:
-          this.person = new ContactModel(person);
-          break;
         case EntityType.CONTACT_OF_CONTACT:
           this.person = new ContactOfContactModel(person);
+          break;
+        // case EntityType.CONTACT:
+        default:
+          this.person = new ContactModel(person);
           break;
       }
     }

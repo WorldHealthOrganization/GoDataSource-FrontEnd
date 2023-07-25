@@ -20,11 +20,12 @@ export class RangeFollowUpsModel {
         case EntityType.CASE:
           this.person = new CaseModel(contactData);
           break;
-        case EntityType.CONTACT:
-          this.person = new ContactModel(contactData);
-          break;
         case EntityType.CONTACT_OF_CONTACT:
           this.person = new ContactOfContactModel(contactData);
+          break;
+        // case EntityType.CONTACT:
+        default:
+          this.person = new ContactModel(contactData);
           break;
       }
     }

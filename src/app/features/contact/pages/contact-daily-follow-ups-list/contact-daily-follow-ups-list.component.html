@@ -12,11 +12,7 @@
   [pageCount]="pageCount"
   [pageSize]="pageSize"
   [pageIndex]="pageIndex"
-  [pageSettingsKey]="!!this.entityData ?
-    this.entityData.type === EntityType.CASE ?
-      UserSettings.CASE_RELATED_DAILY_FOLLOW_UP_FIELDS :
-      UserSettings.CONTACT_OF_CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS :
-    UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS"
+  [pageSettingsKey]="pageSettingsKey"
   [sortColumn]="tableSortBy"
   [infos]="infos"
   [suffixLegends]="suffixLegends"

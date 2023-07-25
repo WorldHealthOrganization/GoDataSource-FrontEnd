@@ -83,19 +83,18 @@ export class PersonDataResolver implements Resolve<CaseModel | ContactModel | Ev
           this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
           qb
         );
-      }))
-        .pipe(switchMap((data) => {
-          // found ?
-          if (data?.length > 0) {
-            return of(data);
-          }
+      })).pipe(switchMap((data) => {
+        // found ?
+        if (data?.length > 0) {
+          return of(data);
+        }
 
-          // check contacts of contacts
-          return this.contactsOfContactsDataService.getContactsOfContactsList(
-            this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
-            qb
-          );
-        }));
+        // check contacts of contacts
+        return this.contactsOfContactsDataService.getContactsOfContactsList(
+          this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
+          qb
+        );
+      }));
     } else if (
       route.params.caseId ||
       route.queryParams.caseId

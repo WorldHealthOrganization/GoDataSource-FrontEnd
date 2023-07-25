@@ -16,7 +16,7 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { QuestionModel } from '../../../../core/models/question.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -65,10 +65,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   private static readonly CREATED_BY_USER: string = 'createdByUser';
   private static readonly UPDATED_BY_USER: string = 'updatedByUser';
 
-  EntityType = EntityType;
-
   // case/contact of contact
   entityData: CaseModel | ContactOfContactModel;
+
+  pageSettingsKey: string = UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS;
 
   // follow-up fields
   private followUpFields: ILabelValuePairModel[] = [
@@ -158,6 +158,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     // disable outbreak change ?
     if (this.entityData) {
       TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+
+      // determine page settings key
+      this.pageSettingsKey = this.entityData.type === EntityType.CASE ?
+        UserSettings.CASE_RELATED_DAILY_FOLLOW_UP_FIELDS :
+        UserSettings.CONTACT_OF_CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS;
     }
 
     // update breadcrumbs
@@ -389,7 +394,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               visible: (item: FollowUpModel): boolean => {
                 // visible only if at least one of the previous...
                 return !item.deleted &&
-                  item.person?.type === EntityType.CONTACT &&
+                  item.person?.type !== EntityType.CASE &&
+                  item.person?.type !== EntityType.CONTACT_OF_CONTACT &&
                   this.selectedOutbreakIsActive &&
                   FollowUpModel.canModify(this.authUser) &&
                   !Constants.isDateInTheFuture(item.date);
@@ -493,7 +499,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               },
               visible: (item: FollowUpModel): boolean => {
                 return !item.deleted &&
-                  item.person?.type === EntityType.CONTACT &&
+                  item.person?.type !== EntityType.CASE &&
+                  item.person?.type !== EntityType.CONTACT_OF_CONTACT &&
                   this.selectedOutbreakIsActive &&
                   FollowUpModel.canModify(this.authUser);
               }
@@ -583,7 +590,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               },
               visible: (item: FollowUpModel): boolean => {
                 return !item.deleted &&
-                  item.person?.type === EntityType.CONTACT &&
+                  item.person?.type !== EntityType.CASE &&
+                  item.person?.type !== EntityType.CONTACT_OF_CONTACT &&
                   this.selectedOutbreakIsActive &&
                   FollowUpModel.canModify(this.authUser);
               }
@@ -2556,12 +2564,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     // add case/contact of contact id
     if (this.entityData?.id) {
       this.queryBuilder
-        .addChildQueryBuilder(this.entityData.type === EntityType.CASE ?
-          'case' :
-          'contactOfContact'
+        .addChildQueryBuilder(
+          this.entityData.type === EntityType.CASE ?
+            'case' :
+            'contactOfContact'
         )
-        .filter
-        .byEquality('id', this.entityData.id);
+        .filter.byEquality('id', this.entityData.id);
     }
 
     // refresh badges list with applied filter
@@ -2600,12 +2608,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
 
     // add case/contact of contact id
     if (this.entityData?.id) {
-      qb.addChildQueryBuilder(this.entityData.type === EntityType.CASE ?
-        'case' :
-        'contactOfContact'
-      )
-        .filter
-        .byEquality('id', this.entityData.id);
+      qb.addChildQueryBuilder(
+        this.entityData.type === EntityType.CASE ?
+          'case' :
+          'contactOfContact'
+      ).filter.byEquality('id', this.entityData.id);
     }
 
     // remove paginator from query builder

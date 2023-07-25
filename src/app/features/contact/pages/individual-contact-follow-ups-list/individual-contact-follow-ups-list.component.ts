@@ -667,13 +667,11 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
           this.entityData.type === EntityType.CONTACT_OF_CONTACT &&
           ContactOfContactModel.canView(this.authUser)
         ) || (
-          (
-            this.entityData.type === EntityType.CONTACT &&
-            ContactModel.canView(this.authUser)
-          ) || (
-            this.entityData.type === EntityType.CASE &&
-            CaseModel.canView(this.authUser)
-          )
+          this.entityData.type === EntityType.CONTACT &&
+          ContactModel.canView(this.authUser)
+        ) || (
+          this.entityData.type === EntityType.CASE &&
+          CaseModel.canView(this.authUser)
         )
       )
     ) {

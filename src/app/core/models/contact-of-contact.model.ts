@@ -83,6 +83,7 @@ export class ContactOfContactModel
   numberOfContacts: number;
   numberOfExposures: number;
 
+  // this property was added to handle the legacy follow-ups (if the contact of a contact was a contact)
   followUp: {
     originalStartDate: string,
     startDate: string,
@@ -559,7 +560,7 @@ export class ContactOfContactModel
     this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
 
-    this.followUp = _.get(data, 'followUp', {});
+    this.followUp = _.get(data, 'followUp');
 
     // vaccines received
     const vaccinesReceived = _.get(data, 'vaccinesReceived');
