@@ -1,4 +1,4 @@
-import { commandFunction, NgxWigComponent, TButton } from 'ngx-wig';
+import { CommandFunction, NgxWigComponent, TButton } from 'ngx-wig';
 import { Inject, Injectable, Renderer2 } from '@angular/core';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../../core/services/helper/i18n.service';
@@ -44,7 +44,7 @@ class TButtonExtended implements TButton {
   label: string;
   icon: string;
   title: string;
-  command: string | commandFunction;
+  command: string | CommandFunction;
   styleClass: string;
 
   // other properties
@@ -56,7 +56,7 @@ class TButtonExtended implements TButton {
     label?: string,
     icon?: string,
     title?: string,
-    command?: string | commandFunction,
+    command?: string | CommandFunction,
     styleClass?: string
   }) {
     // assign properties
