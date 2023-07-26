@@ -42,6 +42,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { Moment } from 'moment';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -475,6 +476,31 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               },
               visible: (item: ContactOfContactModel): boolean => {
                 return !item.deleted;
+              }
+            },
+
+            // See contacts follow-us belonging to this contact of contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_FOLLOW_UPS'
+              },
+              action: {
+                link: (item: ContactOfContactModel): string[] => {
+                  return ['/contacts', 'contact-of-contact-related-follow-ups', item.id];
+                }
+              },
+              visible: (item: ContactOfContactModel): boolean => {
+                return !item.deleted &&
+                  FollowUpModel.canList(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: ContactOfContactModel): boolean => {
+                // visible only if at least one of the previous two items is visible
+                return !item.deleted ||
+                  FollowUpModel.canList(this.authUser);
               }
             },
 

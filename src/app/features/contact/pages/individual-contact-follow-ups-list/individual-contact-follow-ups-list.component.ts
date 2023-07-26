@@ -30,6 +30,8 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
   selector: 'app-individual-contact-follow-ups-list',
@@ -37,7 +39,7 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 })
 export class IndividualContactFollowUpsListComponent extends ListComponent<FollowUpModel> implements OnDestroy {
   // data
-  entityData: ContactModel | CaseModel;
+  entityData: ContactOfContactModel | ContactModel | CaseModel;
 
   // follow-up fields
   private followUpFields: ILabelValuePairModel[] = [
@@ -284,9 +286,11 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                         {
                           type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
                           name: 'contactId',
-                          placeholder: this.entityData.type === EntityType.CONTACT ?
-                            'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CONTACT_BUTTON' :
-                            'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CASE_BUTTON',
+                          placeholder: this.entityData.type === EntityType.CONTACT_OF_CONTACT ?
+                            'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CONTACT_OF_CONTACT_BUTTON' :
+                            this.entityData.type === EntityType.CONTACT ?
+                              'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CONTACT_BUTTON' :
+                              'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CASE_BUTTON',
                           options: [({
                             label: this.entityData.name,
                             value: this.entityData.id
@@ -623,31 +627,46 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
       }
     ];
 
-    // add contact/case breadcrumbs
-    if (this.entityData.type === EntityType.CONTACT) {
-      if (ContactModel.canList(this.authUser)) {
-        this.breadcrumbs.push({
-          label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
-          action: {
-            link: ['/contacts']
-          }
-        });
-      }
-    } else {
-      if (CaseModel.canList(this.authUser)) {
-        this.breadcrumbs.push({
-          label: 'LNG_PAGE_LIST_CASES_TITLE',
-          action: {
-            link: ['/cases']
-          }
-        });
-      }
+    // add contact of contact/contact/case breadcrumbs
+    if (
+      this.entityData.type === EntityType.CONTACT_OF_CONTACT &&
+      ContactOfContactModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+        action: {
+          link: ['/contacts-of-contacts']
+        }
+      });
+    } else if (
+      this.entityData.type === EntityType.CONTACT &&
+      ContactModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+        action: {
+          link: ['/contacts']
+        }
+      });
+    } else if (
+      this.entityData.type === EntityType.CASE &&
+      CaseModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        action: {
+          link: ['/cases']
+        }
+      });
     }
 
     // add record data ?
     if (
       this.entityData && (
         (
+          this.entityData.type === EntityType.CONTACT_OF_CONTACT &&
+          ContactOfContactModel.canView(this.authUser)
+        ) || (
           this.entityData.type === EntityType.CONTACT &&
           ContactModel.canView(this.authUser)
         ) || (
@@ -659,7 +678,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
       this.breadcrumbs.push({
         label: this.entityData.name,
         action: {
-          link: [this.entityData.type === EntityType.CONTACT ? `/contacts/${ this.entityData.id }/view` : `/cases/${ this.entityData.id }/view`]
+          link: [EntityModel.getPersonLink(this.entityData)]
         }
       });
     }

@@ -65,6 +65,8 @@ export class PersonDataResolver implements Resolve<CaseModel | ContactModel | Ev
     qb.limit(1);
 
     // contact ?
+    // #TODO - /contacts/contact-related-follow-ups/<entityId> feature requires refactoring using alternative approaches: either a direct link on the person or a specific link for each entity type
+    // #TODO - The required refactoring is for the following requests not to be called unnecessarily: contactDataService.getContactsList(), caseDataService.getCasesList() and contactsOfContactsDataService.getContactsOfContactsList()
     if (
       route.params.contactId ||
       route.queryParams.contactId
@@ -80,6 +82,17 @@ export class PersonDataResolver implements Resolve<CaseModel | ContactModel | Ev
 
         // check cases
         return this.caseDataService.getCasesList(
+          this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
+          qb
+        );
+      })).pipe(switchMap((data) => {
+        // found ?
+        if (data?.length > 0) {
+          return of(data);
+        }
+
+        // check contacts of contacts
+        return this.contactsOfContactsDataService.getContactsOfContactsList(
           this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
           qb
         );
