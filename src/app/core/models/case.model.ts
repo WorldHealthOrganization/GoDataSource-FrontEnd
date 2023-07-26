@@ -106,6 +106,7 @@ export class CaseModel
   numberOfContacts: number;
   numberOfExposures: number;
 
+  // this property was added to handle the legacy follow-ups (if the case was a contact)
   followUp: {
     originalStartDate: string,
     startDate: string,

@@ -31,6 +31,7 @@ export enum UserSettings {
   CONTACT_DAILY_FOLLOW_UP_FIELDS = 'contactDailyFollowUpFields',
   CASE_RELATED_DAILY_FOLLOW_UP_FIELDS = 'caseRelatedFollowUpFields',
   CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS = 'contactRelatedFollowUpFields',
+  CONTACT_OF_CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS = 'contactOfContactRelatedFollowUpFields',
   SYNC_UPSTREAM_SERVERS_FIELDS = 'syncUpstreamServersFields',
   SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
   SYNC_LOGS_FIELDS = 'syncLogsFields',

@@ -16,7 +16,7 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { QuestionModel } from '../../../../core/models/question.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -53,6 +53,8 @@ import { AppFormSelectMultipleV2Component } from '../../../../shared/forms-v2/co
 import { LocationModel } from '../../../../core/models/location.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -63,8 +65,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   private static readonly CREATED_BY_USER: string = 'createdByUser';
   private static readonly UPDATED_BY_USER: string = 'updatedByUser';
 
-  // case
-  caseData: CaseModel;
+  // case/contact of contact
+  entityData: CaseModel | ContactOfContactModel;
+
+  pageSettingsKey: string = UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS;
 
   // follow-up fields
   private followUpFields: ILabelValuePairModel[] = [
@@ -149,11 +153,16 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     }
 
     // get data
-    this.caseData = this.activatedRoute.snapshot.data.entityData;
+    this.entityData = this.activatedRoute.snapshot.data.entityData;
 
     // disable outbreak change ?
-    if (this.caseData) {
+    if (this.entityData) {
       TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+
+      // determine page settings key
+      this.pageSettingsKey = this.entityData.type === EntityType.CASE ?
+        UserSettings.CASE_RELATED_DAILY_FOLLOW_UP_FIELDS :
+        UserSettings.CONTACT_OF_CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS;
     }
 
     // update breadcrumbs
@@ -386,6 +395,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 // visible only if at least one of the previous...
                 return !item.deleted &&
                   item.person?.type !== EntityType.CASE &&
+                  item.person?.type !== EntityType.CONTACT_OF_CONTACT &&
                   this.selectedOutbreakIsActive &&
                   FollowUpModel.canModify(this.authUser) &&
                   !Constants.isDateInTheFuture(item.date);
@@ -490,6 +500,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               visible: (item: FollowUpModel): boolean => {
                 return !item.deleted &&
                   item.person?.type !== EntityType.CASE &&
+                  item.person?.type !== EntityType.CONTACT_OF_CONTACT &&
                   this.selectedOutbreakIsActive &&
                   FollowUpModel.canModify(this.authUser);
               }
@@ -580,6 +591,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               visible: (item: FollowUpModel): boolean => {
                 return !item.deleted &&
                   item.person?.type !== EntityType.CASE &&
+                  item.person?.type !== EntityType.CONTACT_OF_CONTACT &&
                   this.selectedOutbreakIsActive &&
                   FollowUpModel.canModify(this.authUser);
               }
@@ -636,7 +648,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: 'person.lastName'
         },
         filter: {
-          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         },
@@ -648,9 +660,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             ) || (
               item.person.type === EntityType.CONTACT &&
               ContactModel.canView(this.authUser)
+            ) || (
+              item.person.type === EntityType.CONTACT_OF_CONTACT &&
+              ContactOfContactModel.canView(this.authUser)
             )
           ) && !item.person.deleted ?
-            `/${item.person.type === EntityType.CASE ? 'cases' : 'contacts'}/${item.person.id}/view` :
+            EntityModel.getPersonLink(item.person) :
             undefined;
         }
       },
@@ -663,7 +678,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: 'person.firstName'
         },
         filter: {
-          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         },
@@ -675,9 +690,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             ) || (
               item.person.type === EntityType.CONTACT &&
               ContactModel.canView(this.authUser)
+            ) || (
+              item.person.type === EntityType.CONTACT_OF_CONTACT &&
+              ContactOfContactModel.canView(this.authUser)
             )
           ) && !item.person.deleted ?
-            `/${item.person.type === EntityType.CASE ? 'cases' : 'contacts'}/${item.person.id}/view` :
+            EntityModel.getPersonLink(item.person) :
             undefined;
         }
       },
@@ -690,7 +708,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: 'person.visualId'
         },
         filter: {
-          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         }
@@ -705,7 +723,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           includeNoValue: true
@@ -721,7 +739,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
           type: V2FilterType.MULTIPLE_SELECT,
           options: this.referenceDataHelperService.filterPerOutbreakOptions(
             this.selectedOutbreak,
@@ -969,7 +987,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
           type: V2FilterType.DATE_RANGE
         }
       },
@@ -983,7 +1001,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
           type: V2FilterType.DATE_RANGE
         }
       },
@@ -1023,7 +1041,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
           type: V2FilterType.MULTIPLE_SELECT,
           options: this.referenceDataHelperService.filterPerOutbreakOptions(
             this.selectedOutbreak,
@@ -1498,7 +1516,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     // Follow-up person
     this.advancedFilters.push(
       {
-        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
         type: V2AdvancedFilterType.TEXT,
         field: 'contact.firstName',
         label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
@@ -1506,7 +1524,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         sortable: 'contact.firstName'
       },
       {
-        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
         type: V2AdvancedFilterType.TEXT,
         field: 'contact.lastName',
         label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
@@ -1514,7 +1532,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         sortable: 'contact.lastName'
       },
       {
-        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
         type: V2AdvancedFilterType.ADDRESS,
         field: 'contact.addresses',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
@@ -1526,7 +1544,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         ]
       },
       {
-        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'contact.gender',
         label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
@@ -1534,7 +1552,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
       },
       {
-        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'contact.riskLevel',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
@@ -1546,21 +1564,21 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
       },
       {
-        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
         type: V2AdvancedFilterType.RANGE_AGE,
         field: 'contact.age',
         label: 'LNG_CONTACT_FIELD_LABEL_AGE',
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
       },
       {
-        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'contact.dob',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
       },
       {
-        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
         type: V2AdvancedFilterType.TEXT,
         field: 'contact.visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
@@ -1568,14 +1586,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         sortable: 'contact.visualId'
       },
       {
-        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
         type: V2AdvancedFilterType.TEXT,
         field: 'contact.addresses.phoneNumber',
         label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
       },
       {
-        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'contact.occupation',
         label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
@@ -2437,7 +2455,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     ];
 
     // add case / contact breadcrumbs
-    if (!this.caseData) {
+    if (!this.entityData) {
       // add team/user workload page if necessary
       if (this._workloadData) {
         if (
@@ -2477,7 +2495,33 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
         action: null
       });
-    } else {
+    } else if (this.entityData.type === EntityType.CONTACT_OF_CONTACT) {
+      // contacts of contacts list
+      if (ContactOfContactModel.canList(this.authUser)) {
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+          action: {
+            link: ['/contacts-of-contacts']
+          }
+        });
+      }
+
+      // contact of contact view
+      if (ContactOfContactModel.canView(this.authUser)) {
+        this.breadcrumbs.push({
+          label: this.entityData.name,
+          action: {
+            link: [`/contacts-of-contacts/${this.entityData.id}/view`]
+          }
+        });
+      }
+
+      // current page
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE',
+        action: null
+      });
+    } else if (this.entityData.type === EntityType.CASE) {
       // cases list
       if (CaseModel.canList(this.authUser)) {
         this.breadcrumbs.push({
@@ -2491,9 +2535,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       // case view
       if (CaseModel.canView(this.authUser)) {
         this.breadcrumbs.push({
-          label: this.caseData.name,
+          label: this.entityData.name,
           action: {
-            link: [`/cases/${ this.caseData.id }/view`]
+            link: [`/cases/${this.entityData.id}/view`]
           }
         });
       }
@@ -2517,9 +2561,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
    * Refresh list
    */
   refreshList(triggeredByPageChange: boolean) {
-    // add case id
-    if (this.caseData?.id) {
-      this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseData.id);
+    // add case/contact of contact id
+    if (this.entityData?.id) {
+      this.queryBuilder
+        .addChildQueryBuilder(
+          this.entityData.type === EntityType.CASE ?
+            'case' :
+            'contactOfContact'
+        ).filter.byEquality('id', this.entityData.id);
     }
 
     // refresh badges list with applied filter
@@ -2556,9 +2605,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     const qb = new RequestQueryBuilder();
     qb.merge(this.queryBuilder);
 
-    // add case id
-    if (this.caseData?.id) {
-      qb.addChildQueryBuilder('case').filter.byEquality('id', this.caseData.id);
+    // add case/contact of contact id
+    if (this.entityData?.id) {
+      qb.addChildQueryBuilder(
+        this.entityData.type === EntityType.CASE ?
+          'case' :
+          'contactOfContact'
+      ).filter.byEquality('id', this.entityData.id);
     }
 
     // remove paginator from query builder
