@@ -417,7 +417,7 @@ const routes: Routes = [
   },
   // View History Follow Up
   {
-    path: ':contactOfContactId/follow-ups/:followUpId/history',
+    path: ':contactOfContactId/follow-ups/:followUpId/contactOfContact-history',
     ...followUpFoundation,
     data: {
       permissions: [
@@ -429,7 +429,7 @@ const routes: Routes = [
   },
   // View History Follow Up
   {
-    path: ':caseId/follow-ups/:followUpId/history',
+    path: ':caseId/follow-ups/:followUpId/case-history',
     ...followUpFoundation,
     data: {
       permissions: [

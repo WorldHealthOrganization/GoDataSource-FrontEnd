@@ -2612,7 +2612,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         this.entityData.type === EntityType.CASE ?
           'case' :
           'contactOfContact'
-      ).filter.byEquality('id', this.entityData.id);
+      )
+        .filter.byEquality('id', this.entityData.id);
     }
 
     // remove paginator from query builder

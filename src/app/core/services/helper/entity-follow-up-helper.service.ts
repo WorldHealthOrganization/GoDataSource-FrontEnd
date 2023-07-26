@@ -70,7 +70,17 @@ export class EntityFollowUpHelperService {
           iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP',
           action: {
             link: (item: FollowUpModel): string[] => {
-              return ['/contacts', item.personId, 'follow-ups', item.id, definitions.entityData.type === EntityType.CONTACT ? 'view' : 'history'];
+              return [
+                '/contacts',
+                item.personId,
+                'follow-ups',
+                item.id,
+                definitions.entityData.type === EntityType.CONTACT ?
+                  'view' :
+                  definitions.entityData.type === EntityType.CASE ?
+                    'case-history' :
+                    'contactOfContact-history'
+              ];
             }
           },
           visible: (item: FollowUpModel): boolean => {
