@@ -317,7 +317,8 @@
                                     <div
                                         *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && item.sourceFieldWithSelectedIndexes && (
                                             !!importableObject.modelPropertyValuesMap[item.destinationField] ||
-                                            addressFields[item.destinationField]
+                                            addressFields[item.destinationField] ||
+                                            roleFields[item.destinationField]
                                         )">
 
                                         <!-- Waiting for map ? -->
@@ -528,7 +529,8 @@
                                     <div
                                         *ngIf="item.sourceFieldWithoutIndexes && item.destinationField && item.sourceFieldWithSelectedIndexes && (
                                             !!importableObject.modelPropertyValuesMap[item.destinationField] ||
-                                            addressFields[item.destinationField]
+                                            addressFields[item.destinationField] ||
+                                            roleFields[item.destinationField]
                                         )">
 
                                         <!-- Waiting for map ? -->
@@ -581,7 +583,8 @@
                                 item.sourceFieldWithoutIndexes && item.destinationField &&
                                 distinctValuesCache && distinctValuesCache[item.sourceFieldWithoutIndexes] && (
                                     !!importableObject.modelPropertyValuesMap[item.destinationField] ||
-                                    addressFields[item.destinationField]
+                                    addressFields[item.destinationField] ||
+                                    roleFields[item.destinationField]
                                 )"
                             class="import-data-body-row-extra-details"
                             fxLayout="column">
@@ -629,6 +632,19 @@
                                                             '—'
                                                     )
                                                 }}
+                                            </div>
+
+                                            <!-- Option role -->
+                                            <div
+                                              fxFlex="1 1">
+                                              {{ roleFields[item.destinationField] && mappedOpt.destinationOption && userRoleIdMap[mappedOpt.destinationOption] ?
+                                              userRoleIdMap[mappedOpt.destinationOption] : (
+                                                mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
+                                                importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
+                                                  importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
+                                                  '—'
+                                              )
+                                              }}
                                             </div>
                                         </div>
 
@@ -720,36 +736,60 @@
                                             <div
                                                 fxFlex="1 1">
 
-                                                <!-- Not location ? -->
-                                                <app-form-select-single-v2
-                                                    *ngIf="!addressFields || !addressFields[item.destinationField]; else addressLocation"
+                                              <!-- Not location ? -->
+                                              <app-form-select-single-v2
+                                                *ngIf="!(addressFields && addressFields[item.destinationField]) && !(roleFields && roleFields[item.destinationField])"
+                                                name="mapObjectOptionsDestination"
+                                                required="true"
+                                                [ngModel]="mappedOpt.destinationOption"
+                                                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                                [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
+                                                [clearable]="true"
+                                                [disabled]="mappedOpt.readOnly"
+                                                (ngModelChange)="setMapOptionValue(mappedOpt, false, $event)">
+                                              </app-form-select-single-v2>
+
+                                              <!-- Location -->
+                                              <ng-container
+                                                *ngIf="addressFields && addressFields[item.destinationField]; then addressLocation">
+                                              </ng-container>
+                                              <ng-template
+                                                #addressLocation>
+                                                <div
+                                                  fxFlex
+                                                  class="import-data-body-row-edit-extra-details-row-location">
+                                                  <app-form-select-location-single-v2
                                                     name="mapObjectOptionsDestination"
                                                     required="true"
                                                     [ngModel]="mappedOpt.destinationOption"
                                                     [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                                    [options]="importableObject.modelPropertyValuesMap[item.destinationField]"
-                                                    [clearable]="true"
+                                                    [useOutbreakLocations]="useOutbreakLocations"
                                                     [disabled]="mappedOpt.readOnly"
-                                                    (ngModelChange)="setMapOptionValue(mappedOpt, false, $event)">
-                                                </app-form-select-single-v2>
+                                                    (selectedLocationChanged)="mappedOptionsLocationChanged(mappedOpt, $event)">
+                                                  </app-form-select-location-single-v2>
+                                                </div>
+                                              </ng-template>
 
-                                                <!-- Location -->
-                                                <ng-template
-                                                    #addressLocation>
-                                                    <div
-                                                        fxFlex
-                                                        class="import-data-body-row-edit-extra-details-row-location">
-                                                        <app-form-select-location-single-v2
-                                                            name="mapObjectOptionsDestination"
-                                                            required="true"
-                                                            [ngModel]="mappedOpt.destinationOption"
-                                                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                                            [useOutbreakLocations]="useOutbreakLocations"
-                                                            [disabled]="mappedOpt.readOnly"
-                                                            (selectedLocationChanged)="mappedOptionsLocationChanged(mappedOpt, $event)">
-                                                        </app-form-select-location-single-v2>
-                                                    </div>
-                                                </ng-template>
+                                              <!-- Role -->
+                                              <ng-container
+                                                *ngIf="roleFields && roleFields[item.destinationField]; then role">
+                                              </ng-container>
+                                              <ng-template
+                                                #role>
+                                                <div
+                                                  fxFlex
+                                                  class="import-data-body-row-edit-extra-details-row-role">
+                                                  <app-form-select-single-v2
+                                                    name="mapObjectOptionsDestination"
+                                                    required="true"
+                                                    [ngModel]="mappedOpt.destinationOption"
+                                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                                    [disabled]="mappedOpt.readOnly"
+                                                    [options]="userRoleOptions"
+                                                    (ngModelChange)="mappedOptionsRoleChanged(mappedOpt, $event)">
+                                                  </app-form-select-single-v2>
+                                                </div>
+                                              </ng-template>
                                             </div>
 
                                         </div>

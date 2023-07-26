@@ -37,6 +37,10 @@ export class ImportUserDataComponent implements OnInit, OnDestroy {
 
   ImportServerModelNames = ImportServerModelNames;
 
+  roleFields = {
+    'roleIds[]': true
+  };
+
   requiredDestinationFields = [
     'firstName',
     'lastName',

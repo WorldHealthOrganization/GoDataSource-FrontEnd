@@ -7,6 +7,7 @@ import * as fromPages from './pages';
 import { Constants } from '../../core/models/constants';
 import { SavedImportMappingDataResolver } from '../../core/services/resolvers/data/saved-import-mapping.resolver';
 import { SelectedLanguageDataResolver } from '../../core/services/resolvers/data/selected-language.resolver';
+import { UserRoleDataResolver } from '../../core/services/resolvers/data/user-role.resolver';
 
 const routes: Routes = [
   // Import locations
@@ -203,7 +204,8 @@ const routes: Routes = [
       savedImportPage: Constants.APP_IMPORT_PAGE.USER_DATA.value
     },
     resolve: {
-      savedImportMapping: SavedImportMappingDataResolver
+      savedImportMapping: SavedImportMappingDataResolver,
+      userRole: UserRoleDataResolver
     }
   },
 

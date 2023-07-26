@@ -75,6 +75,7 @@ import {
 import { ILocation } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -291,6 +292,11 @@ export class ImportDataComponent
     [property: string]: boolean
   } = {};
 
+  // Role fields so we can use custom dropdowns
+  @Input() roleFields: {
+    [property: string]: boolean
+  } = {};
+
   // Required fields that user needs to map
   private requiredDestinationFieldsMap: {
     [modelProperty: string]: true
@@ -415,20 +421,23 @@ export class ImportDataComponent
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
-                    item.sourceFieldWithoutIndexes &&
-                    item.destinationField &&
-                    this.distinctValuesCache &&
-                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
-          !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
-                        this.addressFields[item.destinationField]
-        ) &&
-                    item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length && (
-          !this.usedSourceFieldOptionsForOptionMapping ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes || (
-            this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
-          )
-        );
+          item.sourceFieldWithoutIndexes &&
+          item.destinationField &&
+          this.distinctValuesCache &&
+          this.distinctValuesCache[item.sourceFieldWithoutIndexes] &&
+          (
+            !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+            this.addressFields[item.destinationField] ||
+            this.roleFields[item.destinationField]
+          ) &&
+          item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length &&
+          (
+            !this.usedSourceFieldOptionsForOptionMapping ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes || (
+              this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+            )
+          );
       },
       click: (
         item: ImportableMapField,
@@ -458,19 +467,22 @@ export class ImportDataComponent
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_EXPAND_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
-                    item.sourceFieldWithoutIndexes &&
-                    item.destinationField &&
-                    this.distinctValuesCache &&
-                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
-          !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
-                        this.addressFields[item.destinationField]
-        ) &&
-                    item.mappedOptionsCollapsed && (
-          !this.usedSourceFieldOptionsForOptionMapping ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes ||
-                        this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
-        );
+          item.sourceFieldWithoutIndexes &&
+          item.destinationField &&
+          this.distinctValuesCache &&
+          this.distinctValuesCache[item.sourceFieldWithoutIndexes] &&
+          (
+            !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+            this.addressFields[item.destinationField] ||
+            this.roleFields[item.destinationField]
+          ) &&
+          item.mappedOptionsCollapsed &&
+          (
+            !this.usedSourceFieldOptionsForOptionMapping ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes ||
+            this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+          );
       },
       click: (
         item: ImportableMapField,
@@ -490,14 +502,16 @@ export class ImportDataComponent
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_COLLAPSE_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
-                    item.sourceFieldWithoutIndexes &&
-                    item.destinationField &&
-                    this.distinctValuesCache &&
-                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
-          !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
-                        this.addressFields[item.destinationField]
-        ) &&
-                    !item.mappedOptionsCollapsed;
+          item.sourceFieldWithoutIndexes &&
+          item.destinationField &&
+          this.distinctValuesCache &&
+          this.distinctValuesCache[item.sourceFieldWithoutIndexes] &&
+          (
+            !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+            this.addressFields[item.destinationField] ||
+            this.roleFields[item.destinationField]
+          ) &&
+          !item.mappedOptionsCollapsed;
       },
       click: (
         item: ImportableMapField,
@@ -655,6 +669,15 @@ export class ImportDataComponent
     [indexKey: string]: string[]
   } = {};
 
+  // user roles
+  userRoleOptions: ILabelValuePairModel[] = [];
+  userRoleIdMap: {
+    [id: string]: string;
+  } = {};
+  userRoleNameMap: {
+    [name: string]: string;
+  } = {};
+
   // Used to keep function scope
   onWindowResizeScope: any;
 
@@ -682,7 +705,7 @@ export class ImportDataComponent
     private locationDataService: LocationDataService,
     private importLogDataService: ImportLogDataService,
     private importResultDataService: ImportResultDataService,
-    activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute
   ) {
     // list parent
     super(
@@ -1482,16 +1505,17 @@ export class ImportDataComponent
     // there is no point in setting mapped values if we  don't have to map something
     if (
       !importableItem.sourceFieldWithoutIndexes ||
-            !importableItem.destinationField ||
-            !this.distinctValuesCache ||
-            !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] || (
+      !importableItem.destinationField ||
+      !this.distinctValuesCache ||
+      !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] || (
         !this.importableObject.modelPropertyValuesMap[importableItem.destinationField] &&
-                !this.addressFields[importableItem.destinationField]
+        !this.addressFields[importableItem.destinationField] &&
+        !this.roleFields[importableItem.destinationField]
       ) || (
         this.usedSourceFieldOptionsForOptionMapping &&
-                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
-                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes &&
-                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes !== importableItem.sourceFieldWithSelectedIndexes
+        this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
+        this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes &&
+        this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes !== importableItem.sourceFieldWithSelectedIndexes
       )
     ) {
       return;
@@ -1524,16 +1548,22 @@ export class ImportDataComponent
           const destinationValue: string = restrictTo[mapOpt.sourceOption][0];
 
           // determine destination option
-          destinationOpt = this.addressFields[importableItem.destinationField] ? (
-            this.locationCache[destinationValue] ?
-              destinationValue :
-              undefined
-          ) : (
-            this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
-                            this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined ?
-              destinationValue :
-              undefined
-          );
+          if (
+            (
+              this.addressFields[importableItem.destinationField] &&
+              this.locationCache[destinationValue]
+            ) || (
+              this.roleFields[importableItem.destinationField] &&
+              this.userRoleIdMap[destinationValue]
+            ) || (
+              !this.addressFields[importableItem.destinationField] &&
+              !this.roleFields[importableItem.destinationField] &&
+              this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
+              this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined
+            )
+          ) {
+            destinationOpt = destinationValue;
+          }
 
           // found a possible destination field
           if (destinationOpt) {
@@ -1547,18 +1577,25 @@ export class ImportDataComponent
         // check if we can find a proper destination option
         const sourceOption: string = mapOpt.sourceOption;
         const sourceOptReduced: string = _.camelCase(sourceOption).toLowerCase();
-        destinationOpt = this.addressFields[importableItem.destinationField] ? (
-          this.locationCacheIndex[sourceOptReduced] && this.locationCacheIndex[sourceOptReduced].length === 1 ?
-            this.locationCacheIndex[sourceOptReduced][0] : (
-              this.locationCache && this.locationCache[sourceOption] ?
-                sourceOption :
-                undefined
-            )
-        ) : (
-          this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField] ?
-            this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced] :
-            undefined
-        );
+
+        if (this.addressFields[importableItem.destinationField]) {
+          if (
+            this.locationCacheIndex[sourceOptReduced] &&
+            this.locationCacheIndex[sourceOptReduced].length === 1
+          ) {
+            destinationOpt = this.locationCacheIndex[sourceOptReduced][0];
+          } else if (this.locationCache && this.locationCache[sourceOption]) {
+            destinationOpt = sourceOption;
+          }
+        } else if (this.roleFields[importableItem.destinationField]) {
+          if (
+            this.userRoleNameMap[sourceOptReduced]
+          ) {
+            destinationOpt = this.userRoleNameMap[sourceOptReduced];
+          }
+        } else if (this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField]) {
+          destinationOpt = this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced];
+        }
 
         // found a possible destination field
         if (destinationOpt) {
@@ -2600,12 +2637,13 @@ export class ImportDataComponent
       // this.distinctValuesCache && this.distinctValuesCache[field.sourceFieldWithoutIndexes]
       if (
         field.destinationField &&
-                field.sourceFieldWithoutIndexes && (
+        field.sourceFieldWithoutIndexes && (
           !!this.importableObject.modelPropertyValuesMap[field.destinationField] ||
-                    this.addressFields[field.destinationField]
+          this.addressFields[field.destinationField] ||
+          this.roleFields[field.destinationField]
         ) && (
           !this.distinctValuesCache ||
-                    !this.distinctValuesCache[field.sourceFieldWithoutIndexes]
+          !this.distinctValuesCache[field.sourceFieldWithoutIndexes]
         )
       ) {
         this.needToMapOptions = true;
@@ -2820,7 +2858,8 @@ export class ImportDataComponent
         !field.destinationField ||
         !field.sourceFieldWithoutIndexes || (
           !this.importableObject.modelPropertyValuesMap[field.destinationField] &&
-          !this.addressFields[field.destinationField]
+          !this.addressFields[field.destinationField] &&
+          !this.roleFields[field.destinationField]
         ) ||
         this.distinctValuesCache[field.sourceFieldWithoutIndexes]
       ) {
@@ -2837,6 +2876,26 @@ export class ImportDataComponent
       // must retrieve locations ?
       if (this.addressFields[field.destinationField]) {
         mustRetrieveLocations[field.sourceFieldWithoutIndexes] = true;
+      }
+
+      // must retrieve roles ?
+      if (
+        this.roleFields[field.destinationField] &&
+        !this.userRoleOptions.length
+      ) {
+        this.userRoleOptions = (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
+        this.userRoleIdMap = this.userRoleOptions.reduce((result, obj) => {
+          result[obj.value] = obj.label;
+          return result;
+        }, {});
+        this.userRoleNameMap = this.userRoleOptions.reduce((result, obj) => {
+          // get only the first role found
+          const roleName = _.camelCase(obj.label).toLowerCase();
+          if (!this.userRoleNameMap[roleName]) {
+            result[roleName] = obj.value;
+            return result;
+          }
+        }, {});
       }
 
       // add to list of items to retrieve distinct values for
@@ -3387,6 +3446,22 @@ export class ImportDataComponent
 
     // set option value
     mappedOpt.destinationOption = locationAutoItem.id;
+
+    // prepare data
+    this.validateData();
+  }
+
+  /**
+   * Mapped field option role changed handler
+   */
+  mappedOptionsRoleChanged(
+    mappedOpt: IMappedOption,
+    roleId: string
+  ): void {
+    // set option value
+    mappedOpt.destinationOption = roleId && this.userRoleIdMap[roleId] ?
+      roleId :
+      null;
 
     // prepare data
     this.validateData();
