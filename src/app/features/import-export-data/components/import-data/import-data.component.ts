@@ -747,10 +747,11 @@ export class ImportDataComponent
   ngOnInit() {
     // init array levels
     this.possibleSourceDestinationLevels = [];
-    for (let level = 0; level < 100; level++) {
+    for (let level = 0; level < 300; level++) {
       this.possibleSourceDestinationLevels.push({
         label: (level + 1).toString(),
-        value: level
+        value: level,
+        order: level
       });
     }
 
