@@ -42,6 +42,7 @@ export class ImportUserDataComponent implements OnInit, OnDestroy {
   };
 
   outbreakFields = {
+    'activeOutbreakId': true,
     'outbreakIds[]': true
   };
 
