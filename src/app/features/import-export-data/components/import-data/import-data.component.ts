@@ -297,6 +297,11 @@ export class ImportDataComponent
     [property: string]: boolean
   } = {};
 
+  // Outbreak fields so we can use custom dropdowns
+  @Input() outbreakFields: {
+    [property: string]: boolean
+  } = {};
+
   // Required fields that user needs to map
   private requiredDestinationFieldsMap: {
     [modelProperty: string]: true
@@ -428,7 +433,8 @@ export class ImportDataComponent
           (
             !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
             this.addressFields[item.destinationField] ||
-            this.roleFields[item.destinationField]
+            this.roleFields[item.destinationField] ||
+            this.outbreakFields[item.destinationField]
           ) &&
           item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length &&
           (
@@ -474,7 +480,8 @@ export class ImportDataComponent
           (
             !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
             this.addressFields[item.destinationField] ||
-            this.roleFields[item.destinationField]
+            this.roleFields[item.destinationField] ||
+            this.outbreakFields[item.destinationField]
           ) &&
           item.mappedOptionsCollapsed &&
           (
@@ -509,7 +516,8 @@ export class ImportDataComponent
           (
             !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
             this.addressFields[item.destinationField] ||
-            this.roleFields[item.destinationField]
+            this.roleFields[item.destinationField] ||
+            this.outbreakFields[item.destinationField]
           ) &&
           !item.mappedOptionsCollapsed;
       },
@@ -675,6 +683,15 @@ export class ImportDataComponent
     [id: string]: string;
   } = {};
   userRoleNameMap: {
+    [name: string]: string;
+  } = {};
+
+  // outbreaks
+  outbreakOptions: ILabelValuePairModel[] = [];
+  outbreakIdMap: {
+    [id: string]: string;
+  } = {};
+  outbreakNameMap: {
     [name: string]: string;
   } = {};
 
@@ -1050,6 +1067,12 @@ export class ImportDataComponent
     this.distinctValuesCache = {};
     this.locationCache = {};
     this.locationCacheIndex = {};
+    this.userRoleOptions = [];
+    this.userRoleIdMap = {};
+    this.userRoleNameMap = {};
+    this.outbreakOptions = [];
+    this.outbreakIdMap = {};
+    this.outbreakNameMap = {};
     this.importableObject = new ImportableFileModel(
       jsonResponse,
       (token: string): string => {
@@ -1511,7 +1534,8 @@ export class ImportDataComponent
       !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] || (
         !this.importableObject.modelPropertyValuesMap[importableItem.destinationField] &&
         !this.addressFields[importableItem.destinationField] &&
-        !this.roleFields[importableItem.destinationField]
+        !this.roleFields[importableItem.destinationField] &&
+        !this.outbreakFields[importableItem.destinationField]
       ) || (
         this.usedSourceFieldOptionsForOptionMapping &&
         this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
@@ -1557,8 +1581,12 @@ export class ImportDataComponent
               this.roleFields[importableItem.destinationField] &&
               this.userRoleIdMap[destinationValue]
             ) || (
+              this.outbreakFields[importableItem.destinationField] &&
+              this.outbreakIdMap[destinationValue]
+            ) || (
               !this.addressFields[importableItem.destinationField] &&
               !this.roleFields[importableItem.destinationField] &&
+              !this.outbreakFields[importableItem.destinationField] &&
               this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
               this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined
             )
@@ -1593,6 +1621,12 @@ export class ImportDataComponent
             this.userRoleNameMap[sourceOptReduced]
           ) {
             destinationOpt = this.userRoleNameMap[sourceOptReduced];
+          }
+        } else if (this.outbreakFields[importableItem.destinationField]) {
+          if (
+            this.outbreakNameMap[sourceOptReduced]
+          ) {
+            destinationOpt = this.outbreakNameMap[sourceOptReduced];
           }
         } else if (this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField]) {
           destinationOpt = this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced];
@@ -1915,6 +1949,12 @@ export class ImportDataComponent
               this.distinctValuesCache = {};
               this.locationCache = {};
               this.locationCacheIndex = {};
+              this.userRoleOptions = [];
+              this.userRoleIdMap = {};
+              this.userRoleNameMap = {};
+              this.outbreakOptions = [];
+              this.outbreakIdMap = {};
+              this.outbreakNameMap = {};
 
               // update visible items count
               this.updateVisibleItemsCount();
@@ -2333,6 +2373,12 @@ export class ImportDataComponent
     this.distinctValuesCache = {};
     this.locationCache = {};
     this.locationCacheIndex = {};
+    this.userRoleOptions = [];
+    this.userRoleIdMap = {};
+    this.userRoleNameMap = {};
+    this.outbreakOptions = [];
+    this.outbreakIdMap = {};
+    this.outbreakNameMap = {};
     this.importableObject = null;
     this.notMappedTransData = {
       no: 0,
@@ -2641,7 +2687,8 @@ export class ImportDataComponent
         field.sourceFieldWithoutIndexes && (
           !!this.importableObject.modelPropertyValuesMap[field.destinationField] ||
           this.addressFields[field.destinationField] ||
-          this.roleFields[field.destinationField]
+          this.roleFields[field.destinationField] ||
+          this.outbreakFields[field.destinationField]
         ) && (
           !this.distinctValuesCache ||
           !this.distinctValuesCache[field.sourceFieldWithoutIndexes]
@@ -2860,7 +2907,8 @@ export class ImportDataComponent
         !field.sourceFieldWithoutIndexes || (
           !this.importableObject.modelPropertyValuesMap[field.destinationField] &&
           !this.addressFields[field.destinationField] &&
-          !this.roleFields[field.destinationField]
+          !this.roleFields[field.destinationField] &&
+          !this.outbreakFields[field.destinationField]
         ) ||
         this.distinctValuesCache[field.sourceFieldWithoutIndexes]
       ) {
@@ -2894,6 +2942,26 @@ export class ImportDataComponent
           const roleName = _.camelCase(obj.label).toLowerCase();
           if (!this.userRoleNameMap[roleName]) {
             result[roleName] = obj.value;
+            return result;
+          }
+        }, {});
+      }
+
+      // must retrieve outbreaks ?
+      if (
+        this.outbreakFields[field.destinationField] &&
+        !this.outbreakOptions.length
+      ) {
+        this.outbreakOptions = (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
+        this.outbreakIdMap = this.outbreakOptions.reduce((result, obj) => {
+          result[obj.value] = obj.label;
+          return result;
+        }, {});
+        this.outbreakNameMap = this.outbreakOptions.reduce((result, obj) => {
+          // get only the first outbreak found
+          const outbreakName = _.camelCase(obj.label).toLowerCase();
+          if (!this.outbreakNameMap[outbreakName]) {
+            result[outbreakName] = obj.value;
             return result;
           }
         }, {});
@@ -3462,6 +3530,22 @@ export class ImportDataComponent
     // set option value
     mappedOpt.destinationOption = roleId && this.userRoleIdMap[roleId] ?
       roleId :
+      null;
+
+    // prepare data
+    this.validateData();
+  }
+
+  /**
+   * Mapped field option outbreak changed handler
+   */
+  mappedOptionsOutbreakChanged(
+    mappedOpt: IMappedOption,
+    outbreakId: string
+  ): void {
+    // set option value
+    mappedOpt.destinationOption = outbreakId && this.outbreakIdMap[outbreakId] ?
+      outbreakId :
       null;
 
     // prepare data

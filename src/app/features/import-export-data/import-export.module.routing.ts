@@ -8,6 +8,7 @@ import { Constants } from '../../core/models/constants';
 import { SavedImportMappingDataResolver } from '../../core/services/resolvers/data/saved-import-mapping.resolver';
 import { SelectedLanguageDataResolver } from '../../core/services/resolvers/data/selected-language.resolver';
 import { UserRoleDataResolver } from '../../core/services/resolvers/data/user-role.resolver';
+import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
 
 const routes: Routes = [
   // Import locations
@@ -205,7 +206,8 @@ const routes: Routes = [
     },
     resolve: {
       savedImportMapping: SavedImportMappingDataResolver,
-      userRole: UserRoleDataResolver
+      userRole: UserRoleDataResolver,
+      outbreak: OutbreakDataResolver
     }
   },
 

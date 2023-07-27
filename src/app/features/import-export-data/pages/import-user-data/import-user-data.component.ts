@@ -41,6 +41,10 @@ export class ImportUserDataComponent implements OnInit, OnDestroy {
     'roleIds[]': true
   };
 
+  outbreakFields = {
+    'outbreakIds[]': true
+  };
+
   requiredDestinationFields = [
     'firstName',
     'lastName',
