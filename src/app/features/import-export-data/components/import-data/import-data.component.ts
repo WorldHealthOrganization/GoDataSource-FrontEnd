@@ -302,6 +302,11 @@ export class ImportDataComponent
     [property: string]: boolean
   } = {};
 
+  // Language fields so we can use custom dropdowns
+  @Input() languageFields: {
+    [property: string]: boolean
+  } = {};
+
   // Required fields that user needs to map
   private requiredDestinationFieldsMap: {
     [modelProperty: string]: true
@@ -434,7 +439,8 @@ export class ImportDataComponent
             !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
             this.addressFields[item.destinationField] ||
             this.roleFields[item.destinationField] ||
-            this.outbreakFields[item.destinationField]
+            this.outbreakFields[item.destinationField] ||
+            this.languageFields[item.destinationField]
           ) &&
           item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length &&
           (
@@ -481,7 +487,8 @@ export class ImportDataComponent
             !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
             this.addressFields[item.destinationField] ||
             this.roleFields[item.destinationField] ||
-            this.outbreakFields[item.destinationField]
+            this.outbreakFields[item.destinationField] ||
+            this.languageFields[item.destinationField]
           ) &&
           item.mappedOptionsCollapsed &&
           (
@@ -517,7 +524,8 @@ export class ImportDataComponent
             !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
             this.addressFields[item.destinationField] ||
             this.roleFields[item.destinationField] ||
-            this.outbreakFields[item.destinationField]
+            this.outbreakFields[item.destinationField] ||
+            this.languageFields[item.destinationField]
           ) &&
           !item.mappedOptionsCollapsed;
       },
@@ -692,6 +700,15 @@ export class ImportDataComponent
     [id: string]: string;
   } = {};
   outbreakNameMap: {
+    [name: string]: string;
+  } = {};
+
+  // languages
+  languageOptions: ILabelValuePairModel[] = [];
+  languageIdMap: {
+    [id: string]: string;
+  } = {};
+  languageNameMap: {
     [name: string]: string;
   } = {};
 
@@ -1073,6 +1090,9 @@ export class ImportDataComponent
     this.outbreakOptions = [];
     this.outbreakIdMap = {};
     this.outbreakNameMap = {};
+    this.languageOptions = [];
+    this.languageIdMap = {};
+    this.languageNameMap = {};
     this.importableObject = new ImportableFileModel(
       jsonResponse,
       (token: string): string => {
@@ -1535,7 +1555,8 @@ export class ImportDataComponent
         !this.importableObject.modelPropertyValuesMap[importableItem.destinationField] &&
         !this.addressFields[importableItem.destinationField] &&
         !this.roleFields[importableItem.destinationField] &&
-        !this.outbreakFields[importableItem.destinationField]
+        !this.outbreakFields[importableItem.destinationField] &&
+        !this.languageFields[importableItem.destinationField]
       ) || (
         this.usedSourceFieldOptionsForOptionMapping &&
         this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
@@ -1584,9 +1605,13 @@ export class ImportDataComponent
               this.outbreakFields[importableItem.destinationField] &&
               this.outbreakIdMap[destinationValue]
             ) || (
+              this.languageFields[importableItem.destinationField] &&
+              this.languageIdMap[destinationValue]
+            ) || (
               !this.addressFields[importableItem.destinationField] &&
               !this.roleFields[importableItem.destinationField] &&
               !this.outbreakFields[importableItem.destinationField] &&
+              !this.languageFields[importableItem.destinationField] &&
               this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
               this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined
             )
@@ -1627,6 +1652,12 @@ export class ImportDataComponent
             this.outbreakNameMap[sourceOptReduced]
           ) {
             destinationOpt = this.outbreakNameMap[sourceOptReduced];
+          }
+        } else if (this.languageFields[importableItem.destinationField]) {
+          if (
+            this.languageNameMap[sourceOptReduced]
+          ) {
+            destinationOpt = this.languageNameMap[sourceOptReduced];
           }
         } else if (this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField]) {
           destinationOpt = this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced];
@@ -1955,6 +1986,9 @@ export class ImportDataComponent
               this.outbreakOptions = [];
               this.outbreakIdMap = {};
               this.outbreakNameMap = {};
+              this.languageOptions = [];
+              this.languageIdMap = {};
+              this.languageNameMap = {};
 
               // update visible items count
               this.updateVisibleItemsCount();
@@ -2379,6 +2413,9 @@ export class ImportDataComponent
     this.outbreakOptions = [];
     this.outbreakIdMap = {};
     this.outbreakNameMap = {};
+    this.languageOptions = [];
+    this.languageIdMap = {};
+    this.languageNameMap = {};
     this.importableObject = null;
     this.notMappedTransData = {
       no: 0,
@@ -2688,7 +2725,8 @@ export class ImportDataComponent
           !!this.importableObject.modelPropertyValuesMap[field.destinationField] ||
           this.addressFields[field.destinationField] ||
           this.roleFields[field.destinationField] ||
-          this.outbreakFields[field.destinationField]
+          this.outbreakFields[field.destinationField] ||
+          this.languageFields[field.destinationField]
         ) && (
           !this.distinctValuesCache ||
           !this.distinctValuesCache[field.sourceFieldWithoutIndexes]
@@ -2908,7 +2946,8 @@ export class ImportDataComponent
           !this.importableObject.modelPropertyValuesMap[field.destinationField] &&
           !this.addressFields[field.destinationField] &&
           !this.roleFields[field.destinationField] &&
-          !this.outbreakFields[field.destinationField]
+          !this.outbreakFields[field.destinationField] &&
+          !this.languageFields[field.destinationField]
         ) ||
         this.distinctValuesCache[field.sourceFieldWithoutIndexes]
       ) {
@@ -2962,6 +3001,26 @@ export class ImportDataComponent
           const outbreakName = _.camelCase(obj.label).toLowerCase();
           if (!this.outbreakNameMap[outbreakName]) {
             result[outbreakName] = obj.value;
+            return result;
+          }
+        }, {});
+      }
+
+      // must retrieve languages ?
+      if (
+        this.languageFields[field.destinationField] &&
+        !this.languageOptions.length
+      ) {
+        this.languageOptions = (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
+        this.languageIdMap = this.languageOptions.reduce((result, obj) => {
+          result[obj.value] = obj.label;
+          return result;
+        }, {});
+        this.languageNameMap = this.languageOptions.reduce((result, obj) => {
+          // get only the first language found
+          const languageName = _.camelCase(obj.label).toLowerCase();
+          if (!this.languageNameMap[languageName]) {
+            result[languageName] = obj.value;
             return result;
           }
         }, {});
@@ -3546,6 +3605,22 @@ export class ImportDataComponent
     // set option value
     mappedOpt.destinationOption = outbreakId && this.outbreakIdMap[outbreakId] ?
       outbreakId :
+      null;
+
+    // prepare data
+    this.validateData();
+  }
+
+  /**
+   * Mapped field option language changed handler
+   */
+  mappedOptionsLanguageChanged(
+    mappedOpt: IMappedOption,
+    languageId: string
+  ): void {
+    // set option value
+    mappedOpt.destinationOption = languageId && this.languageIdMap[languageId] ?
+      languageId :
       null;
 
     // prepare data

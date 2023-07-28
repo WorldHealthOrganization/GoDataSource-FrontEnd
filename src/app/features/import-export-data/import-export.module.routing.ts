@@ -9,6 +9,7 @@ import { SavedImportMappingDataResolver } from '../../core/services/resolvers/da
 import { SelectedLanguageDataResolver } from '../../core/services/resolvers/data/selected-language.resolver';
 import { UserRoleDataResolver } from '../../core/services/resolvers/data/user-role.resolver';
 import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
+import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
 
 const routes: Routes = [
   // Import locations
@@ -207,7 +208,8 @@ const routes: Routes = [
     resolve: {
       savedImportMapping: SavedImportMappingDataResolver,
       userRole: UserRoleDataResolver,
-      outbreak: OutbreakDataResolver
+      outbreak: OutbreakDataResolver,
+      language: LanguageDataResolver
     }
   },
 
