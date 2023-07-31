@@ -137,6 +137,27 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       // keep default tab order
       this._tabsDefaultOrder[tab.name || tab.label] = tabIndex;
 
+      // map inputs
+      if (tab.type === CreateViewModifyV2TabInputType.TAB) {
+        tab.nameToInput = {};
+        tab.sections?.forEach((section) => {
+          section.inputs?.forEach((input) => {
+            // nothing to do ?
+            const inputWithName: {
+              name?: string
+            } = input as {
+              name?: string
+            };
+            if (!inputWithName.name) {
+              return;
+            }
+
+            // map
+            tab.nameToInput[inputWithName.name] = input;
+          });
+        });
+      }
+
       // not important ?
       if (tab.type !== CreateViewModifyV2TabInputType.TAB_TABLE) {
         return;

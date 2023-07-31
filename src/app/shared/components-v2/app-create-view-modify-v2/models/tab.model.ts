@@ -248,7 +248,7 @@ interface ICreateViewModifyV2TabInputPassword extends Omit<ICreateViewModifyV2Ta
 /**
  * Input - select single
  */
-interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+export interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.SELECT_SINGLE;
   options: ILabelValuePairModel[];
@@ -664,8 +664,13 @@ export interface ICreateViewModifyV2Tab {
 
   // optional
   visible?: () => boolean
-  form?: NgForm;
   invalidHTMLSuffix?: (tab: ICreateViewModifyV2Tab) => string;
+
+  // used by ui
+  form?: NgForm;
+  nameToInput?: {
+    [name: string]: CreateViewModifyV2TabInput
+  };
 }
 
 /**
