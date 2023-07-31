@@ -1338,7 +1338,11 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
 
     // retrieve data
     this.expandListRecords$ = this.outbreakDataService
-      .getOutbreaksList(data.queryBuilder)
+      .getOutbreaksList(
+        data.queryBuilder,
+        true,
+        true
+      )
       .pipe(
         // should be the last pipe
         takeUntil(this.destroyed$)

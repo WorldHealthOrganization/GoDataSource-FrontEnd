@@ -52,6 +52,8 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
   ) {
     super(
       listHelperService, {
+        // required to allow big filters that are bigger than the size allowed by the browser
+        disableFilterCachingOnlyUrl: true,
         disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
@@ -1233,7 +1235,11 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
 
     // retrieve the list of Outbreaks
     this.records$ = this.outbreakDataService
-      .getOutbreaksList(this.queryBuilder)
+      .getOutbreaksList(
+        this.queryBuilder,
+        true,
+        true
+      )
       .pipe(
         switchMap((data) => {
           // determine locations that we need to retrieve
