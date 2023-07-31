@@ -52,6 +52,8 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
   ) {
     super(
       listHelperService, {
+        // required to allow big filters that are bigger than the size allowed by the browser
+        disableFilterCachingOnlyUrl: true,
         disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
@@ -1233,7 +1235,11 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
 
     // retrieve the list of Outbreaks
     this.records$ = this.outbreakDataService
-      .getOutbreaksList(this.queryBuilder)
+      .getOutbreaksList(
+        this.queryBuilder,
+        true,
+        true
+      )
       .pipe(
         switchMap((data) => {
           // determine locations that we need to retrieve
@@ -1304,14 +1310,9 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
   /**
    * Get total number of items, based on the applied filters
    */
-  refreshListCount(applyHasMoreLimit?: boolean) {
+  refreshListCount() {
     // reset
     this.pageCount = undefined;
-
-    // set apply value
-    if (applyHasMoreLimit !== undefined) {
-      this.applyHasMoreLimit = applyHasMoreLimit;
-    }
 
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
@@ -1324,14 +1325,12 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       countQueryBuilder.filter.includeDeletedRecordsWhereField();
     }
 
-    // apply has more limit
-    if (this.applyHasMoreLimit) {
-      countQueryBuilder.flag('applyHasMoreLimit', true);
-    }
-
     // count
     this.outbreakDataService
-      .getOutbreaksCount(countQueryBuilder)
+      .getOutbreaksCount(
+        countQueryBuilder,
+        true
+      )
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
