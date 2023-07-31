@@ -140,10 +140,8 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   // disable next load from cache input values ?
   private _disableNextLoadCachedInputValues: boolean = false;
   private _loadedCachedFilterPage: string;
-  private _disableFilterCaching: boolean = false;
-  get disableFilterCaching(): boolean {
-    return this._disableFilterCaching;
-  }
+  private readonly _disableFilterCaching: boolean = false;
+  private readonly _disableFilterCachingOnlyUrl: boolean = false;
 
   // timers
   private _initializeTimer: number;
@@ -225,6 +223,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     config?: {
       // optional
       disableFilterCaching?: boolean,
+      disableFilterCachingOnlyUrl?: boolean,
       disableWaitForSelectedOutbreakToRefreshList?: boolean,
       initializeTableColumnsAfterSelectedOutbreakChanged?: boolean,
       initializeTableAdvancedFiltersAfterSelectedOutbreakChanged?: boolean
@@ -403,6 +402,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
     // disable filter caching ?
     this._disableFilterCaching = !!config?.disableFilterCaching;
+    this._disableFilterCachingOnlyUrl = !!config?.disableFilterCachingOnlyUrl;
 
     // check filters
     this.checkListFilters();
@@ -1067,6 +1067,12 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Save cache to url
    */
   private saveCacheToUrl(currentUserCache: ICachedFilterItems): void {
+    // disabled ?
+    if (this._disableFilterCachingOnlyUrl) {
+      return;
+    }
+
+    // update
     this.mergeQueryParamsToUrl({
       cachedListFilters: JSON.stringify(currentUserCache)
     });
