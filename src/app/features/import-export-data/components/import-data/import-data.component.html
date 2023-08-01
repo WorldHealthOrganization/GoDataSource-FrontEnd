@@ -320,7 +320,8 @@
                                             addressFields[item.destinationField] ||
                                             roleFields[item.destinationField] ||
                                             outbreakFields[item.destinationField] ||
-                                            languageFields[item.destinationField]
+                                            languageFields[item.destinationField] ||
+                                            userFields[item.destinationField]
                                         )">
 
                                         <!-- Waiting for map ? -->
@@ -534,7 +535,8 @@
                                             addressFields[item.destinationField] ||
                                             roleFields[item.destinationField] ||
                                             outbreakFields[item.destinationField] ||
-                                            languageFields[item.destinationField]
+                                            languageFields[item.destinationField] ||
+                                            userFields[item.destinationField]
                                         )">
 
                                         <!-- Waiting for map ? -->
@@ -590,7 +592,8 @@
                                     addressFields[item.destinationField] ||
                                     roleFields[item.destinationField] ||
                                     outbreakFields[item.destinationField] ||
-                                    languageFields[item.destinationField]
+                                    languageFields[item.destinationField] ||
+                                    userFields[item.destinationField]
                                 )"
                             class="import-data-body-row-extra-details"
                             fxLayout="column">
@@ -679,8 +682,22 @@
                                                 importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
                                                   importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
                                                   '—'
+                                               )
+                                               }}
+                                            </div>
+
+                                            <!-- Option user -->
+                                            <div
+                                              *ngIf="userFields[item.destinationField] && mappedOpt.destinationOption && userIdMap[mappedOpt.destinationOption]"
+                                              fxFlex="1 1">
+                                              {{ userFields[item.destinationField] && mappedOpt.destinationOption && userIdMap[mappedOpt.destinationOption] ?
+                                              userIdMap[mappedOpt.destinationOption] : (
+                                                mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
+                                                importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
+                                                  importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
+                                                  '—'
                                               )
-                                                }}
+                                              }}
                                             </div>
                                         </div>
 
@@ -777,7 +794,8 @@
                                                 *ngIf="!(addressFields && addressFields[item.destinationField]) &&
                                                   !(roleFields && roleFields[item.destinationField]) &&
                                                   !(outbreakFields && outbreakFields[item.destinationField]) &&
-                                                  !(languageFields && languageFields[item.destinationField])"
+                                                  !(languageFields && languageFields[item.destinationField]) &&
+                                                  !(userFields && userFields[item.destinationField])"
                                                 name="mapObjectOptionsDestination"
                                                 required="true"
                                                 [ngModel]="mappedOpt.destinationOption"
@@ -851,7 +869,7 @@
                                                 </div>
                                               </ng-template>
 
-                                                <!-- Language -->
+                                              <!-- Language -->
                                               <ng-container
                                                 *ngIf="languageFields && languageFields[item.destinationField]; then language">
                                               </ng-container>
@@ -868,6 +886,27 @@
                                                     [disabled]="mappedOpt.readOnly"
                                                     [options]="languageOptions"
                                                     (ngModelChange)="mappedOptionsLanguageChanged(mappedOpt, $event)">
+                                                  </app-form-select-single-v2>
+                                                </div>
+                                              </ng-template>
+
+                                              <!-- User -->
+                                              <ng-container
+                                                *ngIf="userFields && userFields[item.destinationField]; then user">
+                                              </ng-container>
+                                              <ng-template
+                                                #user>
+                                                <div
+                                                  fxFlex
+                                                  class="import-data-body-row-edit-extra-details-row-custom-dropdown">
+                                                  <app-form-select-single-v2
+                                                    name="mapObjectOptionsDestination"
+                                                    required="true"
+                                                    [ngModel]="mappedOpt.destinationOption"
+                                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                                    [disabled]="mappedOpt.readOnly"
+                                                    [options]="userOptions"
+                                                    (ngModelChange)="mappedOptionsUserChanged(mappedOpt, $event)">
                                                   </app-form-select-single-v2>
                                                 </div>
                                               </ng-template>

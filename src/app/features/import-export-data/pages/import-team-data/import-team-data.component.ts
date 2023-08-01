@@ -33,6 +33,14 @@ export class ImportTeamDataComponent implements OnInit {
     ImportDataExtension.ZIP
   ];
 
+  addressFields = {
+    'locationIds[]': true
+  };
+
+  userFields = {
+    'userIds[]': true
+  };
+
   ImportServerModelNames = ImportServerModelNames;
 
   requiredDestinationFields = [

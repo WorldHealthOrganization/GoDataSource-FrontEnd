@@ -10,6 +10,7 @@ import { SelectedLanguageDataResolver } from '../../core/services/resolvers/data
 import { UserRoleDataResolver } from '../../core/services/resolvers/data/user-role.resolver';
 import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
 import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 
 const routes: Routes = [
   // Import locations
@@ -241,7 +242,8 @@ const routes: Routes = [
       savedImportPage: Constants.APP_IMPORT_PAGE.TEAM_DATA.value
     },
     resolve: {
-      savedImportMapping: SavedImportMappingDataResolver
+      savedImportMapping: SavedImportMappingDataResolver,
+      user: UserDataResolver
     }
   }
 ];

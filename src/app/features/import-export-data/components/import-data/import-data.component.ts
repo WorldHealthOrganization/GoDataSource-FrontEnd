@@ -307,6 +307,11 @@ export class ImportDataComponent
     [property: string]: boolean
   } = {};
 
+  // user fields so we can use custom dropdowns
+  @Input() userFields: {
+    [property: string]: boolean
+  } = {};
+
   // Required fields that user needs to map
   private requiredDestinationFieldsMap: {
     [modelProperty: string]: true
@@ -440,7 +445,8 @@ export class ImportDataComponent
             this.addressFields[item.destinationField] ||
             this.roleFields[item.destinationField] ||
             this.outbreakFields[item.destinationField] ||
-            this.languageFields[item.destinationField]
+            this.languageFields[item.destinationField] ||
+            this.userFields[item.destinationField]
           ) &&
           item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length &&
           (
@@ -488,7 +494,8 @@ export class ImportDataComponent
             this.addressFields[item.destinationField] ||
             this.roleFields[item.destinationField] ||
             this.outbreakFields[item.destinationField] ||
-            this.languageFields[item.destinationField]
+            this.languageFields[item.destinationField] ||
+            this.userFields[item.destinationField]
           ) &&
           item.mappedOptionsCollapsed &&
           (
@@ -525,7 +532,8 @@ export class ImportDataComponent
             this.addressFields[item.destinationField] ||
             this.roleFields[item.destinationField] ||
             this.outbreakFields[item.destinationField] ||
-            this.languageFields[item.destinationField]
+            this.languageFields[item.destinationField] ||
+            this.userFields[item.destinationField]
           ) &&
           !item.mappedOptionsCollapsed;
       },
@@ -709,6 +717,15 @@ export class ImportDataComponent
     [id: string]: string;
   } = {};
   languageNameMap: {
+    [name: string]: string;
+  } = {};
+
+  // users
+  userOptions: ILabelValuePairModel[] = [];
+  userIdMap: {
+    [id: string]: string;
+  } = {};
+  userNameMap: {
     [name: string]: string;
   } = {};
 
@@ -1093,6 +1110,9 @@ export class ImportDataComponent
     this.languageOptions = [];
     this.languageIdMap = {};
     this.languageNameMap = {};
+    this.userOptions = [];
+    this.userIdMap = {};
+    this.userNameMap = {};
     this.importableObject = new ImportableFileModel(
       jsonResponse,
       (token: string): string => {
@@ -1556,7 +1576,8 @@ export class ImportDataComponent
         !this.addressFields[importableItem.destinationField] &&
         !this.roleFields[importableItem.destinationField] &&
         !this.outbreakFields[importableItem.destinationField] &&
-        !this.languageFields[importableItem.destinationField]
+        !this.languageFields[importableItem.destinationField] &&
+        !this.userFields[importableItem.destinationField]
       ) || (
         this.usedSourceFieldOptionsForOptionMapping &&
         this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
@@ -1608,10 +1629,14 @@ export class ImportDataComponent
               this.languageFields[importableItem.destinationField] &&
               this.languageIdMap[destinationValue]
             ) || (
+              this.userFields[importableItem.destinationField] &&
+              this.userIdMap[destinationValue]
+            ) || (
               !this.addressFields[importableItem.destinationField] &&
               !this.roleFields[importableItem.destinationField] &&
               !this.outbreakFields[importableItem.destinationField] &&
               !this.languageFields[importableItem.destinationField] &&
+              !this.userFields[importableItem.destinationField] &&
               this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
               this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined
             )
@@ -1658,6 +1683,12 @@ export class ImportDataComponent
             this.languageNameMap[sourceOptReduced]
           ) {
             destinationOpt = this.languageNameMap[sourceOptReduced];
+          }
+        } else if (this.userFields[importableItem.destinationField]) {
+          if (
+            this.userNameMap[sourceOptReduced]
+          ) {
+            destinationOpt = this.userNameMap[sourceOptReduced];
           }
         } else if (this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField]) {
           destinationOpt = this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced];
@@ -1989,6 +2020,9 @@ export class ImportDataComponent
               this.languageOptions = [];
               this.languageIdMap = {};
               this.languageNameMap = {};
+              this.userOptions = [];
+              this.userIdMap = {};
+              this.userNameMap = {};
 
               // update visible items count
               this.updateVisibleItemsCount();
@@ -2416,6 +2450,9 @@ export class ImportDataComponent
     this.languageOptions = [];
     this.languageIdMap = {};
     this.languageNameMap = {};
+    this.userOptions = [];
+    this.userIdMap = {};
+    this.userNameMap = {};
     this.importableObject = null;
     this.notMappedTransData = {
       no: 0,
@@ -2726,7 +2763,8 @@ export class ImportDataComponent
           this.addressFields[field.destinationField] ||
           this.roleFields[field.destinationField] ||
           this.outbreakFields[field.destinationField] ||
-          this.languageFields[field.destinationField]
+          this.languageFields[field.destinationField] ||
+          this.userFields[field.destinationField]
         ) && (
           !this.distinctValuesCache ||
           !this.distinctValuesCache[field.sourceFieldWithoutIndexes]
@@ -2947,7 +2985,8 @@ export class ImportDataComponent
           !this.addressFields[field.destinationField] &&
           !this.roleFields[field.destinationField] &&
           !this.outbreakFields[field.destinationField] &&
-          !this.languageFields[field.destinationField]
+          !this.languageFields[field.destinationField] &&
+          !this.userFields[field.destinationField]
         ) ||
         this.distinctValuesCache[field.sourceFieldWithoutIndexes]
       ) {
@@ -3021,6 +3060,26 @@ export class ImportDataComponent
           const languageName = _.camelCase(obj.label).toLowerCase();
           if (!this.languageNameMap[languageName]) {
             result[languageName] = obj.value;
+            return result;
+          }
+        }, {});
+      }
+
+      // must retrieve users ?
+      if (
+        this.userFields[field.destinationField] &&
+        !this.userOptions.length
+      ) {
+        this.userOptions = (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
+        this.userIdMap = this.userOptions.reduce((result, obj) => {
+          result[obj.value] = obj.label;
+          return result;
+        }, {});
+        this.userNameMap = this.userOptions.reduce((result, obj) => {
+          // get only the first user found
+          const userName = _.camelCase(obj.label).toLowerCase();
+          if (!this.userNameMap[userName]) {
+            result[userName] = obj.value;
             return result;
           }
         }, {});
@@ -3621,6 +3680,22 @@ export class ImportDataComponent
     // set option value
     mappedOpt.destinationOption = languageId && this.languageIdMap[languageId] ?
       languageId :
+      null;
+
+    // prepare data
+    this.validateData();
+  }
+
+  /**
+   * Mapped field option user changed handler
+   */
+  mappedOptionsUserChanged(
+    mappedOpt: IMappedOption,
+    userId: string
+  ): void {
+    // set option value
+    mappedOpt.destinationOption = userId && this.userIdMap[userId] ?
+      userId :
       null;
 
     // prepare data
