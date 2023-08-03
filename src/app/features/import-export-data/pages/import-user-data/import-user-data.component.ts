@@ -37,6 +37,10 @@ export class ImportUserDataComponent implements OnInit, OnDestroy {
 
   ImportServerModelNames = ImportServerModelNames;
 
+  fieldsWithoutTokens = {
+    'securityQuestions[]': 'LNG_USER_FIELD_LABEL_SECURITY_QUESTIONS'
+  };
+
   roleFields = {
     'roleIds[]': true
   };
