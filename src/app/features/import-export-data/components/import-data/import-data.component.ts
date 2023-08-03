@@ -1098,21 +1098,8 @@ export class ImportDataComponent
     }
 
     // construct importable file object
+    this.resetCustomDropdowns();
     this.distinctValuesCache = {};
-    this.locationCache = {};
-    this.locationCacheIndex = {};
-    this.userRoleOptions = [];
-    this.userRoleIdMap = {};
-    this.userRoleNameMap = {};
-    this.outbreakOptions = [];
-    this.outbreakIdMap = {};
-    this.outbreakNameMap = {};
-    this.languageOptions = [];
-    this.languageIdMap = {};
-    this.languageNameMap = {};
-    this.userOptions = [];
-    this.userIdMap = {};
-    this.userNameMap = {};
     this.importableObject = new ImportableFileModel(
       jsonResponse,
       (token: string): string => {
@@ -2008,22 +1995,8 @@ export class ImportDataComponent
               this.mappedFieldsVisible = [];
               this.mappedFields = [];
               this.updateNotMappedFileColumnsData();
+              this.resetCustomDropdowns();
               this.distinctValuesCache = {};
-              this.locationCache = {};
-              this.locationCacheIndex = {};
-              this.userRoleOptions = [];
-              this.userRoleIdMap = {};
-              this.userRoleNameMap = {};
-              this.outbreakOptions = [];
-              this.outbreakIdMap = {};
-              this.outbreakNameMap = {};
-              this.languageOptions = [];
-              this.languageIdMap = {};
-              this.languageNameMap = {};
-              this.userOptions = [];
-              this.userIdMap = {};
-              this.userNameMap = {};
-
               // update visible items count
               this.updateVisibleItemsCount();
 
@@ -2438,21 +2411,8 @@ export class ImportDataComponent
      */
   tryAgain() {
     // reset data
+    this.resetCustomDropdowns();
     this.distinctValuesCache = {};
-    this.locationCache = {};
-    this.locationCacheIndex = {};
-    this.userRoleOptions = [];
-    this.userRoleIdMap = {};
-    this.userRoleNameMap = {};
-    this.outbreakOptions = [];
-    this.outbreakIdMap = {};
-    this.outbreakNameMap = {};
-    this.languageOptions = [];
-    this.languageIdMap = {};
-    this.languageNameMap = {};
-    this.userOptions = [];
-    this.userIdMap = {};
-    this.userNameMap = {};
     this.importableObject = null;
     this.notMappedTransData = {
       no: 0,
@@ -4142,7 +4102,7 @@ export class ImportDataComponent
       return '-';
     }
 
-    // check custom dropdowns
+    // check custom dropdown
     if (this.addressFields[destinationField] && this.locationCache[destinationOption]) {
       return this.locationCache[destinationOption].label;
     } else if (this.roleFields[destinationField] && this.userRoleIdMap[destinationOption]) {
@@ -4154,11 +4114,31 @@ export class ImportDataComponent
     } else if (this.userFields[destinationField] && this.userIdMap[destinationOption]) {
       return this.userIdMap[destinationOption];
     } else {
-      // general drodown
+      // general dropdown
       return this.importableObject.modelPropertyValuesMapChildMap[destinationField] &&
       this.importableObject.modelPropertyValuesMapChildMap[destinationField][destinationOption] ?
         this.importableObject.modelPropertyValuesMapChildMap[destinationField][destinationOption] :
         '—';
     }
+  }
+
+  /**
+   * Reset custom dropdowns data
+   */
+  private resetCustomDropdowns(){
+    this.locationCache = {};
+    this.locationCacheIndex = {};
+    this.userRoleOptions = [];
+    this.userRoleIdMap = {};
+    this.userRoleNameMap = {};
+    this.outbreakOptions = [];
+    this.outbreakIdMap = {};
+    this.outbreakNameMap = {};
+    this.languageOptions = [];
+    this.languageIdMap = {};
+    this.languageNameMap = {};
+    this.userOptions = [];
+    this.userIdMap = {};
+    this.userNameMap = {};
   }
 }
