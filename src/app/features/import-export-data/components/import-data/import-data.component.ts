@@ -4129,4 +4129,36 @@ export class ImportDataComponent
         ]
       }).subscribe();
   }
+
+  /**
+   * Maps the option value from a dropdown
+   */
+  getOptionValue(destinationField: string, destinationOption: string): string {
+    // return if no valid input provided
+    if (
+      !destinationField ||
+      !destinationOption
+    ) {
+      return '-';
+    }
+
+    // check custom dropdowns
+    if (this.addressFields[destinationField] && this.locationCache[destinationOption]) {
+      return this.locationCache[destinationOption].label;
+    } else if (this.roleFields[destinationField] && this.userRoleIdMap[destinationOption]) {
+      return this.userRoleIdMap[destinationOption];
+    } else if (this.outbreakFields[destinationField] && this.outbreakIdMap[destinationOption]) {
+      return this.outbreakIdMap[destinationOption];
+    } else if (this.languageFields[destinationField] && this.languageIdMap[destinationOption]) {
+      return this.languageIdMap[destinationOption];
+    } else if (this.userFields[destinationField] && this.userIdMap[destinationOption]) {
+      return this.userIdMap[destinationOption];
+    } else {
+      // general drodown
+      return this.importableObject.modelPropertyValuesMapChildMap[destinationField] &&
+      this.importableObject.modelPropertyValuesMapChildMap[destinationField][destinationOption] ?
+        this.importableObject.modelPropertyValuesMapChildMap[destinationField][destinationOption] :
+        '—';
+    }
+  }
 }

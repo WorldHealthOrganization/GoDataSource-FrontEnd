@@ -632,72 +632,8 @@
 
                                             <!-- Option Destination -->
                                             <div
-                                                *ngIf="addressFields[item.destinationField] && mappedOpt.destinationOption && locationCache[mappedOpt.destinationOption]"
                                                 fxFlex="1 1">
-                                                {{ addressFields[item.destinationField] && mappedOpt.destinationOption && locationCache[mappedOpt.destinationOption] ?
-                                                    locationCache[mappedOpt.destinationOption].label : (
-                                                        mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
-                                                        importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
-                                                            importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
-                                                            '—'
-                                                    )
-                                                }}
-                                            </div>
-
-                                            <!-- Option role -->
-                                            <div
-                                              *ngIf="roleFields[item.destinationField] && mappedOpt.destinationOption && userRoleIdMap[mappedOpt.destinationOption]"
-                                              fxFlex="1 1">
-                                              {{ roleFields[item.destinationField] && mappedOpt.destinationOption && userRoleIdMap[mappedOpt.destinationOption] ?
-                                              userRoleIdMap[mappedOpt.destinationOption] : (
-                                                mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
-                                                importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
-                                                  importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
-                                                  '—'
-                                              )
-                                              }}
-                                            </div>
-
-                                            <!-- Option outbreak -->
-                                            <div
-                                              *ngIf="outbreakFields[item.destinationField] && mappedOpt.destinationOption && outbreakIdMap[mappedOpt.destinationOption]"
-                                              fxFlex="1 1">
-                                              {{ outbreakFields[item.destinationField] && mappedOpt.destinationOption && outbreakIdMap[mappedOpt.destinationOption] ?
-                                              outbreakIdMap[mappedOpt.destinationOption] : (
-                                                mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
-                                                importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
-                                                  importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
-                                                  '—'
-                                              )
-                                              }}
-                                            </div>
-
-                                            <!-- Option language -->
-                                            <div
-                                              *ngIf="languageFields[item.destinationField] && mappedOpt.destinationOption && languageIdMap[mappedOpt.destinationOption]"
-                                              fxFlex="1 1">
-                                              {{ languageFields[item.destinationField] && mappedOpt.destinationOption && languageIdMap[mappedOpt.destinationOption] ?
-                                              languageIdMap[mappedOpt.destinationOption] : (
-                                                mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
-                                                importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
-                                                  importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
-                                                  '—'
-                                               )
-                                               }}
-                                            </div>
-
-                                            <!-- Option user -->
-                                            <div
-                                              *ngIf="userFields[item.destinationField] && mappedOpt.destinationOption && userIdMap[mappedOpt.destinationOption]"
-                                              fxFlex="1 1">
-                                              {{ userFields[item.destinationField] && mappedOpt.destinationOption && userIdMap[mappedOpt.destinationOption] ?
-                                              userIdMap[mappedOpt.destinationOption] : (
-                                                mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
-                                                importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
-                                                  importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
-                                                  '—'
-                                              )
-                                              }}
+                                                  {{ getOptionValue(item.destinationField, mappedOpt.destinationOption) }}
                                             </div>
                                         </div>
 
