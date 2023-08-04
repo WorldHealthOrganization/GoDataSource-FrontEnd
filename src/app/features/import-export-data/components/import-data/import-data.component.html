@@ -731,7 +731,7 @@
                                                   !(roleFields && roleFields[item.destinationField]) &&
                                                   !(outbreakFields && outbreakFields[item.destinationField]) &&
                                                   !(languageFields && languageFields[item.destinationField]) &&
-                                                  !(userFields && userFields[item.destinationField])"
+                                                  !(userFields && userFields[item.destinationField]); else addressTemplate"
                                                 name="mapObjectOptionsDestination"
                                                 required="true"
                                                 [ngModel]="mappedOpt.destinationOption"
@@ -742,13 +742,10 @@
                                                 (ngModelChange)="setMapOptionValue(mappedOpt, false, $event)">
                                               </app-form-select-single-v2>
 
-                                              <!-- Location -->
-                                              <ng-container
-                                                *ngIf="addressFields && addressFields[item.destinationField]; then addressLocation">
-                                              </ng-container>
-                                              <ng-template
-                                                #addressLocation>
+                                              <ng-template #addressTemplate>
+                                                <!-- Location -->
                                                 <div
+                                                  *ngIf="addressFields && addressFields[item.destinationField]; else otherTemplates"
                                                   fxFlex
                                                   class="import-data-body-row-edit-extra-details-row-custom-dropdown">
                                                   <app-form-select-location-single-v2
@@ -762,13 +759,8 @@
                                                   </app-form-select-location-single-v2>
                                                 </div>
                                               </ng-template>
-
-                                              <!-- Role -->
-                                              <ng-container
-                                                *ngIf="roleFields && roleFields[item.destinationField]; then role">
-                                              </ng-container>
-                                              <ng-template
-                                                #role>
+                                              <ng-template #otherTemplates>
+                                                <!-- Roles/Outbreaks/Languages/User -->
                                                 <div
                                                   fxFlex
                                                   class="import-data-body-row-edit-extra-details-row-custom-dropdown">
@@ -778,71 +770,8 @@
                                                     [ngModel]="mappedOpt.destinationOption"
                                                     [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                                                     [disabled]="mappedOpt.readOnly"
-                                                    [options]="userRoleOptions"
-                                                    (ngModelChange)="mappedOptionsRoleChanged(mappedOpt, $event)">
-                                                  </app-form-select-single-v2>
-                                                </div>
-                                              </ng-template>
-
-                                              <!-- Outbreak -->
-                                              <ng-container
-                                                *ngIf="outbreakFields && outbreakFields[item.destinationField]; then outbreak">
-                                              </ng-container>
-                                              <ng-template
-                                                #outbreak>
-                                                <div
-                                                  fxFlex
-                                                  class="import-data-body-row-edit-extra-details-row-custom-dropdown">
-                                                  <app-form-select-single-v2
-                                                    name="mapObjectOptionsDestination"
-                                                    required="true"
-                                                    [ngModel]="mappedOpt.destinationOption"
-                                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                                    [disabled]="mappedOpt.readOnly"
-                                                    [options]="outbreakOptions"
-                                                    (ngModelChange)="mappedOptionsOutbreakChanged(mappedOpt, $event)">
-                                                  </app-form-select-single-v2>
-                                                </div>
-                                              </ng-template>
-
-                                              <!-- Language -->
-                                              <ng-container
-                                                *ngIf="languageFields && languageFields[item.destinationField]; then language">
-                                              </ng-container>
-                                              <ng-template
-                                                #language>
-                                                <div
-                                                  fxFlex
-                                                  class="import-data-body-row-edit-extra-details-row-custom-dropdown">
-                                                  <app-form-select-single-v2
-                                                    name="mapObjectOptionsDestination"
-                                                    required="true"
-                                                    [ngModel]="mappedOpt.destinationOption"
-                                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                                    [disabled]="mappedOpt.readOnly"
-                                                    [options]="languageOptions"
-                                                    (ngModelChange)="mappedOptionsLanguageChanged(mappedOpt, $event)">
-                                                  </app-form-select-single-v2>
-                                                </div>
-                                              </ng-template>
-
-                                              <!-- User -->
-                                              <ng-container
-                                                *ngIf="userFields && userFields[item.destinationField]; then user">
-                                              </ng-container>
-                                              <ng-template
-                                                #user>
-                                                <div
-                                                  fxFlex
-                                                  class="import-data-body-row-edit-extra-details-row-custom-dropdown">
-                                                  <app-form-select-single-v2
-                                                    name="mapObjectOptionsDestination"
-                                                    required="true"
-                                                    [ngModel]="mappedOpt.destinationOption"
-                                                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
-                                                    [disabled]="mappedOpt.readOnly"
-                                                    [options]="userOptions"
-                                                    (ngModelChange)="mappedOptionsUserChanged(mappedOpt, $event)">
+                                                    [options]="userRoles.options"
+                                                    (ngModelChange)="mappedOptionsOtherTemplateChanged(item.destinationField, mappedOpt, $event)">
                                                   </app-form-select-single-v2>
                                                 </div>
                                               </ng-template>
