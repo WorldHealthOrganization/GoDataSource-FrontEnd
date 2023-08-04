@@ -3006,7 +3006,7 @@ export class ImportDataComponent
         this.languageFields[field.destinationField] &&
         !Object.keys(this.languageNameMap).length
       ) {
-        this.languages = (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<LanguageModel>);
+        this.languages = (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>);
         this.languages.list.forEach((item: LanguageModel) => {
           // ignore duplicates, get only the first item found
           const languageName: string = _.camelCase(item.name).toLowerCase();
@@ -3582,6 +3582,27 @@ export class ImportDataComponent
 
     // prepare data
     this.validateData();
+  }
+
+  /**
+   * Mapped field option role changed handler
+   */
+  getOptionsOtherTemplate(
+    destinationField: string
+  ): ILabelValuePairModel[] {
+    // return options
+    if (this.roleFields[destinationField]) {
+      return this.userRoles.options;
+    } else if (this.outbreakFields[destinationField]) {
+      return this.outbreaks.options;
+    } else if (this.languageFields[destinationField]) {
+      return this.languages.options;
+    } else if (this.userFields[destinationField]) {
+      return this.users.options;
+    }
+
+    // no template found
+    return [];
   }
 
   /**
