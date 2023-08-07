@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
-import { Constants } from '../../../../core/models/constants';
 import { ImportDataExtension } from '../../components/import-data/model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
+import {
+  UserModel,
+  UserRoleModel
+} from '../../../../core/models/user.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -18,7 +20,7 @@ export class ImportUserRoleDataComponent implements OnInit {
   breadcrumbs: IV2Breadcrumb[] = [];
 
   // constants for template usage
-  Constants = Constants;
+  ImportServerModelNames = ImportServerModelNames;
 
   // models
   authUser: UserModel;
@@ -32,8 +34,6 @@ export class ImportUserRoleDataComponent implements OnInit {
     ImportDataExtension.JSON,
     ImportDataExtension.ZIP
   ];
-
-  ImportServerModelNames = ImportServerModelNames;
 
   requiredDestinationFields = [
     'name'
@@ -75,7 +75,7 @@ export class ImportUserRoleDataComponent implements OnInit {
     }];
 
     // add list breadcrumb only if we have permission
-    if (UserModel.canList(this.authUser)) {
+    if (UserRoleModel.canList(this.authUser)) {
       this.breadcrumbs.push({
         label: 'LNG_PAGE_LIST_USER_ROLES_TITLE',
         action: {
@@ -95,7 +95,7 @@ export class ImportUserRoleDataComponent implements OnInit {
    * Finished import
    */
   finished() {
-    if (UserModel.canList(this.authUser)) {
+    if (UserRoleModel.canList(this.authUser)) {
       this.router.navigate(['/user-roles']);
     } else {
       // fallback

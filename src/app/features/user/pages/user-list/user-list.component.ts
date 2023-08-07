@@ -633,7 +633,7 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
           }
         },
 
-        // Onset report
+        // View workload
         {
           label: {
             get: () => 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USERS_WORKLOAD'

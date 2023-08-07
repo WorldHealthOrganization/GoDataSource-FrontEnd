@@ -696,41 +696,25 @@ export class ImportDataComponent
   } = {};
 
   // user roles
-  userRoles: IResolverV2ResponseModel<UserRoleModel> = {
-    list: [],
-    map: {},
-    options: []
-  };
+  userRoles: IResolverV2ResponseModel<UserRoleModel>;
   userRoleNameMap: {
     [name: string]: string;
   } = {};
 
   // outbreaks
-  outbreaks: IResolverV2ResponseModel<OutbreakModel> = {
-    list: [],
-    map: {},
-    options: []
-  };
+  outbreaks: IResolverV2ResponseModel<OutbreakModel>;
   outbreakNameMap: {
     [name: string]: string;
   } = {};
 
   // languages
-  languages: IResolverV2ResponseModel<LanguageModel> = {
-    list: [],
-    map: {},
-    options: []
-  };
+  languages: IResolverV2ResponseModel<LanguageModel>;
   languageNameMap: {
     [name: string]: string;
   } = {};
 
   // users
-  users: IResolverV2ResponseModel<UserModel> = {
-    list: [],
-    map: {},
-    options: []
-  };
+  users: IResolverV2ResponseModel<UserModel>;
   userNameMap: {
     [name: string]: string;
   } = {};
@@ -1649,7 +1633,6 @@ export class ImportDataComponent
         // check if we can find a proper destination option
         const sourceOption: string = mapOpt.sourceOption;
         const sourceOptReduced: string = _.camelCase(sourceOption).toLowerCase();
-
         if (this.addressFields[importableItem.destinationField]) {
           if (
             this.locationCacheIndex[sourceOptReduced] &&
@@ -1660,27 +1643,19 @@ export class ImportDataComponent
             destinationOpt = sourceOption;
           }
         } else if (this.roleFields[importableItem.destinationField]) {
-          if (
-            this.userRoleNameMap[sourceOptReduced]
-          ) {
+          if (this.userRoleNameMap[sourceOptReduced]) {
             destinationOpt = this.userRoleNameMap[sourceOptReduced];
           }
         } else if (this.outbreakFields[importableItem.destinationField]) {
-          if (
-            this.outbreakNameMap[sourceOptReduced]
-          ) {
+          if (this.outbreakNameMap[sourceOptReduced]) {
             destinationOpt = this.outbreakNameMap[sourceOptReduced];
           }
         } else if (this.languageFields[importableItem.destinationField]) {
-          if (
-            this.languageNameMap[sourceOptReduced]
-          ) {
+          if (this.languageNameMap[sourceOptReduced]) {
             destinationOpt = this.languageNameMap[sourceOptReduced];
           }
         } else if (this.userFields[importableItem.destinationField]) {
-          if (
-            this.userNameMap[sourceOptReduced]
-          ) {
+          if (this.userNameMap[sourceOptReduced]) {
             destinationOpt = this.userNameMap[sourceOptReduced];
           }
         } else if (this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField]) {

@@ -441,7 +441,6 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
     };
   }
 
-
   /**
    * Initialize table group actions
    */

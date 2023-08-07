@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
-import { Constants } from '../../../../core/models/constants';
 import { ImportDataExtension } from '../../components/import-data/model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { TeamModel } from '../../../../core/models/team.model';
 
 @Component({
   selector: 'app-import-team-data',
@@ -18,7 +18,7 @@ export class ImportTeamDataComponent implements OnInit {
   breadcrumbs: IV2Breadcrumb[] = [];
 
   // constants for template usage
-  Constants = Constants;
+  ImportServerModelNames = ImportServerModelNames;
 
   // models
   authUser: UserModel;
@@ -40,8 +40,6 @@ export class ImportTeamDataComponent implements OnInit {
   userFields = {
     'userIds[]': true
   };
-
-  ImportServerModelNames = ImportServerModelNames;
 
   requiredDestinationFields = [
     'name'
@@ -83,11 +81,11 @@ export class ImportTeamDataComponent implements OnInit {
     }];
 
     // add list breadcrumb only if we have permission
-    if (UserModel.canList(this.authUser)) {
+    if (TeamModel.canList(this.authUser)) {
       this.breadcrumbs.push({
         label: 'LNG_PAGE_LIST_TEAMS_TITLE',
         action: {
-          link: ['/users']
+          link: ['/teams']
         }
       });
     }
@@ -103,7 +101,7 @@ export class ImportTeamDataComponent implements OnInit {
    * Finished import
    */
   finished() {
-    if (UserModel.canList(this.authUser)) {
+    if (TeamModel.canList(this.authUser)) {
       this.router.navigate(['/teams']);
     } else {
       // fallback

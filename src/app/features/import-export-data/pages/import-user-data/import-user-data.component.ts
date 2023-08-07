@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
-import { Constants } from '../../../../core/models/constants';
 import { ImportDataExtension } from '../../components/import-data/model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -20,7 +19,7 @@ export class ImportUserDataComponent implements OnInit, OnDestroy {
   breadcrumbs: IV2Breadcrumb[] = [];
 
   // constants for template usage
-  Constants = Constants;
+  ImportServerModelNames = ImportServerModelNames;
 
   // models
   authUser: UserModel;
@@ -34,8 +33,6 @@ export class ImportUserDataComponent implements OnInit, OnDestroy {
     ImportDataExtension.JSON,
     ImportDataExtension.ZIP
   ];
-
-  ImportServerModelNames = ImportServerModelNames;
 
   fieldsWithoutTokens = {
     'securityQuestions[]': 'LNG_USER_FIELD_LABEL_SECURITY_QUESTIONS'
@@ -81,6 +78,7 @@ export class ImportUserDataComponent implements OnInit, OnDestroy {
     // update breadcrumbs
     this.initializeBreadcrumbs();
 
+    // show the warning message
     this.toastV2Service.notice(
       'LNG_PAGE_IMPORT_USER_DATA_WARNING',
       undefined,

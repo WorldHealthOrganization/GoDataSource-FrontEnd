@@ -382,7 +382,7 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
           }
         },
 
-        // Onset report
+        // View workload
         {
           label: {
             get: () => 'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAMS_WORKLOAD'
