@@ -2009,7 +2009,33 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 this.dialogV2Service.showRecordDetailsDialog(
                   'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.isCreate || !this.itemData.wasContact ?
+                    undefined :
+                    [
+                      {
+                        type: V2SideDialogConfigInputType.KEY_VALUE,
+                        name: 'followUp.originalStartDate',
+                        placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_ORIGINAL_START_DATE',
+                        value: this.itemData.followUp?.originalStartDate ?
+                          moment(this.itemData.followUp.originalStartDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          '—'
+                      }, {
+                        type: V2SideDialogConfigInputType.KEY_VALUE,
+                        name: 'followUp.startDate',
+                        placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_START_DATE',
+                        value: this.itemData.followUp?.startDate ?
+                          moment(this.itemData.followUp.startDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          '—'
+                      }, {
+                        type: V2SideDialogConfigInputType.KEY_VALUE,
+                        name: 'followUp.endDate',
+                        placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
+                        value: this.itemData.followUp?.endDate ?
+                          moment(this.itemData.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          '—'
+                      }
+                    ]
                 );
               }
             }
