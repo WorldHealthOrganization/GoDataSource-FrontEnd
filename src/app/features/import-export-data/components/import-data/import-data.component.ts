@@ -715,8 +715,11 @@ export class ImportDataComponent
 
   // users
   users: IResolverV2ResponseModel<UserModel>;
-  userNameMap: {
+  userNameAndEmailMap: {
     [name: string]: string;
+  } = {};
+  userNameMap: {
+    [name: string]: string[];
   } = {};
 
   // Used to keep function scope
@@ -1659,8 +1662,16 @@ export class ImportDataComponent
             destinationOpt = this.languageNameMap[sourceOptReduced];
           }
         } else if (this.userFields[importableItem.destinationField]) {
-          if (this.userNameMap[sourceOptReduced]) {
-            destinationOpt = this.userNameMap[sourceOptReduced];
+          // try to map by name and email
+          if (this.userNameAndEmailMap[sourceOptReduced]) {
+            destinationOpt = this.userNameAndEmailMap[sourceOptReduced];
+          } else {
+            // try to map by name
+            if (this.userNameMap[sourceOptReduced]?.length === 1) {
+              destinationOpt = this.userNameMap[sourceOptReduced][0];
+            } else if (this.users && this.users[sourceOption]) {
+              destinationOpt = sourceOption;
+            }
           }
         } else if (this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField]) {
           destinationOpt = this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced];
@@ -2477,60 +2488,53 @@ export class ImportDataComponent
   private getDataOtherTemplates(): void {
     // roles
     this.userRoles = this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>;
-    if (
-      this.userRoles &&
-      this.userRoles.list
-    ) {
+    if (this.userRoles?.list?.length) {
       this.userRoles.list.forEach((item: UserRoleModel) => {
-        // ignore duplicates, get only the first item found
+        // user role name is unique
         const roleName: string = _.camelCase(item.name).toLowerCase();
-        if (!this.userRoleNameMap[roleName]) {
-          this.userRoleNameMap[roleName] = item.id;
-        }
+        this.userRoleNameMap[roleName] = item.id;
       });
     }
 
     // outbreaks
     this.outbreaks = (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>);
-    if (
-      this.outbreaks &&
-      this.outbreaks.list
-    ) {
+    if (this.outbreaks?.list?.length) {
       (this.outbreaks.list || []).forEach((item: OutbreakModel) => {
-        // ignore duplicates, get only the first item found
+        // outbreak name is unique
         const outbreakName: string = _.camelCase(item.name).toLowerCase();
-        if (!this.outbreakNameMap[outbreakName]) {
-          this.outbreakNameMap[outbreakName] = item.id;
-        }
+        this.outbreakNameMap[outbreakName] = item.id;
       });
     }
 
     // languages
     this.languages = (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>);
-    if (
-      this.languages &&
-      this.languages.list
-    ) {
+    if (this.languages?.list?.length) {
       this.languages.list.forEach((item: LanguageModel) => {
-        // ignore duplicates, get only the first item found
+        // language name is unique
         const languageName: string = _.camelCase(item.name).toLowerCase();
-        if (!this.languageNameMap[languageName]) {
-          this.languageNameMap[languageName] = item.id;
-        }
+        this.languageNameMap[languageName] = item.id;
       });
     }
 
     // users
     this.users = (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>);
-    if (
-      this.users &&
-      this.users.list
-    ) {
+    if (this.users?.list?.length) {
       this.users.list.forEach((item: UserModel) => {
-        // ignore duplicates, get only the first item found
+        // map name and email to id
+        if (item.email) {
+          // the name with email pair is unique
+          const userNameAndEmail: string = _.camelCase(item.nameAndEmail).toLowerCase();
+          this.userNameAndEmailMap[userNameAndEmail] = item.id;
+        }
+
+        // map name to id
         const userName: string = _.camelCase(item.name).toLowerCase();
-        if (!this.userNameMap[userName]) {
-          this.userNameMap[userName] = item.id;
+        if (this.userNameMap[userName]) {
+          if (!this.userNameMap[userName].includes(item.id)) {
+            this.userNameMap[userName].push(item.id);
+          }
+        } else {
+          this.userNameMap[userName] = [item.id];
         }
       });
     }
@@ -4066,7 +4070,7 @@ export class ImportDataComponent
     } else if (this.languageFields[destinationField] && this.languages.map[destinationOption]) {
       return this.languages.map[destinationOption].name;
     } else if (this.userFields[destinationField] && this.users.map[destinationOption]) {
-      return this.users.map[destinationOption].name;
+      return this.users.map[destinationOption].nameAndEmail;
     } else {
       // general dropdown
       return this.importableObject.modelPropertyValuesMapChildMap[destinationField] &&

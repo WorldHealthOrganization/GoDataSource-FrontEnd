@@ -685,4 +685,12 @@ export class UserModel
     const lastName = _.get(this, 'lastName', '');
     return _.trim(`${firstName} ${lastName}`);
   }
+
+  /**
+   * User Name and Email
+   * @returns {string}
+   */
+  get nameAndEmail(): string {
+    return `${this.name} ( ${this.email} )`;
+  }
 }

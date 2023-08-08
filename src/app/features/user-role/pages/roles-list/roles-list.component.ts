@@ -313,7 +313,7 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
         label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_BY',
         notVisible: true,
         format: {
-          type: 'createdByUser.name'
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -343,7 +343,7 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
         label: 'LNG_USER_ROLE_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
         format: {
-          type: 'updatedByUser.name'
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,

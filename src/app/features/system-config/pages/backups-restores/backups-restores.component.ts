@@ -119,7 +119,7 @@ export class BackupsRestoresComponent extends ListComponent<RestoreLogModel> imp
         field: 'createdBy',
         label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY',
         format: {
-          type: 'createdByUser.name'
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,

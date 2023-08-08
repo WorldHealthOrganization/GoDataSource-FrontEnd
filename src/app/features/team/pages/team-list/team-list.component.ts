@@ -272,7 +272,7 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
           item.userIds.map((userId) => {
             return {
               label: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[userId] ?
-                (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[userId].name :
+                (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[userId].nameAndEmail :
                 '—',
               href: UserModel.canView(this.authUser) ?
                 `/users/${userId}/view` :

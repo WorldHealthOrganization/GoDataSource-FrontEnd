@@ -1115,7 +1115,7 @@ export class EntityHelperService {
         field: 'createdBy',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY',
         format: {
-          type: 'relationship.createdByUser.name'
+          type: 'relationship.createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1148,7 +1148,7 @@ export class EntityHelperService {
         field: 'updatedBy',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY',
         format: {
-          type: 'relationship.updatedByUser.name'
+          type: 'relationship.updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,

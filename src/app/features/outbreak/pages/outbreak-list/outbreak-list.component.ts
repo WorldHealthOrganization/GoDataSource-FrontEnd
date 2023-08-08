@@ -1029,7 +1029,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         notVisible: true,
         sortable: true,
         format: {
-          type: 'createdByUser.name'
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1063,7 +1063,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         notVisible: true,
         sortable: true,
         format: {
-          type: 'updatedByUser.name'
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
