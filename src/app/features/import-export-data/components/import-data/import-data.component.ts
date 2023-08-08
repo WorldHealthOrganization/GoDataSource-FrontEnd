@@ -1599,33 +1599,31 @@ export class ImportDataComponent
           const destinationValue: string = restrictTo[mapOpt.sourceOption][0];
 
           // determine destination option
-          if (
-            (
-              this.addressFields[importableItem.destinationField] &&
-              this.locationCache[destinationValue]
-            ) || (
-              this.roleFields[importableItem.destinationField] &&
-              this.userRoles.map[destinationValue]
-            ) || (
-              this.outbreakFields[importableItem.destinationField] &&
-              this.outbreaks.map[destinationValue]
-            ) || (
-              this.languageFields[importableItem.destinationField] &&
-              this.languages.map[destinationValue]
-            ) || (
-              this.userFields[importableItem.destinationField] &&
-              this.users.map[destinationValue]
-            ) || (
-              !this.addressFields[importableItem.destinationField] &&
-              !this.roleFields[importableItem.destinationField] &&
-              !this.outbreakFields[importableItem.destinationField] &&
-              !this.languageFields[importableItem.destinationField] &&
-              !this.userFields[importableItem.destinationField] &&
-              this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
-              this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined
-            )
-          ) {
-            destinationOpt = destinationValue;
+          if (this.addressFields[importableItem.destinationField]) {
+            destinationOpt = this.locationCache[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else if (this.roleFields[importableItem.destinationField]) {
+            destinationOpt = this.userRoles.map[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else if (this.outbreakFields[importableItem.destinationField]) {
+            destinationOpt = this.outbreaks.map[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else if (this.languageFields[importableItem.destinationField]) {
+            destinationOpt = this.languages.map[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else if (this.userFields[importableItem.destinationField]) {
+            destinationOpt = this.users.map[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else {
+            destinationOpt = this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
+            this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined ?
+              destinationValue :
+              undefined;
           }
 
           // found a possible destination field
