@@ -755,6 +755,9 @@ export class ImportDataComponent
       }
     );
 
+    // create helper mappings for data from resolvers
+    this.getDataOtherTemplates();
+
     // retrieve import mappings if we have any
     this.savedImportPage = activatedRoute.snapshot.data.savedImportPage;
     if (this.savedImportPage) {
@@ -1088,8 +1091,9 @@ export class ImportDataComponent
     }
 
     // construct importable file object
-    this.resetCustomDropdowns();
     this.distinctValuesCache = {};
+    this.locationCache = {};
+    this.locationCacheIndex = {};
     this.importableObject = new ImportableFileModel(
       jsonResponse,
       (token: string): string => {
@@ -1976,8 +1980,9 @@ export class ImportDataComponent
               this.mappedFieldsVisible = [];
               this.mappedFields = [];
               this.updateNotMappedFileColumnsData();
-              this.resetCustomDropdowns();
               this.distinctValuesCache = {};
+              this.locationCache = {};
+              this.locationCacheIndex = {};
               // update visible items count
               this.updateVisibleItemsCount();
 
@@ -2392,8 +2397,9 @@ export class ImportDataComponent
      */
   tryAgain() {
     // reset data
-    this.resetCustomDropdowns();
     this.distinctValuesCache = {};
+    this.locationCache = {};
+    this.locationCacheIndex = {};
     this.importableObject = null;
     this.notMappedTransData = {
       no: 0,
@@ -2460,6 +2466,71 @@ export class ImportDataComponent
       setTimeout(() => {
         if (this.virtualScrollViewport) {
           this.virtualScrollViewport.checkViewportSize();
+        }
+      });
+    }
+  }
+
+  /**
+   * Get data from resolvers
+   */
+  private getDataOtherTemplates(): void {
+    // roles
+    this.userRoles = this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>;
+    if (
+      this.userRoles &&
+      this.userRoles.list
+    ) {
+      this.userRoles.list.forEach((item: UserRoleModel) => {
+        // ignore duplicates, get only the first item found
+        const roleName: string = _.camelCase(item.name).toLowerCase();
+        if (!this.userRoleNameMap[roleName]) {
+          this.userRoleNameMap[roleName] = item.id;
+        }
+      });
+    }
+
+    // outbreaks
+    this.outbreaks = (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>);
+    if (
+      this.outbreaks &&
+      this.outbreaks.list
+    ) {
+      (this.outbreaks.list || []).forEach((item: OutbreakModel) => {
+        // ignore duplicates, get only the first item found
+        const outbreakName: string = _.camelCase(item.name).toLowerCase();
+        if (!this.outbreakNameMap[outbreakName]) {
+          this.outbreakNameMap[outbreakName] = item.id;
+        }
+      });
+    }
+
+    // languages
+    this.languages = (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>);
+    if (
+      this.languages &&
+      this.languages.list
+    ) {
+      this.languages.list.forEach((item: LanguageModel) => {
+        // ignore duplicates, get only the first item found
+        const languageName: string = _.camelCase(item.name).toLowerCase();
+        if (!this.languageNameMap[languageName]) {
+          this.languageNameMap[languageName] = item.id;
+        }
+      });
+    }
+
+    // users
+    this.users = (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>);
+    if (
+      this.users &&
+      this.users.list
+    ) {
+      this.users.list.forEach((item: UserModel) => {
+        // ignore duplicates, get only the first item found
+        const userName: string = _.camelCase(item.name).toLowerCase();
+        if (!this.userNameMap[userName]) {
+          this.userNameMap[userName] = item.id;
         }
       });
     }
@@ -2944,66 +3015,6 @@ export class ImportDataComponent
       // must retrieve locations ?
       if (this.addressFields[field.destinationField]) {
         mustRetrieveLocations[field.sourceFieldWithoutIndexes] = true;
-      }
-
-      // must retrieve roles ?
-      if (
-        this.roleFields[field.destinationField] &&
-        !Object.keys(this.userRoleNameMap).length
-      ) {
-        this.userRoles = this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>;
-        this.userRoles.list.forEach((item: UserRoleModel) => {
-          // ignore duplicates, get only the first item found
-          const roleName: string = _.camelCase(item.name).toLowerCase();
-          if (!this.userRoleNameMap[roleName]) {
-            this.userRoleNameMap[roleName] = item.id;
-          }
-        });
-      }
-
-      // must retrieve outbreaks ?
-      if (
-        this.outbreakFields[field.destinationField] &&
-        !Object.keys(this.outbreakNameMap).length
-      ) {
-        this.outbreaks = (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>);
-        this.outbreaks.list.forEach((item: OutbreakModel) => {
-          // ignore duplicates, get only the first item found
-          const outbreakName: string = _.camelCase(item.name).toLowerCase();
-          if (!this.outbreakNameMap[outbreakName]) {
-            this.outbreakNameMap[outbreakName] = item.id;
-          }
-        });
-      }
-
-      // must retrieve languages ?
-      if (
-        this.languageFields[field.destinationField] &&
-        !Object.keys(this.languageNameMap).length
-      ) {
-        this.languages = (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>);
-        this.languages.list.forEach((item: LanguageModel) => {
-          // ignore duplicates, get only the first item found
-          const languageName: string = _.camelCase(item.name).toLowerCase();
-          if (!this.languageNameMap[languageName]) {
-            this.languageNameMap[languageName] = item.id;
-          }
-        });
-      }
-
-      // must retrieve users ?
-      if (
-        this.userFields[field.destinationField] &&
-        !Object.keys(!this.userNameMap).length
-      ) {
-        this.users = (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>);
-        this.users.list.forEach((item: UserModel) => {
-          // ignore duplicates, get only the first item found
-          const userName: string = _.camelCase(item.name).toLowerCase();
-          if (!this.userNameMap[userName]) {
-            this.userNameMap[userName] = item.id;
-          }
-        });
       }
 
       // add to list of items to retrieve distinct values for
@@ -4063,17 +4074,5 @@ export class ImportDataComponent
         this.importableObject.modelPropertyValuesMapChildMap[destinationField][destinationOption] :
         '—';
     }
-  }
-
-  /**
-   * Reset custom dropdowns data
-   */
-  private resetCustomDropdowns() {
-    this.locationCache = {};
-    this.locationCacheIndex = {};
-    this.userRoleNameMap = {};
-    this.outbreakNameMap = {};
-    this.languageNameMap = {};
-    this.userNameMap = {};
   }
 }
