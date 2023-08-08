@@ -54,7 +54,8 @@ export class ImportUserDataComponent implements OnInit, OnDestroy {
   requiredDestinationFields = [
     'firstName',
     'lastName',
-    'email'
+    'email',
+    'roleIds[]'
   ];
 
   /**

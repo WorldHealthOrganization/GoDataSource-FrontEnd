@@ -42,7 +42,9 @@ export class ImportTeamDataComponent implements OnInit {
   };
 
   requiredDestinationFields = [
-    'name'
+    'name',
+    'userIds[]',
+    'locationIds[]'
   ];
 
   /**

@@ -36,7 +36,8 @@ export class ImportUserRoleDataComponent implements OnInit {
   ];
 
   requiredDestinationFields = [
-    'name'
+    'name',
+    'permissionIds[]'
   ];
 
   /**

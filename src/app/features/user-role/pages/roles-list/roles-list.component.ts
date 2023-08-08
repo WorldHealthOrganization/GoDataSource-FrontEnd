@@ -34,6 +34,7 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
   roleFields: ILabelValuePairModel[] = [
     { label: 'LNG_USER_ROLE_FIELD_LABEL_NAME', value: 'name' },
     { label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS', value: 'permissionIds' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION', value: 'description' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
