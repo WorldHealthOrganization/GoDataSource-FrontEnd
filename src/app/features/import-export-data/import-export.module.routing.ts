@@ -7,6 +7,10 @@ import * as fromPages from './pages';
 import { Constants } from '../../core/models/constants';
 import { SavedImportMappingDataResolver } from '../../core/services/resolvers/data/saved-import-mapping.resolver';
 import { SelectedLanguageDataResolver } from '../../core/services/resolvers/data/selected-language.resolver';
+import { UserRoleDataResolver } from '../../core/services/resolvers/data/user-role.resolver';
+import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
+import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 
 const routes: Routes = [
   // Import locations
@@ -188,6 +192,58 @@ const routes: Routes = [
     },
     resolve: {
       savedImportMapping: SavedImportMappingDataResolver
+    }
+  },
+
+  // Import user data
+  {
+    path: 'user-data/import',
+    component: fromPages.ImportUserDataComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.USER_IMPORT
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.USER_DATA.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver,
+      userRole: UserRoleDataResolver,
+      outbreak: OutbreakDataResolver,
+      language: LanguageDataResolver
+    }
+  },
+
+  // Import user role data
+  {
+    path: 'user-role-data/import',
+    component: fromPages.ImportUserRoleDataComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.USER_ROLE_IMPORT
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.ROLE_DATA.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
+    }
+  },
+
+  // Import team data
+  {
+    path: 'team-data/import',
+    component: fromPages.ImportTeamDataComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.TEAM_IMPORT
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.TEAM_DATA.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver,
+      user: UserDataResolver
     }
   }
 ];

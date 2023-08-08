@@ -181,7 +181,7 @@ export class AuditLogsListComponent
         label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER',
         format: {
           type: (item) => item.userId && this.activatedRoute.snapshot.data.user.map[item.userId] ?
-            `${ this.activatedRoute.snapshot.data.user.map[item.userId].name } ( ${ this.activatedRoute.snapshot.data.user.map[item.userId].email } )` :
+            this.activatedRoute.snapshot.data.user.map[item.userId].nameAndEmail :
             ''
         },
         filter: {

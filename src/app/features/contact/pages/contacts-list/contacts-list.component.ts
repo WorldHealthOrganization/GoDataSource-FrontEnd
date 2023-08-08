@@ -1404,7 +1404,7 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
         notVisible: true,
         format: {
-          type: 'responsibleUser.name'
+          type: 'responsibleUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1511,7 +1511,7 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY',
         notVisible: true,
         format: {
-          type: 'createdByUser.name'
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1544,7 +1544,7 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
         format: {
-          type: 'updatedByUser.name'
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,

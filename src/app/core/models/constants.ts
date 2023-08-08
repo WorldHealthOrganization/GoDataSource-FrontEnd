@@ -458,6 +458,18 @@ export class Constants {
     RELATIONSHIP_DATA: {
       label: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA',
       value: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA'
+    },
+    USER_DATA: {
+      label: 'LNG_APP_PAGE_IMPORT_USER_DATA',
+      value: 'LNG_APP_PAGE_IMPORT_USER_DATA'
+    },
+    ROLE_DATA: {
+      label: 'LNG_APP_PAGE_IMPORT_USER_ROLE_DATA',
+      value: 'LNG_APP_PAGE_IMPORT_USER_ROLE_DATA'
+    },
+    TEAM_DATA: {
+      label: 'LNG_APP_PAGE_IMPORT_TEAM_DATA',
+      value: 'LNG_APP_PAGE_IMPORT_TEAM_DATA'
     }
   };
 

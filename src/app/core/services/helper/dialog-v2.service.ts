@@ -2574,7 +2574,7 @@ export class DialogV2Service {
       record.createdBy &&
       users.map[record.createdBy]
     ) {
-      createdByName = users.map[record.createdBy].name;
+      createdByName = users.map[record.createdBy].nameAndEmail;
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
@@ -2601,7 +2601,7 @@ export class DialogV2Service {
       record.updatedBy &&
       users.map[record.updatedBy]
     ) {
-      updatedByName = users.map[record.updatedBy].name;
+      updatedByName = users.map[record.updatedBy].nameAndEmail;
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
@@ -2632,7 +2632,7 @@ export class DialogV2Service {
       title: {
         get: () => title
       },
-      width: '45rem',
+      width: '60rem',
       inputs: detailsInputs,
       bottomButtons: [{
         type: IV2SideDialogConfigButtonType.CANCEL,

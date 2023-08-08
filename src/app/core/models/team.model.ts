@@ -56,6 +56,16 @@ export class TeamModel
   static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.TEAM_DELETE) : false; }
 
   /**
+   * Static Permissions - IPermissionExportable
+   */
+  static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.TEAM_EXPORT) : false; }
+
+  /**
+   * Static Permissions - IPermissionImportable
+   */
+  static canImport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.TEAM_IMPORT) : false; }
+
+  /**
      * Static Permissions - IPermissionTeam
      */
   static canListWorkload(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.TEAM_LIST_WORKLOAD) : false; }
@@ -82,6 +92,16 @@ export class TeamModel
   canCreate(user: UserModel): boolean { return TeamModel.canCreate(user); }
   canModify(user: UserModel): boolean { return TeamModel.canModify(user); }
   canDelete(user: UserModel): boolean { return TeamModel.canDelete(user); }
+
+  /**
+   * Permissions - IPermissionExportable
+   */
+  canExport(user: UserModel): boolean { return TeamModel.canExport(user); }
+
+  /**
+   * Permissions - IPermissionImportable
+   */
+  canImport(user: UserModel): boolean { return TeamModel.canImport(user); }
 
   /**
      * Permissions - IPermissionTeam

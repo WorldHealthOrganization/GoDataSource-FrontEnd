@@ -276,6 +276,16 @@ export class UserRoleModel
   static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_CREATE_CLONE) : false; }
 
   /**
+   * Static Permissions - IPermissionExportable
+   */
+  static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_EXPORT) : false; }
+
+  /**
+   * Static Permissions - IPermissionImportable
+   */
+  static canImport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_IMPORT) : false; }
+
+  /**
      * Constructor
      */
   constructor(data = null) {
@@ -307,6 +317,16 @@ export class UserRoleModel
      * Permissions - IPermissionCloneable
      */
   canClone(user: UserModel): boolean { return UserRoleModel.canClone(user); }
+
+  /**
+   * Permissions - IPermissionExportable
+   */
+  canExport(user: UserModel): boolean { return UserRoleModel.canExport(user); }
+
+  /**
+   * Permissions - IPermissionImportable
+   */
+  canImport(user: UserModel): boolean { return UserRoleModel.canImport(user); }
 }
 
 export class UserModel
@@ -513,6 +533,16 @@ export class UserModel
   static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_DELETE) : false; }
 
   /**
+   * Static Permissions - IPermissionExportable
+   */
+  static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_EXPORT) : false; }
+
+  /**
+   * Static Permissions - IPermissionImportable
+   */
+  static canImport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_IMPORT) : false; }
+
+  /**
      * Static Permissions - IPermissionUser
      */
   static canModifyOwnAccount(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_MODIFY_OWN_ACCOUNT) : false; }
@@ -567,6 +597,16 @@ export class UserModel
   canCreate(user: UserModel): boolean { return UserModel.canCreate(user); }
   canModify(user: UserModel): boolean { return UserModel.canModify(user); }
   canDelete(user: UserModel): boolean { return UserModel.canDelete(user); }
+
+  /**
+   * Permissions - IPermissionExportable
+   */
+  canExport(user: UserModel): boolean { return UserModel.canExport(user); }
+
+  /**
+   * Permissions - IPermissionImportable
+   */
+  canImport(user: UserModel): boolean { return UserModel.canImport(user); }
 
   /**
      * Permissions - IPermissionUser
@@ -644,5 +684,12 @@ export class UserModel
     const firstName = _.get(this, 'firstName', '');
     const lastName = _.get(this, 'lastName', '');
     return _.trim(`${firstName} ${lastName}`);
+  }
+
+  /**
+   * Get user name and email
+   */
+  get nameAndEmail(): string {
+    return `${this.name} ( ${this.email} )`;
   }
 }

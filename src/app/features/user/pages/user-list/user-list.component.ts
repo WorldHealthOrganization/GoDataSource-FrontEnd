@@ -20,12 +20,47 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import {
+  ExportDataExtension,
+  ExportDataMethod
+} from '../../../../core/services/helper/models/dialog-v2.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as momentOriginal from 'moment/moment';
 
 @Component({
   selector: 'app-user-list',
   templateUrl: './user-list.component.html'
 })
 export class UserListComponent extends ListComponent<UserModel> implements OnDestroy {
+  // user fields
+  userFields: ILabelValuePairModel[] = [
+    { label: 'LNG_USER_FIELD_LABEL_EMAIL', value: 'email' },
+    { label: 'LNG_COMMON_FIELD_LABEL_PASSWORD', value: 'password' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_USER_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
+    { label: 'LNG_USER_FIELD_LABEL_LAST_NAME', value: 'lastName' },
+    { label: 'LNG_USER_FIELD_LABEL_ROLES', value: 'roleIds' },
+    { label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS', value: 'outbreakIds' },
+    { label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK', value: 'activeOutbreakId' },
+    { label: 'LNG_LAYOUT_LANGUAGE_LABEL', value: 'languageId' },
+    { label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME', value: 'institutionName' },
+    { label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS', value: 'telephoneNumbers' },
+    { label: 'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE', value: 'telephoneNumbers.LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE' },
+    { label: 'LNG_USER_FIELD_LABEL_SECURITY_QUESTIONS', value: 'securityQuestions' },
+    { label: 'LNG_USER_FIELD_LABEL_LAST_LOGIN_DATE', value: 'lastLoginDate' },
+    { label: 'LNG_USER_FIELD_LABEL_LAST_RESET_PASSWORD_DATE', value: 'lastResetPasswordDate' },
+    { label: 'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS', value: 'disregardGeographicRestrictions' },
+    { label: 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS', value: 'dontCacheFilters' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+  ];
+
   // list of existing teams mapped by user
   userTeamMap: {
     [userId: string]: TeamModel[]
@@ -39,7 +74,8 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
     private userDataService: UserDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private i18nService: I18nService
   ) {
     // parent
     super(
@@ -395,7 +431,7 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
         label: 'LNG_USER_FIELD_LABEL_CREATED_BY',
         notVisible: true,
         format: {
-          type: 'createdByUser.name'
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -425,7 +461,7 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
         label: 'LNG_USER_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
         format: {
-          type: 'updatedByUser.name'
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -554,10 +590,50 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return UserModel.canListWorkload(this.authUser);
+        return UserModel.canListWorkload(this.authUser) ||
+          UserModel.canExport(this.authUser) ||
+          UserModel.canImport(this.authUser);
       },
       menuOptions: [
-        // Onset report
+        // Export users
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USERS_EXPORT_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.exportUsers(this.queryBuilder);
+            }
+          },
+          visible: (): boolean => {
+            return UserModel.canExport(this.authUser);
+          }
+        },
+
+        // Import users
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USERS_IMPORT_BUTTON'
+          },
+          action: {
+            link: () => ['/import-export-data', 'user-data', 'import']
+          },
+          visible: (): boolean => {
+            return UserModel.canImport(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return (
+              UserModel.canExport(this.authUser) ||
+              UserModel.canImport(this.authUser)
+            );
+          }
+        },
+
+        // View workload
         {
           label: {
             get: () => 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USERS_WORKLOAD'
@@ -576,7 +652,45 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {}
+  protected initializeGroupActions(): void {
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => UserModel.canExport(this.authUser),
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USERS_GROUP_ACTION_EXPORT_SELECTED_USERS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect('id', selected, true, null);
+
+              // allow deleted records
+              qb.includeDeleted();
+
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
+              }
+
+              // export
+              this.exportUsers(qb);
+            }
+          },
+          visible: (): boolean => {
+            return UserModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table add action
@@ -701,6 +815,45 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
       )
       .subscribe((response) => {
         this.pageCount = response;
+      });
+  }
+
+  /**
+   * Export selected records
+   */
+  private exportUsers(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_USERS_EXPORT_TITLE'
+        },
+        export: {
+          url: '/users/export',
+          async: true,
+          method: ExportDataMethod.POST,
+          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_USERS_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
+          queryBuilder: qb,
+          allow: {
+            types: [
+              ExportDataExtension.CSV,
+              ExportDataExtension.XLS,
+              ExportDataExtension.XLSX,
+              ExportDataExtension.JSON,
+              ExportDataExtension.ODS,
+              ExportDataExtension.PDF
+            ],
+            encrypt: true,
+            anonymize: {
+              fields: this.userFields
+            },
+            fields: {
+              options: this.userFields
+            },
+            dbColumns: true,
+            dbValues: true,
+            jsonReplaceUndefinedWithNull: true
+          }
+        }
       });
   }
 }

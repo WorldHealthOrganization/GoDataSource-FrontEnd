@@ -75,6 +75,9 @@ import {
 import { ILocation } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { LanguageModel } from '../../../../core/models/language.model';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -86,7 +89,10 @@ export enum ImportServerModelNames {
   CASE = 'case',
   EVENT = 'event',
   CONTACT = 'contact',
-  CONTACT_OF_CONTACT = 'contactOfContact'
+  CONTACT_OF_CONTACT = 'contactOfContact',
+  USER = 'user',
+  ROLE = 'role',
+  TEAM = 'team'
 }
 
 enum ImportServerErrorCodes {
@@ -288,6 +294,26 @@ export class ImportDataComponent
     [property: string]: boolean
   } = {};
 
+  // Role fields so we can use custom dropdowns
+  @Input() roleFields: {
+    [property: string]: boolean
+  } = {};
+
+  // Outbreak fields so we can use custom dropdowns
+  @Input() outbreakFields: {
+    [property: string]: boolean
+  } = {};
+
+  // Language fields so we can use custom dropdowns
+  @Input() languageFields: {
+    [property: string]: boolean
+  } = {};
+
+  // user fields so we can use custom dropdowns
+  @Input() userFields: {
+    [property: string]: boolean
+  } = {};
+
   // Required fields that user needs to map
   private requiredDestinationFieldsMap: {
     [modelProperty: string]: true
@@ -412,20 +438,26 @@ export class ImportDataComponent
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
-                    item.sourceFieldWithoutIndexes &&
-                    item.destinationField &&
-                    this.distinctValuesCache &&
-                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
-          !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
-                        this.addressFields[item.destinationField]
-        ) &&
-                    item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length && (
-          !this.usedSourceFieldOptionsForOptionMapping ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes || (
-            this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
-          )
-        );
+          item.sourceFieldWithoutIndexes &&
+          item.destinationField &&
+          this.distinctValuesCache &&
+          this.distinctValuesCache[item.sourceFieldWithoutIndexes] &&
+          (
+            !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+            this.addressFields[item.destinationField] ||
+            this.roleFields[item.destinationField] ||
+            this.outbreakFields[item.destinationField] ||
+            this.languageFields[item.destinationField] ||
+            this.userFields[item.destinationField]
+          ) &&
+          item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length &&
+          (
+            !this.usedSourceFieldOptionsForOptionMapping ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes || (
+              this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+            )
+          );
       },
       click: (
         item: ImportableMapField,
@@ -455,19 +487,25 @@ export class ImportDataComponent
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_EXPAND_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
-                    item.sourceFieldWithoutIndexes &&
-                    item.destinationField &&
-                    this.distinctValuesCache &&
-                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
-          !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
-                        this.addressFields[item.destinationField]
-        ) &&
-                    item.mappedOptionsCollapsed && (
-          !this.usedSourceFieldOptionsForOptionMapping ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes ||
-                        this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
-        );
+          item.sourceFieldWithoutIndexes &&
+          item.destinationField &&
+          this.distinctValuesCache &&
+          this.distinctValuesCache[item.sourceFieldWithoutIndexes] &&
+          (
+            !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+            this.addressFields[item.destinationField] ||
+            this.roleFields[item.destinationField] ||
+            this.outbreakFields[item.destinationField] ||
+            this.languageFields[item.destinationField] ||
+            this.userFields[item.destinationField]
+          ) &&
+          item.mappedOptionsCollapsed &&
+          (
+            !this.usedSourceFieldOptionsForOptionMapping ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes ||
+            this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+          );
       },
       click: (
         item: ImportableMapField,
@@ -487,14 +525,19 @@ export class ImportDataComponent
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_COLLAPSE_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
-                    item.sourceFieldWithoutIndexes &&
-                    item.destinationField &&
-                    this.distinctValuesCache &&
-                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
-          !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
-                        this.addressFields[item.destinationField]
-        ) &&
-                    !item.mappedOptionsCollapsed;
+          item.sourceFieldWithoutIndexes &&
+          item.destinationField &&
+          this.distinctValuesCache &&
+          this.distinctValuesCache[item.sourceFieldWithoutIndexes] &&
+          (
+            !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+            this.addressFields[item.destinationField] ||
+            this.roleFields[item.destinationField] ||
+            this.outbreakFields[item.destinationField] ||
+            this.languageFields[item.destinationField] ||
+            this.userFields[item.destinationField]
+          ) &&
+          !item.mappedOptionsCollapsed;
       },
       click: (
         item: ImportableMapField,
@@ -652,6 +695,33 @@ export class ImportDataComponent
     [indexKey: string]: string[]
   } = {};
 
+  // user roles
+  userRoles: IResolverV2ResponseModel<UserRoleModel>;
+  userRoleNameMap: {
+    [name: string]: string;
+  } = {};
+
+  // outbreaks
+  outbreaks: IResolverV2ResponseModel<OutbreakModel>;
+  outbreakNameMap: {
+    [name: string]: string;
+  } = {};
+
+  // languages
+  languages: IResolverV2ResponseModel<LanguageModel>;
+  languageNameMap: {
+    [name: string]: string;
+  } = {};
+
+  // users
+  users: IResolverV2ResponseModel<UserModel>;
+  userNameAndEmailMap: {
+    [name: string]: string;
+  } = {};
+  userNameMap: {
+    [name: string]: string[];
+  } = {};
+
   // Used to keep function scope
   onWindowResizeScope: any;
 
@@ -679,7 +749,7 @@ export class ImportDataComponent
     private locationDataService: LocationDataService,
     private importLogDataService: ImportLogDataService,
     private importResultDataService: ImportResultDataService,
-    activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute
   ) {
     // list parent
     super(
@@ -687,6 +757,9 @@ export class ImportDataComponent
         disableFilterCaching: true
       }
     );
+
+    // create helper mappings for data from resolvers
+    this.getDataOtherTemplates();
 
     // retrieve import mappings if we have any
     this.savedImportPage = activatedRoute.snapshot.data.savedImportPage;
@@ -721,10 +794,11 @@ export class ImportDataComponent
   ngOnInit() {
     // init array levels
     this.possibleSourceDestinationLevels = [];
-    for (let level = 0; level < 100; level++) {
+    for (let level = 0; level < 300; level++) {
       this.possibleSourceDestinationLevels.push({
         label: (level + 1).toString(),
-        value: level
+        value: level,
+        order: level
       });
     }
 
@@ -1479,16 +1553,20 @@ export class ImportDataComponent
     // there is no point in setting mapped values if we  don't have to map something
     if (
       !importableItem.sourceFieldWithoutIndexes ||
-            !importableItem.destinationField ||
-            !this.distinctValuesCache ||
-            !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] || (
+      !importableItem.destinationField ||
+      !this.distinctValuesCache ||
+      !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] || (
         !this.importableObject.modelPropertyValuesMap[importableItem.destinationField] &&
-                !this.addressFields[importableItem.destinationField]
+        !this.addressFields[importableItem.destinationField] &&
+        !this.roleFields[importableItem.destinationField] &&
+        !this.outbreakFields[importableItem.destinationField] &&
+        !this.languageFields[importableItem.destinationField] &&
+        !this.userFields[importableItem.destinationField]
       ) || (
         this.usedSourceFieldOptionsForOptionMapping &&
-                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
-                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes &&
-                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes !== importableItem.sourceFieldWithSelectedIndexes
+        this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
+        this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes &&
+        this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes !== importableItem.sourceFieldWithSelectedIndexes
       )
     ) {
       return;
@@ -1521,16 +1599,32 @@ export class ImportDataComponent
           const destinationValue: string = restrictTo[mapOpt.sourceOption][0];
 
           // determine destination option
-          destinationOpt = this.addressFields[importableItem.destinationField] ? (
-            this.locationCache[destinationValue] ?
+          if (this.addressFields[importableItem.destinationField]) {
+            destinationOpt = this.locationCache[destinationValue] ?
               destinationValue :
-              undefined
-          ) : (
-            this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
-                            this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined ?
+              undefined;
+          } else if (this.roleFields[importableItem.destinationField]) {
+            destinationOpt = this.userRoles.map[destinationValue] ?
               destinationValue :
-              undefined
-          );
+              undefined;
+          } else if (this.outbreakFields[importableItem.destinationField]) {
+            destinationOpt = this.outbreaks.map[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else if (this.languageFields[importableItem.destinationField]) {
+            destinationOpt = this.languages.map[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else if (this.userFields[importableItem.destinationField]) {
+            destinationOpt = this.users.map[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else {
+            destinationOpt = this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
+            this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined ?
+              destinationValue :
+              undefined;
+          }
 
           // found a possible destination field
           if (destinationOpt) {
@@ -1544,18 +1638,42 @@ export class ImportDataComponent
         // check if we can find a proper destination option
         const sourceOption: string = mapOpt.sourceOption;
         const sourceOptReduced: string = _.camelCase(sourceOption).toLowerCase();
-        destinationOpt = this.addressFields[importableItem.destinationField] ? (
-          this.locationCacheIndex[sourceOptReduced] && this.locationCacheIndex[sourceOptReduced].length === 1 ?
-            this.locationCacheIndex[sourceOptReduced][0] : (
-              this.locationCache && this.locationCache[sourceOption] ?
-                sourceOption :
-                undefined
-            )
-        ) : (
-          this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField] ?
-            this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced] :
-            undefined
-        );
+        if (this.addressFields[importableItem.destinationField]) {
+          if (
+            this.locationCacheIndex[sourceOptReduced] &&
+            this.locationCacheIndex[sourceOptReduced].length === 1
+          ) {
+            destinationOpt = this.locationCacheIndex[sourceOptReduced][0];
+          } else if (this.locationCache && this.locationCache[sourceOption]) {
+            destinationOpt = sourceOption;
+          }
+        } else if (this.roleFields[importableItem.destinationField]) {
+          if (this.userRoleNameMap[sourceOptReduced]) {
+            destinationOpt = this.userRoleNameMap[sourceOptReduced];
+          }
+        } else if (this.outbreakFields[importableItem.destinationField]) {
+          if (this.outbreakNameMap[sourceOptReduced]) {
+            destinationOpt = this.outbreakNameMap[sourceOptReduced];
+          }
+        } else if (this.languageFields[importableItem.destinationField]) {
+          if (this.languageNameMap[sourceOptReduced]) {
+            destinationOpt = this.languageNameMap[sourceOptReduced];
+          }
+        } else if (this.userFields[importableItem.destinationField]) {
+          // try to map by name and email
+          if (this.userNameAndEmailMap[sourceOptReduced]) {
+            destinationOpt = this.userNameAndEmailMap[sourceOptReduced];
+          } else {
+            // try to map by name
+            if (this.userNameMap[sourceOptReduced]?.length === 1) {
+              destinationOpt = this.userNameMap[sourceOptReduced][0];
+            } else if (this.users && this.users[sourceOption]) {
+              destinationOpt = sourceOption;
+            }
+          }
+        } else if (this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField]) {
+          destinationOpt = this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced];
+        }
 
         // found a possible destination field
         if (destinationOpt) {
@@ -2364,6 +2482,61 @@ export class ImportDataComponent
   }
 
   /**
+   * Get data from resolvers
+   */
+  private getDataOtherTemplates(): void {
+    // roles
+    this.userRoles = this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>;
+    if (this.userRoles?.list?.length) {
+      this.userRoles.list.forEach((item: UserRoleModel) => {
+        // user role name is unique
+        const roleName: string = _.camelCase(item.name).toLowerCase();
+        this.userRoleNameMap[roleName] = item.id;
+      });
+    }
+
+    // outbreaks
+    this.outbreaks = (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>);
+    if (this.outbreaks?.list?.length) {
+      (this.outbreaks.list || []).forEach((item: OutbreakModel) => {
+        // outbreak name is unique
+        const outbreakName: string = _.camelCase(item.name).toLowerCase();
+        this.outbreakNameMap[outbreakName] = item.id;
+      });
+    }
+
+    // languages
+    this.languages = (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>);
+    if (this.languages?.list?.length) {
+      this.languages.list.forEach((item: LanguageModel) => {
+        // language name is unique
+        const languageName: string = _.camelCase(item.name).toLowerCase();
+        this.languageNameMap[languageName] = item.id;
+      });
+    }
+
+    // users
+    this.users = (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>);
+    if (this.users?.list?.length) {
+      this.users.list.forEach((item: UserModel) => {
+        // map name and email to id. the name with email pair is unique
+        const userNameAndEmail: string = _.camelCase(item.nameAndEmail).toLowerCase();
+        this.userNameAndEmailMap[userNameAndEmail] = item.id;
+
+        // map name to id
+        const userName: string = _.camelCase(item.name).toLowerCase();
+        if (this.userNameMap[userName]) {
+          if (!this.userNameMap[userName].includes(item.id)) {
+            this.userNameMap[userName].push(item.id);
+          }
+        } else {
+          this.userNameMap[userName] = [item.id];
+        }
+      });
+    }
+  }
+
+  /**
      * Clear element in edit mode
      */
   private clearElementInEditMode(): void {
@@ -2597,12 +2770,16 @@ export class ImportDataComponent
       // this.distinctValuesCache && this.distinctValuesCache[field.sourceFieldWithoutIndexes]
       if (
         field.destinationField &&
-                field.sourceFieldWithoutIndexes && (
+        field.sourceFieldWithoutIndexes && (
           !!this.importableObject.modelPropertyValuesMap[field.destinationField] ||
-                    this.addressFields[field.destinationField]
+          this.addressFields[field.destinationField] ||
+          this.roleFields[field.destinationField] ||
+          this.outbreakFields[field.destinationField] ||
+          this.languageFields[field.destinationField] ||
+          this.userFields[field.destinationField]
         ) && (
           !this.distinctValuesCache ||
-                    !this.distinctValuesCache[field.sourceFieldWithoutIndexes]
+          !this.distinctValuesCache[field.sourceFieldWithoutIndexes]
         )
       ) {
         this.needToMapOptions = true;
@@ -2817,7 +2994,11 @@ export class ImportDataComponent
         !field.destinationField ||
         !field.sourceFieldWithoutIndexes || (
           !this.importableObject.modelPropertyValuesMap[field.destinationField] &&
-          !this.addressFields[field.destinationField]
+          !this.addressFields[field.destinationField] &&
+          !this.roleFields[field.destinationField] &&
+          !this.outbreakFields[field.destinationField] &&
+          !this.languageFields[field.destinationField] &&
+          !this.userFields[field.destinationField]
         ) ||
         this.distinctValuesCache[field.sourceFieldWithoutIndexes]
       ) {
@@ -3390,6 +3571,52 @@ export class ImportDataComponent
   }
 
   /**
+   * Mapped field option role changed handler
+   */
+  getOptionsOtherTemplate(
+    destinationField: string
+  ): ILabelValuePairModel[] {
+    // return options
+    if (this.roleFields[destinationField]) {
+      return this.userRoles.options;
+    } else if (this.outbreakFields[destinationField]) {
+      return this.outbreaks.options;
+    } else if (this.languageFields[destinationField]) {
+      return this.languages.options;
+    } else if (this.userFields[destinationField]) {
+      return this.users.options;
+    }
+
+    // no template found
+    return [];
+  }
+
+  /**
+   * Mapped field option role changed handler
+   */
+  mappedOptionsOtherTemplateChanged(
+    destinationField: string,
+    mappedOpt: IMappedOption,
+    optionId: string
+  ): void {
+    // set option value
+    if (this.roleFields[destinationField]) {
+      mappedOpt.destinationOption = this.userRoles.map[optionId].id;
+    } else if (this.outbreakFields[destinationField]) {
+      mappedOpt.destinationOption = this.outbreaks.map[optionId].id;
+    } else if (this.languageFields[destinationField]) {
+      mappedOpt.destinationOption = this.languages.map[optionId].id;
+    } else if (this.userFields[destinationField]) {
+      mappedOpt.destinationOption = this.users.map[optionId].id;
+    } else {
+      mappedOpt.destinationOption = null;
+    }
+
+    // prepare data
+    this.validateData();
+  }
+
+  /**
      * Determine & retrieve map option height
      */
   getFieldMapOptionsHeight(
@@ -3815,5 +4042,37 @@ export class ImportDataComponent
           }
         ]
       }).subscribe();
+  }
+
+  /**
+   * Maps the option value from a dropdown
+   */
+  getOptionValue(destinationField: string, destinationOption: string): string {
+    // return if no valid input provided
+    if (
+      !destinationField ||
+      !destinationOption
+    ) {
+      return '-';
+    }
+
+    // check custom dropdown
+    if (this.addressFields[destinationField] && this.locationCache[destinationOption]) {
+      return this.locationCache[destinationOption].label;
+    } else if (this.roleFields[destinationField] && this.userRoles.map[destinationOption]) {
+      return this.userRoles.map[destinationOption].name;
+    } else if (this.outbreakFields[destinationField] && this.outbreaks.map[destinationOption]) {
+      return this.outbreaks.map[destinationOption].name;
+    } else if (this.languageFields[destinationField] && this.languages.map[destinationOption]) {
+      return this.languages.map[destinationOption].name;
+    } else if (this.userFields[destinationField] && this.users.map[destinationOption]) {
+      return this.users.map[destinationOption].nameAndEmail;
+    } else {
+      // general dropdown
+      return this.importableObject.modelPropertyValuesMapChildMap[destinationField] &&
+      this.importableObject.modelPropertyValuesMapChildMap[destinationField][destinationOption] ?
+        this.importableObject.modelPropertyValuesMapChildMap[destinationField][destinationOption] :
+        '—';
+    }
   }
 }
