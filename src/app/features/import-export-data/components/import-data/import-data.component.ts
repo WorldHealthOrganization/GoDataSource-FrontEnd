@@ -2519,12 +2519,9 @@ export class ImportDataComponent
     this.users = (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>);
     if (this.users?.list?.length) {
       this.users.list.forEach((item: UserModel) => {
-        // map name and email to id
-        if (item.email) {
-          // the name with email pair is unique
-          const userNameAndEmail: string = _.camelCase(item.nameAndEmail).toLowerCase();
-          this.userNameAndEmailMap[userNameAndEmail] = item.id;
-        }
+        // map name and email to id. the name with email pair is unique
+        const userNameAndEmail: string = _.camelCase(item.nameAndEmail).toLowerCase();
+        this.userNameAndEmailMap[userNameAndEmail] = item.id;
 
         // map name to id
         const userName: string = _.camelCase(item.name).toLowerCase();
