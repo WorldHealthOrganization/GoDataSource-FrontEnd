@@ -687,8 +687,7 @@ export class UserModel
   }
 
   /**
-   * User Name and Email
-   * @returns {string}
+   * Get user name and email
    */
   get nameAndEmail(): string {
     return `${this.name} ( ${this.email} )`;

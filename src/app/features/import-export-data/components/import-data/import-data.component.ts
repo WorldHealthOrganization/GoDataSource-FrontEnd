@@ -1992,6 +1992,7 @@ export class ImportDataComponent
               this.distinctValuesCache = {};
               this.locationCache = {};
               this.locationCacheIndex = {};
+
               // update visible items count
               this.updateVisibleItemsCount();
 
