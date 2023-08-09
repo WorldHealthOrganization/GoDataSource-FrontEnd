@@ -929,6 +929,56 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'outcomeId',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_OUTCOME_DESCRIPTION',
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              this.itemData.outcomeId
+            ),
+            value: {
+              get: () => this.itemData.outcomeId,
+              set: (value) => {
+                // set data
+                this.itemData.outcomeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfOutcome',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
+            value: {
+              get: () => this.itemData.dateOfOutcome,
+              set: (value) => {
+                this.itemData.dateOfOutcome = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              dateSameOrBefore: () => [
+                this._today,
+                'dateOfBurial'
+              ],
+              dateSameOrAfter: () => [
+                'dateOfOnset',
+                'dateOfInfection'
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'transferRefused',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
+            value: {
+              get: () => this.itemData.transferRefused,
+              set: (value) => {
+                this.itemData.transferRefused = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'riskLevel',
             placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
             description: () => 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
@@ -2468,7 +2518,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             const forms: V2ColumnStatusForm[] = ContactModel.getStatusForms({
               item,
               i18nService: this.i18nService,
-              risk: this.activatedRoute.snapshot.data.risk
+              risk: this.activatedRoute.snapshot.data.risk,
+              outcome: this.activatedRoute.snapshot.data.outcome
             });
 
             // create html
@@ -2503,6 +2554,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       'lastName',
       'middleName',
       'visualId',
+      'outcomeId',
       'riskLevel',
       'followUp',
       'questionnaireAnswers'
