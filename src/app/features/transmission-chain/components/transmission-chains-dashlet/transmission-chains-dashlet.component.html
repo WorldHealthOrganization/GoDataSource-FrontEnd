@@ -191,7 +191,7 @@
 
       <!-- Configure snapshot -->
       <button
-        *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
+        *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
         type="button"
         mat-flat-button
         [disabled]="!selectedSnapshot || chainGroupId !== selectedSnapshot"
