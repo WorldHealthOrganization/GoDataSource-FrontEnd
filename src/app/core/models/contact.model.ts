@@ -74,6 +74,9 @@ export class ContactModel
   occupation: string;
   documents: DocumentModel[];
   addresses: AddressModel[];
+  outcomeId: string;
+  dateOfOutcome: string | Moment;
+  transferRefused: boolean;
   riskLevel: string;
   riskReason: string;
   type: EntityType = EntityType.CONTACT;
@@ -203,6 +206,26 @@ export class ContactModel
         field: 'riskLevel',
         label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
         options: data.options.risk,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'outcomeId',
+        label: 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
+        options: data.options.outcome,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfOutcome',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'transferRefused',
+        label: 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED',
+        options:  data.options.yesNo,
         sortable: true
       },
       {
@@ -1249,11 +1272,24 @@ export class ContactModel
       // required
       item: ContactModel,
       i18nService: I18nService,
-      risk: IResolverV2ResponseModel<ReferenceDataEntryModel>
+      risk: IResolverV2ResponseModel<ReferenceDataEntryModel>,
+      outcome: IResolverV2ResponseModel<ReferenceDataEntryModel>
     }
   ): V2ColumnStatusForm[] {
     // construct list of forms that we need to display
     const forms: V2ColumnStatusForm[] = [];
+
+    // outcome
+    if (
+      info.item.outcomeId &&
+      info.outcome.map[info.item.outcomeId]
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.HEXAGON,
+        color: info.outcome.map[info.item.outcomeId].getColorCode(),
+        tooltip: info.i18nService.instant(info.item.outcomeId)
+      });
+    }
 
     // risk
     if (
@@ -1487,6 +1523,10 @@ export class ContactModel
 
     this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
     this.questionnaireAnswersCase = _.get(data, 'questionnaireAnswersCase', {});
+
+    this.outcomeId = _.get(data, 'outcomeId');
+    this.dateOfOutcome = _.get(data, 'dateOfOutcome');
+    this.transferRefused = _.get(data, 'transferRefused');
 
     this.riskLevel = _.get(data, 'riskLevel');
     this.riskReason = _.get(data, 'riskReason');

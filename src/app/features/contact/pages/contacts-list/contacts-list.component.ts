@@ -100,7 +100,7 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', value: 'dateBecomeContact' },
     { label: 'LNG_CONTACT_FIELD_LABEL_OUTCOME_ID', value: 'outcomeId' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome' },
-    { label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused' },
     { label: 'LNG_CONTACT_FIELD_LABEL_SAFE_BURIAL', value: 'safeBurial' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
     { label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP', value: 'followUp' },
@@ -1138,6 +1138,46 @@ export class ContactsListComponent
         }
       },
       {
+        field: 'outcomeId',
+        label: 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'dateOfOutcome',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'transferRefused',
+        label: 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
         field: 'riskLevel',
         label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
         sortable: true,
@@ -1232,6 +1272,24 @@ export class ContactsListComponent
         notResizable: true,
         pinned: true,
         legends: [
+          // outcome
+          {
+            title: 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
+            items: this.referenceDataHelperService.filterPerOutbreak(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).list
+            ).map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.HEXAGON,
+                  color: item.getColorCode()
+                },
+                label: item.id,
+                order: item.order
+              };
+            })
+          },
+
           // risk
           {
             title: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
@@ -1295,7 +1353,8 @@ export class ContactsListComponent
         forms: (_column, data: ContactModel): V2ColumnStatusForm[] => ContactModel.getStatusForms({
           item: data,
           i18nService: this.i18nService,
-          risk: this.activatedRoute.snapshot.data.risk
+          risk: this.activatedRoute.snapshot.data.risk,
+          outcome: this.activatedRoute.snapshot.data.outcome
         })
       },
       {
@@ -2600,6 +2659,9 @@ export class ContactsListComponent
       'age',
       'dob',
       'gender',
+      'outcomeId',
+      'dateOfOutcome',
+      'transferRefused',
       'riskLevel',
       'riskReason',
       'occupation',
