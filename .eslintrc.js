@@ -144,7 +144,7 @@ module.exports = {
         "max-len": [
           "error",
           {
-            "code": 512
+            "code": 1024
           }
         ],
         "no-bitwise": "error",
