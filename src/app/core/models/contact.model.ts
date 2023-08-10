@@ -1285,7 +1285,7 @@ export class ContactModel
       info.outcome.map[info.item.outcomeId]
     ) {
       forms.push({
-        type: IV2ColumnStatusFormType.TRIANGLE,
+        type: IV2ColumnStatusFormType.HEXAGON,
         color: info.outcome.map[info.item.outcomeId].getColorCode(),
         tooltip: info.i18nService.instant(info.item.outcomeId)
       });

@@ -896,7 +896,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             ).map((item) => {
               return {
                 form: {
-                  type: IV2ColumnStatusFormType.TRIANGLE,
+                  type: IV2ColumnStatusFormType.HEXAGON,
                   color: item.getColorCode()
                 },
                 label: item.id,
