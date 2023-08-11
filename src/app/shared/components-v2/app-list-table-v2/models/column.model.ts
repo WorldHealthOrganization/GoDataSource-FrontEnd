@@ -254,7 +254,7 @@ export type V2ColumnStatusForm = IV2ColumnStatusFormShapeEmpty | IV2ColumnStatus
  */
 interface IV2ColumnLegendStatusItem {
   // required
-  form: V2ColumnStatusForm;
+  form: IV2ColumnStatusFormShape;
   label: string;
   order: number | undefined;
 }
