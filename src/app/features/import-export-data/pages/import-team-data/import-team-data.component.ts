@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
 import { ImportDataExtension } from '../../components/import-data/model';
@@ -8,12 +8,14 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { TeamModel } from '../../../../core/models/team.model';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-import-team-data',
   templateUrl: './import-team-data.component.html'
 })
-export class ImportTeamDataComponent implements OnInit {
+export class ImportTeamDataComponent implements OnInit, OnDestroy {
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
 
@@ -53,7 +55,8 @@ export class ImportTeamDataComponent implements OnInit {
   constructor(
     private router: Router,
     private authDataService: AuthDataService,
-    private redirectService: RedirectService
+    private redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service
   ) {
   }
 
@@ -66,6 +69,21 @@ export class ImportTeamDataComponent implements OnInit {
 
     // update breadcrumbs
     this.initializeBreadcrumbs();
+
+    // show the warning message
+    this.toastV2Service.notice(
+      'LNG_PAGE_IMPORT_TEAM_DATA_WARNING',
+      undefined,
+      AppMessages.APP_MESSAGE_IMPORT_TEAM_DATA_WARNING
+    );
+  }
+
+  /**
+   * Component destroyed
+   */
+  ngOnDestroy(): void {
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_IMPORT_TEAM_DATA_WARNING);
   }
 
   /**
