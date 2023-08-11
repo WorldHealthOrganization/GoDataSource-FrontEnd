@@ -205,6 +205,10 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
               color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
               tooltip: this.i18nService.instant(data.type)
             });
+          } else {
+            forms.push({
+              type: IV2ColumnStatusFormType.EMPTY
+            });
           }
 
           // finished

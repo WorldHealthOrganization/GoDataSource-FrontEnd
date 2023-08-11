@@ -168,6 +168,10 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
               color: (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type].getColorCode(),
               tooltip: this.i18nService.instant(data.type)
             });
+          } else {
+            forms.push({
+              type: IV2ColumnStatusFormType.EMPTY
+            });
           }
 
           // finished

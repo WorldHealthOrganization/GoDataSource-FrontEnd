@@ -216,6 +216,7 @@ export interface IV2ColumnAction {
  * Status column form type
  */
 export enum IV2ColumnStatusFormType {
+  EMPTY,
   CIRCLE,
   SQUARE,
   TRIANGLE,
@@ -236,9 +237,17 @@ interface IV2ColumnStatusFormShape {
 }
 
 /**
+ * Status column form - shape placeholder
+ */
+interface IV2ColumnStatusFormShapeEmpty {
+  // required
+  type: IV2ColumnStatusFormType.EMPTY;
+}
+
+/**
  * Status column form
  */
-export type V2ColumnStatusForm = IV2ColumnStatusFormShape;
+export type V2ColumnStatusForm = IV2ColumnStatusFormShapeEmpty | IV2ColumnStatusFormShape;
 
 /**
  * Status column - legend

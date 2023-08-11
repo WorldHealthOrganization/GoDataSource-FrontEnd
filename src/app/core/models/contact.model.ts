@@ -1289,6 +1289,10 @@ export class ContactModel
         color: info.outcome.map[info.item.outcomeId].getColorCode(),
         tooltip: info.i18nService.instant(info.item.outcomeId)
       });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
     }
 
     // risk
@@ -1300,6 +1304,10 @@ export class ContactModel
         type: IV2ColumnStatusFormType.TRIANGLE,
         color: info.risk.map[info.item.riskLevel].getColorCode(),
         tooltip: info.i18nService.instant(info.item.riskLevel)
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
       });
     }
 
@@ -1337,6 +1345,10 @@ export class ContactModel
         color: 'var(--gd-status-follow-up-ended)',
         tooltip: info.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP')
       });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
     }
 
     // alerted
@@ -1345,6 +1357,10 @@ export class ContactModel
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
         tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
       });
     }
 
