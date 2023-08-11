@@ -1631,9 +1631,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // set column width
         this._agTable.columnApi.setColumnWidth(
           column,
-          (maxForms - 1) * (AppListTableV2Component.STANDARD_SHAPE_SIZE + AppListTableV2Component.STANDARD_SHAPE_GAP) +
-          AppListTableV2Component.STANDARD_SHAPE_SIZE +
-          AppListTableV2Component.STANDARD_SHAPE_PADDING * 2
+          maxForms * (AppListTableV2Component.STANDARD_SHAPE_SIZE + AppListTableV2Component.STANDARD_SHAPE_PADDING) +
+            (maxForms < 2 ? AppListTableV2Component.STANDARD_SHAPE_PADDING : 0)
         );
       } else if (colDef.headerComponent === AppListTableV2SelectionHeaderComponent) {
         this._agTable.columnApi.setColumnWidth(
