@@ -726,16 +726,4 @@ export class ContactOfContactModel
       this.addresses.splice(existingAddressIndex, 1, mainAddress);
     }
   }
-
-  /**
-   * Get phone numbers
-   */
-  get phoneNumbers(): string[] {
-    return this.addresses.reduce((acc: string[], address) => {
-      if (!_.isEmpty(address.phoneNumber)) {
-        acc.push(address.phoneNumber);
-      }
-      return acc;
-    }, []);
-  }
 }

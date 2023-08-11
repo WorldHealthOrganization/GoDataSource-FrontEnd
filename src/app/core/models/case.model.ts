@@ -994,16 +994,4 @@ export class CaseModel
         typeId: AddressType.CURRENT_ADDRESS
       });
   }
-
-  /**
-     * Get phone numbers
-     */
-  get phoneNumbers(): string[] {
-    return this.addresses.reduce((acc: string[], address) => {
-      if (!_.isEmpty(address.phoneNumber)) {
-        acc.push(address.phoneNumber);
-      }
-      return acc;
-    }, []);
-  }
 }
