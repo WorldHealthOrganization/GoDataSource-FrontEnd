@@ -943,6 +943,10 @@ export class EntityHelperService {
               color: definitions.personType.map[data.type].getColorCode(),
               tooltip: this.i18nService.instant(data.type)
             });
+          } else {
+            forms.push({
+              type: IV2ColumnStatusFormType.EMPTY
+            });
           }
 
           // finished

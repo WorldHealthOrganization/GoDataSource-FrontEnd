@@ -418,6 +418,10 @@ export class ContactOfContactModel
         color: info.risk.map[info.item.riskLevel].getColorCode(),
         tooltip: info.i18nService.instant(info.item.riskLevel)
       });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
     }
 
     // finished

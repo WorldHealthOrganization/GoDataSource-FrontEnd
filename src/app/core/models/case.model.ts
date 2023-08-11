@@ -602,6 +602,10 @@ export class CaseModel
         color: info.classification.map[info.item.classification].getColorCode(),
         tooltip: info.i18nService.instant(info.item.classification)
       });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
     }
 
     // outcome
@@ -614,6 +618,10 @@ export class CaseModel
         color: info.outcome.map[info.item.outcomeId].getColorCode(),
         tooltip: info.i18nService.instant(info.item.outcomeId)
       });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
     }
 
     // alerted
@@ -622,6 +630,10 @@ export class CaseModel
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
         tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
       });
     }
 

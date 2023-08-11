@@ -185,6 +185,10 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
               color: (this.route.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type].getColorCode(),
               tooltip: this.i18nService.instant(data.type)
             });
+          } else {
+            forms.push({
+              type: IV2ColumnStatusFormType.EMPTY
+            });
           }
 
           // finished
