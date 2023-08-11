@@ -390,6 +390,10 @@ export class LabResultModel
         color: 'var(--gd-danger)',
         tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
     }
 
     // finished

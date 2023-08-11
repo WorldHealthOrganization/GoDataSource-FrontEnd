@@ -527,63 +527,52 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     form: V2ColumnStatusForm,
     addGap: boolean
   ): string {
-    let statusHtml: string = '';
+    let statusHtml: string = `<svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">`;
     switch (form.type) {
       case IV2ColumnStatusFormType.CIRCLE:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <circle fill="${form.color}" cx="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" cy="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" r="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" />
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <circle fill="${form.color}" cx="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" cy="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" r="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" />`;
 
         // finished
         break;
 
       case IV2ColumnStatusFormType.SQUARE:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <rect fill="${form.color}" width="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <rect fill="${form.color}" width="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />`;
 
         // finished
         break;
 
       case IV2ColumnStatusFormType.TRIANGLE:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} 0, 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}"/>
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} 0, 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}"/>`;
 
         // finished
         break;
 
       case IV2ColumnStatusFormType.STAR:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2},0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.2},${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.95},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2},0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.2},${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.95},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />`;
 
         // finished
         break;
 
       case IV2ColumnStatusFormType.HEXAGON:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.93} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.25},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.93} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.25},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.06} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.75},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.06}" />
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.93} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.25},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.93} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.25},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.06} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.75},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.06}" />`;
 
         // finished
         break;
+
+      default:
+      // case IV2ColumnStatusFormType.EMPTY:
+        // nothing to do, empty svg is enough
+        // finished
+        break;
     }
+
+    // close svg
+    statusHtml += '</svg>';
 
     // finished
     return statusHtml;

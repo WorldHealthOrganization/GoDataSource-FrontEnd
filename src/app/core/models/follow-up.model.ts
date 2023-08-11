@@ -153,6 +153,10 @@ export class FollowUpModel
         color: info.dailyFollowUpStatus.map[info.item.statusId].getColorCode(),
         tooltip: info.i18nService.instant(info.item.statusId)
       });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
     }
 
     // alerted
@@ -161,6 +165,10 @@ export class FollowUpModel
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
         tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
       });
     }
 
