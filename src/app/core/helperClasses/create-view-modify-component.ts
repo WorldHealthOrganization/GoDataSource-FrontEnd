@@ -400,7 +400,8 @@ export abstract class CreateViewModifyComponent<T>
   ): IVisibleMandatoryDataGroupTab[] {
     return tabs.map((tab) => {
       return {
-        id: tab.name,
+        // must be uuid because tab names are the same for multiple groups
+        id: uuid(),
         label: tab.label,
         children: tab.sections.map((section) => {
           // construct children inputs
@@ -464,6 +465,7 @@ export abstract class CreateViewModifyComponent<T>
 
           // finished
           return {
+            // must be uuid because section names are the same for multiple tabs / groups
             id: uuid(),
             label: section.label,
             children
