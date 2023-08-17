@@ -42,10 +42,10 @@ export class EntityContactHelperService {
    * Constructor
    */
   constructor(
+    private authDataService: AuthDataService,
     private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
-    private contactDataService: ContactDataService,
-    private authDataService: AuthDataService
+    private contactDataService: ContactDataService
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();

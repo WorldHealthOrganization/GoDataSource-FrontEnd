@@ -35,9 +35,9 @@ export class EntityCaseHelperService {
    * Constructor
    */
   constructor(
+    private authDataService: AuthDataService,
     private i18nService: I18nService,
-    private caseDataService: CaseDataService,
-    private authDataService: AuthDataService
+    private caseDataService: CaseDataService
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
