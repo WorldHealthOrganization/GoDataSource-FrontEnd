@@ -973,11 +973,11 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   private initializeTabsVisibleAndRequiredFields(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'TEST',
-      label: 'TEST2',
+      name: 'visible_mandatory_fields',
+      label: 'LNG_OUTBREAK_FIELD_LABEL_VISIBLE_AND_MANDATORY_FIELDS',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY,
-        name: 'TEST3',
+        name: 'visibleAndMandatoryFields',
         options: [
           // cases
           {

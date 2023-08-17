@@ -22,7 +22,7 @@
       color="text"
       [disabled]="!!searchValue"
       (click)="collapseExpandAll(false, true)">
-      {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_EXPAND_ALL' | translate}}
+      {{'LNG_COMMON_LABEL_EXPAND_ALL' | translate}}
     </button>
 
     <!-- Collapse All -->
@@ -32,7 +32,7 @@
       color="text"
       [disabled]="!!searchValue"
       (click)="collapseExpandAll(true, true)">
-      {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL' | translate}}
+      {{'LNG_COMMON_LABEL_COLLAPSE_ALL' | translate}}
     </button>
 
   </div>
@@ -131,7 +131,7 @@
             <app-form-checkbox-v2
               [ngModel]="false"
               [name]="item.data.id"
-              placeholder="Required"
+              placeholder="LNG_COMMON_LABEL_REQUIRED"
               [disabled]="viewOnly"></app-form-checkbox-v2>
           </div>
 
