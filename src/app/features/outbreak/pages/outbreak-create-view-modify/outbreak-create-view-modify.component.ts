@@ -1134,7 +1134,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           // follow-ups
           {
             id: 'follow-ups',
-            label: 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+            label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOW_UP',
             children: this.tabsToGroupTabs(
               this.i18nService, [
                 this.entityFollowUpHelperService.generateTabsPersonal({
