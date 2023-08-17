@@ -18,7 +18,8 @@ import { ICreateViewModifyV2Refresh } from '../../shared/components-v2/app-creat
 import { RedirectService } from '../services/helper/redirect.service';
 import { AppCreateViewModifyV2Component } from '../../shared/components-v2/app-create-view-modify-v2/app-create-view-modify-v2.component';
 import { v4 as uuid } from 'uuid';
-import { IVisibleMandatoryDataGroupTab } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { IVisibleMandatoryDataGroupTab, IVisibleMandatoryDataGroupTabSectionField } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { I18nService } from '../services/helper/i18n.service';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T>
@@ -393,74 +394,79 @@ export abstract class CreateViewModifyComponent<T>
   /**
    * Convert create/view/modify tabs to group tabs
    */
-  tabsToGroupTabs(tabs: ICreateViewModifyV2Tab[]): IVisibleMandatoryDataGroupTab[] {
+  tabsToGroupTabs(
+    i18nService: I18nService,
+    tabs: ICreateViewModifyV2Tab[]
+  ): IVisibleMandatoryDataGroupTab[] {
     return tabs.map((tab) => {
       return {
         id: tab.name,
         label: tab.label,
         children: tab.sections.map((section) => {
+          // construct children inputs
+          const children: IVisibleMandatoryDataGroupTabSectionField[] = [];
+          section.inputs.forEach((input) => {
+            switch (input.type) {
+              case CreateViewModifyV2TabInputType.TEXT:
+              case CreateViewModifyV2TabInputType.SELECT_SINGLE:
+              case CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT:
+              case CreateViewModifyV2TabInputType.DATE:
+              case CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX:
+              case CreateViewModifyV2TabInputType.LOCATION_SINGLE:
+              case CreateViewModifyV2TabInputType.TEXTAREA:
+                // add to list
+                children.push({
+                  id: input.name,
+                  label: input.placeholder()
+                });
+
+                // finished
+                break;
+
+              case CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH:
+                // add to list
+                children.push({
+                  id: 'ageDob',
+                  label: `${i18nService.instant('LNG_ENTITY_FIELD_LABEL_AGE')} / ${i18nService.instant('LNG_ENTITY_FIELD_LABEL_DOB')}`
+                });
+
+                // finished
+                break;
+
+              case CreateViewModifyV2TabInputType.LIST:
+
+                // handle list item types
+                switch (input.definition.input.type) {
+                  case CreateViewModifyV2TabInputType.DOCUMENT:
+                  case CreateViewModifyV2TabInputType.ADDRESS:
+                  case CreateViewModifyV2TabInputType.VACCINE:
+                  case CreateViewModifyV2TabInputType.CENTER_DATE_RANGE:
+                    // add to list
+                    children.push({
+                      id: input.name,
+                      label: section.label
+                    });
+
+                    // finished
+                    break;
+
+                  default:
+                    throw new Error(`tabsToGroupTabs: unhandled list type '${input.definition.input.type}'`);
+                }
+
+                // finished
+                break;
+
+              default:
+                throw new Error(`tabsToGroupTabs: unhandled type '${input.type}'`);
+            }
+          });
+
+          // finished
           return {
             id: uuid(),
             label: section.label,
-            children: section.inputs.map((input) => {
-              switch (input.type) {
-                case CreateViewModifyV2TabInputType.TEXT:
-                case CreateViewModifyV2TabInputType.SELECT_SINGLE:
-                case CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT:
-                case CreateViewModifyV2TabInputType.DATE:
-                case CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX:
-                case CreateViewModifyV2TabInputType.LOCATION_SINGLE:
-                case CreateViewModifyV2TabInputType.TEXTAREA:
-                  return {
-                    id: input.name,
-                    label: input.placeholder()
-                  };
-
-                case CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH:
-                  return {
-                    id: 'name..age..dob',
-                    label: 'age...dob..'
-                  };
-
-                case CreateViewModifyV2TabInputType.LIST:
-
-                  // handle list item types
-                  switch (input.definition.input.type) {
-                    case CreateViewModifyV2TabInputType.DOCUMENT:
-                      return {
-                        id: 'document...',
-                        label: 'document'
-                      };
-
-                    case CreateViewModifyV2TabInputType.ADDRESS:
-                      return {
-                        id: 'address...',
-                        label: 'address'
-                      };
-
-                    case CreateViewModifyV2TabInputType.VACCINE:
-                      return {
-                        id: 'vaccine...',
-                        label: 'vaccine'
-                      };
-
-                    case CreateViewModifyV2TabInputType.CENTER_DATE_RANGE:
-                      return {
-                        id: 'center_date_range...',
-                        label: 'center date range'
-                      };
-
-                    default:
-                      throw new Error(`tabsToGroupTabs: unhandled list type '${input.definition.input.type}'`);
-                  }
-
-                  // finished
-                  break;
-
-                default:
-                  throw new Error(`tabsToGroupTabs: unhandled type '${input.type}'`);
-              }
-            })
+            children
           };
         })
       };

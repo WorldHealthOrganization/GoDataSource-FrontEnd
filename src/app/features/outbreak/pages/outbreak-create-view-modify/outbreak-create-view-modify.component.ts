@@ -983,43 +983,45 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           {
             id: 'cases',
             label: 'LNG_PAGE_LIST_CASES_TITLE',
-            children: this.tabsToGroupTabs([
-              CaseModel.generateTabsPersonal({
-                authUser: this.authUser,
-                i18nService: this.i18nService,
-                caseDataService: undefined,
-                selectedOutbreak: this.selectedOutbreak,
-                isCreate: true,
-                itemData: new CaseModel(),
-                checkForPersonExistence: () => {},
-                caseVisualIDMask: undefined,
-                options: {
-                  gender: [],
-                  pregnancy: [],
-                  occupation: [],
-                  user: [],
-                  documentType: [],
-                  addressType: []
-                }
-              }),
-              CaseModel.generateTabsEpidemiology({
-                selectedOutbreak: this.selectedOutbreak,
-                isCreate: true,
-                itemData: new CaseModel(),
-                checkForOnsetAfterReporting: () => {},
-                checkForOnsetAfterHospitalizationStartDate: () => {},
-                options: {
-                  classification: [],
-                  investigationStatus: [],
-                  outcome: [],
-                  risk: [],
-                  vaccine: [],
-                  vaccineStatus: [],
-                  dateRangeType: [],
-                  dateRangeCenter: []
-                }
-              })
-            ])
+            children: this.tabsToGroupTabs(
+              this.i18nService, [
+                CaseModel.generateTabsPersonal({
+                  authUser: this.authUser,
+                  i18nService: this.i18nService,
+                  caseDataService: undefined,
+                  selectedOutbreak: this.selectedOutbreak,
+                  isCreate: true,
+                  itemData: new CaseModel(),
+                  checkForPersonExistence: () => {},
+                  caseVisualIDMask: undefined,
+                  options: {
+                    gender: [],
+                    pregnancy: [],
+                    occupation: [],
+                    user: [],
+                    documentType: [],
+                    addressType: []
+                  }
+                }),
+                CaseModel.generateTabsEpidemiology({
+                  selectedOutbreak: this.selectedOutbreak,
+                  isCreate: true,
+                  itemData: new CaseModel(),
+                  checkForOnsetAfterReporting: () => {},
+                  checkForOnsetAfterHospitalizationStartDate: () => {},
+                  options: {
+                    classification: [],
+                    investigationStatus: [],
+                    outcome: [],
+                    risk: [],
+                    vaccine: [],
+                    vaccineStatus: [],
+                    dateRangeType: [],
+                    dateRangeCenter: []
+                  }
+                })
+              ]
+            )
           }
         ],
         value: {
