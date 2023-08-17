@@ -56,6 +56,7 @@ import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { Moment } from 'moment';
+import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
 
 @Component({
   selector: 'app-contacts-list',
@@ -159,7 +160,8 @@ export class ContactsListComponent
     private router: Router,
     private relationshipDataService: RelationshipDataService,
     private clusterDataService: ClusterDataService,
-    private location: Location
+    private location: Location,
+    private entityContactHelperService: EntityContactHelperService
   ) {
     super(
       listHelperService, {
@@ -1350,9 +1352,8 @@ export class ContactsListComponent
             }]
           }
         ],
-        forms: (_column, data: ContactModel): V2ColumnStatusForm[] => ContactModel.getStatusForms({
+        forms: (_column, data: ContactModel): V2ColumnStatusForm[] => this.entityContactHelperService.getStatusForms({
           item: data,
-          i18nService: this.i18nService,
           risk: this.activatedRoute.snapshot.data.risk,
           outcome: this.activatedRoute.snapshot.data.outcome
         })
@@ -1708,9 +1709,7 @@ export class ContactsListComponent
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = ContactModel.generateAdvancedFilters({
-      authUser: this.authUser,
-      i18nService: this.i18nService,
+    this.advancedFilters = this.entityContactHelperService.generateAdvancedFilters({
       contactInvestigationTemplate: () => this.selectedOutbreak.contactInvestigationTemplate,
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,

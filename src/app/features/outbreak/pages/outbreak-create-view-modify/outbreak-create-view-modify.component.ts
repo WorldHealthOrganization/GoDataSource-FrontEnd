@@ -44,6 +44,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
+import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
 
 /**
  * Component
@@ -75,6 +76,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     protected router: Router,
     protected referenceDataHelperService: ReferenceDataHelperService,
     private entityCaseHelperService: EntityCaseHelperService,
+    private entityContactHelperService: EntityContactHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -1030,11 +1032,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
             children: this.tabsToGroupTabs(
               this.i18nService, [
-                ContactModel.generateTabsPersonal({
-                  authUser: this.authUser,
-                  i18nService: this.i18nService,
-                  dialogV2Service: undefined,
-                  contactDataService: undefined,
+                this.entityContactHelperService.generateTabsPersonal({
                   selectedOutbreak: this.selectedOutbreak,
                   isCreate: true,
                   itemData: new ContactModel(),
@@ -1051,9 +1049,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                     addressType: []
                   }
                 }),
-                ContactModel.generateTabsEpidemiology({
-                  authUser: this.authUser,
-                  i18nService: this.i18nService,
+                this.entityContactHelperService.generateTabsEpidemiology({
                   isCreate: true,
                   itemData: new ContactModel(),
                   options: {

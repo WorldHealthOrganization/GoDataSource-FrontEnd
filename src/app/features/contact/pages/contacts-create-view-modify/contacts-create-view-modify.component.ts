@@ -35,7 +35,6 @@ import { Location } from '@angular/common';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
@@ -62,6 +61,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
 
 /**
  * Component
@@ -112,7 +112,6 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected contactDataService: ContactDataService,
-    protected caseDataService: CaseDataService,
     protected i18nService: I18nService,
     protected toastV2Service: ToastV2Service,
     protected location: Location,
@@ -126,6 +125,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
     private clusterDataService: ClusterDataService,
+    private entityContactHelperService: EntityContactHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -211,7 +211,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
   protected initializedData(): void {
     // initialize visual ID mask
     this._contactVisualIDMask = {
-      mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+      mask: this.entityContactHelperService.generateContactIDMask(this.selectedOutbreak.contactIdMask)
     };
 
     // set visual id for case
@@ -502,11 +502,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Personal
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return ContactModel.generateTabsPersonal({
-      authUser: this.authUser,
-      i18nService: this.i18nService,
-      dialogV2Service: this.dialogV2Service,
-      contactDataService: this.contactDataService,
+    return this.entityContactHelperService.generateTabsPersonal({
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,
@@ -535,9 +531,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Epidemiology
    */
   private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
-    return ContactModel.generateTabsEpidemiology({
-      authUser: this.authUser,
-      i18nService: this.i18nService,
+    return this.entityContactHelperService.generateTabsEpidemiology({
       isCreate: this.isCreate,
       itemData: this.itemData,
       options: {
@@ -1995,9 +1989,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
           if (!item.uiStatusForms) {
             // determine forms
-            const forms: V2ColumnStatusForm[] = ContactModel.getStatusForms({
+            const forms: V2ColumnStatusForm[] = this.entityContactHelperService.getStatusForms({
               item,
-              i18nService: this.i18nService,
               risk: this.activatedRoute.snapshot.data.risk,
               outcome: this.activatedRoute.snapshot.data.outcome
             });
@@ -2045,9 +2038,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = ContactModel.generateAdvancedFilters({
-      authUser: this.authUser,
-      i18nService: this.i18nService,
+    this.expandListAdvancedFilters = this.entityContactHelperService.generateAdvancedFilters({
       contactInvestigationTemplate: () => this.selectedOutbreak.contactInvestigationTemplate,
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
