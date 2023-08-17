@@ -67,7 +67,7 @@
           <div
             class="gd-form-visible-mandatory-v2-list-item-group-content"
             fxFlex
-            [innerHTML]="item.data.label | translate | highlight:searchValue"></div>
+            [innerHTML]="item.text | highlight:searchValue"></div>
 
         </div>
 
@@ -85,7 +85,7 @@
           <div
             class="gd-form-visible-mandatory-v2-list-item-group-tab-content"
             fxFlex
-            [innerHTML]="item.data.label | translate | highlight:searchValue"></div>
+            [innerHTML]="item.text | highlight:searchValue"></div>
 
         </div>
 
@@ -103,7 +103,7 @@
           <div
             class="gd-form-visible-mandatory-v2-list-item-group-tab-section-content"
             fxFlex
-            [innerHTML]="item.data.label | translate | highlight:searchValue"></div>
+            [innerHTML]="item.text | highlight:searchValue"></div>
 
         </div>
 

@@ -41,6 +41,7 @@ enum FlattenType {
 interface IFlattenNodeGroup {
   // required
   type: FlattenType.GROUP;
+  text: string;
   data: IVisibleMandatoryDataGroup;
 }
 
@@ -51,6 +52,7 @@ interface IFlattenNodeGroupTab {
   // required
   type: FlattenType.GROUP_TAB;
   parent: IFlattenNodeGroup;
+  text: string;
   data: IVisibleMandatoryDataGroupTab;
 }
 
@@ -61,6 +63,7 @@ interface IFlattenNodeGroupTabSection {
   // required
   type: FlattenType.GROUP_TAB_SECTION;
   parent: IFlattenNodeGroupTab;
+  text: string;
   data: IVisibleMandatoryDataGroupTabSection;
 }
 
@@ -283,6 +286,7 @@ export class AppFormVisibleMandatoryV2Component
       // add group
       const groupNode: IFlattenNodeGroup = {
         type: FlattenType.GROUP,
+        text: this.i18nService.instant(group.label),
         data: group
       };
       this._allFlattenedData.push(groupNode);
@@ -293,6 +297,7 @@ export class AppFormVisibleMandatoryV2Component
         const groupTabNode: IFlattenNodeGroupTab = {
           type: FlattenType.GROUP_TAB,
           parent: groupNode,
+          text: this.i18nService.instant(tab.label),
           data: tab
         };
         this._allFlattenedData.push(groupTabNode);
@@ -303,6 +308,7 @@ export class AppFormVisibleMandatoryV2Component
           const groupTabSectionNode: IFlattenNodeGroupTabSection = {
             type: FlattenType.GROUP_TAB_SECTION,
             parent: groupTabNode,
+            text: this.i18nService.instant(section.label),
             data: section
           };
           this._allFlattenedData.push(groupTabSectionNode);
@@ -396,59 +402,105 @@ export class AppFormVisibleMandatoryV2Component
     this._allFlattenedData.forEach((item): void => {
       // filter
       if (
-        !byValue // ||
-        // (
-        //   item.type === FlattenType.CATEGORY &&
-        //   item.text.toLowerCase().indexOf(byValue) > -1
-        // ) || (
-        //   item.type === FlattenType.INFO && (
-        //     visibleIds[item.parent.data.id] === VisibleCause.SEARCH ||
-        //     item.text.toLowerCase().indexOf(byValue) > -1
-        //   )
-        // ) || (
-        //   item.type === FlattenType.CATEGORY_ITEM && (
-        //     visibleIds[item.parent.data.id] === VisibleCause.SEARCH || (
-        //       item.data.label &&
-        //       this.i18nService.instant(item.data.label) &&
-        //       this.i18nService.instant(item.data.label).toLowerCase().indexOf(byValue) > -1
-        //     )
-        //   )
-        // )
+        !byValue ||
+        (
+          item.type === FlattenType.GROUP &&
+          item.text &&
+          item.text.toLowerCase().indexOf(byValue) > -1
+        ) || (
+          (
+            item.type === FlattenType.GROUP_TAB ||
+            item.type === FlattenType.GROUP_TAB_SECTION
+          ) && (
+            visibleIds[item.parent.data.id] === VisibleCause.SEARCH || (
+              item.text &&
+              item.text.toLowerCase().indexOf(byValue) > -1
+            )
+          )
+        ) || (
+          item.type === FlattenType.GROUP_TAB_SECTION_FIELD && (
+            visibleIds[item.parent.data.id] === VisibleCause.SEARCH || (
+              item.data.label &&
+              this.i18nService.instant(item.data.label).toLowerCase().indexOf(byValue) > -1
+            )
+          )
+        )
       ) {
         // make item visible
         visibleIds[item.data.id] = VisibleCause.SEARCH;
 
+        // parent matched ?
+        if (
+          byValue && (
+            item.type === FlattenType.GROUP_TAB_SECTION ||
+            item.type === FlattenType.GROUP_TAB ||
+            item.type === FlattenType.GROUP
+          )
+        ) {
+          item.data.collapsed = false;
+        }
+
         // make parent visible if necessary
-        // if (
-        //   (
-        //     item.type === FlattenType.CATEGORY_ITEM ||
-        //     item.type === FlattenType.INFO
-        //   ) &&
-        //   !visibleIds[item.parent.data.id]
-        // ) {
-        //   // make parent visible
-        //   visibleIds[item.parent.data.id] = VisibleCause.CHILD;
-        //
-        //   // expand since a child matched the search criteria
-        //   if (byValue) {
-        //     item.parent.data.collapsed = false;
-        //   }
-        // } else if (
-        //   byValue &&
-        //   item.type === FlattenType.CATEGORY
-        // ) {
-        //   // expand since parent matched
-        //   item.data.collapsed = false;
-        // }
+        if (
+          item.type === FlattenType.GROUP_TAB_SECTION_FIELD &&
+          !visibleIds[item.parent.data.id]
+        ) {
+          // make parent visible - section
+          visibleIds[item.parent.data.id] = VisibleCause.CHILD;
+          item.parent.data.collapsed = false;
+
+          // make parent visible - tab
+          if (!visibleIds[item.parent.parent.data.id]) {
+            visibleIds[item.parent.parent.data.id] = VisibleCause.CHILD;
+            item.parent.parent.data.collapsed = false;
+          }
+
+          // make parent visible - group
+          if (!visibleIds[item.parent.parent.parent.data.id]) {
+            visibleIds[item.parent.parent.parent.data.id] = VisibleCause.CHILD;
+            item.parent.parent.parent.data.collapsed = false;
+          }
+        } else if (
+          item.type === FlattenType.GROUP_TAB_SECTION &&
+          !visibleIds[item.parent.data.id]
+        ) {
+          // make parent visible - tab
+          visibleIds[item.parent.data.id] = VisibleCause.CHILD;
+          item.parent.data.collapsed = false;
+
+          // make parent visible - group
+          if (!visibleIds[item.parent.parent.data.id]) {
+            visibleIds[item.parent.parent.data.id] = VisibleCause.CHILD;
+            item.parent.parent.data.collapsed = false;
+          }
+        } else if (
+          item.type === FlattenType.GROUP_TAB &&
+          !visibleIds[item.parent.data.id]
+        ) {
+          // make parent visible - group
+          visibleIds[item.parent.data.id] = VisibleCause.CHILD;
+          item.parent.data.collapsed = false;
+        }
       }
     });
 
     // filter
     this.flattenedData = this._allFlattenedData.filter((item): boolean =>
-      !!visibleIds[item.data.id] // && (
-      //   item.type === FlattenType.CATEGORY ||
-      //   !item.parent.data.collapsed
-      // )
+      !!visibleIds[item.data.id] && (
+        item.type === FlattenType.GROUP || (
+          item.type === FlattenType.GROUP_TAB &&
+          !item.parent.data.collapsed
+        ) || (
+          item.type === FlattenType.GROUP_TAB_SECTION &&
+          !item.parent.data.collapsed &&
+          !item.parent.parent.data.collapsed
+        ) || (
+          item.type === FlattenType.GROUP_TAB_SECTION_FIELD &&
+          !item.parent.data.collapsed &&
+          !item.parent.parent.data.collapsed &&
+          !item.parent.parent.parent.data.collapsed
+        )
+      )
     );
 
     // update ui
@@ -458,14 +510,13 @@ export class AppFormVisibleMandatoryV2Component
   /**
    * Expand collapse
    */
-  expandCollapse(_item: IFlattenNodeGroup): void {
-    // // expand / collapse
-    // if (item.data.collapsed) {
-    //   delete item.data.collapsed;
-    // } else {
-    //   item.data.collapsed = true;
-    // }
-
+  expandCollapse(item: IFlattenNodeGroup | IFlattenNodeGroupTab | IFlattenNodeGroupTabSection): void {
+    // expand / collapse
+    if (item.data.collapsed) {
+      delete item.data.collapsed;
+    } else {
+      item.data.collapsed = true;
+    }
     // redraw
     // - detect changes is triggered by this.nonFlatToFlat function
     this.nonFlatToFlat();
@@ -484,8 +535,20 @@ export class AppFormVisibleMandatoryV2Component
     }
 
     // go through categories and collapse / expand them
-    this.options.forEach((item) => {
-      item.collapsed = collapsed;
+    this.options.forEach((group) => {
+      // group
+      group.collapsed = collapsed;
+
+      // tabs
+      group.children.forEach((tab) => {
+        // tab
+        tab.collapsed = collapsed;
+
+        // sections
+        tab.children.forEach((section) => {
+          section.collapsed = collapsed;
+        });
+      });
     });
 
     // refresh
