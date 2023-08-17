@@ -51,6 +51,7 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
     'documents[]': 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
     'dateRanges[]': 'LNG_CASE_FIELD_LABEL_DATE_RANGES',
     'vaccinesReceived[]': 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
+    'age': 'LNG_CASE_FIELD_LABEL_AGE',
 
     // !must be empty token - logic depends on it!
     'addresses[].geoLocation': ''

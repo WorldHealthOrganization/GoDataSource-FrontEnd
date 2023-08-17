@@ -16,5 +16,6 @@ export enum AppMessages {
   APP_MESSAGE_DUPLICATE_ENTITY_MASK = 'app-message-duplicate-entity-mask',
   APP_MESSAGE_PASTE_WARNING = 'app-message-paste-warning',
   APP_MESSAGE_CONVERT_RELATIONSHIP_WARNING = 'app-message-convert-relationship-warning',
-  APP_MESSAGE_IMPORT_USER_DATA_WARNING = 'app-message-import-user-data-warning'
+  APP_MESSAGE_IMPORT_USER_DATA_WARNING = 'app-message-import-user-data-warning',
+  APP_MESSAGE_IMPORT_TEAM_DATA_WARNING = 'app-message-import-team-data-warning'
 }
