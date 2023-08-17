@@ -115,10 +115,10 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     protected location: Location,
     protected referenceDataHelperService: ReferenceDataHelperService,
     private entityContactOfContactHelperService: EntityContactOfContactHelperService,
+    private entityFollowUpHelperService: EntityFollowUpHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
-    redirectService: RedirectService,
-    private entityFollowUpHelperService: EntityFollowUpHelperService
+    redirectService: RedirectService
   ) {
     // parent
     super(

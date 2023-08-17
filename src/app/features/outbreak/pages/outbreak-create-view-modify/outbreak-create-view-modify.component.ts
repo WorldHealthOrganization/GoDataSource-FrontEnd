@@ -47,6 +47,8 @@ import { EntityCaseHelperService } from '../../../../core/services/helper/entity
 import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
 import { EntityEventHelperService } from '../../../../core/services/helper/entity-event-helper.service';
 import { EventModel } from '../../../../core/models/event.model';
+import { EntityContactOfContactHelperService } from '../../../../core/services/helper/entity-contact-of-contact-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 /**
  * Component
@@ -78,8 +80,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     protected router: Router,
     protected referenceDataHelperService: ReferenceDataHelperService,
     private entityCaseHelperService: EntityCaseHelperService,
-    private entityContactHelperService: EntityContactHelperService,
     private entityEventHelperService: EntityEventHelperService,
+    private entityContactHelperService: EntityContactHelperService,
+    private entityContactOfContactHelperService: EntityContactOfContactHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -1081,6 +1084,42 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                     risk: [],
                     team: [],
                     followUpStatus: [],
+                    vaccine: [],
+                    vaccineStatus: []
+                  }
+                })
+              ]
+            )
+          },
+
+          // contact of contacts
+          {
+            id: 'contacts-of-contacts',
+            label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+            children: this.tabsToGroupTabs(
+              this.i18nService, [
+                this.entityContactOfContactHelperService.generateTabsPersonal({
+                  selectedOutbreak: this.selectedOutbreak,
+                  isCreate: true,
+                  itemData: new ContactOfContactModel(),
+                  checkForPersonExistence: () => {},
+                  detectChanges: () => {},
+                  cocVisualIDMask: undefined,
+                  parentEntity: undefined,
+                  options: {
+                    gender: [],
+                    pregnancy: [],
+                    occupation: [],
+                    user: [],
+                    documentType: [],
+                    addressType: []
+                  }
+                }),
+                this.entityContactOfContactHelperService.generateTabsEpidemiology({
+                  isCreate: true,
+                  itemData: new ContactOfContactModel(),
+                  options: {
+                    risk: [],
                     vaccine: [],
                     vaccineStatus: []
                   }
