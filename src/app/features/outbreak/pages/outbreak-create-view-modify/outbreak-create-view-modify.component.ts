@@ -49,6 +49,8 @@ import { EntityEventHelperService } from '../../../../core/services/helper/entit
 import { EventModel } from '../../../../core/models/event.model';
 import { EntityContactOfContactHelperService } from '../../../../core/services/helper/entity-contact-of-contact-helper.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
 
 /**
  * Component
@@ -83,6 +85,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     private entityEventHelperService: EntityEventHelperService,
     private entityContactHelperService: EntityContactHelperService,
     private entityContactOfContactHelperService: EntityContactOfContactHelperService,
+    private entityFollowUpHelperService: EntityFollowUpHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -1122,6 +1125,28 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                     risk: [],
                     vaccine: [],
                     vaccineStatus: []
+                  }
+                })
+              ]
+            )
+          },
+
+          // follow-ups
+          {
+            id: 'follow-ups',
+            label: 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+            children: this.tabsToGroupTabs(
+              this.i18nService, [
+                this.entityFollowUpHelperService.generateTabsPersonal({
+                  isCreate: true,
+                  isModify: false,
+                  itemData: new FollowUpModel(),
+                  entityData: undefined,
+                  options: {
+                    dailyFollowUpStatus: [],
+                    user: [],
+                    team: [],
+                    addressType: []
                   }
                 })
               ]
