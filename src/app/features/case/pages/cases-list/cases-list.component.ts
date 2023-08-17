@@ -46,6 +46,7 @@ import { Moment } from 'moment';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
+import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
 
 @Component({
   selector: 'app-cases-list',
@@ -148,7 +149,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     private redirectService: RedirectService,
     private clusterDataService: ClusterDataService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private location: Location
+    private location: Location,
+    private entityCaseHelperService: EntityCaseHelperService
   ) {
     super(
       listHelperService, {
@@ -918,9 +920,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             }]
           }
         ],
-        forms: (_column, data: CaseModel): V2ColumnStatusForm[] => CaseModel.getStatusForms({
+        forms: (_column, data: CaseModel): V2ColumnStatusForm[] => this.entityCaseHelperService.getStatusForms({
           item: data,
-          i18nService: this.i18nService,
           classification: this.activatedRoute.snapshot.data.classification,
           outcome: this.activatedRoute.snapshot.data.outcome
         })
@@ -1754,8 +1755,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = CaseModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.advancedFilters = this.entityCaseHelperService.generateAdvancedFilters({
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
         gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

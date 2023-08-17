@@ -43,6 +43,7 @@ import {
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
 
 /**
  * Component
@@ -73,6 +74,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
     protected referenceDataHelperService: ReferenceDataHelperService,
+    private entityCaseHelperService: EntityCaseHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -986,10 +988,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             label: 'LNG_PAGE_LIST_CASES_TITLE',
             children: this.tabsToGroupTabs(
               this.i18nService, [
-                CaseModel.generateTabsPersonal({
-                  authUser: this.authUser,
-                  i18nService: this.i18nService,
-                  caseDataService: undefined,
+                this.entityCaseHelperService.generateTabsPersonal({
                   selectedOutbreak: this.selectedOutbreak,
                   isCreate: true,
                   itemData: new CaseModel(),
@@ -1004,7 +1003,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                     addressType: []
                   }
                 }),
-                CaseModel.generateTabsEpidemiology({
+                this.entityCaseHelperService.generateTabsEpidemiology({
                   selectedOutbreak: this.selectedOutbreak,
                   isCreate: true,
                   itemData: new CaseModel(),

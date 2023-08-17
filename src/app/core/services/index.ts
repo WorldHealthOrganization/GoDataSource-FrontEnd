@@ -149,6 +149,7 @@ import { RestoreLogDataService } from './data/restore-log.data.service';
 import {
   SyncPackageStatusStepBackupRestoreResolver
 } from './resolvers/data/sync-package-status-step-backup-restore.resolver';
+import { EntityCaseHelperService } from './helper/entity-case-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -301,6 +302,7 @@ export const services: any[] = [
   CacheService,
   DialogV2Service,
   DomService,
+  EntityCaseHelperService,
   EntityFollowUpHelperService,
   EntityLabResultService,
   EntityHelperService,

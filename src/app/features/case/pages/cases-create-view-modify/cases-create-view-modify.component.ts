@@ -34,7 +34,6 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Location } from '@angular/common';
@@ -59,6 +58,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
 
 /**
  * Component
@@ -108,7 +108,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected i18nService: I18nService,
     protected systemSettingsDataService: SystemSettingsDataService,
     protected toastV2Service: ToastV2Service,
-    protected contactDataService: ContactDataService,
     protected location: Location,
     protected dialogV2Service: DialogV2Service,
     protected entityDataService: EntityDataService,
@@ -117,6 +116,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
     protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
+    private entityCaseHelperService: EntityCaseHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -205,7 +205,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   protected initializedData(): void {
     // initialize visual ID mask
     this._caseVisualIDMask = {
-      mask: CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+      mask: this.entityCaseHelperService.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
     };
 
     // set visual id for case
@@ -481,10 +481,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs - Personal
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return CaseModel.generateTabsPersonal({
-      authUser: this.authUser,
-      i18nService: this.i18nService,
-      caseDataService: this.caseDataService,
+    return this.entityCaseHelperService.generateTabsPersonal({
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,
@@ -509,7 +506,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs - Epidemiology
    */
   private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
-    return CaseModel.generateTabsEpidemiology({
+    return this.entityCaseHelperService.generateTabsEpidemiology({
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,
@@ -1797,9 +1794,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
           if (!item.uiStatusForms) {
             // determine forms
-            const forms: V2ColumnStatusForm[] = CaseModel.getStatusForms({
+            const forms: V2ColumnStatusForm[] = this.entityCaseHelperService.getStatusForms({
               item,
-              i18nService: this.i18nService,
               classification: this.activatedRoute.snapshot.data.classification,
               outcome: this.activatedRoute.snapshot.data.outcome
             });
@@ -1846,8 +1842,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = CaseModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.expandListAdvancedFilters = this.entityCaseHelperService.generateAdvancedFilters({
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
         gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
