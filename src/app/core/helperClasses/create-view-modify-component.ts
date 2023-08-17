@@ -434,6 +434,16 @@ export abstract class CreateViewModifyComponent<T>
                 // finished
                 break;
 
+              case CreateViewModifyV2TabInputType.ADDRESS:
+                // add to list
+                children.push({
+                  id: input.name,
+                  label: section.label
+                });
+
+                // finished
+                break;
+
               case CreateViewModifyV2TabInputType.LIST:
 
                 // handle list item types

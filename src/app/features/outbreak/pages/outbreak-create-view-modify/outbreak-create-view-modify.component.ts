@@ -45,6 +45,8 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
 import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
+import { EntityEventHelperService } from '../../../../core/services/helper/entity-event-helper.service';
+import { EventModel } from '../../../../core/models/event.model';
 
 /**
  * Component
@@ -77,6 +79,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     protected referenceDataHelperService: ReferenceDataHelperService,
     private entityCaseHelperService: EntityCaseHelperService,
     private entityContactHelperService: EntityContactHelperService,
+    private entityEventHelperService: EntityEventHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -1020,6 +1023,27 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                     vaccineStatus: [],
                     dateRangeType: [],
                     dateRangeCenter: []
+                  }
+                })
+              ]
+            )
+          },
+
+          // events
+          {
+            id: 'events',
+            label: 'LNG_PAGE_LIST_EVENTS_TITLE',
+            children: this.tabsToGroupTabs(
+              this.i18nService, [
+                this.entityEventHelperService.generateTabsDetails({
+                  selectedOutbreak: this.selectedOutbreak,
+                  isCreate: true,
+                  itemData: new EventModel(),
+                  eventVisualIDMask: undefined,
+                  options: {
+                    user: [],
+                    eventCategory: [],
+                    addressType: []
                   }
                 })
               ]
