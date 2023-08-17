@@ -1131,7 +1131,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         pageSettingsKey: UserSettings.CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value,
         tableColumnActions: this.entityFollowUpHelperService.retrieveTableColumnActions({
-          authUser: this.authUser,
           entityData: this.itemData,
           selectedOutbreak: () => this.selectedOutbreak,
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -1143,7 +1142,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
         }),
         tableColumns: this.entityFollowUpHelperService.retrieveTableColumns({
-          authUser: this.authUser,
           team: this.activatedRoute.snapshot.data.team,
           user: this.activatedRoute.snapshot.data.user,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,
@@ -1152,7 +1150,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
         }),
         advancedFilters: this.entityFollowUpHelperService.generateAdvancedFilters({
-          authUser: this.authUser,
           contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
           options: {
             team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,

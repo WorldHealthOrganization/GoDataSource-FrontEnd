@@ -795,7 +795,6 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    */
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = this.entityFollowUpHelperService.generateAdvancedFilters({
-      authUser: this.authUser,
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       options: {
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,

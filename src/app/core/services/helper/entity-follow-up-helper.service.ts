@@ -31,27 +31,34 @@ import * as moment from 'moment';
 import { ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { I18nService } from './i18n.service';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+import { AuthDataService } from '../data/auth.data.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntityFollowUpHelperService {
+  // data
+  private _authUser: UserModel;
+
   /**
    * Constructor
    */
   constructor(
+    private authDataService: AuthDataService,
     private dialogV2Service: DialogV2Service,
     private followUpsDataService: FollowUpsDataService,
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private locationDataService: LocationDataService
-  ) {}
+  ) {
+    // get the authenticated user
+    this._authUser = this.authDataService.getAuthenticatedUser();
+  }
 
   /**
    * Retrieve table columns
    */
   retrieveTableColumnActions(definitions: {
-    authUser: UserModel,
     entityData: ContactOfContactModel | ContactModel | CaseModel,
     selectedOutbreak: () => OutbreakModel,
     selectedOutbreakIsActive: () => boolean,
@@ -85,7 +92,7 @@ export class EntityFollowUpHelperService {
           },
           visible: (item: FollowUpModel): boolean => {
             return !item.deleted &&
-              FollowUpModel.canView(definitions.authUser);
+              FollowUpModel.canView(this._authUser);
           }
         },
 
@@ -103,7 +110,7 @@ export class EntityFollowUpHelperService {
             return !item.deleted &&
               definitions.entityData.type === EntityType.CONTACT &&
               definitions.selectedOutbreakIsActive() &&
-              FollowUpModel.canModify(definitions.authUser);
+              FollowUpModel.canModify(this._authUser);
           }
         },
 
@@ -186,7 +193,7 @@ export class EntityFollowUpHelperService {
                 return !item.deleted &&
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
-                  FollowUpModel.canDelete(definitions.authUser);
+                  FollowUpModel.canDelete(this._authUser);
               }
             },
 
@@ -264,7 +271,7 @@ export class EntityFollowUpHelperService {
                 return item.deleted &&
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
-                  FollowUpModel.canRestore(definitions.authUser);
+                  FollowUpModel.canRestore(this._authUser);
               }
             },
 
@@ -275,7 +282,7 @@ export class EntityFollowUpHelperService {
                 return !item.deleted &&
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
-                  FollowUpModel.canModify(definitions.authUser) &&
+                  FollowUpModel.canModify(this._authUser) &&
                   !Constants.isDateInTheFuture(item.date);
               }
             },
@@ -379,7 +386,7 @@ export class EntityFollowUpHelperService {
                 return !item.deleted &&
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
-                  FollowUpModel.canModify(definitions.authUser);
+                  FollowUpModel.canModify(this._authUser);
               }
             },
 
@@ -469,7 +476,7 @@ export class EntityFollowUpHelperService {
                 return !item.deleted &&
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
-                  FollowUpModel.canModify(definitions.authUser);
+                  FollowUpModel.canModify(this._authUser);
               }
             }
           ]
@@ -482,7 +489,6 @@ export class EntityFollowUpHelperService {
    * Retrieve table columns
    */
   retrieveTableColumns(definitions: {
-    authUser: UserModel,
     team: IResolverV2ResponseModel<TeamModel>,
     user: IResolverV2ResponseModel<UserModel>,
     dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>,
@@ -522,7 +528,7 @@ export class EntityFollowUpHelperService {
         },
         link: (item: FollowUpModel) => {
           return item.teamId &&
-            TeamModel.canView(definitions.authUser) &&
+            TeamModel.canView(this._authUser) &&
             definitions.team.map[item.teamId] ?
             `/teams/${ item.teamId }/view` :
             undefined;
@@ -754,7 +760,7 @@ export class EntityFollowUpHelperService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canListForFilters(definitions.authUser);
+          return !UserModel.canListForFilters(this._authUser);
         },
         link: (data) => {
           return data.responsibleUserId ?
@@ -803,7 +809,7 @@ export class EntityFollowUpHelperService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canView(definitions.authUser);
+          return !UserModel.canView(this._authUser);
         },
         link: (data) => {
           return data.createdBy ?
@@ -838,7 +844,7 @@ export class EntityFollowUpHelperService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canView(definitions.authUser);
+          return !UserModel.canView(this._authUser);
         },
         link: (data) => {
           return data.updatedBy ?
@@ -868,7 +874,6 @@ export class EntityFollowUpHelperService {
    * Advanced filters
    */
   generateAdvancedFilters(data: {
-    authUser: UserModel,
     contactFollowUpTemplate: () => QuestionModel[],
     options: {
       team: ILabelValuePairModel[],
@@ -1023,7 +1028,7 @@ export class EntityFollowUpHelperService {
     ];
 
     // allowed to filter by user ?
-    if (UserModel.canListForFilters(data.authUser)) {
+    if (UserModel.canListForFilters(this._authUser)) {
       advancedFilters.push(
         {
           type: V2AdvancedFilterType.MULTISELECT,
