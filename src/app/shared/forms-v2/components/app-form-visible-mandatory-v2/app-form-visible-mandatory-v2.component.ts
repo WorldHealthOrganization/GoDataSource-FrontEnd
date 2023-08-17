@@ -89,6 +89,14 @@ enum VisibleCause {
   CHILD = 2
 }
 
+/**
+ * Selected change type
+ */
+enum FieldSelectedType {
+  VISIBLE,
+  MANDATORY
+}
+
 @Component({
   selector: 'app-form-visible-mandatory-v2',
   templateUrl: './app-form-visible-mandatory-v2.component.html',
@@ -154,6 +162,7 @@ export class AppFormVisibleMandatoryV2Component
 
   // constants
   FlattenType = FlattenType;
+  FieldSelectedType = FieldSelectedType;
 
   /**
    * Constructor
@@ -564,6 +573,7 @@ export class AppFormVisibleMandatoryV2Component
    */
   selectedChanged(
     item: IFlattenNodeGroupTabSectionField,
+    type: FieldSelectedType,
     checked: boolean
   ): void {
     // update value
@@ -580,9 +590,21 @@ export class AppFormVisibleMandatoryV2Component
       }
 
       // check item
-      this.value[group.data.id][item.data.id].visible = true;
+      if (type === FieldSelectedType.MANDATORY) {
+        this.value[group.data.id][item.data.id].mandatory = true;
+      } else {
+        this.value[group.data.id][item.data.id].visible = true;
+      }
     } else if (this.value[group.data.id]) {
-      delete this.value[group.data.id][item.data.id];
+      // if visible removed, then delete everything
+      if (type === FieldSelectedType.VISIBLE) {
+        delete this.value[group.data.id][item.data.id];
+      } else {
+        // remove only mandatory ?
+        if (this.value[group.data.id][item.data.id]) {
+          delete this.value[group.data.id][item.data.id].mandatory;
+        }
+      }
     }
 
     // trigger on change

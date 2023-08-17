@@ -122,7 +122,7 @@
               [placeholder]="item.data.label"
               [disabled]="viewOnly"
               [highlightPlaceholder]="searchValue"
-              (ngModelChange)="selectedChanged(item, $event)"></app-form-checkbox-v2>
+              (ngModelChange)="selectedChanged(item, FieldSelectedType.VISIBLE, $event)"></app-form-checkbox-v2>
           </div>
 
           <!-- Required Checkbox -->
@@ -133,7 +133,8 @@
               [ngModel]="value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].mandatory"
               [name]="item.name.mandatory"
               placeholder="LNG_COMMON_LABEL_REQUIRED"
-              [disabled]="viewOnly"></app-form-checkbox-v2>
+              [disabled]="viewOnly"
+              (ngModelChange)="selectedChanged(item, FieldSelectedType.MANDATORY, $event)"></app-form-checkbox-v2>
           </div>
 
         </div>
