@@ -42,6 +42,7 @@ import {
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 /**
  * Component
@@ -1018,6 +1019,37 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                     vaccineStatus: [],
                     dateRangeType: [],
                     dateRangeCenter: []
+                  }
+                })
+              ]
+            )
+          },
+
+          // contacts
+          {
+            id: 'contacts',
+            label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+            children: this.tabsToGroupTabs(
+              this.i18nService, [
+                ContactModel.generateTabsPersonal({
+                  authUser: this.authUser,
+                  i18nService: this.i18nService,
+                  dialogV2Service: undefined,
+                  contactDataService: undefined,
+                  selectedOutbreak: this.selectedOutbreak,
+                  isCreate: true,
+                  itemData: new ContactModel(),
+                  checkForPersonExistence: () => {},
+                  detectChanges: () => {},
+                  contactVisualIDMask: undefined,
+                  parentEntity: undefined,
+                  options: {
+                    gender: [],
+                    pregnancy: [],
+                    occupation: [],
+                    user: [],
+                    documentType: [],
+                    addressType: []
                   }
                 })
               ]
