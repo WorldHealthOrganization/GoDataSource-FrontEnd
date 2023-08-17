@@ -21,7 +21,6 @@ import { Constants } from '../../../../core/models/constants';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
-import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -536,204 +535,36 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Epidemiology
    */
   private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'infection',
-      label: this.isCreate ?
-        'LNG_PAGE_CREATE_CONTACT_TAB_INFECTION_TITLE' :
-        'LNG_PAGE_MODIFY_CONTACT_TAB_INFECTION_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_COMMON_LABEL_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfReporting',
-            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfReporting,
-              set: (value) => {
-                this.itemData.dateOfReporting = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              required: () => true,
-              dateSameOrBefore: () => [
-                this._today
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'isDateOfReportingApproximate',
-            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.isDateOfReportingApproximate,
-              set: (value) => {
-                this.itemData.isDateOfReportingApproximate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'outcomeId',
-            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
-            description: () => 'LNG_CONTACT_FIELD_LABEL_OUTCOME_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this.itemData.outcomeId
-            ),
-            value: {
-              get: () => this.itemData.outcomeId,
-              set: (value) => {
-                // set data
-                this.itemData.outcomeId = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfOutcome',
-            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
-            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfOutcome,
-              set: (value) => {
-                this.itemData.dateOfOutcome = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today,
-                'dateOfBurial'
-              ],
-              dateSameOrAfter: () => [
-                'dateOfOnset',
-                'dateOfInfection'
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'transferRefused',
-            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED',
-            description: () => 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
-            value: {
-              get: () => this.itemData.transferRefused,
-              set: (value) => {
-                this.itemData.transferRefused = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'riskLevel',
-            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
-            description: () => 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this.itemData.riskLevel
-            ),
-            value: {
-              get: () => this.itemData.riskLevel,
-              set: (value) => {
-                this.itemData.riskLevel = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: 'riskReason',
-            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
-            description: () => 'LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION',
-            value: {
-              get: () => this.itemData.riskReason,
-              set: (value) => {
-                this.itemData.riskReason = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'followUpTeamId',
-            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
-            description: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
-            value: {
-              get: () => this.itemData.followUpTeamId,
-              set: (value) => {
-                this.itemData.followUpTeamId = value;
-              }
-            },
-            replace: {
-              condition: () => !TeamModel.canList(this.authUser),
-              html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'followUp[status]',
-            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-            description: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => this.itemData.followUp?.status,
-              set: (value) => {
-                // initialize
-                if (!this.itemData.followUp) {
-                  this.itemData.followUp = {} as any;
-                }
-
-                // set data
-                this.itemData.followUp.status = value;
-              }
-            }
-          }]
-        },
-
-        // Vaccines
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'vaccinesReceived',
-            items: this.itemData.vaccinesReceived,
-            itemsChanged: (list) => {
-              // update documents
-              this.itemData.vaccinesReceived = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
-                newItem: () => new VaccineModel()
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.VACCINE,
-                vaccineOptions: this.referenceDataHelperService.filterPerOutbreakOptions(
-                  this.selectedOutbreak,
-                  (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  this.itemData.vaccinesReceived?.map((vaccine) => vaccine.vaccine)
-                ),
-                vaccineStatusOptions: this.referenceDataHelperService.filterPerOutbreakOptions(
-                  this.selectedOutbreak,
-                  (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  this.itemData.vaccinesReceived?.map((vaccine) => vaccine.status)
-                ),
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.vaccinesReceived[index];
-                  }
-                }
-              }
-            }
-          }]
-        }
-      ]
-    };
+    return ContactModel.generateTabsEpidemiology({
+      authUser: this.authUser,
+      i18nService: this.i18nService,
+      isCreate: this.isCreate,
+      itemData: this.itemData,
+      options: {
+        outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.outcomeId
+        ),
+        risk: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.riskLevel
+        ),
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        followUpStatus: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        vaccine: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.vaccinesReceived?.map((vaccine) => vaccine.vaccine)
+        ),
+        vaccineStatus: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.vaccinesReceived?.map((vaccine) => vaccine.status)
+        )
+      }
+    });
   }
 
   /**

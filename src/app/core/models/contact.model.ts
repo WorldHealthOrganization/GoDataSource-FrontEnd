@@ -543,6 +543,211 @@ export class ContactModel
   }
 
   /**
+   * Generate tab - Epidemiology
+   */
+  static generateTabsEpidemiology(data: {
+    authUser: UserModel,
+    i18nService: I18nService,
+    isCreate: boolean,
+    itemData: ContactModel,
+    options: {
+      outcome: ILabelValuePairModel[],
+      risk: ILabelValuePairModel[],
+      team: ILabelValuePairModel[],
+      followUpStatus: ILabelValuePairModel[],
+      vaccine: ILabelValuePairModel[],
+      vaccineStatus: ILabelValuePairModel[]
+    }
+  }): ICreateViewModifyV2Tab {
+    // today
+    const today: Moment = moment();
+
+    // finished
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      name: 'infection',
+      label: data.isCreate ?
+        'LNG_PAGE_CREATE_CONTACT_TAB_INFECTION_TITLE' :
+        'LNG_PAGE_MODIFY_CONTACT_TAB_INFECTION_TITLE',
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_COMMON_LABEL_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfReporting',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            value: {
+              get: () => data.itemData.dateOfReporting,
+              set: (value) => {
+                data.itemData.dateOfReporting = value;
+              }
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'isDateOfReportingApproximate',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
+            value: {
+              get: () => data.itemData.isDateOfReportingApproximate,
+              set: (value) => {
+                data.itemData.isDateOfReportingApproximate = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'outcomeId',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_OUTCOME_DESCRIPTION',
+            options: data.options.outcome,
+            value: {
+              get: () => data.itemData.outcomeId,
+              set: (value) => {
+                // set data
+                data.itemData.outcomeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfOutcome',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
+            value: {
+              get: () => data.itemData.dateOfOutcome,
+              set: (value) => {
+                data.itemData.dateOfOutcome = value;
+              }
+            },
+            maxDate: today,
+            validators: {
+              dateSameOrBefore: () => [
+                today,
+                'dateOfBurial'
+              ],
+              dateSameOrAfter: () => [
+                'dateOfOnset',
+                'dateOfInfection'
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'transferRefused',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
+            value: {
+              get: () => data.itemData.transferRefused,
+              set: (value) => {
+                data.itemData.transferRefused = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'riskLevel',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
+            options: data.options.risk,
+            value: {
+              get: () => data.itemData.riskLevel,
+              set: (value) => {
+                data.itemData.riskLevel = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXTAREA,
+            name: 'riskReason',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION',
+            value: {
+              get: () => data.itemData.riskReason,
+              set: (value) => {
+                data.itemData.riskReason = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'followUpTeamId',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID_DESCRIPTION',
+            options: data.options.team,
+            value: {
+              get: () => data.itemData.followUpTeamId,
+              set: (value) => {
+                data.itemData.followUpTeamId = value;
+              }
+            },
+            replace: {
+              condition: () => !TeamModel.canList(data.authUser),
+              html: data.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'followUp[status]',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
+            options: data.options.followUpStatus,
+            value: {
+              get: () => data.itemData.followUp?.status,
+              set: (value) => {
+                // initialize
+                if (!data.itemData.followUp) {
+                  data.itemData.followUp = {} as any;
+                }
+
+                // set data
+                data.itemData.followUp.status = value;
+              }
+            }
+          }]
+        },
+
+        // Vaccines
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'vaccinesReceived',
+            items: data.itemData.vaccinesReceived,
+            itemsChanged: (list) => {
+              // update documents
+              data.itemData.vaccinesReceived = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
+                newItem: () => new VaccineModel()
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.VACCINE,
+                vaccineOptions: data.options.vaccine,
+                vaccineStatusOptions: data.options.vaccineStatus,
+                value: {
+                  get: (index: number) => {
+                    return data.itemData.vaccinesReceived[index];
+                  }
+                }
+              }
+            }
+          }]
+        }
+      ]
+    };
+  }
+
+  /**
    * Advanced filters
    */
   static generateAdvancedFilters(data: {

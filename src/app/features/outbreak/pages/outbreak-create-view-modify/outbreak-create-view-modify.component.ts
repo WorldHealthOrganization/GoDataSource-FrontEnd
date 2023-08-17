@@ -1051,6 +1051,20 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                     documentType: [],
                     addressType: []
                   }
+                }),
+                ContactModel.generateTabsEpidemiology({
+                  authUser: this.authUser,
+                  i18nService: this.i18nService,
+                  isCreate: true,
+                  itemData: new ContactModel(),
+                  options: {
+                    outcome: [],
+                    risk: [],
+                    team: [],
+                    followUpStatus: [],
+                    vaccine: [],
+                    vaccineStatus: []
+                  }
                 })
               ]
             )
