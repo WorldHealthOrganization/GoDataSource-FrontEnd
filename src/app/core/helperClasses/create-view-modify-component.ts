@@ -2,7 +2,7 @@ import { Observable, ReplaySubject, throwError } from 'rxjs';
 import { IV2Breadcrumb, IV2BreadcrumbInfo } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel, UserSettings } from '../models/user.model';
-import { ICreateViewModifyV2, ICreateViewModifyV2Config } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Config, ICreateViewModifyV2Tab } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { ActivatedRoute } from '@angular/router';
 import { Directive, Renderer2, ViewChild } from '@angular/core';
 import { TopnavComponent } from '../components/topnav/topnav.component';
@@ -17,6 +17,8 @@ import { CreateViewModifyV2ExpandColumn } from '../../shared/components-v2/app-c
 import { ICreateViewModifyV2Refresh } from '../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
 import { RedirectService } from '../services/helper/redirect.service';
 import { AppCreateViewModifyV2Component } from '../../shared/components-v2/app-create-view-modify-v2/app-create-view-modify-v2.component';
+import { v4 as uuid } from 'uuid';
+import { IVisibleMandatoryDataGroupTab } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T>
@@ -385,6 +387,83 @@ export abstract class CreateViewModifyComponent<T>
       // not loading anymore
       this.loadingPage = false;
       this.loadingItemData = false;
+    });
+  }
+
+  /**
+   * Convert create/view/modify tabs to group tabs
+   */
+  tabsToGroupTabs(tabs: ICreateViewModifyV2Tab[]): IVisibleMandatoryDataGroupTab[] {
+    return tabs.map((tab) => {
+      return {
+        id: tab.name,
+        label: tab.label,
+        children: tab.sections.map((section) => {
+          return {
+            id: uuid(),
+            label: section.label,
+            children: section.inputs.map((input) => {
+              switch (input.type) {
+                case CreateViewModifyV2TabInputType.TEXT:
+                case CreateViewModifyV2TabInputType.SELECT_SINGLE:
+                case CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT:
+                case CreateViewModifyV2TabInputType.DATE:
+                case CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX:
+                case CreateViewModifyV2TabInputType.LOCATION_SINGLE:
+                case CreateViewModifyV2TabInputType.TEXTAREA:
+                  return {
+                    id: input.name,
+                    label: input.placeholder()
+                  };
+
+                case CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH:
+                  return {
+                    id: 'name..age..dob',
+                    label: 'age...dob..'
+                  };
+
+                case CreateViewModifyV2TabInputType.LIST:
+
+                  // handle list item types
+                  switch (input.definition.input.type) {
+                    case CreateViewModifyV2TabInputType.DOCUMENT:
+                      return {
+                        id: 'document...',
+                        label: 'document'
+                      };
+
+                    case CreateViewModifyV2TabInputType.ADDRESS:
+                      return {
+                        id: 'address...',
+                        label: 'address'
+                      };
+
+                    case CreateViewModifyV2TabInputType.VACCINE:
+                      return {
+                        id: 'vaccine...',
+                        label: 'vaccine'
+                      };
+
+                    case CreateViewModifyV2TabInputType.CENTER_DATE_RANGE:
+                      return {
+                        id: 'center_date_range...',
+                        label: 'center date range'
+                      };
+
+                    default:
+                      throw new Error(`tabsToGroupTabs: unhandled list type '${input.definition.input.type}'`);
+                  }
+
+                  // finished
+                  break;
+
+                default:
+                  throw new Error(`tabsToGroupTabs: unhandled type '${input.type}'`);
+              }
+            })
+          };
+        })
+      };
     });
   }
 }

@@ -41,6 +41,7 @@ import {
   IV2BottomDialogConfigButtonType
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { UserModel } from '../../../../core/models/user.model';
+import { CaseModel } from '../../../../core/models/case.model';
 
 /**
  * Component
@@ -232,6 +233,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
 
         // Map servers
         this.initializeTabsMapServers(),
+
+        // Visible and required fields
+        this.initializeTabsVisibleAndRequiredFields(),
 
         // Reference Data Per Outbreak
         this.initializeTabsReferenceDataPerOutbreak(),
@@ -960,6 +964,71 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           inputs
         }
       ]
+    };
+  }
+
+  /**
+   * Initialize tabs - Visible and required fields
+   */
+  private initializeTabsVisibleAndRequiredFields(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'TEST',
+      label: 'TEST2',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY,
+        name: 'TEST3',
+        options: [
+          // cases
+          {
+            id: 'cases',
+            label: 'LNG_PAGE_LIST_CASES_TITLE',
+            children: this.tabsToGroupTabs([
+              CaseModel.generateTabsPersonal({
+                authUser: this.authUser,
+                i18nService: this.i18nService,
+                caseDataService: undefined,
+                selectedOutbreak: this.selectedOutbreak,
+                isCreate: true,
+                itemData: new CaseModel(),
+                checkForPersonExistence: () => {},
+                caseVisualIDMask: undefined,
+                options: {
+                  gender: [],
+                  pregnancy: [],
+                  occupation: [],
+                  user: [],
+                  documentType: [],
+                  addressType: []
+                }
+              }),
+              CaseModel.generateTabsEpidemiology({
+                selectedOutbreak: this.selectedOutbreak,
+                isCreate: true,
+                itemData: new CaseModel(),
+                checkForOnsetAfterReporting: () => {},
+                checkForOnsetAfterHospitalizationStartDate: () => {},
+                options: {
+                  classification: [],
+                  investigationStatus: [],
+                  outcome: [],
+                  risk: [],
+                  vaccine: [],
+                  vaccineStatus: [],
+                  dateRangeType: [],
+                  dateRangeCenter: []
+                }
+              })
+            ])
+          }
+        ],
+        value: {
+          get: () => undefined,
+          set: (_value) => {
+            // this.itemData.allowedRefDataItems = value;
+          }
+        }
+      }
     };
   }
 

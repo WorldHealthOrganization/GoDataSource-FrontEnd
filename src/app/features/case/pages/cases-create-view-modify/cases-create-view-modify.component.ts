@@ -19,15 +19,9 @@ import {
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
-import { AgeModel } from '../../../../core/models/age.model';
-import { TimerCache } from '../../../../core/helperClasses/timer-cache';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { Moment, moment } from '../../../../core/helperClasses/x-moment';
-import { VaccineModel } from '../../../../core/models/vaccine.model';
-import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
+import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -82,9 +76,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private _caseVisualIDMask: {
     mask: string
   };
-
-  // today
-  private _today: Moment = moment();
 
   // check for duplicate
   private _duplicateCheckingTimeout: number;
@@ -490,780 +481,79 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs - Personal
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    // create tab
-    const tab: ICreateViewModifyV2Tab = {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'personal',
-      label: this.isCreate ?
-        'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE' :
-        'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
-          inputs: [
-            {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'firstName',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-              description: () => 'LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
-              value: {
-                get: () => this.itemData.firstName,
-                set: (value) => {
-                  // set data
-                  this.itemData.firstName = value;
-
-                  // check for duplicates
-                  this.checkForPersonExistence();
-                }
-              },
-              validators: {
-                required: () => true
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'middleName',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-              description: () => 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
-              value: {
-                get: () => this.itemData.middleName,
-                set: (value) => {
-                  // set data
-                  this.itemData.middleName = value;
-
-                  // check for duplicates
-                  this.checkForPersonExistence();
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'lastName',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-              description: () => 'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION',
-              value: {
-                get: () => this.itemData.lastName,
-                set: (value) => {
-                  // set data
-                  this.itemData.lastName = value;
-
-                  // check for duplicates
-                  this.checkForPersonExistence();
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'gender',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_GENDER',
-              description: () => 'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              value: {
-                get: () => this.itemData.gender,
-                set: (value) => {
-                  // set gender
-                  this.itemData.gender = value;
-
-                  // reset pregnancy ?
-                  if (this.itemData.gender === Constants.GENDER_MALE) {
-                    // reset
-                    this.itemData.pregnancyStatus = null;
-
-                    // make sure we update pregnancy too
-                    tab.form.controls['pregnancyStatus'].markAsDirty();
-                  }
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'pregnancyStatus',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-              description: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
-              clearable: false,
-              options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              value: {
-                get: () => this.itemData.pregnancyStatus,
-                set: (value) => {
-                  this.itemData.pregnancyStatus = value;
-                }
-              },
-              disabled: () => {
-                return this.itemData.gender === Constants.GENDER_MALE;
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'occupation',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-              description: () => 'LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION',
-              options: this.referenceDataHelperService.filterPerOutbreakOptions(
-                this.selectedOutbreak,
-                (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                this.itemData.occupation
-              ),
-              value: {
-                get: () => this.itemData.occupation,
-                set: (value) => {
-                  this.itemData.occupation = value;
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH,
-              name: {
-                age: 'age',
-                dob: 'dob'
-              },
-              description: {
-                age: 'LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION',
-                dob: 'LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION'
-              },
-              ageChecked: !this.itemData.dob,
-              ageTypeYears: this.itemData.age?.months < 1,
-              value: {
-                age: {
-                  years: {
-                    get: () => this.itemData.age?.years,
-                    set: (value) => {
-                      // set value
-                      this.itemData.age = this.itemData.age || new AgeModel();
-                      this.itemData.age.years = value;
-
-                      // reset
-                      this.itemData.dob = null;
-                    }
-                  },
-                  months: {
-                    get: () => this.itemData.age?.months,
-                    set: (value) => {
-                      // set value
-                      this.itemData.age = this.itemData.age || new AgeModel();
-                      this.itemData.age.months = value;
-
-                      // reset
-                      this.itemData.dob = null;
-                    }
-                  }
-                },
-                dob: {
-                  get: () => this.itemData.dob,
-                  set: (value) => {
-                    // set value
-                    this.itemData.dob = value;
-
-                    // update age
-                    if (
-                      this.itemData.dob &&
-                      (this.itemData.dob as Moment).isValid()
-                    ) {
-                      // add age object if we don't have one
-                      this.itemData.age = this.itemData.age || new AgeModel();
-
-                      // add data
-                      const now = moment();
-                      this.itemData.age.years = now.diff(this.itemData.dob, 'years');
-                      this.itemData.age.months = this.itemData.age.years < 1 ? now.diff(this.itemData.dob, 'months') : 0;
-                    } else {
-                      this.itemData.age.months = 0;
-                      this.itemData.age.years = 0;
-                    }
-                  }
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
-              name: 'visualId',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-              description: () => this.i18nService.instant(
-                'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
-                this._caseVisualIDMask
-              ),
-              value: {
-                get: () => this.itemData.visualId,
-                set: (value) => {
-                  this.itemData.visualId = value;
-                }
-              },
-              suffixIconButtons: [
-                {
-                  icon: 'refresh',
-                  tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
-                  clickAction: (input) => {
-                    // nothing to do ?
-                    if (!this._caseVisualIDMask) {
-                      return;
-                    }
-
-                    // generate
-                    this.itemData.visualId = CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
-
-                    // mark as dirty
-                    input.control?.markAsDirty();
-                  }
-                }
-              ],
-              validators: {
-                async: new Observable((observer) => {
-                  // construct cache key
-                  const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
-                    this._caseVisualIDMask.mask +
-                    this.itemData.visualId +
-                    (
-                      this.isCreate ?
-                        '' :
-                        this.itemData.id
-                    );
-
-                  // get data from cache or execute validator
-                  TimerCache.run(
-                    cacheKey,
-                    this.caseDataService.checkCaseVisualIDValidity(
-                      this.selectedOutbreak.id,
-                      this._caseVisualIDMask.mask,
-                      this.itemData.visualId,
-                      this.isCreate ?
-                        undefined :
-                        this.itemData.id
-                    )
-                  ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                    observer.next(isValid);
-                    observer.complete();
-                  });
-                })
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'responsibleUserId',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-              description: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-              value: {
-                get: () => this.itemData.responsibleUserId,
-                set: (value) => {
-                  this.itemData.responsibleUserId = value;
-                }
-              },
-              replace: {
-                condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.i18nService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
-              }
-            }
-          ]
-        },
-
-        // Documents
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'documents',
-            items: this.itemData.documents,
-            itemsChanged: (list) => {
-              // update documents
-              this.itemData.documents = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
-                newItem: () => new DocumentModel()
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.DOCUMENT,
-                typeOptions: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.documents[index];
-                  }
-                }
-              }
-            }
-          }]
-        },
-
-        // Addresses
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'addresses',
-            items: this.itemData.addresses,
-            itemsChanged: (list) => {
-              // update addresses
-              this.itemData.addresses = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
-                newItem: () => new AddressModel({
-                  date: moment().toISOString()
-                })
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.ADDRESS,
-                typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.addresses[index];
-                  }
-                },
-                validators: {
-                  required: () => true
-                }
-              }
-            }
-          }]
-        }
-      ]
-    };
-
-    // finished
-    return tab;
+    return CaseModel.generateTabsPersonal({
+      authUser: this.authUser,
+      i18nService: this.i18nService,
+      caseDataService: this.caseDataService,
+      selectedOutbreak: this.selectedOutbreak,
+      isCreate: this.isCreate,
+      itemData: this.itemData,
+      checkForPersonExistence: this.checkForPersonExistence,
+      caseVisualIDMask: this._caseVisualIDMask,
+      options: {
+        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.occupation
+        ),
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      }
+    });
   }
 
   /**
    * Initialize tabs - Epidemiology
    */
   private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'infection',
-      label: this.isCreate ?
-        'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE' :
-        'LNG_PAGE_MODIFY_CASE_TAB_INFECTION_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'classification',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-            description: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this.itemData.classification
-            ),
-            value: {
-              get: () => this.itemData.classification,
-              set: (value) => {
-                this.itemData.classification = value;
-              }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfOnset',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfOnset,
-              set: (value) => {
-                // set data
-                this.itemData.dateOfOnset = value;
-
-                // check onset after reporting
-                this.checkForOnsetAfterReporting();
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              required: () => !!this.selectedOutbreak.isDateOfOnsetRequired,
-              dateSameOrBefore: () => [
-                this._today,
-                'dateOfOutcome'
-              ],
-              dateSameOrAfter: () => [
-                'dateOfInfection'
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'isDateOfOnsetApproximate',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-            description: () => 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.isDateOfOnsetApproximate,
-              set: (value) => {
-                this.itemData.isDateOfOnsetApproximate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateBecomeCase',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateBecomeCase,
-              set: (value) => {
-                this.itemData.dateBecomeCase = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfInfection',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfInfection,
-              set: (value) => {
-                this.itemData.dateOfInfection = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today,
-                'dateOfOutcome',
-                'dateOfOnset'
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'investigationStatus',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
-            description: () => 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => this.itemData.investigationStatus,
-              set: (value) => {
-                this.itemData.investigationStatus = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateInvestigationCompleted',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateInvestigationCompleted,
-              set: (value) => {
-                this.itemData.dateInvestigationCompleted = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'outcomeId',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_OUTCOME',
-            description: () => 'LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this.itemData.outcomeId
-            ),
-            value: {
-              get: () => this.itemData.outcomeId,
-              set: (value) => {
-                // set data
-                this.itemData.outcomeId = value;
-
-                // reset data if not deceased
-                if (this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
-                  this.itemData.deathLocationId = null;
-                  this.itemData.safeBurial = null;
-                  this.itemData.dateOfBurial = null;
-                  this.itemData.burialLocationId = null;
-                  this.itemData.burialPlaceName = null;
-                }
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfOutcome',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfOutcome,
-              set: (value) => {
-                this.itemData.dateOfOutcome = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today,
-                'dateOfBurial'
-              ],
-              dateSameOrAfter: () => [
-                'dateOfOnset',
-                'dateOfInfection'
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'transferRefused',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-            description: () => 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
-            value: {
-              get: () => this.itemData.transferRefused,
-              set: (value) => {
-                this.itemData.transferRefused = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
-            name: 'deathLocationId',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
-            description: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID_DESCRIPTION',
-            useOutbreakLocations: true,
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.deathLocationId,
-              set: (value) => {
-                this.itemData.deathLocationId = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'safeBurial',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-            description: () => 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION',
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                false :
-                this.itemData.safeBurial,
-              set: (value) => {
-                this.itemData.safeBurial = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfBurial',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION',
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.dateOfBurial,
-              set: (value) => {
-                this.itemData.dateOfBurial = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today
-              ],
-              dateSameOrAfter: () => [
-                'dateOfOutcome'
-              ]
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
-            name: 'burialLocationId',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
-            description: () => 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION',
-            useOutbreakLocations: true,
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.burialLocationId,
-              set: (value) => {
-                this.itemData.burialLocationId = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'burialPlaceName',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
-            description: () => 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.burialPlaceName,
-              set: (value) => {
-                this.itemData.burialPlaceName = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfReporting',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfReporting,
-              set: (value) => {
-                // set data
-                this.itemData.dateOfReporting = value;
-
-                // check onset after reporting
-                this.checkForOnsetAfterReporting();
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              required: () => true,
-              dateSameOrBefore: () => [
-                this._today
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'isDateOfReportingApproximate',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.isDateOfReportingApproximate,
-              set: (value) => {
-                this.itemData.isDateOfReportingApproximate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'riskLevel',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-            description: () => 'LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this.itemData.riskLevel
-            ),
-            value: {
-              get: () => this.itemData.riskLevel,
-              set: (value) => {
-                this.itemData.riskLevel = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: 'riskReason',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_RISK_REASON',
-            description: () => 'LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION',
-            value: {
-              get: () => this.itemData.riskReason,
-              set: (value) => {
-                this.itemData.riskReason = value;
-              }
-            }
-          }]
-        },
-
-        // Vaccines
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'vaccinesReceived',
-            items: this.itemData.vaccinesReceived,
-            itemsChanged: (list) => {
-              // update documents
-              this.itemData.vaccinesReceived = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
-                newItem: () => new VaccineModel()
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.VACCINE,
-                vaccineOptions: this.referenceDataHelperService.filterPerOutbreakOptions(
-                  this.selectedOutbreak,
-                  (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  this.itemData.vaccinesReceived?.map((vaccine) => vaccine.vaccine)
-                ),
-                vaccineStatusOptions: this.referenceDataHelperService.filterPerOutbreakOptions(
-                  this.selectedOutbreak,
-                  (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  this.itemData.vaccinesReceived?.map((vaccine) => vaccine.status)
-                ),
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.vaccinesReceived[index];
-                  }
-                }
-              }
-            }
-          }]
-        },
-
-        // Date ranges
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'dateRanges',
-            items: this.itemData.dateRanges,
-            itemsChanged: (list) => {
-              // update documents
-              this.itemData.dateRanges = list.items;
-
-              // validate hospitalization start date against date of onset
-              this.checkForOnsetAfterHospitalizationStartDate();
-            },
-            definition: {
-              add: {
-                label: 'LNG_COMMON_BUTTON_ADD_DATE_RANGE',
-                newItem: () => new CaseCenterDateRangeModel()
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE,
-                typeOptions: this.referenceDataHelperService.filterPerOutbreakOptions(
-                  this.selectedOutbreak,
-                  (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  this.itemData.dateRanges?.map((date) => date.typeId)
-                ),
-                centerOptions: this.referenceDataHelperService.filterPerOutbreakOptions(
-                  this.selectedOutbreak,
-                  (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  this.itemData.dateRanges?.map((date) => date.centerName)
-                ),
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.dateRanges[index];
-                  }
-                },
-                changed: () => {
-                  // validate hospitalization start date against date of onset
-                  this.checkForOnsetAfterHospitalizationStartDate();
-                }
-              }
-            }
-          }]
-        }
-      ]
-    };
+    return CaseModel.generateTabsEpidemiology({
+      selectedOutbreak: this.selectedOutbreak,
+      isCreate: this.isCreate,
+      itemData: this.itemData,
+      checkForOnsetAfterReporting: this.checkForOnsetAfterReporting,
+      checkForOnsetAfterHospitalizationStartDate: this.checkForOnsetAfterHospitalizationStartDate,
+      options: {
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.classification
+        ),
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.outcomeId
+        ),
+        risk: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.riskLevel
+        ),
+        vaccine: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.vaccinesReceived?.map((vaccine) => vaccine.vaccine)
+        ),
+        vaccineStatus: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.vaccinesReceived?.map((vaccine) => vaccine.status)
+        ),
+        dateRangeType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.dateRanges?.map((date) => date.typeId)
+        ),
+        dateRangeCenter: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.dateRanges?.map((date) => date.centerName)
+        )
+      }
+    });
   }
 
   /**

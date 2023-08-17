@@ -41,6 +41,15 @@ import {
 import { ReferenceDataEntryModel } from './reference-data.model';
 import { SafeHtml } from '@angular/platform-browser';
 import { I18nService } from '../services/helper/i18n.service';
+import {
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2Tab
+} from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { Constants } from './constants';
+import { Observable } from 'rxjs';
+import { TimerCache } from '../helperClasses/timer-cache';
+import { CaseDataService } from '../services/data/case.data.service';
+import { IGeneralAsyncValidatorResponse } from '../../shared/xt-forms/validators/general-async-validator.directive';
 
 export class CaseModel
   extends BaseModel
@@ -147,6 +156,793 @@ export class CaseModel
   uiDocuments: string;
   uiVaccines: string;
   uiDateRanges: string;
+
+  /**
+   * Generate tab - Personal
+   */
+  static generateTabsPersonal(data: {
+    authUser: UserModel,
+    i18nService: I18nService,
+    caseDataService: CaseDataService,
+    selectedOutbreak: OutbreakModel,
+    isCreate: boolean,
+    itemData: CaseModel,
+    checkForPersonExistence: () => void,
+    caseVisualIDMask: {
+      mask: string
+    },
+    options: {
+      gender: ILabelValuePairModel[],
+      pregnancy: ILabelValuePairModel[],
+      occupation: ILabelValuePairModel[],
+      user: ILabelValuePairModel[],
+      documentType: ILabelValuePairModel[],
+      addressType: ILabelValuePairModel[]
+    }
+  }): ICreateViewModifyV2Tab {
+    // create tab
+    const tab: ICreateViewModifyV2Tab = {
+      type: CreateViewModifyV2TabInputType.TAB,
+      name: 'personal',
+      label: data.isCreate ?
+        'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE' :
+        'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_TITLE',
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'firstName',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+              description: () => 'LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
+              value: {
+                get: () => data.itemData.firstName,
+                set: (value) => {
+                  // set data
+                  data.itemData.firstName = value;
+
+                  // check for duplicates
+                  data.checkForPersonExistence();
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'middleName',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+              description: () => 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
+              value: {
+                get: () => data.itemData.middleName,
+                set: (value) => {
+                  // set data
+                  data.itemData.middleName = value;
+
+                  // check for duplicates
+                  data.checkForPersonExistence();
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'lastName',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+              description: () => 'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION',
+              value: {
+                get: () => data.itemData.lastName,
+                set: (value) => {
+                  // set data
+                  data.itemData.lastName = value;
+
+                  // check for duplicates
+                  data.checkForPersonExistence();
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'gender',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_GENDER',
+              description: () => 'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION',
+              options: data.options.gender,
+              value: {
+                get: () => data.itemData.gender,
+                set: (value) => {
+                  // set gender
+                  data.itemData.gender = value;
+
+                  // reset pregnancy ?
+                  if (data.itemData.gender === Constants.GENDER_MALE) {
+                    // reset
+                    data.itemData.pregnancyStatus = null;
+
+                    // make sure we update pregnancy too
+                    tab.form.controls['pregnancyStatus'].markAsDirty();
+                  }
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'pregnancyStatus',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+              description: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
+              clearable: false,
+              options: data.options.pregnancy,
+              value: {
+                get: () => data.itemData.pregnancyStatus,
+                set: (value) => {
+                  data.itemData.pregnancyStatus = value;
+                }
+              },
+              disabled: () => {
+                return data.itemData.gender === Constants.GENDER_MALE;
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'occupation',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+              description: () => 'LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION',
+              options: data.options.occupation,
+              value: {
+                get: () => data.itemData.occupation,
+                set: (value) => {
+                  data.itemData.occupation = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH,
+              name: {
+                age: 'age',
+                dob: 'dob'
+              },
+              description: {
+                age: 'LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION',
+                dob: 'LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION'
+              },
+              ageChecked: !data.itemData.dob,
+              ageTypeYears: data.itemData.age?.months < 1,
+              value: {
+                age: {
+                  years: {
+                    get: () => data.itemData.age?.years,
+                    set: (value) => {
+                      // set value
+                      data.itemData.age = data.itemData.age || new AgeModel();
+                      data.itemData.age.years = value;
+
+                      // reset
+                      data.itemData.dob = null;
+                    }
+                  },
+                  months: {
+                    get: () => data.itemData.age?.months,
+                    set: (value) => {
+                      // set value
+                      data.itemData.age = data.itemData.age || new AgeModel();
+                      data.itemData.age.months = value;
+
+                      // reset
+                      data.itemData.dob = null;
+                    }
+                  }
+                },
+                dob: {
+                  get: () => data.itemData.dob,
+                  set: (value) => {
+                    // set value
+                    data.itemData.dob = value;
+
+                    // update age
+                    if (
+                      data.itemData.dob &&
+                      (data.itemData.dob as Moment).isValid()
+                    ) {
+                      // add age object if we don't have one
+                      data.itemData.age = data.itemData.age || new AgeModel();
+
+                      // add data
+                      const now = moment();
+                      data.itemData.age.years = now.diff(data.itemData.dob, 'years');
+                      data.itemData.age.months = data.itemData.age.years < 1 ? now.diff(data.itemData.dob, 'months') : 0;
+                    } else {
+                      data.itemData.age.months = 0;
+                      data.itemData.age.years = 0;
+                    }
+                  }
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
+              name: 'visualId',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+              description: () => data.i18nService.instant(
+                'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+                data.caseVisualIDMask
+              ),
+              value: {
+                get: () => data.itemData.visualId,
+                set: (value) => {
+                  data.itemData.visualId = value;
+                }
+              },
+              suffixIconButtons: [
+                {
+                  icon: 'refresh',
+                  tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+                  clickAction: (input) => {
+                    // nothing to do ?
+                    if (!data.caseVisualIDMask) {
+                      return;
+                    }
+
+                    // generate
+                    data.itemData.visualId = CaseModel.generateCaseIDMask(data.selectedOutbreak.caseIdMask);
+
+                    // mark as dirty
+                    input.control?.markAsDirty();
+                  }
+                }
+              ],
+              validators: {
+                async: new Observable((observer) => {
+                  // construct cache key
+                  const cacheKey: string = 'CCA_' + data.selectedOutbreak.id +
+                    data.caseVisualIDMask.mask +
+                    data.itemData.visualId +
+                    (
+                      data.isCreate ?
+                        '' :
+                        data.itemData.id
+                    );
+
+                  // get data from cache or execute validator
+                  TimerCache.run(
+                    cacheKey,
+                    data.caseDataService.checkCaseVisualIDValidity(
+                      data.selectedOutbreak.id,
+                      data.caseVisualIDMask.mask,
+                      data.itemData.visualId,
+                      data.isCreate ?
+                        undefined :
+                        data.itemData.id
+                    )
+                  ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                    observer.next(isValid);
+                    observer.complete();
+                  });
+                })
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'responsibleUserId',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+              description: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
+              options: data.options.user,
+              value: {
+                get: () => data.itemData.responsibleUserId,
+                set: (value) => {
+                  data.itemData.responsibleUserId = value;
+                }
+              },
+              replace: {
+                condition: () => !UserModel.canListForFilters(data.authUser),
+                html: data.i18nService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
+              }
+            }
+          ]
+        },
+
+        // Documents
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'documents',
+            items: data.itemData.documents,
+            itemsChanged: (list) => {
+              // update documents
+              data.itemData.documents = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
+                newItem: () => new DocumentModel()
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.DOCUMENT,
+                typeOptions: data.options.documentType,
+                value: {
+                  get: (index: number) => {
+                    return data.itemData.documents[index];
+                  }
+                }
+              }
+            }
+          }]
+        },
+
+        // Addresses
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'addresses',
+            items: data.itemData.addresses,
+            itemsChanged: (list) => {
+              // update addresses
+              data.itemData.addresses = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
+                newItem: () => new AddressModel({
+                  date: moment().toISOString()
+                })
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.ADDRESS,
+                typeOptions: data.options.addressType,
+                value: {
+                  get: (index: number) => {
+                    return data.itemData.addresses[index];
+                  }
+                },
+                validators: {
+                  required: () => true
+                }
+              }
+            }
+          }]
+        }
+      ]
+    };
+
+    // finished
+    return tab;
+  }
+
+  /**
+   * Generate tab - Epidemiology
+   */
+  static generateTabsEpidemiology(data: {
+    selectedOutbreak: OutbreakModel,
+    isCreate: boolean,
+    itemData: CaseModel,
+    checkForOnsetAfterReporting: () => void,
+    checkForOnsetAfterHospitalizationStartDate: () => void,
+    options: {
+      classification: ILabelValuePairModel[],
+      investigationStatus: ILabelValuePairModel[],
+      outcome: ILabelValuePairModel[],
+      risk: ILabelValuePairModel[],
+      vaccine: ILabelValuePairModel[],
+      vaccineStatus: ILabelValuePairModel[],
+      dateRangeType: ILabelValuePairModel[],
+      dateRangeCenter: ILabelValuePairModel[]
+    }
+  }): ICreateViewModifyV2Tab {
+    // today
+    const today: Moment = moment();
+
+    // finished
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      name: 'infection',
+      label: data.isCreate ?
+        'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE' :
+        'LNG_PAGE_MODIFY_CASE_TAB_INFECTION_TITLE',
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'classification',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            description: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION',
+            options: data.options.classification,
+            value: {
+              get: () => data.itemData.classification,
+              set: (value) => {
+                data.itemData.classification = value;
+              }
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfOnset',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION',
+            value: {
+              get: () => data.itemData.dateOfOnset,
+              set: (value) => {
+                // set data
+                data.itemData.dateOfOnset = value;
+
+                // check onset after reporting
+                data.checkForOnsetAfterReporting();
+              }
+            },
+            maxDate: today,
+            validators: {
+              required: () => !!data.selectedOutbreak.isDateOfOnsetRequired,
+              dateSameOrBefore: () => [
+                today,
+                'dateOfOutcome'
+              ],
+              dateSameOrAfter: () => [
+                'dateOfInfection'
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'isDateOfOnsetApproximate',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+            description: () => 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION',
+            value: {
+              get: () => data.itemData.isDateOfOnsetApproximate,
+              set: (value) => {
+                data.itemData.isDateOfOnsetApproximate = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateBecomeCase',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+            description: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION',
+            value: {
+              get: () => data.itemData.dateBecomeCase,
+              set: (value) => {
+                data.itemData.dateBecomeCase = value;
+              }
+            },
+            maxDate: today,
+            validators: {
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfInfection',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION',
+            value: {
+              get: () => data.itemData.dateOfInfection,
+              set: (value) => {
+                data.itemData.dateOfInfection = value;
+              }
+            },
+            maxDate: today,
+            validators: {
+              dateSameOrBefore: () => [
+                today,
+                'dateOfOutcome',
+                'dateOfOnset'
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'investigationStatus',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
+            description: () => 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS_DESCRIPTION',
+            options: data.options.investigationStatus,
+            value: {
+              get: () => data.itemData.investigationStatus,
+              set: (value) => {
+                data.itemData.investigationStatus = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateInvestigationCompleted',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
+            description: () => 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED_DESCRIPTION',
+            value: {
+              get: () => data.itemData.dateInvestigationCompleted,
+              set: (value) => {
+                data.itemData.dateInvestigationCompleted = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'outcomeId',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            description: () => 'LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION',
+            options: data.options.outcome,
+            value: {
+              get: () => data.itemData.outcomeId,
+              set: (value) => {
+                // set data
+                data.itemData.outcomeId = value;
+
+                // reset data if not deceased
+                if (data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
+                  data.itemData.deathLocationId = null;
+                  data.itemData.safeBurial = null;
+                  data.itemData.dateOfBurial = null;
+                  data.itemData.burialLocationId = null;
+                  data.itemData.burialPlaceName = null;
+                }
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfOutcome',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
+            value: {
+              get: () => data.itemData.dateOfOutcome,
+              set: (value) => {
+                data.itemData.dateOfOutcome = value;
+              }
+            },
+            maxDate: today,
+            validators: {
+              dateSameOrBefore: () => [
+                today,
+                'dateOfBurial'
+              ],
+              dateSameOrAfter: () => [
+                'dateOfOnset',
+                'dateOfInfection'
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'transferRefused',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+            description: () => 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
+            value: {
+              get: () => data.itemData.transferRefused,
+              set: (value) => {
+                data.itemData.transferRefused = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
+            name: 'deathLocationId',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
+            description: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID_DESCRIPTION',
+            useOutbreakLocations: true,
+            value: {
+              get: () => data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
+                undefined :
+                data.itemData.deathLocationId,
+              set: (value) => {
+                data.itemData.deathLocationId = value;
+              }
+            },
+            disabled: () => {
+              return data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'safeBurial',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+            description: () => 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION',
+            value: {
+              get: () => data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
+                false :
+                data.itemData.safeBurial,
+              set: (value) => {
+                data.itemData.safeBurial = value;
+              }
+            },
+            disabled: () => {
+              return data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfBurial',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION',
+            value: {
+              get: () => data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
+                undefined :
+                data.itemData.dateOfBurial,
+              set: (value) => {
+                data.itemData.dateOfBurial = value;
+              }
+            },
+            maxDate: today,
+            validators: {
+              dateSameOrBefore: () => [
+                today
+              ],
+              dateSameOrAfter: () => [
+                'dateOfOutcome'
+              ]
+            },
+            disabled: () => {
+              return data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
+            name: 'burialLocationId',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+            description: () => 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION',
+            useOutbreakLocations: true,
+            value: {
+              get: () => data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
+                undefined :
+                data.itemData.burialLocationId,
+              set: (value) => {
+                data.itemData.burialLocationId = value;
+              }
+            },
+            disabled: () => {
+              return data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXT,
+            name: 'burialPlaceName',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
+            description: () => 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION',
+            value: {
+              get: () => data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
+                undefined :
+                data.itemData.burialPlaceName,
+              set: (value) => {
+                data.itemData.burialPlaceName = value;
+              }
+            },
+            disabled: () => {
+              return data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateOfReporting',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            value: {
+              get: () => data.itemData.dateOfReporting,
+              set: (value) => {
+                // set data
+                data.itemData.dateOfReporting = value;
+
+                // check onset after reporting
+                data.checkForOnsetAfterReporting();
+              }
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'isDateOfReportingApproximate',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
+            value: {
+              get: () => data.itemData.isDateOfReportingApproximate,
+              set: (value) => {
+                data.itemData.isDateOfReportingApproximate = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'riskLevel',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            description: () => 'LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
+            options: data.options.risk,
+            value: {
+              get: () => data.itemData.riskLevel,
+              set: (value) => {
+                data.itemData.riskLevel = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXTAREA,
+            name: 'riskReason',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+            description: () => 'LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION',
+            value: {
+              get: () => data.itemData.riskReason,
+              set: (value) => {
+                data.itemData.riskReason = value;
+              }
+            }
+          }]
+        },
+
+        // Vaccines
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'vaccinesReceived',
+            items: data.itemData.vaccinesReceived,
+            itemsChanged: (list) => {
+              // update documents
+              data.itemData.vaccinesReceived = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
+                newItem: () => new VaccineModel()
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.VACCINE,
+                vaccineOptions: data.options.vaccine,
+                vaccineStatusOptions: data.options.vaccineStatus,
+                value: {
+                  get: (index: number) => {
+                    return data.itemData.vaccinesReceived[index];
+                  }
+                }
+              }
+            }
+          }]
+        },
+
+        // Date ranges
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'dateRanges',
+            items: data.itemData.dateRanges,
+            itemsChanged: (list) => {
+              // update documents
+              data.itemData.dateRanges = list.items;
+
+              // validate hospitalization start date against date of onset
+              data.checkForOnsetAfterHospitalizationStartDate();
+            },
+            definition: {
+              add: {
+                label: 'LNG_COMMON_BUTTON_ADD_DATE_RANGE',
+                newItem: () => new CaseCenterDateRangeModel()
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE,
+                typeOptions: data.options.dateRangeType,
+                centerOptions: data.options.dateRangeCenter,
+                value: {
+                  get: (index: number) => {
+                    return data.itemData.dateRanges[index];
+                  }
+                },
+                changed: () => {
+                  // validate hospitalization start date against date of onset
+                  data.checkForOnsetAfterHospitalizationStartDate();
+                }
+              }
+            }
+          }]
+        }
+      ]
+    };
+  }
 
   /**
    * Advanced filters

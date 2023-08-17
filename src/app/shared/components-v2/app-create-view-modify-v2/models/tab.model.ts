@@ -27,6 +27,10 @@ import {
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
+import {
+  IVisibleMandatoryDataGroup,
+  IVisibleMandatoryDataValue
+} from '../../../forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 /**
  * Input type
@@ -68,6 +72,7 @@ export enum CreateViewModifyV2TabInputType {
   TAB_TABLE_EDIT_QUESTIONNAIRE,
   TAB_TABLE_FILL_QUESTIONNAIRE,
   TAB_TABLE_TREE_EDITOR,
+  TAB_TABLE_VISIBLE_AND_MANDATORY,
   SECTION,
 
   // other
@@ -748,6 +753,17 @@ interface ICreateViewModifyV2TabTableTree {
 }
 
 /**
+ * Tab table - visible and mandatory fields
+ */
+interface ICreateViewModifyV2TabTableVisibleAndMandatory {
+  // required
+  type: CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY;
+  name: string;
+  value: ICreateViewModifyV2TabInputValue<IVisibleMandatoryDataValue>;
+  options: IVisibleMandatoryDataGroup[];
+}
+
+/**
  * Tab table
  */
 export interface ICreateViewModifyV2TabTable {
@@ -755,7 +771,7 @@ export interface ICreateViewModifyV2TabTable {
   type: CreateViewModifyV2TabInputType.TAB_TABLE;
   name: string;
   label: string;
-  definition: ICreateViewModifyV2TabTableRecordsList | ICreateViewModifyV2TabTableEditQuestionnaire | ICreateViewModifyV2TabTableFillQuestionnaire | ICreateViewModifyV2TabTableTree;
+  definition: ICreateViewModifyV2TabTableRecordsList | ICreateViewModifyV2TabTableEditQuestionnaire | ICreateViewModifyV2TabTableFillQuestionnaire | ICreateViewModifyV2TabTableTree | ICreateViewModifyV2TabTableVisibleAndMandatory;
 
   // optional
   visible?: () => boolean
