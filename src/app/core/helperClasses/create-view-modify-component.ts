@@ -452,14 +452,14 @@ export abstract class CreateViewModifyComponent<T>
                     break;
 
                   default:
-                    throw new Error(`tabsToGroupTabs: unhandled list type '${input.definition.input.type}'`);
+                    throw new Error(`tabsToGroupTabs - list: unhandled type '${input.definition.input.type}'`);
                 }
 
                 // finished
                 break;
 
               default:
-                throw new Error(`tabsToGroupTabs: unhandled type '${input.type}'`);
+                throw new Error(`tabsToGroupTabs - single: unhandled type '${input.type}'`);
             }
           });
 
