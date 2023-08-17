@@ -48,8 +48,6 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
     { label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS', value: 'telephoneNumbers' },
     { label: 'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE', value: 'telephoneNumbers.LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE' },
     { label: 'LNG_USER_FIELD_LABEL_SECURITY_QUESTIONS', value: 'securityQuestions' },
-    { label: 'LNG_USER_FIELD_LABEL_LAST_LOGIN_DATE', value: 'lastLoginDate' },
-    { label: 'LNG_USER_FIELD_LABEL_LAST_RESET_PASSWORD_DATE', value: 'lastResetPasswordDate' },
     { label: 'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS', value: 'disregardGeographicRestrictions' },
     { label: 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS', value: 'dontCacheFilters' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },

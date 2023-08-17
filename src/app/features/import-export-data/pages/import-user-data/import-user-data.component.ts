@@ -35,7 +35,8 @@ export class ImportUserDataComponent implements OnInit, OnDestroy {
   ];
 
   fieldsWithoutTokens = {
-    'securityQuestions[]': 'LNG_USER_FIELD_LABEL_SECURITY_QUESTIONS'
+    'securityQuestions[]': 'LNG_USER_FIELD_LABEL_SECURITY_QUESTIONS',
+    telephoneNumbers: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
   };
 
   roleFields = {

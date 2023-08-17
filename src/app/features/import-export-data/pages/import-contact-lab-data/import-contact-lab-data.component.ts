@@ -46,7 +46,8 @@ export class ImportContactLabDataComponent implements OnInit, OnDestroy {
   ImportServerModelNames = ImportServerModelNames;
 
   fieldsWithoutTokens = {
-    questionnaireAnswers: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS'
+    questionnaireAnswers: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+    sequence: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
   };
 
   requiredDestinationFields = [
