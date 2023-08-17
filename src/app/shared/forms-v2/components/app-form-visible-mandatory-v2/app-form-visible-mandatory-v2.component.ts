@@ -23,6 +23,7 @@ import {
   IVisibleMandatoryDataGroupTabSectionField,
   IVisibleMandatoryDataValue
 } from './models/visible-mandatory.model';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 /**
  * Flatten type
@@ -73,6 +74,10 @@ interface IFlattenNodeGroupTabSectionField {
   // required
   type: FlattenType.GROUP_TAB_SECTION_FIELD;
   parent: IFlattenNodeGroupTabSection;
+  name: {
+    visible: string,
+    mandatory: string
+  };
   data: IVisibleMandatoryDataGroupTabSectionField;
 }
 
@@ -183,31 +188,31 @@ export class AppFormVisibleMandatoryV2Component
     this.releaseLanguageChangeListener();
   }
 
-  // /**
-  //  * Write value
-  //  */
-  // writeValue(value: IVisibleMandatoryDataValue): void {
-  //   // // initialize value if necessary
-  //   const previousValue = this.value;
-  //   if (!value) {
-  //     value = {};
-  //   }
-  //
-  //   // set value
-  //   super.writeValue(value);
-  //
-  //   // no need to re-render because it is the same value ?
-  //   if (JSON.stringify(this.value) === JSON.stringify(previousValue)) {
-  //     return;
-  //   }
-  //
-  //   // reset collapse
-  //   // - calls this.nonFlatToFlat
-  //   this.collapseExpandAll(
-  //     true,
-  //     true
-  //   );
-  // }
+  /**
+   * Write value
+   */
+  writeValue(value: IVisibleMandatoryDataValue): void {
+    // // initialize value if necessary
+    const previousValue = this.value;
+    if (!value) {
+      value = {};
+    }
+
+    // set value
+    super.writeValue(value);
+
+    // no need to re-render because it is the same value ?
+    if (JSON.stringify(this.value) === JSON.stringify(previousValue)) {
+      return;
+    }
+
+    // reset collapse
+    // - calls this.nonFlatToFlat
+    this.collapseExpandAll(
+      true,
+      true
+    );
+  }
 
   /**
    * Re-render UI
@@ -268,8 +273,8 @@ export class AppFormVisibleMandatoryV2Component
 
     // nothing to do ?
     if (
-      !this.options?.length // ||
-      // !this.value
+      !this.options?.length ||
+      !this.value
     ) {
       return;
     }
@@ -312,6 +317,10 @@ export class AppFormVisibleMandatoryV2Component
             const groupTabSectionFieldNode: IFlattenNodeGroupTabSectionField = {
               type: FlattenType.GROUP_TAB_SECTION_FIELD,
               parent: groupTabSectionNode,
+              name: {
+                visible: `${FormHelperService.IGNORE_FIELD_PREFIX}${groupTabSectionNode.parent.parent.data.id}_${field.id}_visible`,
+                mandatory: `${FormHelperService.IGNORE_FIELD_PREFIX}${groupTabSectionNode.parent.parent.data.id}_${field.id}_mandatory`
+              },
               data: field
             };
             this._allFlattenedData.push(groupTabSectionFieldNode);
@@ -554,59 +563,35 @@ export class AppFormVisibleMandatoryV2Component
    * Selected item changed
    */
   selectedChanged(
-    _item: IFlattenNodeGroupTabSectionField,
-    _checked: boolean
+    item: IFlattenNodeGroupTabSectionField,
+    checked: boolean
   ): void {
-  //   // update value
-  //   if (
-  //     checked &&
-  //     !item.data.isSystemWide
-  //   ) {
-  //     // initialize category ?
-  //     if (!this.value[item.parent.data.id]) {
-  //       this.value[item.parent.data.id] = {};
-  //     }
-  //
-  //     // check item
-  //     this.value[item.parent.data.id][item.data.id] = true;
-  //   } else {
-  //     if (this.value[item.parent.data.id]) {
-  //       delete this.value[item.parent.data.id][item.data.id];
-  //     }
-  //   }
-  //
-  //   // reset value
-  //   item.parent.data.checked = 0;
-  //   item.parent.data.children.forEach((option) => {
-  //     // not selected, and not system-wide
-  //     if (
-  //       !option.isSystemWide && (
-  //         !this.value[item.parent.data.id] ||
-  //         !this.value[item.parent.data.id][option.id]
-  //       )
-  //     ) {
-  //       return;
-  //     }
-  //
-  //     // system-wide, but disabled
-  //     if (
-  //       option.isSystemWide &&
-  //       option.disabled
-  //     ) {
-  //       return;
-  //     }
-  //
-  //     // count
-  //     item.parent.data.checked++;
-  //   });
-  //
-  //   // trigger on change
-  //   this.onChange(this.value);
-  //
-  //   // mark dirty
-  //   this.control?.markAsDirty();
-  //
-  //   // update ui
-  //   this.detectChanges();
+    // update value
+    const group: IFlattenNodeGroup = item.parent.parent.parent;
+    if (checked) {
+      // initialize category ?
+      if (!this.value[group.data.id]) {
+        this.value[group.data.id] = {};
+      }
+
+      // initialize field ?
+      if (!this.value[group.data.id][item.data.id]) {
+        this.value[group.data.id][item.data.id] = {};
+      }
+
+      // check item
+      this.value[group.data.id][item.data.id].visible = true;
+    } else if (this.value[group.data.id]) {
+      delete this.value[group.data.id][item.data.id];
+    }
+
+    // trigger on change
+    this.onChange(this.value);
+
+    // mark dirty
+    this.control?.markAsDirty();
+
+    // update ui
+    this.detectChanges();
   }
 }

@@ -117,8 +117,8 @@
           <div
             class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible">
             <app-form-checkbox-v2
-              [ngModel]="false"
-              [name]="item.data.id"
+              [ngModel]="value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible"
+              [name]="item.name.visible"
               [placeholder]="item.data.label"
               [disabled]="viewOnly"
               [highlightPlaceholder]="searchValue"
@@ -129,8 +129,9 @@
           <div
             class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-required">
             <app-form-checkbox-v2
-              [ngModel]="false"
-              [name]="item.data.id"
+              *ngIf="value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible"
+              [ngModel]="value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].mandatory"
+              [name]="item.name.mandatory"
               placeholder="LNG_COMMON_LABEL_REQUIRED"
               [disabled]="viewOnly"></app-form-checkbox-v2>
           </div>
