@@ -3,7 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   forwardRef,
-  Host, HostListener,
+  Host,
   Input,
   OnDestroy,
   Optional,
@@ -16,7 +16,6 @@ import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { Subscription } from 'rxjs';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
 import {
   IVisibleMandatoryDataGroup,
   IVisibleMandatoryDataGroupTab,
@@ -145,9 +144,6 @@ export class AppFormVisibleMandatoryV2Component
   // filter
   searchValue: string;
 
-  // small screen mode ?
-  isSmallScreenMode: boolean = false;
-
   // timers
   private _filterTimer: number;
 
@@ -168,9 +164,6 @@ export class AppFormVisibleMandatoryV2Component
       i18nService,
       changeDetectorRef
     );
-
-    // update render mode
-    this.updateRenderMode();
 
     // subscribe to language change
     this.initializeLanguageChangeListener();
@@ -615,14 +608,5 @@ export class AppFormVisibleMandatoryV2Component
   //
   //   // update ui
   //   this.detectChanges();
-  }
-
-  /**
-   * Update website render mode
-   */
-  @HostListener('window:resize')
-  private updateRenderMode(): void {
-    // small screen mode ?
-    this.isSmallScreenMode = determineIfSmallScreenMode();
   }
 }
