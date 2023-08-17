@@ -38,6 +38,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -82,7 +83,8 @@ export class ContactRangeFollowUpsListComponent
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service,
     private i18nService: I18nService,
-    private referenceDataHelperService: ReferenceDataHelperService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private entityFollowUpHelperService: EntityFollowUpHelperService
   ) {
     // parent
     super(
@@ -786,7 +788,7 @@ export class ContactRangeFollowUpsListComponent
             }
           }[] = (rangeData || []).map((data) => {
             // determine follow-up questionnaire alertness
-            data.followUps = FollowUpModel.determineAlertness(
+            data.followUps = this.entityFollowUpHelperService.determineAlertness(
               this.selectedOutbreak.contactFollowUpTemplate,
               data.followUps
             );

@@ -748,9 +748,8 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
           if (!item.uiStatusForms) {
             // determine forms
-            const forms: V2ColumnStatusForm[] = FollowUpModel.getStatusForms({
+            const forms: V2ColumnStatusForm[] = this.entityFollowUpHelperService.getStatusForms({
               item,
-              i18nService: this.i18nService,
               dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
             });
 
@@ -825,7 +824,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       .pipe(
         // determine alertness
         map((followUps: FollowUpModel[]) => {
-          return FollowUpModel.determineAlertness(
+          return this.entityFollowUpHelperService.determineAlertness(
             this.selectedOutbreak.contactFollowUpTemplate,
             followUps
           );

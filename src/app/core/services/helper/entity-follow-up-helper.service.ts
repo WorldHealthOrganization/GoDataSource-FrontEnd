@@ -9,7 +9,7 @@ import { V2FilterType } from '../../../shared/components-v2/app-list-table-v2/mo
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { EntityType } from '../../models/entity-type';
-import { QuestionModel } from '../../models/question.model';
+import { IAnswerData, QuestionModel } from '../../models/question.model';
 import { UserModel } from '../../models/user.model';
 import { DialogV2Service } from './dialog-v2.service';
 import { ToastV2Service } from './toast-v2.service';
@@ -53,6 +53,131 @@ export class EntityFollowUpHelperService {
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
+  }
+
+  /**
+   * Determine alertness
+   */
+  determineAlertness(
+    template: QuestionModel[],
+    entities: FollowUpModel[]
+  ): FollowUpModel[] {
+    // map alert question answers to object for easy find
+    const alertQuestionAnswers: {
+      [question_variable: string]: {
+        [answer_value: string]: true
+      }
+    } = QuestionModel.determineAlertAnswers(template);
+
+    // map alert value to follow-ups
+    entities.forEach((followUpData: FollowUpModel) => {
+      // check if we need to mark follow-up as alerted because of questionnaire answers
+      followUpData.alerted = false;
+      if (followUpData.questionnaireAnswers) {
+        const props: string[] = Object.keys(followUpData.questionnaireAnswers);
+        for (let propIndex: number = 0; propIndex < props.length; propIndex++) {
+          // get answer data
+          const questionVariable: string = props[propIndex];
+          const answers: IAnswerData[] = followUpData.questionnaireAnswers[questionVariable];
+
+          // retrieve answer value
+          // only the newest one is of interest, the old ones shouldn't trigger an alert
+          // the first item should be the newest
+          const answerKey = answers?.length > 0 ?
+            answers[0].value :
+            undefined;
+
+          // there is no point in checking the value if there isn't one
+          if (
+            !answerKey &&
+            typeof answerKey !== 'number'
+          ) {
+            continue;
+          }
+
+          // at least one alerted ?
+          if (Array.isArray(answerKey)) {
+            // go through all answers
+            for (let answerKeyIndex: number = 0; answerKeyIndex < answerKey.length; answerKeyIndex++) {
+              if (
+                alertQuestionAnswers[questionVariable] &&
+                alertQuestionAnswers[questionVariable][answerKey[answerKeyIndex]]
+              ) {
+                // alerted
+                followUpData.alerted = true;
+
+                // stop
+                break;
+              }
+            }
+
+            // stop ?
+            if (followUpData.alerted) {
+              // stop
+              break;
+            }
+          } else if (
+            alertQuestionAnswers[questionVariable] &&
+            alertQuestionAnswers[questionVariable][answerKey]
+          ) {
+            // alerted
+            followUpData.alerted = true;
+
+            // stop
+            break;
+          }
+        }
+      }
+    });
+
+    // finished
+    return entities;
+  }
+
+  /**
+   * Retrieve statuses forms
+   */
+  getStatusForms(
+    info: {
+      // required
+      item: FollowUpModel,
+      dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>
+    }
+  ): V2ColumnStatusForm[] {
+    // construct list of forms that we need to display
+    const forms: V2ColumnStatusForm[] = [];
+
+    // status
+    if (
+      info.item.statusId &&
+      info.dailyFollowUpStatus.map[info.item.statusId]
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.CIRCLE,
+        color: info.dailyFollowUpStatus.map[info.item.statusId].getColorCode(),
+        tooltip: this.i18nService.instant(info.item.statusId)
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
+    }
+
+    // alerted
+    if (info.item.alerted) {
+      forms.push({
+        type: IV2ColumnStatusFormType.STAR,
+        color: 'var(--gd-danger)',
+        tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
+    }
+
+    // finished
+    return forms;
   }
 
   /**
@@ -584,9 +709,8 @@ export class EntityFollowUpHelperService {
             }]
           }
         ],
-        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
+        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => this.getStatusForms({
           item: data,
-          i18nService: this.i18nService,
           dailyFollowUpStatus: definitions.dailyFollowUpStatus
         })
       },
@@ -1129,7 +1253,7 @@ export class EntityFollowUpHelperService {
       )
       .pipe(
         map((followUps: FollowUpModel[]) => {
-          return FollowUpModel.determineAlertness(
+          return this.determineAlertness(
             outbreak.contactFollowUpTemplate,
             followUps
           );
