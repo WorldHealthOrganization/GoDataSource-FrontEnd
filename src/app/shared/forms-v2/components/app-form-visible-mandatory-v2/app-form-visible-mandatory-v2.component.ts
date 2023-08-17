@@ -139,7 +139,7 @@ export class AppFormVisibleMandatoryV2Component
     // flatten & start collapsed
     // - detect changes is triggered by this.collapseExpandAll => this.nonFlatToFlat function
     this.collapseExpandAll(
-      true,
+      false,
       true
     );
   }
@@ -218,7 +218,7 @@ export class AppFormVisibleMandatoryV2Component
     // reset collapse
     // - calls this.nonFlatToFlat
     this.collapseExpandAll(
-      true,
+      false,
       true
     );
   }

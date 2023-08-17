@@ -13,7 +13,7 @@
       name="filterValue"
       placeholder="LNG_COMMON_LABEL_SEARCH"
       autocomplete="off"
-      (ngModelChange)="filter($event, true, true)"></app-form-input-v2>
+      (ngModelChange)="filter($event, !!$event, true)"></app-form-input-v2>
 
     <!-- Expand All -->
     <button
