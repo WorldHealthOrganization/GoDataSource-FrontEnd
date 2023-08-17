@@ -18,11 +18,7 @@ import {
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
-import { AgeModel } from '../../../../core/models/age.model';
-import { TimerCache } from '../../../../core/helperClasses/timer-cache';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
@@ -63,7 +59,6 @@ import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-ta
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { EventModel } from '../../../../core/models/event.model';
-import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
@@ -508,379 +503,33 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Personal
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    // create tab
-    const tab: ICreateViewModifyV2Tab = {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'personal',
-      label: this.isCreate ?
-        'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_TITLE' :
-        'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_COMMON_LABEL_DETAILS',
-          inputs: [
-            {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'firstName',
-              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-              description: () => 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
-              value: {
-                get: () => this.itemData.firstName,
-                set: (value) => {
-                  // set data
-                  this.itemData.firstName = value;
-
-                  // check for duplicates
-                  this.checkForPersonExistence();
-                }
-              },
-              validators: {
-                required: () => true
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'middleName',
-              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME',
-              description: () => 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
-              value: {
-                get: () => this.itemData.middleName,
-                set: (value) => {
-                  // set data
-                  this.itemData.middleName = value;
-
-                  // check for duplicates
-                  this.checkForPersonExistence();
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'lastName',
-              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-              description: () => 'LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION',
-              value: {
-                get: () => this.itemData.lastName,
-                set: (value) => {
-                  // set data
-                  this.itemData.lastName = value;
-
-                  // check for duplicates
-                  this.checkForPersonExistence();
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'gender',
-              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_GENDER',
-              description: () => 'LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              value: {
-                get: () => this.itemData.gender,
-                set: (value) => {
-                  // set gender
-                  this.itemData.gender = value;
-
-                  // reset pregnancy ?
-                  if (this.itemData.gender === Constants.GENDER_MALE) {
-                    // reset
-                    this.itemData.pregnancyStatus = null;
-
-                    // make sure we update pregnancy too
-                    tab.form.controls['pregnancyStatus'].markAsDirty();
-                  }
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'pregnancyStatus',
-              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-              description: () => 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
-              clearable: false,
-              options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              value: {
-                get: () => this.itemData.pregnancyStatus,
-                set: (value) => {
-                  this.itemData.pregnancyStatus = value;
-                }
-              },
-              disabled: () => {
-                return this.itemData.gender === Constants.GENDER_MALE;
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'occupation',
-              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-              description: () => 'LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION',
-              options: this.referenceDataHelperService.filterPerOutbreakOptions(
-                this.selectedOutbreak,
-                (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                this.itemData.occupation
-              ),
-              value: {
-                get: () => this.itemData.occupation,
-                set: (value) => {
-                  this.itemData.occupation = value;
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH,
-              name: {
-                age: 'age',
-                dob: 'dob'
-              },
-              description: {
-                age: 'LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION',
-                dob: 'LNG_CONTACT_FIELD_LABEL_DOB_DESCRIPTION'
-              },
-              ageChecked: !this.itemData.dob,
-              ageTypeYears: this.itemData.age?.months < 1,
-              value: {
-                age: {
-                  years: {
-                    get: () => this.itemData.age?.years,
-                    set: (value) => {
-                      // set value
-                      this.itemData.age = this.itemData.age || new AgeModel();
-                      this.itemData.age.years = value;
-
-                      // reset
-                      this.itemData.dob = null;
-                    }
-                  },
-                  months: {
-                    get: () => this.itemData.age?.months,
-                    set: (value) => {
-                      // set value
-                      this.itemData.age = this.itemData.age || new AgeModel();
-                      this.itemData.age.months = value;
-
-                      // reset
-                      this.itemData.dob = null;
-                    }
-                  }
-                },
-                dob: {
-                  get: () => this.itemData.dob,
-                  set: (value) => {
-                    // set value
-                    this.itemData.dob = value;
-
-                    // update age
-                    if (
-                      this.itemData.dob &&
-                      (this.itemData.dob as Moment).isValid()
-                    ) {
-                      // add age object if we don't have one
-                      this.itemData.age = this.itemData.age || new AgeModel();
-
-                      // add data
-                      const now = moment();
-                      this.itemData.age.years = now.diff(this.itemData.dob, 'years');
-                      this.itemData.age.months = this.itemData.age.years < 1 ? now.diff(this.itemData.dob, 'months') : 0;
-                    } else {
-                      this.itemData.age.months = 0;
-                      this.itemData.age.years = 0;
-                    }
-                  }
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
-              name: 'visualId',
-              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.i18nService.instant(
-                'LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
-                this._contactVisualIDMask
-              ),
-              value: {
-                get: () => this.itemData.visualId,
-                set: (value) => {
-                  this.itemData.visualId = value;
-                }
-              },
-              suffixIconButtons: [
-                {
-                  icon: 'refresh',
-                  tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
-                  clickAction: (input) => {
-                    // nothing to do ?
-                    if (!this._contactVisualIDMask) {
-                      return;
-                    }
-
-                    // generate
-                    this.itemData.visualId = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
-
-                    // mark as dirty
-                    input.control?.markAsDirty();
-                  }
-                }
-              ],
-              validators: {
-                async: new Observable((observer) => {
-                  // construct cache key
-                  const cacheKey: string = 'CCO_' + this.selectedOutbreak.id +
-                    this._contactVisualIDMask.mask +
-                    this.itemData.visualId +
-                    (
-                      this.isCreate ?
-                        '' :
-                        this.itemData.id
-                    );
-
-                  // get data from cache or execute validator
-                  TimerCache.run(
-                    cacheKey,
-                    this.contactDataService.checkContactVisualIDValidity(
-                      this.selectedOutbreak.id,
-                      this._contactVisualIDMask.mask,
-                      this.itemData.visualId,
-                      this.isCreate ?
-                        undefined :
-                        this.itemData.id
-                    )
-                  ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                    observer.next(isValid);
-                    observer.complete();
-                  });
-                })
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'responsibleUserId',
-              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-              description: () => 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-              value: {
-                get: () => this.itemData.responsibleUserId,
-                set: (value) => {
-                  this.itemData.responsibleUserId = value;
-                }
-              },
-              replace: {
-                condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
-              }
-            }
-          ]
-        },
-
-        // Documents
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'documents',
-            items: this.itemData.documents,
-            itemsChanged: (list) => {
-              // update documents
-              this.itemData.documents = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
-                newItem: () => new DocumentModel()
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.DOCUMENT,
-                typeOptions: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.documents[index];
-                  }
-                }
-              }
-            }
-          }]
-        },
-
-        // Addresses
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'addresses',
-            items: this.itemData.addresses,
-            itemsChanged: (list) => {
-              // update addresses
-              this.itemData.addresses = list.items;
-            },
-            actionIconButtons: [
-              // copy parent address
-              {
-                icon: 'file_copy',
-                tooltip: 'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP',
-                click: (
-                  _input,
-                  addressIndex: number
-                ) => {
-                  this.dialogV2Service.showConfirmDialog({
-                    config: {
-                      title: {
-                        get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
-                      },
-                      message: {
-                        get: () => 'LNG_DIALOG_CONFIRM_COPY_PARENT_ENTITY_ADDRESS'
-                      }
-                    }
-                  }).subscribe((response) => {
-                    // canceled ?
-                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                      // finished
-                      return;
-                    }
-
-                    // copy parent address - clone
-                    this.itemData.addresses[addressIndex] = new AddressModel(this._parentEntity.mainAddress);
-
-                    // update ui
-                    this.tabsV2Component.detectChanges();
-                  });
-                },
-                visible: () => {
-                  return this.isCreate &&
-                    !!this._parentEntity?.mainAddress?.typeId;
-                }
-              }
-            ],
-            definition: {
-              add: {
-                label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
-                newItem: () => new AddressModel({
-                  date: moment().toISOString()
-                })
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.ADDRESS,
-                typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.addresses[index];
-                  }
-                },
-                validators: {
-                  required: () => true
-                }
-              }
-            }
-          }]
-        }
-      ]
-    };
-
-    // finished
-    return tab;
+    return ContactModel.generateTabsPersonal({
+      authUser: this.authUser,
+      i18nService: this.i18nService,
+      dialogV2Service: this.dialogV2Service,
+      contactDataService: this.contactDataService,
+      selectedOutbreak: this.selectedOutbreak,
+      isCreate: this.isCreate,
+      itemData: this.itemData,
+      checkForPersonExistence: this.checkForPersonExistence,
+      detectChanges: () => {
+        this.tabsV2Component.detectChanges();
+      },
+      contactVisualIDMask: this._contactVisualIDMask,
+      parentEntity: this._parentEntity,
+      options: {
+        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.occupation
+        ),
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      }
+    });
   }
 
   /**
