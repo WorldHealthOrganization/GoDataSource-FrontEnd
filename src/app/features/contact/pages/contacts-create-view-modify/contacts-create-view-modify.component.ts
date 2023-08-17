@@ -508,6 +508,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       itemData: this.itemData,
       checkForPersonExistence: this.checkForPersonExistence,
       detectChanges: () => {
+        // update ui
         this.tabsV2Component.detectChanges();
       },
       contactVisualIDMask: this._contactVisualIDMask,

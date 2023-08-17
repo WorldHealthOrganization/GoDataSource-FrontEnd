@@ -43,6 +43,7 @@ import { Moment } from 'moment';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { EntityContactOfContactHelperService } from '../../../../core/services/helper/entity-contact-of-contact-helper.service';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -134,7 +135,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     private router: Router,
     private bulkCacheHelperService: BulkCacheHelperService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private relationshipDataService: RelationshipDataService
+    private relationshipDataService: RelationshipDataService,
+    private entityContactOfContactHelperService: EntityContactOfContactHelperService
   ) {
     super(
       listHelperService, {
@@ -688,9 +690,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             })
           }
         ],
-        forms: (_column, data: ContactOfContactModel): V2ColumnStatusForm[] => ContactOfContactModel.getStatusForms({
+        forms: (_column, data: ContactOfContactModel): V2ColumnStatusForm[] => this.entityContactOfContactHelperService.getStatusForms({
           item: data,
-          i18nService: this.i18nService,
           risk: this.activatedRoute.snapshot.data.risk
         })
       },
@@ -1257,8 +1258,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = ContactOfContactModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.advancedFilters = this.entityContactOfContactHelperService.generateAdvancedFilters({
       options: {
         occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
