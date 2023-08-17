@@ -468,109 +468,18 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Details
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'details',
-      label: this.isCreate ?
-        'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE' :
-        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_COMMON_LABEL_DETAILS',
-          inputs: [
-            {
-              type: CreateViewModifyV2TabInputType.DATE,
-              name: 'date',
-              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION',
-              value: {
-                get: () => this.itemData.date,
-                set: (value) => {
-                  this.itemData.date = value;
-                }
-              },
-              validators: {
-                required: () => true
-              },
-              disabled: () => this.isModify
-            }, {
-              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: 'targeted',
-              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION',
-              value: {
-                get: () => this.itemData.targeted,
-                set: (value) => {
-                  this.itemData.targeted = value;
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'statusId',
-              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              value: {
-                get: () => this.itemData.statusId,
-                set: (value) => {
-                  this.itemData.statusId = value;
-                }
-              },
-              validators: {
-                required: () => true
-              },
-              disabled: () => this.isModify && Constants.isDateInTheFuture(this.itemData.date)
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'responsibleUserId',
-              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
-              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-              value: {
-                get: () => this.itemData.responsibleUserId,
-                set: (value) => {
-                  this.itemData.responsibleUserId = value;
-                }
-              },
-              replace: {
-                condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.i18nService.instant('LNG_PAGE_MODIFY_FOLLOW_UP_CANT_SET_RESPONSIBLE_ID_TITLE')
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'teamId',
-              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<UserModel>).options,
-              value: {
-                get: () => this.itemData.teamId,
-                set: (value) => {
-                  this.itemData.teamId = value;
-                }
-              }
-            }
-          ]
-        },
-
-        // Address
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.ADDRESS,
-            typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            name: 'address',
-            value: {
-              get: () => this.isCreate ?
-                this._entityData.mainAddress :
-                this.itemData.address
-            }
-          }]
-        }
-      ]
-    };
+    return this.entityFollowUpHelperService.generateTabsPersonal({
+      isCreate: this.isCreate,
+      isModify: this.isModify,
+      itemData: this.itemData,
+      entityData: this._entityData,
+      options: {
+        dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<UserModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      }
+    });
   }
 
   /**
