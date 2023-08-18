@@ -37,6 +37,7 @@ import {
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import * as _ from 'lodash';
 import { UserModel } from '../../../../core/models/user.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -62,6 +63,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
     private dialogV2Service: DialogV2Service,
     private router: Router,
     protected referenceDataHelperService: ReferenceDataHelperService,
+    private outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -110,6 +112,9 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   protected initializedData(): void {
     // format reference data per disease to expected tree format
     this._diseaseSpecificReferenceData = this.referenceDataHelperService.convertRefCategoriesToTreeCategories(this.activatedRoute.snapshot.data.diseaseSpecificCategories.list);
+
+    // merge default fields
+    this.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.itemData);
   }
 
   /**
@@ -202,6 +207,9 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       tabs: [
         // Details
         this.initializeTabsDetails(),
+
+        // Visible and required fields
+        this.initializeTabsVisibleAndRequiredFields(),
 
         // Reference Data Per Outbreak Template
         this.initializeTabsReferenceDataPerOutbreakTemplate(),
@@ -621,6 +629,30 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
           ]
         }
       ]
+    };
+  }
+
+
+  /**
+   * Initialize tabs - Visible and required fields
+   */
+  private initializeTabsVisibleAndRequiredFields(): ICreateViewModifyV2TabTable {
+    // init tab
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'visible_mandatory_fields',
+      label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_VISIBLE_AND_MANDATORY_FIELDS',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY,
+        name: 'visibleAndMandatoryFields',
+        value: {
+          get: () => this.itemData.visibleAndMandatoryFields,
+          set: (value) => {
+            this.itemData.visibleAndMandatoryFields = value;
+          }
+        },
+        options: this.outbreakAndOutbreakTemplateHelperService.generateVisibleMandatoryOptions()
+      }
     };
   }
 
