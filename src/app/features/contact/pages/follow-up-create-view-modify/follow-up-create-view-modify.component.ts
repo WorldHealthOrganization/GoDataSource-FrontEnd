@@ -4,7 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -19,7 +18,6 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -41,8 +39,8 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 
 /**
  * Component
@@ -72,25 +70,22 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected i18nService: I18nService,
-    protected toastV2Service: ToastV2Service,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected followUpsDataService: FollowUpsDataService,
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
-    protected domSanitizer: DomSanitizer,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected domSanitizer: DomSanitizer
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService
     );
 
     // retrieve data
@@ -103,13 +98,13 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       this._entityData?.type === EntityType.CASE ||
       this._entityData?.type === EntityType.CONTACT_OF_CONTACT
     ) {
-      this.toastV2Service.notice(
+      this.createViewModifyHelperService.toastV2Service.notice(
         this.isHistory ?
           'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE' :
           'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO',
         {
           personName: this._entityData.name,
-          personType: this.i18nService.instant(this._entityData.type).toLowerCase()
+          personType: this.createViewModifyHelperService.i18nService.instant(this._entityData.type).toLowerCase()
         },
         AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS
       );
@@ -139,7 +134,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     super.onDestroy();
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS);
   }
 
   /**
@@ -354,7 +349,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE', {
             dateFormatted: moment(this.itemData.date).format('YYYY-MM-DD')
           }
@@ -364,7 +359,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_FOLLOW_UP_TITLE', {
             dateFormatted: moment(this.itemData.date).format('YYYY-MM-DD')
           }
@@ -430,8 +425,8 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL', {
               name: moment(this.itemData.date).format('YYYY-MM-DD')
             }
@@ -629,7 +624,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         takeUntil(this.destroyed$)
       ).subscribe((item: FollowUpModel) => {
         // success creating / updating event
-        this.toastV2Service.success(
+        this.createViewModifyHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE'

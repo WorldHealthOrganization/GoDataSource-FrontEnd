@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import {
   CreateViewModifyV2ActionType,
@@ -50,15 +49,14 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { TeamModel } from '../../../../core/models/team.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
 import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 
 /**
  * Component
@@ -102,12 +100,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected router: Router,
     protected caseDataService: CaseDataService,
-    protected i18nService: I18nService,
     protected systemSettingsDataService: SystemSettingsDataService,
-    protected toastV2Service: ToastV2Service,
     protected location: Location,
     protected dialogV2Service: DialogV2Service,
     protected entityDataService: EntityDataService,
@@ -116,17 +115,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
     protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    private entityCaseHelperService: EntityCaseHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private entityCaseHelperService: EntityCaseHelperService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService
     );
 
     // do we need to use custom id ?
@@ -169,9 +164,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     }
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -219,7 +214,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.isModify
     ) {
       // remove global notifications
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
       // show global notifications
       this.checkForPersonExistence();
@@ -306,7 +301,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     if (this.isCreate) {
       if (this.customCaseUUID) {
         this.breadcrumbs.push({
-          label: this.i18nService.instant(
+          label: this.createViewModifyHelperService.i18nService.instant(
             'LNG_PAGE_CREATE_CASE_WITH_UID_TITLE', {
               uid: this.customCaseUUID
             }
@@ -321,7 +316,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       }
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_CASE_TITLE', {
             name: this.itemData.name
           }
@@ -331,7 +326,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_CASE_TITLE', {
             name: this.itemData.name
           }
@@ -358,7 +353,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.breadcrumbInfos.push({
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
         tooltip: this.itemData.dateBecomeCase ?
-          `${this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -368,7 +363,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.breadcrumbInfos.push({
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
         tooltip: this.itemData.dateBecomeCase ?
-          `${this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -446,8 +441,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -594,7 +589,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
-      label: `${this.i18nService.instant(EntityType.CONTACT)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.createViewModifyHelperService.i18nService.instant(EntityType.CONTACT)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersContact',
@@ -1503,7 +1498,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           // finished
           const finishedProcessingData = () => {
             // success creating / updating case
-            this.toastV2Service.success(
+            this.createViewModifyHelperService.toastV2Service.success(
               type === CreateViewModifyV2ActionType.CREATE ?
                 'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE' :
                 'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE'
@@ -1633,7 +1628,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
               // hide notification
               // - hide alert
-              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+              this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
               // construct list of actions
               const itemsToManage: IV2SideDialogConfigInputLinkWithAction[] = response.duplicates.map((item, index) => {
@@ -1642,9 +1637,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   name: `actionsLink[${item.model.id}]`,
                   placeholder: (index + 1) + '. ' + EntityModel.getDuplicatePersonDetails(
                     item,
-                    this.i18nService.instant(item.model.type),
-                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                    this.createViewModifyHelperService.i18nService.instant(item.model.type),
+                    this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                    this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
                   link: () => ['/cases', item.model.id, 'view'],
                   actions: {
@@ -1954,8 +1949,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
-    this.toastV2Service.notice(
-      this.i18nService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_PERSONS') +
+    this.createViewModifyHelperService.toastV2Service.notice(
+      this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_PERSONS') +
       ' ' +
       this._personDuplicates
         .map((item) => {
@@ -1972,7 +1967,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               !ContactOfContactModel.canView(this.authUser)
             )
           ) {
-            return `${item.model.name} (${this.i18nService.instant(item.type)})`;
+            return `${item.model.name} (${this.createViewModifyHelperService.i18nService.instant(item.type)})`;
           }
 
           // create url
@@ -1991,7 +1986,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           const url =  `${entityPath}/${item.model.id}/view`;
 
           // finished
-          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.i18nService.instant(item.model.type)})</span></a>`;
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.createViewModifyHelperService.i18nService.instant(item.model.type)})</span></a>`;
         })
         .join(', '),
       undefined,
@@ -2032,7 +2027,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         const updateAlert = () => {
           // must update message ?
           // - hide alert
-          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+          this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
           // show duplicates alert
           this.showDuplicatesAlert();
@@ -2098,7 +2093,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             // handle error
             catchError((err) => {
               // show error
-              this.toastV2Service.error(err);
+              this.createViewModifyHelperService.toastV2Service.error(err);
 
               // finished
               return throwError(err);
@@ -2132,13 +2127,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.itemData.dateOfReporting &&
       moment(this.itemData.dateOfOnset).isAfter(moment(this.itemData.dateOfReporting))
     ) {
-      this.toastV2Service.notice(
+      this.createViewModifyHelperService.toastV2Service.notice(
         'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_IS_AFTER_DATE_OF_REPORTING',
         undefined,
         AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
       );
     } else {
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
     }
   }
 
@@ -2153,7 +2148,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       !this.itemData.dateRanges?.length
     ) {
       // make sure that there is no warning
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
       return;
     }
@@ -2165,7 +2160,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         moment(item.startDate).isValid() &&
         moment(item.startDate).isBefore(moment(this.itemData.dateOfOnset))
       ) {
-        this.toastV2Service.notice(
+        this.createViewModifyHelperService.toastV2Service.notice(
           'LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE',
           undefined,
           AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
@@ -2177,6 +2172,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     }
 
     // hide warning if no mismatch found
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 }

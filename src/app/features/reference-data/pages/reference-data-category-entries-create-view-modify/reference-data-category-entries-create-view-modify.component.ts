@@ -4,7 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -14,18 +13,17 @@ import {
   ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ITreeEditorDataCategory } from '../../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 import { IconModel } from '../../../../core/models/icon.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 
 /**
  * Component
@@ -46,24 +44,21 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected toastV2Service: ToastV2Service,
-    protected i18nService: I18nService,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
     protected router: Router,
     protected referenceDataDataService: ReferenceDataDataService,
     protected dialogV2Service: DialogV2Service,
-    protected referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService
     );
 
     // retrieve
@@ -157,13 +152,13 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     // add info accordingly to page type
     if (this.isCreate) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE'),
+        label: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE'),
         action: null
       });
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(this.itemData.value),
+        label: this.createViewModifyHelperService.i18nService.instant(this.itemData.value),
         action: null
       });
     }
@@ -191,12 +186,12 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_COMMON_BUTTON_SAVE'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_BUTTON_SAVE'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             {
               name: this.itemData.value ?
-                this.i18nService.instant(this.itemData.value) :
+                this.createViewModifyHelperService.i18nService.instant(this.itemData.value) :
                 ''
             }
           )
@@ -249,7 +244,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
               description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION',
               value: {
                 get: () => this.itemData.value ?
-                  this.i18nService.instant(this.itemData.value) :
+                  this.createViewModifyHelperService.i18nService.instant(this.itemData.value) :
                   this.itemData.value,
                 set: (value) => {
                   // set data
@@ -362,7 +357,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
               description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
               value: {
                 get: () => this.itemData.description ?
-                  this.i18nService.instant(this.itemData.description) :
+                  this.createViewModifyHelperService.i18nService.instant(this.itemData.description) :
                   this.itemData.description,
                 set: (value) => {
                   // set data
@@ -567,7 +562,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
         }),
         switchMap((item) => {
           // re-load language tokens
-          return this.i18nService.loadUserLanguage()
+          return this.createViewModifyHelperService.i18nService.loadUserLanguage()
             .pipe(
               catchError((err) => {
                 // show error
@@ -584,7 +579,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
         takeUntil(this.destroyed$)
       ).subscribe((item) => {
         // success creating / updating event
-        this.toastV2Service.success(
+        this.createViewModifyHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_ACTION_CREATE_ENTRY_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_REFERENCE_DATA_ENTRY_ACTION_MODIFY_ENTRY_SUCCESS_MESSAGE'
@@ -604,7 +599,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       type: CreateViewModifyV2ExpandColumnType.TEXT,
       link: (item: ReferenceDataEntryModel) => ['/reference-data', this.category.id, item.id, 'view'],
       get: {
-        text: (item: ReferenceDataEntryModel) => this.i18nService.instant(item.value)
+        text: (item: ReferenceDataEntryModel) => this.createViewModifyHelperService.i18nService.instant(item.value)
       }
     };
   }

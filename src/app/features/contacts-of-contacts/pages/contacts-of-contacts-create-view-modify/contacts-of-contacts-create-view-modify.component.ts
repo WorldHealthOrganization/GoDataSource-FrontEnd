@@ -4,7 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, of, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -29,7 +28,6 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -47,13 +45,13 @@ import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates
 import { Subscription } from 'rxjs/internal/Subscription';
 import { CaseModel } from '../../../../core/models/case.model';
 import { Location } from '@angular/common';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { EntityContactOfContactHelperService } from '../../../../core/services/helper/entity-contact-of-contact-helper.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 
 /**
  * Component
@@ -101,11 +99,12 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected router: Router,
     protected contactsOfContactsDataService: ContactsOfContactsDataService,
-    protected toastV2Service: ToastV2Service,
-    protected i18nService: I18nService,
     protected dialogV2Service: DialogV2Service,
     protected entityHelperService: EntityHelperService,
     protected systemSettingsDataService: SystemSettingsDataService,
@@ -115,18 +114,14 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     protected location: Location,
     protected referenceDataHelperService: ReferenceDataHelperService,
     private entityContactOfContactHelperService: EntityContactOfContactHelperService,
-    private entityFollowUpHelperService: EntityFollowUpHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private entityFollowUpHelperService: EntityFollowUpHelperService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService
     );
 
     // get data
@@ -166,7 +161,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     }
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
   }
 
   /**
@@ -219,7 +214,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       this.isModify
     ) {
       // remove global notifications
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
       // show global notifications
       this.checkForPersonExistence();
@@ -305,7 +300,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE', {
             name: this.itemData.name
           }
@@ -315,7 +310,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE', {
             name: this.itemData.name
           }
@@ -342,7 +337,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       this.breadcrumbInfos.push({
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE',
         tooltip: this.itemData.dateBecomeContactOfContact ?
-          `${this.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${moment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${moment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -352,7 +347,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       this.breadcrumbInfos.push({
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT',
         tooltip: this.itemData.dateBecomeContactOfContact ?
-          `${this.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${moment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${moment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -387,8 +382,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -663,7 +658,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: ContactsOfContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE,
-      label: `${this.i18nService.instant(EntityType.CASE)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.createViewModifyHelperService.i18nService.instant(EntityType.CASE)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersCase',
@@ -698,7 +693,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: ContactsOfContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
-      label: `${this.i18nService.instant(EntityType.CONTACT)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.createViewModifyHelperService.i18nService.instant(EntityType.CONTACT)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersContact',
@@ -1395,7 +1390,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           // finished
           const finishedProcessingData = () => {
             // success creating / updating case
-            this.toastV2Service.success(
+            this.createViewModifyHelperService.toastV2Service.success(
               type === CreateViewModifyV2ActionType.CREATE ?
                 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE' :
                 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_OF_CONTACT_SUCCESS_MESSAGE'
@@ -1531,9 +1526,9 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
                   name: `actionsLink[${item.model.id}]`,
                   placeholder: (index + 1) + '. ' + EntityModel.getDuplicatePersonDetails(
                     item,
-                    this.i18nService.instant(item.model.type),
-                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                    this.createViewModifyHelperService.i18nService.instant(item.model.type),
+                    this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                    this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
                   link: () => ['/contacts-of-contacts', item.model.id, 'view'],
                   actions: {
@@ -1804,8 +1799,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
 
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
-    this.toastV2Service.notice(
-      this.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DUPLICATE_PERSONS') +
+    this.createViewModifyHelperService.toastV2Service.notice(
+      this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DUPLICATE_PERSONS') +
       ' ' +
       this._personDuplicates
         .map((item) => {
@@ -1822,7 +1817,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
               !ContactOfContactModel.canView(this.authUser)
             )
           ) {
-            return `${item.model.name} (${this.i18nService.instant(item.type)})`;
+            return `${item.model.name} (${this.createViewModifyHelperService.i18nService.instant(item.type)})`;
           }
 
           // create url
@@ -1841,7 +1836,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           const url =  `${entityPath}/${item.model.id}/view`;
 
           // finished
-          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.i18nService.instant(item.model.type)})</span></a>`;
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.createViewModifyHelperService.i18nService.instant(item.model.type)})</span></a>`;
         })
         .join(', '),
       undefined,
@@ -1882,7 +1877,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         const updateAlert = () => {
           // must update message ?
           // - hide alert
-          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+          this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
           // show duplicates alert
           this.showDuplicatesAlert();
@@ -1948,7 +1943,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             // handle error
             catchError((err) => {
               // show error
-              this.toastV2Service.error(err);
+              this.createViewModifyHelperService.toastV2Service.error(err);
 
               // finished
               return throwError(err);

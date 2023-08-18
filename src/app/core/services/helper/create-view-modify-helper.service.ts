@@ -3,16 +3,18 @@ import { I18nService } from './i18n.service';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IVisibleMandatoryDataGroupTab, IVisibleMandatoryDataGroupTabSectionField } from '../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { v4 as uuid } from 'uuid';
+import { ToastV2Service } from './toast-v2.service';
+import { RedirectService } from './redirect.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class CreateViewModifyHelperService {
   /**
    * Constructor
    */
   constructor(
-    private i18nService: I18nService
+    public i18nService: I18nService,
+    public toastV2Service: ToastV2Service,
+    public redirectService: RedirectService
   ) {}
 
   /**

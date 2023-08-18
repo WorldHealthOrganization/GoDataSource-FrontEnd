@@ -4,7 +4,6 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { Observable, throwError } from 'rxjs';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
@@ -24,7 +23,6 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
   CreateViewModifyV2ExpandColumnType
@@ -38,10 +36,10 @@ import {
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 
 /**
  * Component
@@ -68,26 +66,23 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
     protected router: Router,
     private labResultDataService: LabResultDataService,
-    private activatedRoute: ActivatedRoute,
-    private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     private domSanitizer: DomSanitizer,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private entityLabResultHelperService: EntityLabResultHelperService,
-    authDataService: AuthDataService,
-    toastV2Service: ToastV2Service,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private entityLabResultHelperService: EntityLabResultHelperService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService
     );
 
     // get data
@@ -260,7 +255,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       ) {
         this.breadcrumbs.push(
           {
-            label: `${this.i18nService.instant(this.entityData.name)} ${this.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
+            label: `${this.createViewModifyHelperService.i18nService.instant(this.entityData.name)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
             action: this.entityData.deleted ? null : {
               link: [`/lab-results/contacts/${this.entityData.id}`]
             }
@@ -272,7 +267,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       ) {
         this.breadcrumbs.push(
           {
-            label: `${this.i18nService.instant(this.entityData.name)} ${this.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
+            label: `${this.createViewModifyHelperService.i18nService.instant(this.entityData.name)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
             action: this.entityData.deleted ? null : {
               link: [`/lab-results/cases/${this.entityData.id}`]
             }
@@ -292,7 +287,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     } else if (this.isModify) {
       this.breadcrumbs.push(
         {
-          label: this.i18nService.instant(
+          label: this.createViewModifyHelperService.i18nService.instant(
             'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
             {
               sampleIdentifier: this.itemData.sampleIdentifier ?
@@ -307,7 +302,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       // view
       this.breadcrumbs.push(
         {
-          label: this.i18nService.instant(
+          label: this.createViewModifyHelperService.i18nService.instant(
             'LNG_PAGE_VIEW_LAB_RESULT_TITLE',
             {
               sampleIdentifier: this.itemData.sampleIdentifier ?
@@ -377,8 +372,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.entityData
           )
@@ -630,7 +625,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         takeUntil(this.destroyed$)
       ).subscribe((item: LabResultModel) => {
         // success creating / updating event
-        this.toastV2Service.success(
+        this.createViewModifyHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_LAB_RESULT_ACTION_MODIFY_LAB_RESULT_SUCCESS_MESSAGE'

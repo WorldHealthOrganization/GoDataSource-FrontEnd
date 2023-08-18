@@ -1,8 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { Observable, throwError } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -13,7 +11,8 @@ import { PasswordChangeModel } from '../../../../core/models/password-change.mod
 import { catchError } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
   selector: 'app-change-password',
@@ -27,27 +26,25 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
    * Constructor
    */
   constructor(
-    protected userDataService: UserDataService,
-    protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected userDataService: UserDataService,
     protected dialogV2Service: DialogV2Service,
-    protected router: Router,
-    redirectService: RedirectService,
-    activatedRoute: ActivatedRoute,
-    renderer2: Renderer2
+    protected router: Router
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService
     );
 
     // display you must change password ?
     if (this.authUser.passwordChange) {
-      this.toastV2Service.notice(
+      this.createViewModifyHelperService.toastV2Service.notice(
         'LNG_PAGE_CHANGE_PASSWORD_DESCRIPTION',
         undefined,
         AppMessages.APP_MESSAGE_MUST_CHANGE_PASSWORD
@@ -63,7 +60,7 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
     super.onDestroy();
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_MUST_CHANGE_PASSWORD);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_MUST_CHANGE_PASSWORD);
   }
 
   /**
@@ -272,7 +269,7 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
               .reloadAndPersistAuthUser()
               .subscribe((_authenticatedUser) => {
                 // display message
-                this.toastV2Service.success('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
+                this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
 
                 // redirect
                 if (!askForSecurityQuestions) {

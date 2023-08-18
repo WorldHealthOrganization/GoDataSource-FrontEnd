@@ -3,7 +3,6 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { forkJoin, Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -15,7 +14,6 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -36,9 +34,9 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Location } from '@angular/common';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -85,26 +83,23 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
     protected relationshipDataService: RelationshipDataService,
-    protected i18nService: I18nService,
-    protected toastV2Service: ToastV2Service,
     protected entityHelperService: EntityHelperService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
     protected location: Location,
-    protected referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService
     );
 
     // retrieve data from snapshot
@@ -143,7 +138,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     super.onDestroy();
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -178,7 +173,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       this.isModify
     ) {
       // remove global notifications
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
       // show global notifications
       this.checkForLastContactBeforeCaseOnSet(
@@ -262,7 +257,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE', {
             name: this.itemData.relatedEntity(this._entity.id)?.model?.name || ''
           }
@@ -272,7 +267,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_RELATIONSHIP_TITLE', {
             name: this.itemData.relatedEntity(this._entity.id)?.model?.name || ''
           }
@@ -301,8 +296,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             {
               name: this._entity.name
@@ -594,7 +589,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
         )
         .subscribe((items) => {
           // success creating / updating event
-          this.toastV2Service.success(
+          this.createViewModifyHelperService.toastV2Service.success(
             type === CreateViewModifyV2ActionType.CREATE ?
               (
                 items.length > 1 ?
@@ -844,11 +839,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     });
 
     // hide current warning to re-display the updated message
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
     // show the updated message
     if (Object.keys(this._warnings.entities).length) {
-      this.toastV2Service.notice(
+      this.createViewModifyHelperService.toastV2Service.notice(
         this.isCreate ?
           (
             this.relationshipType === RelationshipType.CONTACT ?
@@ -873,7 +868,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
                 !CaseModel.canView(this.authUser)
               )
             ) {
-              return `${item.name} (${this.i18nService.instant(item.type)})`;
+              return `${item.name} (${this.createViewModifyHelperService.i18nService.instant(item.type)})`;
             }
 
             // create url
@@ -881,11 +876,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
             // finished
             const additionalInfo = this.isCreate && this.relationshipType === RelationshipType.EXPOSURE ?
-              this.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
+              this.createViewModifyHelperService.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
               '';
 
             // return entity as a link
-            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.i18nService.instant(item.type)}) ${additionalInfo}</span></a>`;
+            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.createViewModifyHelperService.i18nService.instant(item.type)}) ${additionalInfo}</span></a>`;
           })
             .join(', ')
         },

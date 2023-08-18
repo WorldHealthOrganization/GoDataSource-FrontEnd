@@ -4,9 +4,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { Observable, throwError } from 'rxjs';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -18,8 +16,8 @@ import { Constants } from '../../../../core/models/constants';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 
 @Component({
   selector: 'app-lab-results-bulk-modify',
@@ -36,23 +34,20 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected router: Router,
     protected labResultDataService: LabResultDataService,
-    protected toastV2Service: ToastV2Service,
-    protected i18nService: I18nService,
-    protected referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService
     );
 
     // retrieve data
@@ -299,7 +294,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
                 label: result.labName ?
                   `${
                     (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName] ?
-                      this.i18nService.instant((this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName].value) :
+                      this.createViewModifyHelperService.i18nService.instant((this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName].value) :
                       '—'
                   } (${result.dateSampleTaken ? moment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '—'})` :
                   (
@@ -531,7 +526,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
       // something went wrong ?
       if (selectedLabResultsIds.length < 1) {
         // show error
-        this.toastV2Service.error('LNG_PAGE_MODIFY_LAB_RESULT_LIST_ERROR_NO_LAB_RESULTS_SELECTED');
+        this.createViewModifyHelperService.toastV2Service.error('LNG_PAGE_MODIFY_LAB_RESULT_LIST_ERROR_NO_LAB_RESULTS_SELECTED');
 
         // don't do anything
         return;
@@ -567,7 +562,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
         )
         .subscribe((items) => {
           // success updating event
-          this.toastV2Service.success('LNG_PAGE_MODIFY_LAB_RESULT_LIST_ACTION_MODIFY_MULTIPLE_LAB_RESULTS_SUCCESS_MESSAGE');
+          this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_MODIFY_LAB_RESULT_LIST_ACTION_MODIFY_MULTIPLE_LAB_RESULTS_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, items);

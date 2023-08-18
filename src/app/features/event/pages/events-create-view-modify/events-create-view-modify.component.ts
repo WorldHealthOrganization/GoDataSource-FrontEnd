@@ -3,7 +3,6 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { Observable, throwError } from 'rxjs';
@@ -32,12 +31,11 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { EntityEventHelperService } from '../../../../core/services/helper/entity-event-helper.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -53,25 +51,22 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected router: Router,
     protected eventDataService: EventDataService,
-    protected i18nService: I18nService,
-    protected toastV2Service: ToastV2Service,
     protected dialogV2Service: DialogV2Service,
     protected entityHelperService: EntityHelperService,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    private entityEventHelperService: EntityEventHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private entityEventHelperService: EntityEventHelperService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService
     );
   }
 
@@ -216,7 +211,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_EVENT_TITLE', {
             name: this.itemData.name
           }
@@ -226,7 +221,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_EVENT_TITLE', {
             name: this.itemData.name
           }
@@ -259,8 +254,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -785,7 +780,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         takeUntil(this.destroyed$)
       ).subscribe((item: EventModel) => {
         // success creating / updating event
-        this.toastV2Service.success(
+        this.createViewModifyHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE'

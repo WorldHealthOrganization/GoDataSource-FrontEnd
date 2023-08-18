@@ -10,18 +10,16 @@ import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ICreateViewModifyV2Refresh } from '../../../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 
 @Component({
   selector: 'app-contact-of-contact-merge-duplicate',
@@ -52,20 +50,17 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
    * Constructor
    */
   constructor(
-    private activatedRoute: ActivatedRoute,
-    private outbreakDataService: OutbreakDataService,
-    private i18nService: I18nService,
-    protected toastV2Service: ToastV2Service,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    private outbreakDataService: OutbreakDataService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService
     );
 
     // retrieve contacts ids
@@ -391,7 +386,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
       createOrUpdate: this.initializeProcessData(),
       redirectAfterCreateUpdate: () => {
         // redirect to view
-        this.redirectService.to(['/duplicated-records']);
+        this.createViewModifyHelperService.redirectService.to(['/duplicated-records']);
       }
     };
   }
@@ -490,7 +485,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
         )
         .subscribe((item) => {
           // success creating / updating event
-          this.toastV2Service.success('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
+          this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, item);
@@ -630,7 +625,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'visualId',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.i18nService.instant(
+              description: () => this.createViewModifyHelperService.i18nService.instant(
                 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this.selectedOutbreak.contactOfContactIdMask
               ),
@@ -655,7 +650,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -842,8 +837,8 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
         mergeRecords,
-        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+        this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
       );
       case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);
