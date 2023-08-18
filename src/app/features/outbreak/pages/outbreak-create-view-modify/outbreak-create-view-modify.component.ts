@@ -41,20 +41,7 @@ import {
   IV2BottomDialogConfigButtonType
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { CaseModel } from '../../../../core/models/case.model';
-import { ContactModel } from '../../../../core/models/contact.model';
-import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
-import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
-import { EntityEventHelperService } from '../../../../core/services/helper/entity-event-helper.service';
-import { EventModel } from '../../../../core/models/event.model';
-import { EntityContactOfContactHelperService } from '../../../../core/services/helper/entity-contact-of-contact-helper.service';
-import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
-import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
-import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -85,13 +72,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    private entityCaseHelperService: EntityCaseHelperService,
-    private entityEventHelperService: EntityEventHelperService,
-    private entityContactHelperService: EntityContactHelperService,
-    private entityContactOfContactHelperService: EntityContactOfContactHelperService,
-    private entityFollowUpHelperService: EntityFollowUpHelperService,
-    private entityLabResultHelperService: EntityLabResultHelperService,
-    private entityHelperService: EntityHelperService,
+    private outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -991,6 +972,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Visible and required fields
    */
   private initializeTabsVisibleAndRequiredFields(): ICreateViewModifyV2TabTable {
+    // init tab
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: 'visible_mandatory_fields',
@@ -999,222 +981,12 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         type: CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY,
         name: 'visibleAndMandatoryFields',
         value: {
-          // #TODO
-          get: () => undefined,
-          set: (_value) => {
-            // this.itemData.allowedRefDataItems = value;
+          get: () => this.itemData.visibleAndMandatoryFields,
+          set: (value) => {
+            this.itemData.visibleAndMandatoryFields = value;
           }
         },
-        options: [
-          // cases
-          {
-            id: 'cases',
-            label: 'LNG_PAGE_LIST_CASES_TITLE',
-            children: this.tabsToGroupTabs(
-              this.i18nService, [
-                this.entityCaseHelperService.generateTabsPersonal({
-                  selectedOutbreak: this.selectedOutbreak,
-                  isCreate: true,
-                  itemData: new CaseModel(),
-                  checkForPersonExistence: () => {},
-                  caseVisualIDMask: undefined,
-                  options: {
-                    gender: [],
-                    pregnancy: [],
-                    occupation: [],
-                    user: [],
-                    documentType: [],
-                    addressType: []
-                  }
-                }),
-                this.entityCaseHelperService.generateTabsEpidemiology({
-                  selectedOutbreak: this.selectedOutbreak,
-                  isCreate: true,
-                  itemData: new CaseModel(),
-                  checkForOnsetAfterReporting: () => {},
-                  checkForOnsetAfterHospitalizationStartDate: () => {},
-                  options: {
-                    classification: [],
-                    investigationStatus: [],
-                    outcome: [],
-                    risk: [],
-                    vaccine: [],
-                    vaccineStatus: [],
-                    dateRangeType: [],
-                    dateRangeCenter: []
-                  }
-                })
-              ]
-            )
-          },
-
-          // events
-          {
-            id: 'events',
-            label: 'LNG_PAGE_LIST_EVENTS_TITLE',
-            children: this.tabsToGroupTabs(
-              this.i18nService, [
-                this.entityEventHelperService.generateTabsDetails({
-                  selectedOutbreak: this.selectedOutbreak,
-                  isCreate: true,
-                  itemData: new EventModel(),
-                  eventVisualIDMask: undefined,
-                  options: {
-                    user: [],
-                    eventCategory: [],
-                    addressType: []
-                  }
-                })
-              ]
-            )
-          },
-
-          // contacts
-          {
-            id: 'contacts',
-            label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
-            children: this.tabsToGroupTabs(
-              this.i18nService, [
-                this.entityContactHelperService.generateTabsPersonal({
-                  selectedOutbreak: this.selectedOutbreak,
-                  isCreate: true,
-                  itemData: new ContactModel(),
-                  checkForPersonExistence: () => {},
-                  detectChanges: () => {},
-                  contactVisualIDMask: undefined,
-                  parentEntity: undefined,
-                  options: {
-                    gender: [],
-                    pregnancy: [],
-                    occupation: [],
-                    user: [],
-                    documentType: [],
-                    addressType: []
-                  }
-                }),
-                this.entityContactHelperService.generateTabsEpidemiology({
-                  isCreate: true,
-                  itemData: new ContactModel(),
-                  options: {
-                    outcome: [],
-                    risk: [],
-                    team: [],
-                    followUpStatus: [],
-                    vaccine: [],
-                    vaccineStatus: []
-                  }
-                })
-              ]
-            )
-          },
-
-          // contact of contacts
-          {
-            id: 'contacts-of-contacts',
-            label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
-            children: this.tabsToGroupTabs(
-              this.i18nService, [
-                this.entityContactOfContactHelperService.generateTabsPersonal({
-                  selectedOutbreak: this.selectedOutbreak,
-                  isCreate: true,
-                  itemData: new ContactOfContactModel(),
-                  checkForPersonExistence: () => {},
-                  detectChanges: () => {},
-                  cocVisualIDMask: undefined,
-                  parentEntity: undefined,
-                  options: {
-                    gender: [],
-                    pregnancy: [],
-                    occupation: [],
-                    user: [],
-                    documentType: [],
-                    addressType: []
-                  }
-                }),
-                this.entityContactOfContactHelperService.generateTabsEpidemiology({
-                  isCreate: true,
-                  itemData: new ContactOfContactModel(),
-                  options: {
-                    risk: [],
-                    vaccine: [],
-                    vaccineStatus: []
-                  }
-                })
-              ]
-            )
-          },
-
-          // follow-ups
-          {
-            id: 'follow-ups',
-            label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOW_UP',
-            children: this.tabsToGroupTabs(
-              this.i18nService, [
-                this.entityFollowUpHelperService.generateTabsPersonal({
-                  isCreate: true,
-                  isModify: false,
-                  itemData: new FollowUpModel(),
-                  entityData: undefined,
-                  options: {
-                    dailyFollowUpStatus: [],
-                    user: [],
-                    team: [],
-                    addressType: []
-                  }
-                })
-              ]
-            )
-          },
-
-          // lab results
-          {
-            id: 'lab-results',
-            label: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
-            children: this.tabsToGroupTabs(
-              this.i18nService, [
-                this.entityLabResultHelperService.generateTabsDetails({
-                  isCreate: true,
-                  itemData: new LabResultModel(),
-                  options: {
-                    labName: [],
-                    labSampleType: [],
-                    labTestType: [],
-                    labTestResult: [],
-                    labResultProgress: [],
-                    labSequenceLaboratory: [],
-                    labSequenceResult: []
-                  }
-                })
-              ]
-            )
-          },
-
-          // relationships
-          {
-            id: 'relationships',
-            label: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
-            children: this.tabsToGroupTabs(
-              this.i18nService, [
-                this.entityHelperService.generateTabsDetails({
-                  entityId: 'LNG_COMMON_MODEL_FIELD_LABEL_ID',
-                  title: 'LNG_COMMON_LABEL_DETAILS',
-                  name: (property) => property,
-                  itemData: new RelationshipModel(),
-                  createCopySuffixButtons: () => [],
-                  checkForLastContactBeforeCaseOnSet: () => {},
-                  options: {
-                    certaintyLevel: [],
-                    exposureType: [],
-                    exposureFrequency: [],
-                    exposureDuration: [],
-                    contextOfTransmission: [],
-                    cluster: []
-                  }
-                })
-              ]
-            )
-          }
-        ]
+        options: this.outbreakAndOutbreakTemplateHelperService.generateVisibleMandatoryOptions()
       }
     };
   }

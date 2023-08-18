@@ -13,6 +13,7 @@ import { Moment } from '../helperClasses/x-moment';
 import {
   ITreeEditorDataValue
 } from '../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
+import { IVisibleMandatoryDataValue } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 export class OutbreakModel
   extends BaseModel
@@ -46,6 +47,7 @@ export class OutbreakModel
   contactIdMask: string;
   contactOfContactIdMask: string;
   allowedRefDataItems: ITreeEditorDataValue;
+  visibleAndMandatoryFields: IVisibleMandatoryDataValue;
 
   // countries
   private _countries: {
@@ -464,11 +466,15 @@ export class OutbreakModel
       (lData: any) => {
         return new MapServerModel(lData);
       });
+
+    // visible / mandatory fields
+    // #TODO default should be as it is now..somehow we need to set default only for selected outbrak or the one that is in edit/create..and NOT for those retrieved for selected outbreak dropdown
+    this.visibleAndMandatoryFields = _.get(data, 'visibleAndMandatoryFields', {});
   }
 
   /**
-     * Permissions - IPermissionBasic
-     */
+   * Permissions - IPermissionBasic
+   */
   canView(user: UserModel): boolean { return OutbreakModel.canView(user); }
   canList(user: UserModel): boolean { return OutbreakModel.canList(user); }
   canCreate(user: UserModel): boolean { return OutbreakModel.canCreate(user); }
@@ -476,27 +482,27 @@ export class OutbreakModel
   canDelete(user: UserModel): boolean { return OutbreakModel.canDelete(user); }
 
   /**
-     * Permissions - IPermissionRestorable
-     */
+   * Permissions - IPermissionRestorable
+   */
   canRestore(user: UserModel): boolean { return OutbreakModel.canRestore(user); }
 
   /**
-     * Permissions - IPermissionOutbreak
-     */
+   * Permissions - IPermissionOutbreak
+   */
   canMakeOutbreakActive(user: UserModel): boolean { return OutbreakModel.canMakeOutbreakActive(user); }
   canSeeInconsistencies(user: UserModel): boolean { return OutbreakModel.canSeeInconsistencies(user); }
   canImportRelationship(user: UserModel): boolean { return OutbreakModel.canSeeInconsistencies(user); }
 
   /**
-     * Permissions - IPermissionQuestionnaire
-     */
+   * Permissions - IPermissionQuestionnaire
+   */
   canModifyCaseQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseQuestionnaire(user); }
   canModifyContactQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyContactQuestionnaire(user); }
   canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyContactFollowUpQuestionnaire(user); }
   canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseLabResultQuestionnaire(user); }
 
   /**
-     * Permissions - IPermissionCloneable
-     */
+   * Permissions - IPermissionCloneable
+   */
   canClone(user: UserModel): boolean { return OutbreakModel.canClone(user); }
 }

@@ -153,6 +153,8 @@ import { EntityContactHelperService } from './helper/entity-contact-helper.servi
 import { EntityEventHelperService } from './helper/entity-event-helper.service';
 import { EntityContactOfContactHelperService } from './helper/entity-contact-of-contact-helper.service';
 import { EntityLabResultHelperService } from './helper/entity-lab-result-helper.service';
+import { CreateViewModifyHelperService } from './helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from './helper/outbreak-and-outbreak-template-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -297,12 +299,8 @@ export const services: any[] = [
   PageChangeConfirmationGuard,
 
   // helper services
-  StorageService,
-  LoggerService,
-  ModelHelperService,
-  FormHelperService,
-  I18nService,
   CacheService,
+  CreateViewModifyHelperService,
   DialogV2Service,
   DomService,
   EntityCaseHelperService,
@@ -312,8 +310,14 @@ export const services: any[] = [
   EntityFollowUpHelperService,
   EntityLabResultHelperService,
   EntityHelperService,
+  FormHelperService,
+  I18nService,
   ListHelperService,
+  LoggerService,
+  ModelHelperService,
+  OutbreakAndOutbreakTemplateHelperService,
   RedirectService,
   ReferenceDataHelperService,
+  StorageService,
   ToastV2Service
 ];
