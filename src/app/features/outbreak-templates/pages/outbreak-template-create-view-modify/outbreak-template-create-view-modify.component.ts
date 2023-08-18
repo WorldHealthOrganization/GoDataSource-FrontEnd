@@ -209,6 +209,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         // Questionnaires
         this.initializeTabsQuestionnaireCase(),
         this.initializeTabsQuestionnaireContact(),
+        this.initializeTabsQuestionnaireEvent(),
         this.initializeTabsQuestionnaireFollowUp(),
         this.initializeTabsQuestionnaireLabResult()
       ],
@@ -729,6 +730,31 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   }
 
   /**
+   * Initialize tabs - Event Questionnaire
+   */
+  private initializeTabsQuestionnaireEvent(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'event_investigation_template',
+      label: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_EVENT_QUESTIONNAIRE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
+        name: 'eventInvestigationTemplate',
+        outbreak: this.itemData,
+        value: {
+          get: () => this.itemData.eventInvestigationTemplate,
+          set: (value) => {
+            this.itemData.eventInvestigationTemplate = value;
+          }
+        }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakTemplateModel.canModifyEventQuestionnaire(this.authUser)
+    };
+  }
+
+  /**
    * Initialize tabs - Follow Up Questionnaire
    */
   private initializeTabsQuestionnaireFollowUp(): ICreateViewModifyV2TabTable {
@@ -872,6 +898,12 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         data.contactInvestigationTemplate = (data.contactInvestigationTemplate || []).map((question) => new QuestionModel(question));
       }
 
+      // sanitize questionnaire - event
+      // - remove fields used by ui (e.g. collapsed...)
+      if (data.eventInvestigationTemplate) {
+        data.eventInvestigationTemplate = (data.eventInvestigationTemplate || []).map((question) => new QuestionModel(question));
+      }
+
       // sanitize questionnaire - follow-up
       // - remove fields used by ui (e.g. collapsed...)
       if (data.contactFollowUpTemplate) {
@@ -905,6 +937,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         if (
           !data.caseInvestigationTemplate &&
           !data.contactInvestigationTemplate &&
+          !data.eventInvestigationTemplate &&
           !data.contactFollowUpTemplate &&
           !data.labResultsTemplate
         ) {

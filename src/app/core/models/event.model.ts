@@ -23,6 +23,12 @@ import {
 } from './permission.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { IAnswerData, QuestionModel } from './question.model';
+import { I18nService } from '../services/helper/i18n.service';
+import {
+  IV2ColumnStatusFormType,
+  V2ColumnStatusForm
+} from '../../shared/components-v2/app-list-table-v2/models/column.model';
 
 export class EventModel
   extends BaseModel
@@ -47,6 +53,9 @@ export class EventModel
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
   endDate: string | Moment;
+  questionnaireAnswers: {
+    [variable: string]: IAnswerData[];
+  };
 
   numberOfContacts: number;
   numberOfExposures: number;
@@ -62,11 +71,16 @@ export class EventModel
   responsibleUserId: string;
   responsibleUser: UserModel;
 
+  // used by ui
+  alerted: boolean = false;
+
   /**
    * Advanced filters
    */
   static generateAdvancedFilters(data: {
     authUser: UserModel,
+    selectedOutbreak: () => OutbreakModel,
+    eventInvestigationTemplate: () => QuestionModel[],
     options: {
       user: ILabelValuePairModel[],
       eventCategory: ILabelValuePairModel[],
@@ -131,6 +145,13 @@ export class EventModel
         field: 'visualId',
         label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+        field: 'questionnaireAnswers',
+        label: 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        template: () => data.selectedOutbreak().eventInvestigationTemplate,
+        useLike: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
@@ -251,6 +272,36 @@ export class EventModel
   }
 
   /**
+   * Retrieve statuses forms
+   */
+  static getStatusForms(
+    info: {
+      // required
+      item: EventModel,
+      i18nService: I18nService
+    }
+  ): V2ColumnStatusForm[] {
+    // construct list of forms that we need to display
+    const forms: V2ColumnStatusForm[] = [];
+
+    // alerted
+    if (info.item.alerted) {
+      forms.push({
+        type: IV2ColumnStatusFormType.STAR,
+        color: 'var(--gd-danger)',
+        tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
+    }
+
+    // finished
+    return forms;
+  }
+
+  /**
    * Return event id mask with data replaced
    */
   static generateEventIDMask(eventIdMask: string): string {
@@ -352,6 +403,8 @@ export class EventModel
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
     this.outbreakId = _.get(data, 'outbreakId');
     this.endDate = _.get(data, 'endDate');
+
+    this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
 
     this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');

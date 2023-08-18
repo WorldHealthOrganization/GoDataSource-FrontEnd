@@ -20,7 +20,11 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { catchError, takeUntil } from 'rxjs/operators';
+import {
+  catchError,
+  map,
+  takeUntil
+} from 'rxjs/operators';
 import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
@@ -39,16 +43,23 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 
 @Component({
   selector: 'app-events-create-view-modify',
   templateUrl: './events-create-view-modify.component.html'
 })
 export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<EventModel> implements OnDestroy {
+  // constants
+  private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
+
   // event visual id mask
   private _eventVisualIDMask: {
     mask: string
   };
+
+  // hide/show question numbers
+  hideQuestionNumbers: boolean = false;
 
   /**
    * Constructor
@@ -73,6 +84,21 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       activatedRoute,
       authDataService
     );
+
+    // do we have tabs options already saved ?
+    const generalSettings: {
+      [key: string]: any
+    } = this.authDataService
+      .getAuthenticatedUser()
+      .getSettings(UserSettings.EVENT_GENERAL);
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
+      undefined;
+
+    // use the saved options
+    this.hideQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] : false;
   }
 
   /**
@@ -115,6 +141,14 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         data.queryBuilder
       )
       .pipe(
+        // determine alertness
+        map((events: EventModel[]) => {
+          return EntityModel.determineAlertness(
+            this.selectedOutbreak.eventInvestigationTemplate,
+            events
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
@@ -251,6 +285,9 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         // Details
         this.initializeTabsDetails(),
 
+        // Questionnaires
+        this.initializeTabsQuestionnaire(),
+
         // Contacts, exposures ...
         this.initializeTabsContacts(),
         this.initializeTabsExposures()
@@ -309,7 +346,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   protected initializeExpandListQueryFields(): void {
     this.expandListQueryFields = [
       'id',
-      'name'
+      'name',
+      'questionnaireAnswers'
     ];
   }
 
@@ -319,6 +357,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = EventModel.generateAdvancedFilters({
       authUser: this.authUser,
+      selectedOutbreak: () => this.selectedOutbreak,
+      eventInvestigationTemplate: () => this.selectedOutbreak.eventInvestigationTemplate,
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -837,6 +877,40 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     // finished
     return newTab;
   }
+
+  /**
+   * Initialize tabs - Questionnaire
+   */
+  private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+      label: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
+        name: 'questionnaireAnswers',
+        questionnaire: this.selectedOutbreak.eventInvestigationTemplate,
+        value: {
+          get: () => this.itemData.questionnaireAnswers,
+          set: (value) => {
+            this.itemData.questionnaireAnswers = value;
+          }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideQuestionNumbers;
+        },
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
+      },
+      visible: () => this.selectedOutbreak.eventInvestigationTemplate?.length > 0
+    };
+  }
+
 
   /**
    * Initialize buttons

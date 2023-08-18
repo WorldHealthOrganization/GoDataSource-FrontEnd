@@ -10,7 +10,10 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import {
+  EntityModel,
+  RelationshipModel
+} from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { EventModel } from '../../../../core/models/event.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
@@ -31,7 +34,11 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import {
+  IV2ColumnPinned,
+  IV2ColumnStatusFormType,
+  V2ColumnFormat, V2ColumnStatusForm
+} from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -67,7 +74,8 @@ export class EventsListComponent
     { label: 'LNG_EVENT_FIELD_LABEL_END_DATE', value: 'endDate' },
     { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY', value: 'eventCategory' },
-    { label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID', value: 'visualId' }
+    { label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
+    { label: 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' }
   ];
 
   // relationship fields
@@ -604,6 +612,34 @@ export class EventsListComponent
           defaultValue: ''
         },
         sortable: true
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' ',
+              order: undefined
+            }]
+          }
+        ],
+        forms: (_column, data: EventModel): V2ColumnStatusForm[] => EventModel.getStatusForms({
+          item: data,
+          i18nService: this.i18nService
+        })
       }
     ];
 
@@ -944,6 +980,8 @@ export class EventsListComponent
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = EventModel.generateAdvancedFilters({
       authUser: this.authUser,
+      selectedOutbreak: () => this.selectedOutbreak,
+      eventInvestigationTemplate: () => this.selectedOutbreak.eventInvestigationTemplate,
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1534,7 +1572,8 @@ export class EventsListComponent
                     },
                     dbColumns: true,
                     dbValues: true,
-                    jsonReplaceUndefinedWithNull: true
+                    jsonReplaceUndefinedWithNull: true,
+                    questionnaireVariables: true
                   }
                 }
               });
@@ -1683,6 +1722,7 @@ export class EventsListComponent
       'dateOfReporting',
       'isDateOfReportingApproximate',
       'responsibleUserId',
+      'questionnaireAnswers',
       'numberOfContacts',
       'numberOfExposures',
       'deleted',
@@ -1773,6 +1813,14 @@ export class EventsListComponent
         })
       )
       .pipe(
+        // process data
+        map((events: EventModel[]) => {
+          return EntityModel.determineAlertness<EventModel>(
+            this.selectedOutbreak.eventInvestigationTemplate,
+            events
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );

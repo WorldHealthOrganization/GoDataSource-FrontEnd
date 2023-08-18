@@ -395,7 +395,7 @@ export class EntityModel {
   /**
    * Determine alertness
    */
-  static determineAlertness<T extends CaseModel | ContactModel>(
+  static determineAlertness<T extends CaseModel | ContactModel | EventModel>(
     template: QuestionModel[],
     entities: T[]
   ): T[] {

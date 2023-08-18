@@ -445,6 +445,11 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
                         translateQuestionnaire(outbreakToClone.contactInvestigationTemplate);
                       }
 
+                      // translate questionnaire questions - Event Form
+                      if (!_.isEmpty(outbreakToClone.eventInvestigationTemplate)) {
+                        translateQuestionnaire(outbreakToClone.eventInvestigationTemplate);
+                      }
+
                       // translate questionnaire questions - Lab Results Form
                       if (!_.isEmpty(outbreakToClone.labResultsTemplate)) {
                         translateQuestionnaire(outbreakToClone.labResultsTemplate);
