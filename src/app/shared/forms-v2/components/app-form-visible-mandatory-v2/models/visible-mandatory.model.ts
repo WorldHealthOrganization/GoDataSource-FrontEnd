@@ -1,3 +1,5 @@
+import { CreateViewModifyV2TabInput } from '../../../../components-v2/app-create-view-modify-v2/models/tab.model';
+
 /**
  * Used by create/view/modify input to configure specific things for visible/mandatory
  */
@@ -26,6 +28,7 @@ export interface IVisibleMandatoryDataGroupTabSectionField {
   id: string;
   label: string;
   visibleMandatoryConf: ICreateViewModifyV2TabInputToVisibleMandatoryConf;
+  definition: CreateViewModifyV2TabInput;
 }
 
 /**

@@ -42,7 +42,8 @@ export class CreateViewModifyHelperService {
                 children.push({
                   id: input.name,
                   label: input.placeholder(),
-                  visibleMandatoryConf: input.visibleMandatoryConf
+                  visibleMandatoryConf: input.visibleMandatoryConf,
+                  definition: input
                 });
 
                 // finished
@@ -53,7 +54,8 @@ export class CreateViewModifyHelperService {
                 children.push({
                   id: 'ageDob',
                   label: `${this.i18nService.instant('LNG_ENTITY_FIELD_LABEL_AGE')} / ${this.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DOB')}`,
-                  visibleMandatoryConf: undefined
+                  visibleMandatoryConf: undefined,
+                  definition: input
                 });
 
                 // finished
@@ -64,7 +66,8 @@ export class CreateViewModifyHelperService {
                 children.push({
                   id: input.name,
                   label: section.label,
-                  visibleMandatoryConf: undefined
+                  visibleMandatoryConf: undefined,
+                  definition: input
                 });
 
                 // finished
@@ -82,7 +85,8 @@ export class CreateViewModifyHelperService {
                     children.push({
                       id: input.name,
                       label: section.label,
-                      visibleMandatoryConf: undefined
+                      visibleMandatoryConf: undefined,
+                      definition: input
                     });
 
                     // finished

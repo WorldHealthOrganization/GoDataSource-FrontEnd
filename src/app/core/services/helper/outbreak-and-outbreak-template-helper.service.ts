@@ -17,6 +17,7 @@ import { EntityLabResultHelperService } from './entity-lab-result-helper.service
 import { EntityHelperService } from './entity-helper.service';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
+import { ICreateViewModifyV2TabInputValidatorRequired } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 
 @Injectable({
   providedIn: 'root'
@@ -241,7 +242,44 @@ export class OutbreakAndOutbreakTemplateHelperService {
   /**
    * Merge missing visible / mandatory fields
    */
-  mergeDefaultVisibleMandatoryFields(_item: OutbreakModel | OutbreakTemplateModel): void {
-    // console.log(item);
+  mergeDefaultVisibleMandatoryFields(item: OutbreakModel | OutbreakTemplateModel): void {
+    // nothing to do ?
+    if (!item) {
+      return;
+    }
+
+    // nothing initialized ?
+    if (!item.visibleAndMandatoryFields) {
+      item.visibleAndMandatoryFields = {};
+    }
+
+    // determine groups and fields that we need to initialize
+    const options: IVisibleMandatoryDataGroup[] = this.generateVisibleMandatoryOptions();
+    options.forEach((group) => {
+      // this group exists already ?
+      if (
+        item.visibleAndMandatoryFields[group.id] &&
+        Object.keys(item.visibleAndMandatoryFields[group.id]).length > 0
+      ) {
+        return;
+      }
+
+      // add default fields
+      item.visibleAndMandatoryFields[group.id] = {};
+
+      // go through fields
+      group.children.forEach((tab) => {
+        tab.children.forEach((section) => {
+          section.children.forEach((field) => {
+            item.visibleAndMandatoryFields[group.id][field.id] = {
+              visible: true,
+              mandatory: (field.definition as ICreateViewModifyV2TabInputValidatorRequired).validators?.required ?
+                (field.definition as ICreateViewModifyV2TabInputValidatorRequired).validators.required() :
+                false
+            };
+          });
+        });
+      });
+    });
   }
 }

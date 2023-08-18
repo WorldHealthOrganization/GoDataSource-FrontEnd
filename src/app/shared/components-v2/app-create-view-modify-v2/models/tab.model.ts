@@ -133,6 +133,16 @@ interface ICreateViewModifyV2TabInputValue<T> {
 }
 
 /**
+ * Required validator
+ */
+export interface ICreateViewModifyV2TabInputValidatorRequired {
+  // optional
+  validators?: {
+    required?: () => boolean
+  };
+}
+
+/**
  * Input - base
  */
 interface ICreateViewModifyV2TabInputBase {
@@ -160,7 +170,7 @@ interface ICreateViewModifyV2TabInputBase {
 /**
  * Input - text
  */
-interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.TEXT;
   value: ICreateViewModifyV2TabInputValue<string>;
@@ -204,7 +214,7 @@ interface ICreateViewModifyV2TabInputColor extends Omit<ICreateViewModifyV2TabIn
 /**
  * Input - email
  */
-interface ICreateViewModifyV2TabInputEmail extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputEmail extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.EMAIL;
   value: ICreateViewModifyV2TabInputValue<string>;
@@ -217,7 +227,7 @@ interface ICreateViewModifyV2TabInputEmail extends Omit<ICreateViewModifyV2TabIn
 /**
  * Input - async validator text
  */
-interface ICreateViewModifyV2TabInputAsyncValidatorText extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputAsyncValidatorText extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT;
   value: ICreateViewModifyV2TabInputValue<string>;
@@ -236,7 +246,7 @@ interface ICreateViewModifyV2TabInputAsyncValidatorText extends Omit<ICreateView
 /**
  * Input - password
  */
-interface ICreateViewModifyV2TabInputPassword extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputPassword extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.PASSWORD;
   value: ICreateViewModifyV2TabInputValue<string>;
@@ -257,7 +267,7 @@ interface ICreateViewModifyV2TabInputPassword extends Omit<ICreateViewModifyV2Ta
 /**
  * Input - select single
  */
-export interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+export interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.SELECT_SINGLE;
   options: ILabelValuePairModel[];
@@ -279,7 +289,7 @@ export interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateVie
 /**
  * Input - select multiple
  */
-interface ICreateViewModifyV2TabInputMultipleSelect extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputMultipleSelect extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.SELECT_MULTIPLE;
   options: ILabelValuePairModel[];
@@ -320,7 +330,7 @@ interface ICreateViewModifyV2TabInputLocationSingle extends Omit<ICreateViewModi
 /**
  * Input - location multiple
  */
-interface ICreateViewModifyV2TabInputLocationMultiple extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputLocationMultiple extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.LOCATION_MULTIPLE;
   value: ICreateViewModifyV2TabInputValue<string[]>;
@@ -347,7 +357,7 @@ interface ICreateViewModifyV2TabInputTextArea extends Omit<ICreateViewModifyV2Ta
 /**
  * Input - number
  */
-interface ICreateViewModifyV2TabInputNumber extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputNumber extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.NUMBER;
   value: ICreateViewModifyV2TabInputValue<number>;
@@ -361,7 +371,7 @@ interface ICreateViewModifyV2TabInputNumber extends Omit<ICreateViewModifyV2TabI
 /**
  * Input - select group
  */
-interface ICreateViewModifyV2TabInputSelectGroups extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputSelectGroups extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.SELECT_GROUPS;
   value: ICreateViewModifyV2TabInputValue<string[]>;
@@ -428,7 +438,7 @@ interface ICreateViewModifyV2TabInputAgeOrDOB extends Omit<ICreateViewModifyV2Ta
 /**
  * Input - date
  */
-interface ICreateViewModifyV2TabInputDate extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputDate extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.DATE;
   value: ICreateViewModifyV2TabInputValue<string | Moment>;
@@ -527,7 +537,7 @@ interface ICreateViewModifyV2TabInputDocument {
 /**
  * Input - address
  */
-interface ICreateViewModifyV2TabInputAddress {
+interface ICreateViewModifyV2TabInputAddress extends ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.ADDRESS;
   typeOptions: ILabelValuePairModel[];
