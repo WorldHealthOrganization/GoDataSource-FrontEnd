@@ -52,9 +52,7 @@ export class EntityLabResultHelperService {
    */
   generateTabsDetails(data: {
     isCreate: boolean,
-    // isModify: boolean,
     itemData: LabResultModel,
-    // entityData: ContactOfContactModel | ContactModel | CaseModel,
     options: {
       labName: ILabelValuePairModel[],
       labSampleType: ILabelValuePairModel[],
