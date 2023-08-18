@@ -12,7 +12,13 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import {
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2Buttons,
+  ICreateViewModifyV2CreateOrUpdate,
+  ICreateViewModifyV2Tab,
+  ICreateViewModifyV2TabTable
+} from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -36,10 +42,12 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     responsibleUserId: ILabelValuePairModel[],
     eventCategory: ILabelValuePairModel[],
     endDate: ILabelValuePairModel[],
-    description: ILabelValuePairModel[]
-    addresses: ILabelValuePairModel[]
+    description: ILabelValuePairModel[],
+    addresses: ILabelValuePairModel[],
+    questionnaireAnswers: ILabelValuePairModel[]
   };
   private _addressID: string;
+  private _selectedQuestionnaireAnswers: number;
 
   /**
    * Constructor
@@ -150,7 +158,14 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
                 mergeRecords,
                 'description'
               ).options,
-              addresses: []
+              addresses: [],
+              questionnaireAnswers: mergeRecords
+                .filter((item) => (item.model as EventModel).questionnaireAnswers && Object.keys((item.model as EventModel).questionnaireAnswers).length > 0)
+                .map((item, index) => ({
+                  label: `${ this.i18nService.instant('LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
+                  value: index,
+                  data: (item.model as EventModel).questionnaireAnswers
+                }))
             };
 
             // go through records and determine data
@@ -217,6 +232,17 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             data.address = this._addressID !== undefined ?
               this._uniqueOptions.addresses.find((addressItem) => addressItem.value === this._addressID).data :
               undefined;
+
+            // select questionnaire answers
+            this._selectedQuestionnaireAnswers = this._uniqueOptions.questionnaireAnswers.length === 1 ?
+              this._uniqueOptions.questionnaireAnswers[0].value :
+              this._selectedQuestionnaireAnswers;
+            if (
+              this._selectedQuestionnaireAnswers ||
+              this._selectedQuestionnaireAnswers === 0
+            ) {
+              data.questionnaireAnswers = this._uniqueOptions.questionnaireAnswers[this._selectedQuestionnaireAnswers].data;
+            }
 
             // finish
             subscriber.next(data);
@@ -329,7 +355,13 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       // tabs
       tabs: [
         // Personal
-        this.initializeTabsDetails()
+        this.initializeTabsDetails(),
+
+        // Epidemiology
+        this.initializeTabsEpidemiology(),
+
+        // Questionnaires
+        this.initializeTabsQuestionnaire()
       ],
 
       // create details
@@ -366,6 +398,75 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
    * Refresh expand list
    */
   refreshExpandList(_data): void {}
+
+  /**
+   * Initialize tab - Epidemiology
+   */
+  private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      name: 'infection',
+      label: 'LNG_PAGE_CREATE_EVENT_TAB_INFECTION_TITLE',
+      sections: [
+        // Questionnaires
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE',
+          inputs: [
+            // answers
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: '_selectedQuestionnaireAnswers',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+              options: this._uniqueOptions.questionnaireAnswers,
+              value: {
+                get: () => this._selectedQuestionnaireAnswers as any,
+                set: (value) => {
+                  // set data
+                  this._selectedQuestionnaireAnswers = value as any;
+
+                  // hack to force re-render without throwing errors because some bindings are missing
+                  this.itemData.questionnaireAnswers = {};
+                  setTimeout(() => {
+                    this.itemData.questionnaireAnswers = this._selectedQuestionnaireAnswers || this._selectedQuestionnaireAnswers === 0 ?
+                      this._uniqueOptions.questionnaireAnswers[this._selectedQuestionnaireAnswers].data :
+                      null;
+                  });
+                }
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialize tab - Questionnaire
+   */
+  private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'questionnaire',
+      label: 'LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
+        name: 'questionnaireAnswers',
+        questionnaire: this.selectedOutbreak.eventInvestigationTemplate,
+        disableValidation: true,
+        value: {
+          get: () => this.itemData.questionnaireAnswers,
+          set: undefined
+        },
+        updateErrors: () => {}
+      },
+      invalidHTMLSuffix: () => '',
+      visible: () => this.selectedOutbreak.eventInvestigationTemplate?.length > 0 &&
+        this.itemData.questionnaireAnswers &&
+        Object.keys(this.itemData.questionnaireAnswers).length > 0
+    };
+  }
+
 
   /**
  * Initialize buttons
@@ -415,6 +516,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     ) => {
       // cleanup
       delete data.addresses;
+      delete data._selectedQuestionnaireAnswers;
 
       // finished
       this.outbreakDataService
