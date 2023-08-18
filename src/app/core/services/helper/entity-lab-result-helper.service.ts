@@ -23,6 +23,8 @@ import { IBasicCount } from '../../models/basic-count.interface';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
 import { I18nService } from './i18n.service';
 import { AuthDataService } from '../data/auth.data.service';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { Constants } from '../../models/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -43,6 +45,334 @@ export class EntityLabResultHelperService {
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
+  }
+
+  /**
+   * Generate tab - Details
+   */
+  generateTabsDetails(data: {
+    isCreate: boolean,
+    // isModify: boolean,
+    itemData: LabResultModel,
+    // entityData: ContactOfContactModel | ContactModel | CaseModel,
+    options: {
+      labName: ILabelValuePairModel[],
+      labSampleType: ILabelValuePairModel[],
+      labTestType: ILabelValuePairModel[],
+      labTestResult: ILabelValuePairModel[],
+      labResultProgress: ILabelValuePairModel[],
+      labSequenceLaboratory: ILabelValuePairModel[],
+      labSequenceResult: ILabelValuePairModel[]
+    }
+  }): ICreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
+      label: data.isCreate ? 'LNG_PAGE_CREATE_LAB_RESULT_TAB_DETAILS' : 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE',
+      sections: [
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: data.isCreate ? 'LNG_PAGE_CREATE_LAB_RESULT_TAB_DETAILS' : 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'sampleIdentifier',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID_DESCRIPTION',
+              value: {
+                get: () => data.itemData.sampleIdentifier,
+                set: (value) => {
+                  // set data
+                  data.itemData.sampleIdentifier = value;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'dateSampleTaken',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN_DESCRIPTION',
+              value: {
+                get: () => data.itemData.dateSampleTaken,
+                set: (value) => {
+                  data.itemData.dateSampleTaken = value;
+                }
+              },
+              validators: {
+                required: () => true,
+                dateSameOrBefore: () => [
+                  'dateSampleDelivered',
+                  'dateTesting',
+                  'dateOfResult'
+                ]
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'dateSampleDelivered',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED_DESCRIPTION',
+              value: {
+                get: () => data.itemData.dateSampleDelivered,
+                set: (value) => {
+                  data.itemData.dateSampleDelivered = value;
+                }
+              },
+              validators: {
+                dateSameOrBefore: () => [
+                  'dateTesting',
+                  'dateOfResult'
+                ],
+                dateSameOrAfter: () => [
+                  'dateSampleTaken'
+                ]
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'dateTesting',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING_DESCRIPTION',
+              value: {
+                get: () => data.itemData.dateTesting,
+                set: (value) => {
+                  data.itemData.dateTesting = value;
+                }
+              },
+              validators: {
+                dateSameOrBefore: () => [
+                  'dateOfResult'
+                ],
+                dateSameOrAfter: () => [
+                  'dateSampleDelivered',
+                  'dateSampleTaken'
+                ]
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'dateOfResult',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT_DESCRIPTION',
+              value: {
+                get: () => data.itemData.dateOfResult,
+                set: (value) => {
+                  data.itemData.dateOfResult = value;
+                }
+              },
+              validators: {
+                dateSameOrAfter: () => [
+                  'dateTesting',
+                  'dateSampleDelivered',
+                  'dateSampleTaken'
+                ]
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'labName',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME_DESCRIPTION',
+              options: data.options.labName,
+              value: {
+                get: () => data.itemData.labName,
+                set: (value) => {
+                  data.itemData.labName = value;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'sampleType',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE_DESCRIPTION',
+              options: data.options.labSampleType,
+              value: {
+                get: () => data.itemData.sampleType,
+                set: (value) => {
+                  data.itemData.sampleType = value;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'testType',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE_DESCRIPTION',
+              options: data.options.labTestType,
+              value: {
+                get: () => data.itemData.testType,
+                set: (value) => {
+                  data.itemData.testType = value;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'result',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION',
+              options: data.options.labTestResult,
+              value: {
+                get: () => data.itemData.result,
+                set: (value) => {
+                  data.itemData.result = value;
+                }
+              },
+              validators: {
+                required: () => data.itemData.status === Constants.LAB_TEST_RESULT_STATUS.COMPLETED
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'testedFor',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR_DESCRIPTION',
+              value: {
+                get: () => data.itemData.testedFor,
+                set: (value) => {
+                  // set data
+                  data.itemData.testedFor = value;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'status',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_STATUS_DESCRIPTION',
+              options: data.options.labResultProgress,
+              value: {
+                get: () => data.itemData.status,
+                set: (value) => {
+                  data.itemData.status = value;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'quantitativeResult',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT_DESCRIPTION',
+              value: {
+                get: () => data.itemData.quantitativeResult,
+                set: (value) => {
+                  data.itemData.quantitativeResult = value;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'notes',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_NOTES_DESCRIPTION',
+              value: {
+                get: () => data.itemData.notes,
+                set: (value) => {
+                  data.itemData.notes = value;
+                }
+              }
+            }
+          ]
+        },
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'sequence[hasSequence]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE_DESCRIPTION',
+              value: {
+                get: () => data.itemData.sequence.hasSequence,
+                set: (value) => {
+                  // set value
+                  data.itemData.sequence.hasSequence = value;
+
+                  // reset data
+                  if (data.itemData.sequence.hasSequence) {
+                    data.itemData.sequence.noSequenceReason = undefined;
+                  } else {
+                    data.itemData.sequence.dateSampleSent = undefined;
+                    data.itemData.sequence.labId = undefined;
+                    data.itemData.sequence.dateResult = undefined;
+                    data.itemData.sequence.resultId = undefined;
+                  }
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'sequence[dateSampleSent]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT_DESCRIPTION',
+              value: {
+                get: () => data.itemData.sequence.dateSampleSent,
+                set: (value) => {
+                  data.itemData.sequence.dateSampleSent = value;
+                }
+              },
+              disabled: () => !data.itemData.sequence.hasSequence
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'sequence[labId]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB_DESCRIPTION',
+              options: data.options.labSequenceLaboratory,
+              value: {
+                get: () => data.itemData.sequence.labId,
+                set: (value) => {
+                  data.itemData.sequence.labId = value;
+                }
+              },
+              disabled: () => !data.itemData.sequence.hasSequence
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'sequence[dateResult]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT_DESCRIPTION',
+              value: {
+                get: () => data.itemData.sequence.dateResult,
+                set: (value) => {
+                  data.itemData.sequence.dateResult = value;
+                }
+              },
+              disabled: () => !data.itemData.sequence.hasSequence
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'sequence[resultId]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT_DESCRIPTION',
+              options: data.options.labSequenceResult,
+              value: {
+                get: () => data.itemData.sequence.resultId,
+                set: (value) => {
+                  data.itemData.sequence.resultId = value;
+                }
+              },
+              disabled: () => !data.itemData.sequence.hasSequence
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'sequence[noSequenceReason]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON_DESCRIPTION',
+              value: {
+                get: () => data.itemData.sequence.noSequenceReason,
+                set: (value) => {
+                  data.itemData.sequence.noSequenceReason = value;
+                }
+              },
+              disabled: () => data.itemData.sequence.hasSequence
+            }
+          ]
+        }
+      ]
+    };
   }
 
   /**
