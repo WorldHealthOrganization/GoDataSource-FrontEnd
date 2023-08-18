@@ -13,6 +13,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { EventModel } from '../../../../core/models/event.model';
+import { QuestionModel } from '../../../../core/models/question.model';
 
 @Component({
   selector: 'app-import-event-data',
@@ -55,6 +56,8 @@ export class ImportEventDataComponent implements OnInit, OnDestroy {
   };
 
   requiredDestinationFields;
+
+  formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
   selectedOutbreak: OutbreakModel;
 
