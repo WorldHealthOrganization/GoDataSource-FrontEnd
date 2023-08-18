@@ -42,6 +42,9 @@ enum SentFromColumn {
 
 @Injectable()
 export class EntityHelperService {
+  // data
+  private _authUser: UserModel;
+
   // entities map
   readonly entityMap: {
     [entityType: string]: {
@@ -162,12 +165,15 @@ export class EntityHelperService {
    * Constructor
    */
   constructor(
+    private authDataService: AuthDataService,
     private dialogV2Service: DialogV2Service,
     private relationshipDataService: RelationshipDataService,
     private i18nService: I18nService,
-    private toastV2Service: ToastV2Service,
-    private authDataService: AuthDataService
-  ) {}
+    private toastV2Service: ToastV2Service
+  ) {
+    // get the authenticated user
+    this._authUser = this.authDataService.getAuthenticatedUser();
+  }
 
   /**
    * Entity dialog
@@ -211,9 +217,6 @@ export class EntityHelperService {
               })
             )
             .subscribe((data) => {
-              // get the authenticated user
-              const authUser = this.authDataService.getAuthenticatedUser();
-
               // construct list of inputs to display
               const entitiesList: IV2SideDialogConfigInputAccordion = {
                 type: V2SideDialogConfigInputType.ACCORDION,
@@ -248,7 +251,7 @@ export class EntityHelperService {
                     relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
                     selectedOutbreak?.isContactsOfContactsActive
                   ) &&
-                    relationshipData.model.canView(authUser) &&
+                    relationshipData.model.canView(this._authUser) &&
                     !relationshipData.model.deleted
                 }, {
                   type: V2SideDialogConfigInputType.DIVIDER
@@ -288,12 +291,12 @@ export class EntityHelperService {
                   link: () => [
                     `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${relationshipData.relationship.id}/view`
                   ],
-                  visible: () => RelationshipModel.canView(authUser) &&
+                  visible: () => RelationshipModel.canView(this._authUser) &&
                     (
                       relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
                       selectedOutbreak?.isContactsOfContactsActive
                     ) &&
-                    relationshipData.model.canView(authUser) &&
+                    relationshipData.model.canView(this._authUser) &&
                     !relationshipData.model.deleted
                 }, {
                   type: V2SideDialogConfigInputType.DIVIDER
@@ -706,7 +709,6 @@ export class EntityHelperService {
     selectedOutbreak: () => OutbreakModel,
     entity: CaseModel | ContactModel | EventModel | ContactOfContactModel,
     relationshipType: RelationshipType,
-    authUser: UserModel,
     refreshList: () => void
   }): IV2ColumnAction {
     return {
@@ -726,8 +728,8 @@ export class EntityHelperService {
           },
           visible: (item: EntityModel): boolean => {
             return !item.relationship.deleted &&
-              RelationshipModel.canView(definitions.authUser) &&
-              this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].view(definitions.authUser);
+              RelationshipModel.canView(this._authUser) &&
+              this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].view(this._authUser);
           }
         },
 
@@ -744,8 +746,8 @@ export class EntityHelperService {
           visible: (item: EntityModel): boolean => {
             return !item.relationship.deleted &&
               definitions.selectedOutbreakIsActive() &&
-              RelationshipModel.canModify(definitions.authUser) &&
-              this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].modify(definitions.authUser);
+              RelationshipModel.canModify(this._authUser) &&
+              this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].modify(this._authUser);
           }
         },
 
@@ -824,7 +826,7 @@ export class EntityHelperService {
               visible: (item: CaseModel): boolean => {
                 return !item.deleted &&
                   definitions.selectedOutbreakIsActive() &&
-                  CaseModel.canDelete(definitions.authUser);
+                  CaseModel.canDelete(this._authUser);
               }
             }
           ]
@@ -837,7 +839,6 @@ export class EntityHelperService {
    * Retrieve table columns
    */
   retrieveTableColumns(definitions: {
-    authUser: UserModel,
     personType: IResolverV2ResponseModel<ReferenceDataEntryModel>,
     cluster: IResolverV2ResponseModel<ClusterModel>,
     options: {
@@ -864,7 +865,7 @@ export class EntityHelperService {
           textType: V2FilterTextType.STARTS_WITH
         },
         link: (data) => {
-          return data.model && data.model.canView(definitions.authUser) && !data.model.deleted ?
+          return data.model && data.model.canView(this._authUser) && !data.model.deleted ?
             `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
             undefined;
         }
@@ -882,7 +883,7 @@ export class EntityHelperService {
           textType: V2FilterTextType.STARTS_WITH
         },
         link: (data) => {
-          return data.model && data.model.canView(definitions.authUser) && !data.model.deleted ?
+          return data.model && data.model.canView(this._authUser) && !data.model.deleted ?
             `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
             undefined;
         }
@@ -900,7 +901,7 @@ export class EntityHelperService {
           textType: V2FilterTextType.STARTS_WITH
         },
         link: (data) => {
-          return data.model && data.model.canView(definitions.authUser) && !data.model.deleted ?
+          return data.model && data.model.canView(this._authUser) && !data.model.deleted ?
             `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
             undefined;
         }
@@ -1095,7 +1096,7 @@ export class EntityHelperService {
     ];
 
     // by cluster
-    if (ClusterModel.canList(definitions.authUser)) {
+    if (ClusterModel.canList(this._authUser)) {
       tableColumns.push({
         field: 'clusterId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
@@ -1128,7 +1129,7 @@ export class EntityHelperService {
           childQueryBuilderKey: 'relationship'
         },
         exclude: (): boolean => {
-          return !UserModel.canView(definitions.authUser);
+          return !UserModel.canView(this._authUser);
         },
         link: (data) => {
           return data.relationship?.createdBy ?
@@ -1161,7 +1162,7 @@ export class EntityHelperService {
           childQueryBuilderKey: 'relationship'
         },
         exclude: (): boolean => {
-          return !UserModel.canView(definitions.authUser);
+          return !UserModel.canView(this._authUser);
         },
         link: (data) => {
           return data.relationship?.updatedBy ?

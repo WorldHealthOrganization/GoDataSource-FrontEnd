@@ -641,7 +641,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
           relationshipType: RelationshipType.CONTACT,
-          authUser: this.authUser,
           refreshList: () => {
             // reload data
             const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
@@ -649,7 +648,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
         }),
         tableColumns: this.entityHelperService.retrieveTableColumns({
-          authUser: this.authUser,
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
@@ -796,7 +794,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
           relationshipType: RelationshipType.EXPOSURE,
-          authUser: this.authUser,
           refreshList: () => {
             // reload data
             const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
@@ -804,7 +801,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
         }),
         tableColumns: this.entityHelperService.retrieveTableColumns({
-          authUser: this.authUser,
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
