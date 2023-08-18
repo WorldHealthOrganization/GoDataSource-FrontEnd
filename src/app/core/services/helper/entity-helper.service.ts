@@ -11,7 +11,7 @@ import { EntityType } from '../../models/entity-type';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { RelationshipDataService } from '../data/relationship.data.service';
 import * as _ from 'lodash';
-import { moment } from '../../helperClasses/x-moment';
+import { Moment, moment } from '../../helperClasses/x-moment';
 import { Constants } from '../../models/constants';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { I18nService } from './i18n.service';
@@ -31,6 +31,8 @@ import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/componen
 import { v4 as uuid } from 'uuid';
 import { catchError } from 'rxjs/operators';
 import { AuthDataService } from '../data/auth.data.service';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { IAppFormIconButtonV2 } from '../../../shared/forms-v2/core/app-form-icon-button-v2';
 
 /**
  * From ?
@@ -173,6 +175,210 @@ export class EntityHelperService {
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
+  }
+
+  /**
+   * Generate tab - Details
+   */
+  generateTabsDetails(data: {
+    entityId: string,
+    title: string,
+    name: (property: string) => string
+    itemData: RelationshipModel,
+    createCopySuffixButtons: (prop: string) => IAppFormIconButtonV2[],
+    checkForLastContactBeforeCaseOnSet: (
+      entities: {
+        [id: string]: string
+      },
+      contactDate: Moment | string
+    ) => void
+    options: {
+      certaintyLevel: ILabelValuePairModel[],
+      exposureType: ILabelValuePairModel[],
+      exposureFrequency: ILabelValuePairModel[],
+      exposureDuration: ILabelValuePairModel[],
+      contextOfTransmission: ILabelValuePairModel[],
+      cluster: ILabelValuePairModel[]
+    }
+  }): ICreateViewModifyV2Tab {
+    // today
+    const today: Moment = moment();
+
+    // finished
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      name: data.title,
+      label: data.title,
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: data.title,
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: data.name('dateOfFirstContact'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION',
+            value: {
+              get: () => data.itemData.dateOfFirstContact,
+              set: (value) => {
+                data.itemData.dateOfFirstContact = value;
+              }
+            },
+            maxDate: today,
+            validators: {
+              dateSameOrBefore: () => [
+                today
+              ]
+            },
+            suffixIconButtons: data.createCopySuffixButtons('dateOfFirstContact')
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: data.name('contactDate'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
+            value: {
+              get: () => data.itemData.contactDate,
+              set: (value) => {
+                data.itemData.contactDate = value;
+
+                // validate against date of onset
+                data.checkForLastContactBeforeCaseOnSet(
+                  { [data.entityId]: data.title },
+                  data.itemData.contactDate
+                );
+              }
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            },
+            suffixIconButtons: data.createCopySuffixButtons('contactDate')
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: data.name('contactDateEstimated'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
+            value: {
+              get: () => data.itemData.contactDateEstimated,
+              set: (value) => {
+                // set data
+                data.itemData.contactDateEstimated = value;
+              }
+            },
+            suffixIconButtons: data.createCopySuffixButtons('contactDateEstimated')
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: data.name('certaintyLevelId'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
+            options: data.options.certaintyLevel,
+            value: {
+              get: () => data.itemData.certaintyLevelId,
+              set: (value) => {
+                data.itemData.certaintyLevelId = value;
+              }
+            },
+            validators: {
+              required: () => true
+            },
+            suffixIconButtons: data.createCopySuffixButtons('certaintyLevelId')
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: data.name('exposureTypeId'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
+            options: data.options.exposureType,
+            value: {
+              get: () => data.itemData.exposureTypeId,
+              set: (value) => {
+                data.itemData.exposureTypeId = value;
+              }
+            },
+            suffixIconButtons: data.createCopySuffixButtons('exposureTypeId')
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: data.name('exposureFrequencyId'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
+            options: data.options.exposureFrequency,
+            value: {
+              get: () => data.itemData.exposureFrequencyId,
+              set: (value) => {
+                data.itemData.exposureFrequencyId = value;
+              }
+            },
+            suffixIconButtons: data.createCopySuffixButtons('exposureFrequencyId')
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: data.name('exposureDurationId'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
+            options: data.options.exposureDuration,
+            value: {
+              get: () => data.itemData.exposureDurationId,
+              set: (value) => {
+                data.itemData.exposureDurationId = value;
+              }
+            },
+            suffixIconButtons: data.createCopySuffixButtons('exposureDurationId')
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: data.name('socialRelationshipTypeId'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
+            options: data.options.contextOfTransmission,
+            value: {
+              get: () => data.itemData.socialRelationshipTypeId,
+              set: (value) => {
+                data.itemData.socialRelationshipTypeId = value;
+              }
+            },
+            suffixIconButtons: data.createCopySuffixButtons('socialRelationshipTypeId')
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: data.name('clusterId'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
+            options: data.options.cluster,
+            value: {
+              get: () => data.itemData.clusterId,
+              set: (value) => {
+                data.itemData.clusterId = value;
+              }
+            },
+            suffixIconButtons: data.createCopySuffixButtons('clusterId')
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXT,
+            name: data.name('socialRelationshipDetail'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
+            value: {
+              get: () => data.itemData.socialRelationshipDetail,
+              set: (value) => {
+                data.itemData.socialRelationshipDetail = value;
+              }
+            },
+            suffixIconButtons: data.createCopySuffixButtons('socialRelationshipDetail')
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXTAREA,
+            name: data.name('comment'),
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
+            value: {
+              get: () => data.itemData.comment,
+              set: (value) => {
+                data.itemData.comment = value;
+              }
+            },
+            suffixIconButtons: data.createCopySuffixButtons('comment')
+          }]
+        }
+      ]
+    };
   }
 
   /**

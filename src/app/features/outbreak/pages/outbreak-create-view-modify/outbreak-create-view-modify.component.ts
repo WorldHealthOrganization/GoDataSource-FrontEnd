@@ -51,6 +51,10 @@ import { EntityContactOfContactHelperService } from '../../../../core/services/h
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 
 /**
  * Component
@@ -86,6 +90,8 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     private entityContactHelperService: EntityContactHelperService,
     private entityContactOfContactHelperService: EntityContactOfContactHelperService,
     private entityFollowUpHelperService: EntityFollowUpHelperService,
+    private entityLabResultHelperService: EntityLabResultHelperService,
+    private entityHelperService: EntityHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -992,6 +998,13 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY,
         name: 'visibleAndMandatoryFields',
+        value: {
+          // #TODO
+          get: () => undefined,
+          set: (_value) => {
+            // this.itemData.allowedRefDataItems = value;
+          }
+        },
         options: [
           // cases
           {
@@ -1151,14 +1164,57 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                 })
               ]
             )
+          },
+
+          // lab results
+          {
+            id: 'lab-results',
+            label: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+            children: this.tabsToGroupTabs(
+              this.i18nService, [
+                this.entityLabResultHelperService.generateTabsDetails({
+                  isCreate: true,
+                  itemData: new LabResultModel(),
+                  options: {
+                    labName: [],
+                    labSampleType: [],
+                    labTestType: [],
+                    labTestResult: [],
+                    labResultProgress: [],
+                    labSequenceLaboratory: [],
+                    labSequenceResult: []
+                  }
+                })
+              ]
+            )
+          },
+
+          // relationships
+          {
+            id: 'relationships',
+            label: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
+            children: this.tabsToGroupTabs(
+              this.i18nService, [
+                this.entityHelperService.generateTabsDetails({
+                  entityId: 'LNG_COMMON_MODEL_FIELD_LABEL_ID',
+                  title: 'LNG_COMMON_LABEL_DETAILS',
+                  name: (property) => property,
+                  itemData: new RelationshipModel(),
+                  createCopySuffixButtons: () => [],
+                  checkForLastContactBeforeCaseOnSet: () => {},
+                  options: {
+                    certaintyLevel: [],
+                    exposureType: [],
+                    exposureFrequency: [],
+                    exposureDuration: [],
+                    contextOfTransmission: [],
+                    cluster: []
+                  }
+                })
+              ]
+            )
           }
-        ],
-        value: {
-          get: () => undefined,
-          set: (_value) => {
-            // this.itemData.allowedRefDataItems = value;
-          }
-        }
+        ]
       }
     };
   }
