@@ -31,6 +31,7 @@ import { Constants } from '../../models/constants';
 })
 export class EntityLabResultHelperService {
   // data
+  public readonly visibleMandatoryKey: string = 'lab-results';
   private _authUser: UserModel;
 
   /**

@@ -45,6 +45,7 @@ enum SentFromColumn {
 @Injectable()
 export class EntityHelperService {
   // data
+  public readonly visibleMandatoryKey: string = 'relationships';
   private _authUser: UserModel;
 
   // entities map

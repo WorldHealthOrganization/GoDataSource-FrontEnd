@@ -9,14 +9,19 @@ export interface ICreateViewModifyV2TabInputToVisibleMandatoryConf {
 }
 
 /**
+ * Visible / Mandatory accepted value format - field
+ */
+export interface IVisibleMandatoryDataValueField {
+  visible?: boolean;
+  mandatory?: boolean;
+}
+
+/**
  * Visible / Mandatory accepted value format
  */
 export interface IVisibleMandatoryDataValue {
   [groupId: string]: {
-    [fieldId: string]: {
-      visible?: boolean,
-      mandatory?: boolean
-    }
+    [fieldId: string]: IVisibleMandatoryDataValueField
   };
 }
 

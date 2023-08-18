@@ -36,6 +36,7 @@ import { EntityType } from '../../models/entity-type';
 })
 export class EntityContactHelperService {
   // data
+  public readonly visibleMandatoryKey: string = 'contacts';
   private _authUser: UserModel;
 
   /**

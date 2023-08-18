@@ -30,6 +30,7 @@ import { ContactsOfContactsDataService } from '../data/contacts-of-contacts.data
 })
 export class EntityContactOfContactHelperService {
   // data
+  public readonly visibleMandatoryKey: string = 'contacts-of-contacts';
   private _authUser: UserModel;
 
   /**

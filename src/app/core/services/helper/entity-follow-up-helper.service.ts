@@ -39,6 +39,7 @@ import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../..
 })
 export class EntityFollowUpHelperService {
   // data
+  public readonly visibleMandatoryKey: string = 'follow-ups';
   private _authUser: UserModel;
 
   /**

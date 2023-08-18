@@ -44,7 +44,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
     return [
       // cases
       {
-        id: 'cases',
+        id: this.entityCaseHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_CASES_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
           this.entityCaseHelperService.generateTabsPersonal({
@@ -84,7 +84,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
 
       // events
       {
-        id: 'events',
+        id: this.entityEventHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_EVENTS_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
           this.entityEventHelperService.generateTabsDetails({
@@ -103,7 +103,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
 
       // contacts
       {
-        id: 'contacts',
+        id: this.entityContactHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
           this.entityContactHelperService.generateTabsPersonal({
@@ -140,7 +140,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
 
       // contact of contacts
       {
-        id: 'contacts-of-contacts',
+        id: this.entityContactOfContactHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
           this.entityContactOfContactHelperService.generateTabsPersonal({
@@ -174,7 +174,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
 
       // follow-ups
       {
-        id: 'follow-ups',
+        id: this.entityFollowUpHelperService.visibleMandatoryKey,
         label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOW_UP',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
           this.entityFollowUpHelperService.generateTabsPersonal({
@@ -194,7 +194,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
 
       // lab results
       {
-        id: 'lab-results',
+        id: this.entityLabResultHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
           this.entityLabResultHelperService.generateTabsDetails({
@@ -215,7 +215,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
 
       // relationships
       {
-        id: 'relationships',
+        id: this.entityHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
           this.entityHelperService.generateTabsDetails({

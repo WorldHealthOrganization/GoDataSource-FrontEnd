@@ -29,6 +29,7 @@ import * as _ from 'lodash';
 })
 export class EntityCaseHelperService {
   // data
+  public readonly visibleMandatoryKey: string = 'cases';
   private _authUser: UserModel;
 
   /**

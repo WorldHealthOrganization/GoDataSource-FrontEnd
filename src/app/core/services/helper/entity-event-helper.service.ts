@@ -18,6 +18,7 @@ import { EventDataService } from '../data/event.data.service';
 })
 export class EntityEventHelperService {
   // data
+  public readonly visibleMandatoryKey: string = 'events';
   private _authUser: UserModel;
 
   /**
