@@ -74,6 +74,9 @@ export class EntityEventHelperService {
             },
             validators: {
               required: () => true
+            },
+            visibleMandatoryConf: {
+              alwaysRequired: true
             }
           }, {
             type: CreateViewModifyV2TabInputType.DATE,

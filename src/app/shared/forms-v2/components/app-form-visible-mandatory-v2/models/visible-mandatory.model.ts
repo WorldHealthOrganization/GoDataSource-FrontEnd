@@ -1,4 +1,12 @@
 /**
+ * Used by create/view/modify input to configure specific things for visible/mandatory
+ */
+export interface ICreateViewModifyV2TabInputToVisibleMandatoryConf {
+  // required
+  alwaysRequired: boolean;
+}
+
+/**
  * Visible / Mandatory accepted value format
  */
 export interface IVisibleMandatoryDataValue {
@@ -17,6 +25,7 @@ export interface IVisibleMandatoryDataGroupTabSectionField {
   // required
   id: string;
   label: string;
+  visibleMandatoryConf: ICreateViewModifyV2TabInputToVisibleMandatoryConf;
 }
 
 /**

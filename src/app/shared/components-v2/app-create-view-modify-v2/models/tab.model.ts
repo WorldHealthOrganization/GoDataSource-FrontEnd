@@ -28,6 +28,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import {
+  ICreateViewModifyV2TabInputToVisibleMandatoryConf,
   IVisibleMandatoryDataGroup,
   IVisibleMandatoryDataValue
 } from '../../../forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
@@ -148,6 +149,9 @@ interface ICreateViewModifyV2TabInputBase {
     html: string
   };
   noValueLabel?: () => string;
+
+  // used by visible / mandatory component
+  visibleMandatoryConf?: ICreateViewModifyV2TabInputToVisibleMandatoryConf;
 
   // never
   value: never;

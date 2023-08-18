@@ -97,7 +97,10 @@ export class EntityFollowUpHelperService {
               validators: {
                 required: () => true
               },
-              disabled: () => data.isModify
+              disabled: () => data.isModify,
+              visibleMandatoryConf: {
+                alwaysRequired: true
+              }
             }, {
               type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
               name: 'targeted',

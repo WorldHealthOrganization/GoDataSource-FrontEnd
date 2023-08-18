@@ -96,6 +96,9 @@ export class EntityContactOfContactHelperService {
               },
               validators: {
                 required: () => true
+              },
+              visibleMandatoryConf: {
+                alwaysRequired: true
               }
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,

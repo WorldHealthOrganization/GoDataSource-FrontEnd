@@ -418,7 +418,8 @@ export abstract class CreateViewModifyComponent<T>
                 // add to list
                 children.push({
                   id: input.name,
-                  label: input.placeholder()
+                  label: input.placeholder(),
+                  visibleMandatoryConf: input.visibleMandatoryConf
                 });
 
                 // finished
@@ -428,7 +429,8 @@ export abstract class CreateViewModifyComponent<T>
                 // add to list
                 children.push({
                   id: 'ageDob',
-                  label: `${i18nService.instant('LNG_ENTITY_FIELD_LABEL_AGE')} / ${i18nService.instant('LNG_ENTITY_FIELD_LABEL_DOB')}`
+                  label: `${i18nService.instant('LNG_ENTITY_FIELD_LABEL_AGE')} / ${i18nService.instant('LNG_ENTITY_FIELD_LABEL_DOB')}`,
+                  visibleMandatoryConf: undefined
                 });
 
                 // finished
@@ -438,7 +440,8 @@ export abstract class CreateViewModifyComponent<T>
                 // add to list
                 children.push({
                   id: input.name,
-                  label: section.label
+                  label: section.label,
+                  visibleMandatoryConf: undefined
                 });
 
                 // finished
@@ -455,7 +458,8 @@ export abstract class CreateViewModifyComponent<T>
                     // add to list
                     children.push({
                       id: input.name,
-                      label: section.label
+                      label: section.label,
+                      visibleMandatoryConf: undefined
                     });
 
                     // finished

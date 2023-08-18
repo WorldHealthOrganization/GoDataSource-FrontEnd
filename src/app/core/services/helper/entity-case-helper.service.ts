@@ -93,6 +93,9 @@ export class EntityCaseHelperService {
               },
               validators: {
                 required: () => true
+              },
+              visibleMandatoryConf: {
+                alwaysRequired: true
               }
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,
