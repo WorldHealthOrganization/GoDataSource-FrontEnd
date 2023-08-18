@@ -241,7 +241,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
   /**
    * Merge missing visible / mandatory fields
    */
-  mergeDefaultVisibleMandatoryFields(item: OutbreakModel | OutbreakTemplateModel): void {
-    console.log(item);
+  mergeDefaultVisibleMandatoryFields(_item: OutbreakModel | OutbreakTemplateModel): void {
+    // console.log(item);
   }
 }
