@@ -132,6 +132,9 @@ export abstract class CreateViewModifyComponent<T>
     // retrieve selected outbreak - since on create, view & modify select outbreak dropdown should be disabled
     this.selectedOutbreak = activatedRoute.snapshot.data.outbreak;
 
+    // merge default fields
+    this.redirectService.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.selectedOutbreak);
+
     // create ?
     this.loadingPage = true;
     if (this.isCreate) {

@@ -16,6 +16,7 @@ import { EntityFollowUpHelperService } from './entity-follow-up-helper.service';
 import { EntityLabResultHelperService } from './entity-lab-result-helper.service';
 import { EntityHelperService } from './entity-helper.service';
 import { OutbreakModel } from '../../models/outbreak.model';
+import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
 
 @Injectable({
   providedIn: 'root'
@@ -235,5 +236,12 @@ export class OutbreakAndOutbreakTemplateHelperService {
         ])
       }
     ];
+  }
+
+  /**
+   * Merge missing visible / mandatory fields
+   */
+  mergeDefaultVisibleMandatoryFields(item: OutbreakModel | OutbreakTemplateModel): void {
+    console.log(item);
   }
 }

@@ -139,6 +139,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
 
     // format reference data per disease to expected tree format
     this._diseaseSpecificReferenceData = this.referenceDataHelperService.convertRefCategoriesToTreeCategories(this.activatedRoute.snapshot.data.diseaseSpecificCategories.list);
+
+    // merge default fields
+    this.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.itemData);
   }
 
   /**

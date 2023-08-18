@@ -10,6 +10,7 @@ import { BaseModel } from './base.model';
 import {
   ITreeEditorDataValue
 } from '../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
+import { IVisibleMandatoryDataValue } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 export class OutbreakTemplateModel
   extends BaseModel
@@ -48,6 +49,7 @@ export class OutbreakTemplateModel
   generateFollowUpsDateOfLastContact: boolean;
 
   allowedRefDataItems: ITreeEditorDataValue;
+  visibleAndMandatoryFields: IVisibleMandatoryDataValue;
 
   /**
    * Advanced filters
@@ -323,6 +325,10 @@ export class OutbreakTemplateModel
       (lData: any) => {
         return new QuestionModel(lData);
       });
+
+    // visible / mandatory fields
+    // default values are configured later after initialization where necessary (create/modify outbreak, retrieve selected outbreak)
+    this.visibleAndMandatoryFields = _.get(data, 'visibleAndMandatoryFields');
   }
 
   /**

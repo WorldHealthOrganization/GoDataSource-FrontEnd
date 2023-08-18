@@ -468,8 +468,8 @@ export class OutbreakModel
       });
 
     // visible / mandatory fields
-    // #TODO default should be as it is now..somehow we need to set default only for selected outbrak or the one that is in edit/create..and NOT for those retrieved for selected outbreak dropdown
-    this.visibleAndMandatoryFields = _.get(data, 'visibleAndMandatoryFields', {});
+    // default values are configured later after initialization where necessary (create/modify outbreak, retrieve selected outbreak)
+    this.visibleAndMandatoryFields = _.get(data, 'visibleAndMandatoryFields');
   }
 
   /**

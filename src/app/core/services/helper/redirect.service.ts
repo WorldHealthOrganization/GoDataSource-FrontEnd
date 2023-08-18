@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Params, Router } from '@angular/router';
+import { OutbreakAndOutbreakTemplateHelperService } from './outbreak-and-outbreak-template-helper.service';
 
 @Injectable()
 export class RedirectService {
   constructor(
-    private router: Router
+    private router: Router,
+    public outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService
   ) {}
 
   /**
