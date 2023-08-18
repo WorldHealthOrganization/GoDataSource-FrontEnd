@@ -44,6 +44,10 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import {
+  IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -279,6 +283,40 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Initialize tabs
    */
   protected initializeTabs(): void {
+    // tab custom configuration
+    this.tabConfiguration = {
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TAB_OPTIONS'
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_EVENT_TAB_OPTION_SHOW_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_EVENT_TAB_OPTION_SHOW_QUESTION_NUMBERS',
+          value: !this.hideQuestionNumbers
+        }
+      ],
+      apply: (data, finish) => {
+        // save settings
+        const hideQuestionNumbers: boolean = !(data.map[EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
+        this.updateGeneralSettings(
+          `${UserSettings.EVENT_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideQuestionNumbers = hideQuestionNumbers;
+            this.tabsV2Component.detectChanges();
+
+            // finish
+            finish();
+          });
+      }
+    };
+
+    // tabs
     this.tabData = {
       // tabs
       tabs: [
