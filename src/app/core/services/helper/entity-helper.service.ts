@@ -52,13 +52,13 @@ export class EntityHelperService {
       link: string,
       can: {
         [type: string]: {
-          view: (UserModel) => boolean,
-          create: (UserModel) => boolean,
-          modify: (UserModel) => boolean,
-          delete: (UserModel) => boolean,
-          share: (UserModel) => boolean,
-          changeSource: (UserModel) => boolean,
-          bulkDelete: (UserModel) => boolean
+          view: (user: UserModel) => boolean,
+          create: (user: UserModel) => boolean,
+          modify: (user: UserModel) => boolean,
+          delete: (user: UserModel) => boolean,
+          share: (user: UserModel) => boolean,
+          changeSource: (user: UserModel) => boolean,
+          bulkDelete: (user: UserModel) => boolean
         }
       }
     }
