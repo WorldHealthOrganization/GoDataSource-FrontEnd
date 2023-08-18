@@ -273,9 +273,8 @@ export class OutbreakAndOutbreakTemplateHelperService {
           section.children.forEach((field) => {
             item.visibleAndMandatoryFields[group.id][field.id] = {
               visible: true,
-              mandatory: (field.definition as ICreateViewModifyV2TabInputValidatorRequired).validators?.required ?
-                (field.definition as ICreateViewModifyV2TabInputValidatorRequired).validators.required() :
-                false
+              // if method exists is enough, no need to execute, otherwise some might not return required because we sent an empty model when we generate groups, and some required might depend on db data
+              mandatory: !!(field.definition as ICreateViewModifyV2TabInputValidatorRequired).validators?.required
             };
           });
         });
