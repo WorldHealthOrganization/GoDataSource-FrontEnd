@@ -1,6 +1,4 @@
 import * as _ from 'lodash';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { BaseModel } from './base.model';
 import { CaseModel } from './case.model';
 import { ContactModel } from './contact.model';
@@ -15,12 +13,10 @@ import {
   IPermissionRestorable
 } from './permission.interface';
 import { PERMISSION } from './permission.model';
-import { IAnswerData, QuestionModel } from './question.model';
+import { IAnswerData } from './question.model';
 import { UserModel } from './user.model';
 import { Moment } from '../helperClasses/x-moment';
-import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { SafeHtml } from '@angular/platform-browser';
-import { I18nService } from '../services/helper/i18n.service';
 import { Constants } from './constants';
 
 export class LabResultModel
@@ -58,351 +54,8 @@ export class LabResultModel
   uiStatusForms: SafeHtml;
 
   /**
-   * Advanced filters
+   * Static Permissions - IPermissionBasic
    */
-  static generateAdvancedFilters(data: {
-    authUser: UserModel,
-    selectedOutbreak: () => OutbreakModel,
-    options: {
-      labName: ILabelValuePairModel[],
-      labSampleType: ILabelValuePairModel[],
-      labTestType: ILabelValuePairModel[],
-      labTestResult: ILabelValuePairModel[],
-      labResultProgress: ILabelValuePairModel[],
-      yesNoAll: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[],
-      user: ILabelValuePairModel[],
-      labSequenceLaboratory: ILabelValuePairModel[],
-      labSequenceResult: ILabelValuePairModel[],
-      classification: ILabelValuePairModel[]
-    }
-  }) {
-    // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'visualId',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID',
-        relationshipPath: ['person'],
-        sortable: 'person.visualId'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'lastName',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_LAST_NAME',
-        relationshipPath: ['person'],
-        sortable: 'person.lastName'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'firstName',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_FIRST_NAME',
-        relationshipPath: ['person'],
-        sortable: 'person.firstName'
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'classification',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
-        options: data.options.classification,
-        relationshipPath: ['person'],
-        sortable: 'person.classification'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'sampleIdentifier',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateSampleTaken',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateSampleDelivered',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfResult',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'labName',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
-        options: data.options.labName,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'sampleType',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
-        options: data.options.labSampleType,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'testType',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
-        options: data.options.labTestType,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'result',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-        options: data.options.labTestResult,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'testedFor',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-        field: 'questionnaireAnswers',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        template: () => data.selectedOutbreak().labResultsTemplate,
-        useLike: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateTesting',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'status',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
-        options: data.options.labResultProgress,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'quantitativeResult',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'notes',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'sequence.hasSequence',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
-        options: data.options.yesNo,
-        sortable: true,
-        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'sequence.dateSampleSent',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
-        sortable: true,
-        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'sequence.labId',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
-        options: data.options.labSequenceLaboratory,
-        sortable: true,
-        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'sequence.dateResult',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
-        sortable: true,
-        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'sequence.resultId',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
-        options: data.options.labSequenceResult,
-        sortable: true,
-        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'sequence.noSequenceReason',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-        sortable: true,
-        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
-      },
-      {
-        type: V2AdvancedFilterType.DELETED,
-        field: 'deleted',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
-        yesNoAllOptions: data.options.yesNoAll,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'createdAt',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'updatedAt',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.DELETED_AT,
-        field: 'deletedAt',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
-        sortable: true
-      }
-    ];
-
-    // allowed to filter by user ?
-    if (UserModel.canListForFilters(data.authUser)) {
-      advancedFilters.push({
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'createdBy',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
-        options: data.options.user,
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'updatedBy',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
-        options: data.options.user,
-        sortable: true
-      });
-    }
-
-    // finished
-    return advancedFilters;
-  }
-
-  /**
-   * Determine alertness
-   */
-  static determineAlertness(
-    template: QuestionModel[],
-    entities: LabResultModel[]
-  ): LabResultModel[] {
-    // map alert question answers to object for easy find
-    const alertQuestionAnswers: {
-      [question_variable: string]: {
-        [answer_value: string]: true
-      }
-    } = QuestionModel.determineAlertAnswers(template);
-
-    // map alert value to lab results
-    entities.forEach((labResultData: LabResultModel) => {
-      // check if we need to mark lab result as alerted because of questionnaire answers
-      labResultData.alerted = false;
-      if (labResultData.questionnaireAnswers) {
-        const props: string[] = Object.keys(labResultData.questionnaireAnswers);
-        for (let propIndex: number = 0; propIndex < props.length; propIndex++) {
-          // get answer data
-          const questionVariable: string = props[propIndex];
-          const answers: IAnswerData[] = labResultData.questionnaireAnswers[questionVariable];
-
-          // retrieve answer value
-          // only the newest one is of interest, the old ones shouldn't trigger an alert
-          // the first item should be the newest
-          const answerKey = answers?.length > 0 ?
-            answers[0].value :
-            undefined;
-
-          // there is no point in checking the value if there isn't one
-          if (
-            !answerKey &&
-            typeof answerKey !== 'number'
-          ) {
-            continue;
-          }
-
-          // at least one alerted ?
-          if (Array.isArray(answerKey)) {
-            // go through all answers
-            for (let answerKeyIndex: number = 0; answerKeyIndex < answerKey.length; answerKeyIndex++) {
-              if (
-                alertQuestionAnswers[questionVariable] &&
-                alertQuestionAnswers[questionVariable][answerKey[answerKeyIndex]]
-              ) {
-                // alerted
-                labResultData.alerted = true;
-
-                // stop
-                break;
-              }
-            }
-
-            // stop ?
-            if (labResultData.alerted) {
-              // stop
-              break;
-            }
-          } else if (
-            alertQuestionAnswers[questionVariable] &&
-            alertQuestionAnswers[questionVariable][answerKey]
-          ) {
-            // alerted
-            labResultData.alerted = true;
-
-            // stop
-            break;
-          }
-        }
-      }
-    });
-
-    // finished
-    return entities;
-  }
-
-  /**
-   * Retrieve statuses forms
-   */
-  static getStatusForms(
-    info: {
-      // required
-      item: LabResultModel,
-      i18nService: I18nService
-    }
-  ): V2ColumnStatusForm[] {
-    // construct list of forms that we need to display
-    const forms: V2ColumnStatusForm[] = [];
-
-    // alerted
-    if (info.item.alerted) {
-      forms.push({
-        type: IV2ColumnStatusFormType.STAR,
-        color: 'var(--gd-danger)',
-        tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
-      });
-    } else {
-      forms.push({
-        type: IV2ColumnStatusFormType.EMPTY
-      });
-    }
-
-    // finished
-    return forms;
-  }
-
-  /**
-     * Static Permissions - IPermissionBasic
-     */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_CREATE) : false); }
@@ -418,23 +71,23 @@ export class LabResultModel
   static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.LAB_RESULT_RESTORE) : false; }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_IMPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_EXPORT) : false); }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 

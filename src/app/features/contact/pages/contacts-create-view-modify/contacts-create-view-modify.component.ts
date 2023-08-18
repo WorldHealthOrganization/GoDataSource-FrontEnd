@@ -43,7 +43,6 @@ import * as _ from 'lodash';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import {
@@ -62,6 +61,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
+import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 
 /**
  * Component
@@ -118,7 +118,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     protected dialogV2Service: DialogV2Service,
     protected entityHelperService: EntityHelperService,
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
-    protected entityLabResultService: EntityLabResultService,
+    protected entityLabResultHelperService: EntityLabResultHelperService,
     protected entityDataService: EntityDataService,
     protected systemSettingsDataService: SystemSettingsDataService,
     protected relationshipDataService: RelationshipDataService,
@@ -1140,8 +1140,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.CONTACT_LAB_FIELDS,
         advancedFilterType: Constants.APP_PAGE.CONTACT_LAB_RESULTS.value,
-        tableColumnActions: this.entityLabResultService.retrieveTableColumnActions({
-          authUser: this.authUser,
+        tableColumnActions: this.entityLabResultHelperService.retrieveTableColumnActions({
           personType: this.itemData.type,
           selectedOutbreak: () => this.selectedOutbreak,
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -1151,8 +1150,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.entityLabResultService.retrieveTableColumns({
-          authUser: this.authUser,
+        tableColumns: this.entityLabResultHelperService.retrieveTableColumns({
           user: this.activatedRoute.snapshot.data.user,
           options: {
             labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -1188,8 +1186,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             )
           }
         }),
-        advancedFilters: this.entityLabResultService.generateAdvancedFilters({
-          authUser: this.authUser,
+        advancedFilters: this.entityLabResultHelperService.generateAdvancedFiltersPerson({
           labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
           options: {
             labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -1233,14 +1230,14 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         refresh: (tab) => {
           // attach fields restrictions
           const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          const fields: string[] = this.entityLabResultService.refreshListFields();
+          const fields: string[] = this.entityLabResultHelperService.refreshListFields();
           if (fields.length > 0) {
             localTab.queryBuilder.clearFields();
             localTab.queryBuilder.fields(...fields);
           }
 
           // refresh data
-          localTab.records$ = this.entityLabResultService
+          localTab.records$ = this.entityLabResultHelperService
             .retrieveRecords(
               this.selectedOutbreak,
               EntityModel.getLinkForEntityType(this.itemData.type),
@@ -1286,7 +1283,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           }
 
           // count
-          this.entityLabResultService
+          this.entityLabResultHelperService
             .retrieveRecordsCount(
               this.selectedOutbreak.id,
               this.itemData.type,

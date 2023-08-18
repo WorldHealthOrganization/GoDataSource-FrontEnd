@@ -41,6 +41,7 @@ import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 
 /**
  * Component
@@ -74,6 +75,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     private dialogV2Service: DialogV2Service,
     private domSanitizer: DomSanitizer,
     private referenceDataHelperService: ReferenceDataHelperService,
+    private entityLabResultHelperService: EntityLabResultHelperService,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -957,9 +959,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
           if (!item.uiStatusForms) {
             // determine forms
-            const forms: V2ColumnStatusForm[] = LabResultModel.getStatusForms({
-              item,
-              i18nService: this.i18nService
+            const forms: V2ColumnStatusForm[] = this.entityLabResultHelperService.getStatusForms({
+              item
             });
 
             // create html
@@ -1002,8 +1003,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = LabResultModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.expandListAdvancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersAggregate({
       selectedOutbreak: () => this.selectedOutbreak,
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -1076,7 +1076,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       .pipe(
         // determine alertness
         map((labResults: LabResultModel[]) => {
-          return LabResultModel.determineAlertness(
+          return this.entityLabResultHelperService.determineAlertness(
             this.selectedOutbreak.labResultsTemplate,
             labResults
           );

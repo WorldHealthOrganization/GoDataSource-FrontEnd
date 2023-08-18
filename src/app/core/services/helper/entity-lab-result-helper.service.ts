@@ -14,7 +14,7 @@ import { EntityModel } from '../../models/entity-and-relationship.model';
 import { EntityType } from '../../models/entity-type';
 import { LabResultModel } from '../../models/lab-result.model';
 import { OutbreakModel } from '../../models/outbreak.model';
-import { QuestionModel } from '../../models/question.model';
+import { IAnswerData, QuestionModel } from '../../models/question.model';
 import { UserModel } from '../../models/user.model';
 import { LabResultDataService } from '../data/lab-result.data.service';
 import { DialogV2Service } from './dialog-v2.service';
@@ -22,26 +22,374 @@ import { ToastV2Service } from './toast-v2.service';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
 import { I18nService } from './i18n.service';
+import { AuthDataService } from '../data/auth.data.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EntityLabResultService {
+export class EntityLabResultHelperService {
+  // data
+  private _authUser: UserModel;
+
   /**
    * Constructor
    */
   constructor(
+    private authDataService: AuthDataService,
     private dialogV2Service: DialogV2Service,
     private labResultDataService: LabResultDataService,
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService
-  ) {}
+  ) {
+    // get the authenticated user
+    this._authUser = this.authDataService.getAuthenticatedUser();
+  }
+
+  /**
+   * Advanced filters
+   */
+  generateAdvancedFiltersAggregate(data: {
+    selectedOutbreak: () => OutbreakModel,
+    options: {
+      labName: ILabelValuePairModel[],
+      labSampleType: ILabelValuePairModel[],
+      labTestType: ILabelValuePairModel[],
+      labTestResult: ILabelValuePairModel[],
+      labResultProgress: ILabelValuePairModel[],
+      yesNoAll: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[],
+      user: ILabelValuePairModel[],
+      labSequenceLaboratory: ILabelValuePairModel[],
+      labSequenceResult: ILabelValuePairModel[],
+      classification: ILabelValuePairModel[]
+    }
+  }) {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID',
+        relationshipPath: ['person'],
+        sortable: 'person.visualId'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_LAST_NAME',
+        relationshipPath: ['person'],
+        sortable: 'person.lastName'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_FIRST_NAME',
+        relationshipPath: ['person'],
+        sortable: 'person.firstName'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'classification',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
+        options: data.options.classification,
+        relationshipPath: ['person'],
+        sortable: 'person.classification'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'sampleIdentifier',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateSampleTaken',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateSampleDelivered',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'labName',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+        options: data.options.labName,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'sampleType',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+        options: data.options.labSampleType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'testType',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+        options: data.options.labTestType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'result',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+        options: data.options.labTestResult,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'testedFor',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+        field: 'questionnaireAnswers',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        template: () => data.selectedOutbreak().labResultsTemplate,
+        useLike: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateTesting',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'status',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+        options: data.options.labResultProgress,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'quantitativeResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'notes',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'sequence.hasSequence',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+        options: data.options.yesNo,
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'sequence.dateSampleSent',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'sequence.labId',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+        options: data.options.labSequenceLaboratory,
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'sequence.dateResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'sequence.resultId',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+        options: data.options.labSequenceResult,
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'sequence.noSequenceReason',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+        sortable: true,
+        relationshipLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
+      },
+      {
+        type: V2AdvancedFilterType.DELETED,
+        field: 'deleted',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
+        yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.DELETED_AT,
+        field: 'deletedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
+        sortable: true
+      }
+    ];
+
+    // allowed to filter by user ?
+    if (UserModel.canListForFilters(this._authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
+      });
+    }
+
+    // finished
+    return advancedFilters;
+  }
+
+  /**
+   * Determine alertness
+   */
+  determineAlertness(
+    template: QuestionModel[],
+    entities: LabResultModel[]
+  ): LabResultModel[] {
+    // map alert question answers to object for easy find
+    const alertQuestionAnswers: {
+      [question_variable: string]: {
+        [answer_value: string]: true
+      }
+    } = QuestionModel.determineAlertAnswers(template);
+
+    // map alert value to lab results
+    entities.forEach((labResultData: LabResultModel) => {
+      // check if we need to mark lab result as alerted because of questionnaire answers
+      labResultData.alerted = false;
+      if (labResultData.questionnaireAnswers) {
+        const props: string[] = Object.keys(labResultData.questionnaireAnswers);
+        for (let propIndex: number = 0; propIndex < props.length; propIndex++) {
+          // get answer data
+          const questionVariable: string = props[propIndex];
+          const answers: IAnswerData[] = labResultData.questionnaireAnswers[questionVariable];
+
+          // retrieve answer value
+          // only the newest one is of interest, the old ones shouldn't trigger an alert
+          // the first item should be the newest
+          const answerKey = answers?.length > 0 ?
+            answers[0].value :
+            undefined;
+
+          // there is no point in checking the value if there isn't one
+          if (
+            !answerKey &&
+            typeof answerKey !== 'number'
+          ) {
+            continue;
+          }
+
+          // at least one alerted ?
+          if (Array.isArray(answerKey)) {
+            // go through all answers
+            for (let answerKeyIndex: number = 0; answerKeyIndex < answerKey.length; answerKeyIndex++) {
+              if (
+                alertQuestionAnswers[questionVariable] &&
+                alertQuestionAnswers[questionVariable][answerKey[answerKeyIndex]]
+              ) {
+                // alerted
+                labResultData.alerted = true;
+
+                // stop
+                break;
+              }
+            }
+
+            // stop ?
+            if (labResultData.alerted) {
+              // stop
+              break;
+            }
+          } else if (
+            alertQuestionAnswers[questionVariable] &&
+            alertQuestionAnswers[questionVariable][answerKey]
+          ) {
+            // alerted
+            labResultData.alerted = true;
+
+            // stop
+            break;
+          }
+        }
+      }
+    });
+
+    // finished
+    return entities;
+  }
+
+  /**
+   * Retrieve statuses forms
+   */
+  getStatusForms(
+    info: {
+      // required
+      item: LabResultModel
+    }
+  ): V2ColumnStatusForm[] {
+    // construct list of forms that we need to display
+    const forms: V2ColumnStatusForm[] = [];
+
+    // alerted
+    if (info.item.alerted) {
+      forms.push({
+        type: IV2ColumnStatusFormType.STAR,
+        color: 'var(--gd-danger)',
+        tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
+    }
+
+    // finished
+    return forms;
+  }
 
   /**
    * Retrieve table columns
    */
   retrieveTableColumnActions(definitions: {
-    authUser: UserModel,
     personType: EntityType,
     selectedOutbreak: () => OutbreakModel,
     selectedOutbreakIsActive: () => boolean,
@@ -64,14 +412,14 @@ export class EntityLabResultService {
           },
           visible: (item: LabResultModel): boolean => {
             return !item.deleted &&
-              LabResultModel.canView(definitions.authUser) &&
+              LabResultModel.canView(this._authUser) &&
               (
                 (
                   definitions.personType === EntityType.CASE &&
-                  CaseModel.canViewLabResult(definitions.authUser)
+                  CaseModel.canViewLabResult(this._authUser)
                 ) || (
                   definitions.personType === EntityType.CONTACT &&
-                  ContactModel.canViewLabResult(definitions.authUser)
+                  ContactModel.canViewLabResult(this._authUser)
                 )
               );
           }
@@ -90,14 +438,14 @@ export class EntityLabResultService {
           visible: (item: LabResultModel): boolean => {
             return !item.deleted &&
               definitions.selectedOutbreakIsActive() &&
-              LabResultModel.canModify(definitions.authUser) &&
+              LabResultModel.canModify(this._authUser) &&
               (
                 (
                   definitions.personType === EntityType.CASE &&
-                  CaseModel.canModifyLabResult(definitions.authUser)
+                  CaseModel.canModifyLabResult(this._authUser)
                 ) || (
                   definitions.personType === EntityType.CONTACT &&
-                  ContactModel.canModifyLabResult(definitions.authUser)
+                  ContactModel.canModifyLabResult(this._authUser)
                 )
               );
           }
@@ -170,14 +518,14 @@ export class EntityLabResultService {
               visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&
                   definitions.selectedOutbreakIsActive() &&
-                  LabResultModel.canDelete(definitions.authUser) &&
+                  LabResultModel.canDelete(this._authUser) &&
                   (
                     (
                       definitions.personType === EntityType.CASE &&
-                      CaseModel.canDeleteLabResult(definitions.authUser)
+                      CaseModel.canDeleteLabResult(this._authUser)
                     ) || (
                       definitions.personType === EntityType.CONTACT &&
-                      ContactModel.canDeleteLabResult(definitions.authUser)
+                      ContactModel.canDeleteLabResult(this._authUser)
                     )
                   );
               }
@@ -189,14 +537,14 @@ export class EntityLabResultService {
                 // visible only if at least one of the first two items is visible
                 return !item.deleted &&
                   definitions.selectedOutbreakIsActive() &&
-                  LabResultModel.canDelete(definitions.authUser) &&
+                  LabResultModel.canDelete(this._authUser) &&
                   (
                     (
                       definitions.personType === EntityType.CASE &&
-                      CaseModel.canDeleteLabResult(definitions.authUser)
+                      CaseModel.canDeleteLabResult(this._authUser)
                     ) || (
                       definitions.personType === EntityType.CONTACT &&
-                      ContactModel.canDeleteLabResult(definitions.authUser)
+                      ContactModel.canDeleteLabResult(this._authUser)
                     )
                   );
               }
@@ -269,14 +617,14 @@ export class EntityLabResultService {
               visible: (item: LabResultModel): boolean => {
                 return item.deleted &&
                   definitions.selectedOutbreakIsActive() &&
-                  LabResultModel.canRestore(definitions.authUser) &&
+                  LabResultModel.canRestore(this._authUser) &&
                   (
                     (
                       definitions.personType === EntityType.CASE &&
-                      CaseModel.canRestoreLabResult(definitions.authUser)
+                      CaseModel.canRestoreLabResult(this._authUser)
                     ) || (
                       definitions.personType === EntityType.CONTACT &&
-                      ContactModel.canRestoreLabResult(definitions.authUser)
+                      ContactModel.canRestoreLabResult(this._authUser)
                     )
                   );
               }
@@ -291,7 +639,6 @@ export class EntityLabResultService {
    * Retrieve table columns
    */
   retrieveTableColumns(definitions: {
-    authUser: UserModel,
     user: IResolverV2ResponseModel<UserModel>,
     options: {
       labName: ILabelValuePairModel[],
@@ -337,9 +684,8 @@ export class EntityLabResultService {
             }]
           }
         ],
-        forms: (_column, data: LabResultModel): V2ColumnStatusForm[] => LabResultModel.getStatusForms({
-          item: data,
-          i18nService: this.i18nService
+        forms: (_column, data: LabResultModel): V2ColumnStatusForm[] => this.getStatusForms({
+          item: data
         })
       },
       {
@@ -559,7 +905,7 @@ export class EntityLabResultService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canView(definitions.authUser);
+          return !UserModel.canView(this._authUser);
         },
         link: (data) => {
           return data.createdBy ?
@@ -594,7 +940,7 @@ export class EntityLabResultService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canView(definitions.authUser);
+          return !UserModel.canView(this._authUser);
         },
         link: (data) => {
           return data.updatedBy ?
@@ -634,8 +980,7 @@ export class EntityLabResultService {
   /**
    * Advanced filters
    */
-  generateAdvancedFilters(data: {
-    authUser: UserModel,
+  generateAdvancedFiltersPerson(data: {
     labResultsTemplate: () => QuestionModel[],
     options: {
       labName: ILabelValuePairModel[],
@@ -810,7 +1155,7 @@ export class EntityLabResultService {
     ];
 
     // allowed to filter by user ?
-    if (UserModel.canListForFilters(data.authUser)) {
+    if (UserModel.canListForFilters(this._authUser)) {
       advancedFilters.push({
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'createdBy',
@@ -849,7 +1194,7 @@ export class EntityLabResultService {
       .pipe(
         // determine alertness
         map((data: LabResultModel[]) => {
-          return LabResultModel.determineAlertness(
+          return this.determineAlertness(
             selectedOutbreak.labResultsTemplate,
             data
           );

@@ -100,7 +100,6 @@ import { LanguageDataResolver } from './resolvers/data/language.resolver';
 import { PersonDataResolver } from './resolvers/data/person.resolver';
 import { NotAuthRedirectGuard } from './guards/not-auth-redirect-guard.service';
 import { EntityFollowUpHelperService } from './helper/entity-follow-up-helper.service';
-import { EntityLabResultService } from './helper/entity-lab-result-helper.service';
 import { SecurityQuestionDataResolver } from './resolvers/data/security-question.resolver';
 import { MapVectorTypeDataResolver } from './resolvers/data/map-vector-type.resolver';
 import { OutbreakTemplateDataResolver } from './resolvers/data/outbreak-template.resolver';
@@ -153,6 +152,7 @@ import { EntityCaseHelperService } from './helper/entity-case-helper.service';
 import { EntityContactHelperService } from './helper/entity-contact-helper.service';
 import { EntityEventHelperService } from './helper/entity-event-helper.service';
 import { EntityContactOfContactHelperService } from './helper/entity-contact-of-contact-helper.service';
+import { EntityLabResultHelperService } from './helper/entity-lab-result-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -310,7 +310,7 @@ export const services: any[] = [
   EntityContactOfContactHelperService,
   EntityEventHelperService,
   EntityFollowUpHelperService,
-  EntityLabResultService,
+  EntityLabResultHelperService,
   EntityHelperService,
   ListHelperService,
   RedirectService,
