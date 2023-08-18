@@ -36,6 +36,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { EntityEventHelperService } from '../../../../core/services/helper/entity-event-helper.service';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -55,6 +56,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected eventDataService: EventDataService,
     protected dialogV2Service: DialogV2Service,
@@ -66,7 +68,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 

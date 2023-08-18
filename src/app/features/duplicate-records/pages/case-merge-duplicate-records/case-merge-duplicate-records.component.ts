@@ -29,6 +29,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -86,6 +87,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected caseDataService: CaseDataService,
     protected dialogV2Service: DialogV2Service,
@@ -97,7 +99,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve cases ids

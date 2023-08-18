@@ -18,6 +18,7 @@ import { RequestFilterGenerator } from '../../../../core/helperClasses/request-q
 import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -35,6 +36,7 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected deviceDataService: DeviceDataService,
     protected dialogV2Service: DialogV2Service
@@ -43,7 +45,8 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 

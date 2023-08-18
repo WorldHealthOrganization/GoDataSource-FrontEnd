@@ -21,6 +21,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-contact-follow-ups-bulk-modify',
@@ -41,6 +42,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     private router: Router,
     private followUpsDataService: FollowUpsDataService
   ) {
@@ -49,7 +51,8 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 

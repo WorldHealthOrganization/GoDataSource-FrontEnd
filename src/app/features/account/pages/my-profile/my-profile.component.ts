@@ -11,6 +11,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-my-profile',
@@ -25,6 +26,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected userDataService: UserDataService,
     protected dialogV2Service: DialogV2Service
   ) {
@@ -32,7 +34,8 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 

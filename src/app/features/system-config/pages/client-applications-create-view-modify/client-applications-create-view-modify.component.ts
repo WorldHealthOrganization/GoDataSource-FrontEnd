@@ -18,6 +18,7 @@ import { Constants } from '../../../../core/models/constants';
 import { catchError } from 'rxjs/operators';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -35,6 +36,7 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected systemSettingsDataService: SystemSettingsDataService,
     protected router: Router
   ) {
@@ -43,7 +45,8 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 

@@ -37,6 +37,7 @@ import { Location } from '@angular/common';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -87,6 +88,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected relationshipDataService: RelationshipDataService,
     protected entityHelperService: EntityHelperService,
     protected dialogV2Service: DialogV2Service,
@@ -99,7 +101,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve data from snapshot

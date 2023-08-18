@@ -21,6 +21,7 @@ import {
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-help-item-create-view-modify',
@@ -38,6 +39,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected helpDataService: HelpDataService,
     protected dialogV2Service: DialogV2Service
@@ -47,6 +49,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       activatedRoute,
       renderer2,
       createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService,
       true
     );
     this.selectedCategory = this.activatedRoute.snapshot.data.category;

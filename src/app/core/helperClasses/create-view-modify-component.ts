@@ -16,6 +16,7 @@ import { AppCreateViewModifyV2Component } from '../../shared/components-v2/app-c
 import { CreateViewModifyHelperService } from '../services/helper/create-view-modify-helper.service';
 import { AuthDataService } from '../services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
+import { OutbreakAndOutbreakTemplateHelperService } from '../services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T>
@@ -111,6 +112,7 @@ export abstract class CreateViewModifyComponent<T>
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     dontDisableOutbreakSelect?: boolean
   ) {
     // initialize parent
@@ -131,8 +133,7 @@ export abstract class CreateViewModifyComponent<T>
     this.selectedOutbreak = this.activatedRoute.snapshot.data.outbreak;
 
     // merge default fields
-    // #TODO
-    // this.createViewModifyHelperService.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.selectedOutbreak);
+    this.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.selectedOutbreak);
 
     // create ?
     this.loadingPage = true;

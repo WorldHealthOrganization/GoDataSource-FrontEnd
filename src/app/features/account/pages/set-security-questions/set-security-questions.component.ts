@@ -11,6 +11,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { catchError } from 'rxjs/operators';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-set-security-questions',
@@ -32,6 +33,7 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected userDataService: UserDataService,
     protected router: Router
   ) {
@@ -40,7 +42,8 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 

@@ -14,6 +14,7 @@ import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateView
 import { moment } from '../../../../core/helperClasses/x-moment';
 import * as _ from 'lodash';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-view-history-system-device',
@@ -33,13 +34,15 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     private deviceDataService: DeviceDataService
   ) {
     super(
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // get deviceId

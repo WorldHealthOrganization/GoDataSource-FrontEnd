@@ -52,6 +52,7 @@ import { EntityFollowUpHelperService } from '../../../../core/services/helper/en
 import { TeamModel } from '../../../../core/models/team.model';
 import { EntityContactOfContactHelperService } from '../../../../core/services/helper/entity-contact-of-contact-helper.service';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -103,6 +104,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected contactsOfContactsDataService: ContactsOfContactsDataService,
     protected dialogV2Service: DialogV2Service,
@@ -121,7 +123,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // get data

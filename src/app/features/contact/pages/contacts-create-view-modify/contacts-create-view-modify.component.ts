@@ -60,6 +60,7 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
 import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -111,6 +112,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected contactDataService: ContactDataService,
     protected location: Location,
@@ -131,7 +133,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // get data

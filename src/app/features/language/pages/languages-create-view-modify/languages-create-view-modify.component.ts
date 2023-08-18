@@ -20,6 +20,7 @@ import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -37,6 +38,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected languageDataService: LanguageDataService
@@ -45,7 +47,8 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 

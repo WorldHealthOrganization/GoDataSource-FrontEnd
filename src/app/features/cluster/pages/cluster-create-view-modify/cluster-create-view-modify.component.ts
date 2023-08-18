@@ -23,6 +23,7 @@ import { MAT_ICONS } from '../../../../shared/forms-v2/core/mat-icons-v2';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -40,6 +41,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     private router: Router,
     private clusterDataService: ClusterDataService,
     private dialogV2Service: DialogV2Service
@@ -48,7 +50,8 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 

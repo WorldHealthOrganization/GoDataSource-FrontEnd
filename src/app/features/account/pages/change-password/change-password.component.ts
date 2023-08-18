@@ -13,6 +13,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-change-password',
@@ -30,6 +31,7 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected userDataService: UserDataService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router
@@ -39,7 +41,8 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // display you must change password ?

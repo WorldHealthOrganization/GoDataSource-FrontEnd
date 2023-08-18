@@ -24,6 +24,7 @@ import { ITreeEditorDataCategory } from '../../../../shared/forms-v2/components/
 import { IconModel } from '../../../../core/models/icon.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -48,6 +49,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected referenceDataDataService: ReferenceDataDataService,
     protected dialogV2Service: DialogV2Service,
@@ -58,7 +60,8 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve

@@ -22,6 +22,7 @@ import { PERMISSION, PermissionModel } from '../../../../core/models/permission.
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -42,6 +43,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected userRoleDataService: UserRoleDataService
@@ -51,7 +53,8 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // clone role ?

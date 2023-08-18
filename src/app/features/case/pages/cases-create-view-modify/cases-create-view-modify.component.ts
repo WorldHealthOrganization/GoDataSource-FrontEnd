@@ -57,6 +57,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
 import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -104,6 +105,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected caseDataService: CaseDataService,
     protected systemSettingsDataService: SystemSettingsDataService,
@@ -121,7 +123,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // do we need to use custom id ?

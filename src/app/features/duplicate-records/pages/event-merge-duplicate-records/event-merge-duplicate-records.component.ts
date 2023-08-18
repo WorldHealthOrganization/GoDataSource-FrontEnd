@@ -17,6 +17,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
@@ -47,6 +48,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     private outbreakDataService: OutbreakDataService,
     private locationDataService: LocationDataService
   ) {
@@ -54,7 +56,8 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve events ids

@@ -68,17 +68,18 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected outbreakDataService: OutbreakDataService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
-    protected referenceDataHelperService: ReferenceDataHelperService,
-    private outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     super(
       authDataService,
       activatedRoute,
       renderer2,
       createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService,
       true
     );
   }

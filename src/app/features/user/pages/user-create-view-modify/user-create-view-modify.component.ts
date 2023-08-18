@@ -24,6 +24,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import * as _ from 'lodash';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -44,6 +45,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected userDataService: UserDataService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service
@@ -52,7 +54,8 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 

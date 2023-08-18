@@ -21,6 +21,7 @@ import { ContactsOfContactsDataService } from '../../../../core/services/data/co
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-create-entity-relationship-bulk',
@@ -72,6 +73,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     private router: Router,
     private entityDataService: EntityDataService,
     private relationshipDataService: RelationshipDataService,
@@ -84,7 +86,8 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // disable select outbreak
