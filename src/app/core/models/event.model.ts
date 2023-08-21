@@ -3,10 +3,7 @@ import { AddressModel } from './address.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import {
-  moment,
-  Moment
-} from '../helperClasses/x-moment';
+import { Moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
@@ -21,8 +18,6 @@ import {
   IPermissionRelatedRelationship,
   IPermissionRestorable
 } from './permission.interface';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 export class EventModel
   extends BaseModel
@@ -63,213 +58,8 @@ export class EventModel
   responsibleUser: UserModel;
 
   /**
-   * Advanced filters
+   * Static Permissions - IPermissionBasic
    */
-  static generateAdvancedFilters(data: {
-    authUser: UserModel,
-    options: {
-      user: ILabelValuePairModel[],
-      eventCategory: ILabelValuePairModel[],
-      addressType: ILabelValuePairModel[],
-      yesNoAll: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[]
-    }
-  }): V2AdvancedFilter[] {
-    // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'name',
-        label: 'LNG_EVENT_FIELD_LABEL_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'date',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'eventCategory',
-        label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
-        options: data.options.eventCategory,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'description',
-        label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'address',
-        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
-        isArray: false
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfReporting',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'isDateOfReportingApproximate',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'endDate',
-        label: 'LNG_EVENT_FIELD_LABEL_END_DATE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'visualId',
-        label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfContacts',
-        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfExposures',
-        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'address.typeId',
-        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_TYPE',
-        options: data.options.addressType,
-        sortable: true,
-        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'address.date',
-        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_DATE',
-        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'address.emailAddress',
-        label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
-        field: 'address',
-        label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
-        isArray: false,
-        sortable: 'address.phoneNumber'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'address.city',
-        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_CITY',
-        sortable: true,
-        useLike: true,
-        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'address.postalCode',
-        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_POSTAL_CODE',
-        sortable: true,
-        useLike: true,
-        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'address.geoLocationAccurate',
-        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
-        options: data.options.yesNo,
-        sortable: true,
-        relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
-      },
-      {
-        type: V2AdvancedFilterType.DELETED,
-        field: 'deleted',
-        label: 'LNG_EVENT_FIELD_LABEL_DELETED',
-        yesNoAllOptions: data.options.yesNoAll,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'createdAt',
-        label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'updatedAt',
-        label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.DELETED_AT,
-        field: 'deletedAt',
-        label: 'LNG_EVENT_FIELD_LABEL_DELETED_AT',
-        sortable: true
-      }
-    ];
-
-    // allowed to filter by user ?
-    if (UserModel.canListForFilters(data.authUser)) {
-      advancedFilters.push({
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user,
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'createdBy',
-        label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
-        options: data.options.user,
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'updatedBy',
-        label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
-        options: data.options.user,
-        sortable: true
-      });
-    }
-
-    // finished
-    return advancedFilters;
-  }
-
-  /**
-   * Return event id mask with data replaced
-   */
-  static generateEventIDMask(eventIdMask: string): string {
-    // validate
-    if (!eventIdMask) {
-      return '';
-    }
-
-    // !!!!!!!!!!!!!!!
-    // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-    // !!!!!!!!!!!!!!!
-    return eventIdMask
-      .replace(/YYYY/g, moment().format('YYYY'))
-      .replace(/\*/g, '');
-  }
-
-  /**
-     * Static Permissions - IPermissionBasic
-     */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_CREATE) : false); }
@@ -282,8 +72,8 @@ export class EventModel
   static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_GENERATE_VISUAL_ID) : false); }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_RESTORE) : false); }
 
   /**
@@ -295,28 +85,28 @@ export class EventModel
   static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_BULK_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_IMPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_EXPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedContact
-     */
+   * Static Permissions - IPermissionRelatedContact
+   */
   static canCreateContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_CREATE_CONTACT) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedContactBulk
-     */
+   * Static Permissions - IPermissionRelatedContactBulk
+   */
   static canBulkCreateContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_CREATE_BULK_CONTACT) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedRelationship
-     */
+   * Static Permissions - IPermissionRelatedRelationship
+   */
   static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_LIST_RELATIONSHIP_CONTACTS) : false); }
   static canViewRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_VIEW_RELATIONSHIP_CONTACTS) : false); }
   static canCreateRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_CREATE_RELATIONSHIP_CONTACTS) : false); }

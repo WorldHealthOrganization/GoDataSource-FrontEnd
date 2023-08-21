@@ -4,7 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -14,7 +13,6 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { LocationModel } from '../../../../core/models/location.model';
@@ -26,8 +24,9 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { LocationIdentifierModel } from '../../../../core/models/location-identifier.model';
 import * as _ from 'lodash';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -45,23 +44,22 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected toastV2Service: ToastV2Service,
-    protected i18nService: I18nService,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
-    protected locationDataService: LocationDataService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected locationDataService: LocationDataService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // get data
@@ -193,7 +191,7 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_LOCATION_TITLE', {
             name: this.itemData.name
           }
@@ -203,7 +201,7 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_LOCATION_TITLE', {
             name: this.itemData.name
           }
@@ -232,8 +230,8 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -570,7 +568,7 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
         takeUntil(this.destroyed$)
       ).subscribe((item: LocationModel) => {
         // success creating / updating cluster
-        this.toastV2Service.success(
+        this.createViewModifyHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE'
@@ -657,7 +655,7 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                       finished(undefined, item);
 
                       // success msg
-                      this.toastV2Service.success('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
+                      this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
                     });
                 });
             });

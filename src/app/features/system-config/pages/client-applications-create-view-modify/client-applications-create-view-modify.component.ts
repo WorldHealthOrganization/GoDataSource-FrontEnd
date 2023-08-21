@@ -4,14 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
@@ -19,7 +17,8 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { Constants } from '../../../../core/models/constants';
 import { catchError } from 'rxjs/operators';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -33,22 +32,21 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
    * Constructor
    */
   constructor(
-    protected systemSettingsDataService: SystemSettingsDataService,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected toastV2Service: ToastV2Service,
-    protected i18nService: I18nService,
-    protected router: Router,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected systemSettingsDataService: SystemSettingsDataService,
+    protected router: Router
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -140,8 +138,8 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -331,7 +329,7 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
             )
             .subscribe(() => {
               // display success message
-              this.toastV2Service.success('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
+              this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
 
               // hide loading & redirect
               finished(undefined, settings);

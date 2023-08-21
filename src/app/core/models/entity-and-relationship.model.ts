@@ -39,8 +39,8 @@ export class RelationshipModel
   dateOfFirstContact: string | Moment;
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Static Permissions - IPermissionBasic
+   */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_CREATE) : false); }
@@ -48,27 +48,27 @@ export class RelationshipModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionRelationship
-     */
+   * Static Permissions - IPermissionRelationship
+   */
   static canReverse(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_REVERSE) : false); }
   static canShare(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_SHARE) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_EXPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionBasicBulk
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
   static canBulkCreate(): boolean { return false; }
   static canBulkModify(): boolean { return false; }
   static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_BULK_DELETE) : false); }
   static canBulkRestore(): boolean { return false; }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 

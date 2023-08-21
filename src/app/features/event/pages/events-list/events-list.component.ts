@@ -36,6 +36,7 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Moment } from 'moment';
+import { EntityEventHelperService } from '../../../../core/services/helper/entity-event-helper.service';
 
 @Component({
   selector: 'app-events-list',
@@ -108,7 +109,8 @@ export class EventsListComponent
     private entityHelperService: EntityHelperService,
     private dialogV2Service: DialogV2Service,
     private locationDataService: LocationDataService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private entityEventHelperService: EntityEventHelperService
   ) {
     super(listHelperService);
   }
@@ -942,8 +944,7 @@ export class EventsListComponent
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = EventModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.advancedFilters = this.entityEventHelperService.generateAdvancedFilters({
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

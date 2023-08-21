@@ -3,7 +3,6 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { Observable, throwError } from 'rxjs';
@@ -32,13 +31,12 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { TimerCache } from '../../../../core/helperClasses/timer-cache';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { EntityEventHelperService } from '../../../../core/services/helper/entity-event-helper.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -54,24 +52,24 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected router: Router,
     protected eventDataService: EventDataService,
-    protected i18nService: I18nService,
-    protected toastV2Service: ToastV2Service,
     protected dialogV2Service: DialogV2Service,
     protected entityHelperService: EntityHelperService,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private entityEventHelperService: EntityEventHelperService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -151,7 +149,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   protected initializedData(): void {
     // initialize visual ID mask
     this._eventVisualIDMask = {
-      mask: EventModel.generateEventIDMask(this.selectedOutbreak.eventIdMask)
+      mask: this.entityEventHelperService.generateEventIDMask(this.selectedOutbreak.eventIdMask)
     };
 
     // set visual id for event
@@ -216,7 +214,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_EVENT_TITLE', {
             name: this.itemData.name
           }
@@ -226,7 +224,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_EVENT_TITLE', {
             name: this.itemData.name
           }
@@ -259,8 +257,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -317,8 +315,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = EventModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.expandListAdvancedFilters = this.entityEventHelperService.generateAdvancedFilters({
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -333,199 +330,17 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Initialize tab details
    */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'details',
-      label: this.isCreate ?
-        'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' :
-        'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: this.isCreate ?
-            'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' :
-            'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'name',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_NAME',
-            description: () => 'LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.name,
-              set: (value) => {
-                this.itemData.name = value;
-              }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'date',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.date,
-              set: (value) => {
-                this.itemData.date = value;
-              }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfReporting',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfReporting,
-              set: (value) => {
-                this.itemData.dateOfReporting = value;
-              }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'isDateOfReportingApproximate',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.isDateOfReportingApproximate,
-              set: (value) => {
-                this.itemData.isDateOfReportingApproximate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
-            name: 'visualId',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
-            description: () => this.i18nService.instant(
-              'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
-              this._eventVisualIDMask
-            ),
-            value: {
-              get: () => this.itemData.visualId,
-              set: (value) => {
-                this.itemData.visualId = value;
-              }
-            },
-            suffixIconButtons: [
-              {
-                icon: 'refresh',
-                tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
-                clickAction: (input) => {
-                  // nothing to do ?
-                  if (!this._eventVisualIDMask) {
-                    return;
-                  }
-
-                  // generate
-                  this.itemData.visualId = EventModel.generateEventIDMask(this.selectedOutbreak.eventIdMask);
-
-                  // mark as dirty
-                  input.control?.markAsDirty();
-                }
-              }
-            ],
-            validators: {
-              async: new Observable((observer) => {
-                // construct cache key
-                const cacheKey: string = 'CEV_' + this.selectedOutbreak.id +
-                  this._eventVisualIDMask.mask +
-                  this.itemData.visualId +
-                  (
-                    this.isCreate ?
-                      '' :
-                      this.itemData.id
-                  );
-
-                // get data from cache or execute validator
-                TimerCache.run(
-                  cacheKey,
-                  this.eventDataService.checkEventVisualIDValidity(
-                    this.selectedOutbreak.id,
-                    this._eventVisualIDMask.mask,
-                    this.itemData.visualId,
-                    this.isCreate ?
-                      undefined :
-                      this.itemData.id
-                  )
-                ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                  observer.next(isValid);
-                  observer.complete();
-                });
-              })
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'responsibleUserId',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-            description: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-            value: {
-              get: () => this.itemData.responsibleUserId,
-              set: (value) => {
-                this.itemData.responsibleUserId = value;
-              }
-            },
-            replace: {
-              condition: () => !UserModel.canListForFilters(this.authUser),
-              html: this.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'eventCategory',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
-            description: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => this.itemData.eventCategory,
-              set: (value) => {
-                this.itemData.eventCategory = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'endDate',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_END_DATE',
-            description: () => 'LNG_EVENT_FIELD_LABEL_END_DATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.endDate,
-              set: (value) => {
-                this.itemData.endDate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: 'description',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
-            value: {
-              get: () => this.itemData.description,
-              set: (value) => {
-                this.itemData.description = value;
-              }
-            }
-          }]
-        },
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.ADDRESS,
-            typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            name: 'address',
-            value: {
-              get: () => this.itemData.address
-            }
-          }]
-        }
-      ]
-    };
+    return this.entityEventHelperService.generateTabsDetails({
+      selectedOutbreak: this.selectedOutbreak,
+      isCreate: this.isCreate,
+      itemData: this.itemData,
+      eventVisualIDMask: this._eventVisualIDMask,
+      options: {
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      }
+    });
   }
 
   /**
@@ -548,7 +363,6 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
           relationshipType: RelationshipType.CONTACT,
-          authUser: this.authUser,
           refreshList: () => {
             // reload data
             const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
@@ -556,7 +370,6 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           }
         }),
         tableColumns: this.entityHelperService.retrieveTableColumns({
-          authUser: this.authUser,
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
@@ -703,7 +516,6 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
           relationshipType: RelationshipType.EXPOSURE,
-          authUser: this.authUser,
           refreshList: () => {
             // reload data
             const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
@@ -711,7 +523,6 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           }
         }),
         tableColumns: this.entityHelperService.retrieveTableColumns({
-          authUser: this.authUser,
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
@@ -972,7 +783,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         takeUntil(this.destroyed$)
       ).subscribe((item: EventModel) => {
         // success creating / updating event
-        this.toastV2Service.success(
+        this.createViewModifyHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE'

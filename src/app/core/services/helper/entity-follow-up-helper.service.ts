@@ -9,7 +9,7 @@ import { V2FilterType } from '../../../shared/components-v2/app-list-table-v2/mo
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { EntityType } from '../../models/entity-type';
-import { QuestionModel } from '../../models/question.model';
+import { IAnswerData, QuestionModel } from '../../models/question.model';
 import { UserModel } from '../../models/user.model';
 import { DialogV2Service } from './dialog-v2.service';
 import { ToastV2Service } from './toast-v2.service';
@@ -31,27 +31,285 @@ import * as moment from 'moment';
 import { ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { I18nService } from './i18n.service';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+import { AuthDataService } from '../data/auth.data.service';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EntityFollowUpHelperService {
+  // data
+  public readonly visibleMandatoryKey: string = 'follow-ups';
+  private _authUser: UserModel;
+
   /**
    * Constructor
    */
   constructor(
+    private authDataService: AuthDataService,
     private dialogV2Service: DialogV2Service,
     private followUpsDataService: FollowUpsDataService,
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private locationDataService: LocationDataService
-  ) {}
+  ) {
+    // get the authenticated user
+    this._authUser = this.authDataService.getAuthenticatedUser();
+  }
+
+  /**
+   * Generate tab - Personal
+   */
+  generateTabsPersonal(data: {
+    isCreate: boolean,
+    isModify: boolean,
+    itemData: FollowUpModel,
+    entityData: ContactOfContactModel | ContactModel | CaseModel,
+    options: {
+      dailyFollowUpStatus: ILabelValuePairModel[],
+      user: ILabelValuePairModel[],
+      team: ILabelValuePairModel[],
+      addressType: ILabelValuePairModel[]
+    }
+  }): ICreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
+      label: data.isCreate ?
+        'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE' :
+        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE',
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_COMMON_LABEL_DETAILS',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'date',
+              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION',
+              value: {
+                get: () => data.itemData.date,
+                set: (value) => {
+                  data.itemData.date = value;
+                }
+              },
+              validators: {
+                required: () => true
+              },
+              disabled: () => data.isModify,
+              visibleMandatoryConf: {
+                visible: true,
+                required: true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'targeted',
+              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION',
+              value: {
+                get: () => data.itemData.targeted,
+                set: (value) => {
+                  data.itemData.targeted = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'statusId',
+              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION',
+              options: data.options.dailyFollowUpStatus,
+              value: {
+                get: () => data.itemData.statusId,
+                set: (value) => {
+                  data.itemData.statusId = value;
+                }
+              },
+              validators: {
+                required: () => true
+              },
+              disabled: () => data.isModify && Constants.isDateInTheFuture(data.itemData.date)
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'responsibleUserId',
+              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
+              options: data.options.user,
+              value: {
+                get: () => data.itemData.responsibleUserId,
+                set: (value) => {
+                  data.itemData.responsibleUserId = value;
+                }
+              },
+              replace: {
+                condition: () => !UserModel.canListForFilters(this._authUser),
+                html: this.i18nService.instant('LNG_PAGE_MODIFY_FOLLOW_UP_CANT_SET_RESPONSIBLE_ID_TITLE')
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'teamId',
+              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION',
+              options: data.options.team,
+              value: {
+                get: () => data.itemData.teamId,
+                set: (value) => {
+                  data.itemData.teamId = value;
+                }
+              }
+            }
+          ]
+        },
+
+        // Address
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.ADDRESS,
+            typeOptions: data.options.addressType,
+            name: 'address',
+            value: {
+              get: () => data.isCreate ?
+                data.entityData.mainAddress :
+                data.itemData.address
+            }
+          }]
+        }
+      ]
+    };
+  }
+
+  /**
+   * Determine alertness
+   */
+  determineAlertness(
+    template: QuestionModel[],
+    entities: FollowUpModel[]
+  ): FollowUpModel[] {
+    // map alert question answers to object for easy find
+    const alertQuestionAnswers: {
+      [question_variable: string]: {
+        [answer_value: string]: true
+      }
+    } = QuestionModel.determineAlertAnswers(template);
+
+    // map alert value to follow-ups
+    entities.forEach((followUpData: FollowUpModel) => {
+      // check if we need to mark follow-up as alerted because of questionnaire answers
+      followUpData.alerted = false;
+      if (followUpData.questionnaireAnswers) {
+        const props: string[] = Object.keys(followUpData.questionnaireAnswers);
+        for (let propIndex: number = 0; propIndex < props.length; propIndex++) {
+          // get answer data
+          const questionVariable: string = props[propIndex];
+          const answers: IAnswerData[] = followUpData.questionnaireAnswers[questionVariable];
+
+          // retrieve answer value
+          // only the newest one is of interest, the old ones shouldn't trigger an alert
+          // the first item should be the newest
+          const answerKey = answers?.length > 0 ?
+            answers[0].value :
+            undefined;
+
+          // there is no point in checking the value if there isn't one
+          if (
+            !answerKey &&
+            typeof answerKey !== 'number'
+          ) {
+            continue;
+          }
+
+          // at least one alerted ?
+          if (Array.isArray(answerKey)) {
+            // go through all answers
+            for (let answerKeyIndex: number = 0; answerKeyIndex < answerKey.length; answerKeyIndex++) {
+              if (
+                alertQuestionAnswers[questionVariable] &&
+                alertQuestionAnswers[questionVariable][answerKey[answerKeyIndex]]
+              ) {
+                // alerted
+                followUpData.alerted = true;
+
+                // stop
+                break;
+              }
+            }
+
+            // stop ?
+            if (followUpData.alerted) {
+              // stop
+              break;
+            }
+          } else if (
+            alertQuestionAnswers[questionVariable] &&
+            alertQuestionAnswers[questionVariable][answerKey]
+          ) {
+            // alerted
+            followUpData.alerted = true;
+
+            // stop
+            break;
+          }
+        }
+      }
+    });
+
+    // finished
+    return entities;
+  }
+
+  /**
+   * Retrieve statuses forms
+   */
+  getStatusForms(
+    info: {
+      // required
+      item: FollowUpModel,
+      dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>
+    }
+  ): V2ColumnStatusForm[] {
+    // construct list of forms that we need to display
+    const forms: V2ColumnStatusForm[] = [];
+
+    // status
+    if (
+      info.item.statusId &&
+      info.dailyFollowUpStatus.map[info.item.statusId]
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.CIRCLE,
+        color: info.dailyFollowUpStatus.map[info.item.statusId].getColorCode(),
+        tooltip: this.i18nService.instant(info.item.statusId)
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
+    }
+
+    // alerted
+    if (info.item.alerted) {
+      forms.push({
+        type: IV2ColumnStatusFormType.STAR,
+        color: 'var(--gd-danger)',
+        tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
+    }
+
+    // finished
+    return forms;
+  }
 
   /**
    * Retrieve table columns
    */
   retrieveTableColumnActions(definitions: {
-    authUser: UserModel,
     entityData: ContactOfContactModel | ContactModel | CaseModel,
     selectedOutbreak: () => OutbreakModel,
     selectedOutbreakIsActive: () => boolean,
@@ -85,7 +343,7 @@ export class EntityFollowUpHelperService {
           },
           visible: (item: FollowUpModel): boolean => {
             return !item.deleted &&
-              FollowUpModel.canView(definitions.authUser);
+              FollowUpModel.canView(this._authUser);
           }
         },
 
@@ -103,7 +361,7 @@ export class EntityFollowUpHelperService {
             return !item.deleted &&
               definitions.entityData.type === EntityType.CONTACT &&
               definitions.selectedOutbreakIsActive() &&
-              FollowUpModel.canModify(definitions.authUser);
+              FollowUpModel.canModify(this._authUser);
           }
         },
 
@@ -186,7 +444,7 @@ export class EntityFollowUpHelperService {
                 return !item.deleted &&
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
-                  FollowUpModel.canDelete(definitions.authUser);
+                  FollowUpModel.canDelete(this._authUser);
               }
             },
 
@@ -264,7 +522,7 @@ export class EntityFollowUpHelperService {
                 return item.deleted &&
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
-                  FollowUpModel.canRestore(definitions.authUser);
+                  FollowUpModel.canRestore(this._authUser);
               }
             },
 
@@ -275,7 +533,7 @@ export class EntityFollowUpHelperService {
                 return !item.deleted &&
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
-                  FollowUpModel.canModify(definitions.authUser) &&
+                  FollowUpModel.canModify(this._authUser) &&
                   !Constants.isDateInTheFuture(item.date);
               }
             },
@@ -379,7 +637,7 @@ export class EntityFollowUpHelperService {
                 return !item.deleted &&
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
-                  FollowUpModel.canModify(definitions.authUser);
+                  FollowUpModel.canModify(this._authUser);
               }
             },
 
@@ -469,7 +727,7 @@ export class EntityFollowUpHelperService {
                 return !item.deleted &&
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
-                  FollowUpModel.canModify(definitions.authUser);
+                  FollowUpModel.canModify(this._authUser);
               }
             }
           ]
@@ -482,7 +740,6 @@ export class EntityFollowUpHelperService {
    * Retrieve table columns
    */
   retrieveTableColumns(definitions: {
-    authUser: UserModel,
     team: IResolverV2ResponseModel<TeamModel>,
     user: IResolverV2ResponseModel<UserModel>,
     dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>,
@@ -522,7 +779,7 @@ export class EntityFollowUpHelperService {
         },
         link: (item: FollowUpModel) => {
           return item.teamId &&
-            TeamModel.canView(definitions.authUser) &&
+            TeamModel.canView(this._authUser) &&
             definitions.team.map[item.teamId] ?
             `/teams/${ item.teamId }/view` :
             undefined;
@@ -578,9 +835,8 @@ export class EntityFollowUpHelperService {
             }]
           }
         ],
-        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
+        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => this.getStatusForms({
           item: data,
-          i18nService: this.i18nService,
           dailyFollowUpStatus: definitions.dailyFollowUpStatus
         })
       },
@@ -754,7 +1010,7 @@ export class EntityFollowUpHelperService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canListForFilters(definitions.authUser);
+          return !UserModel.canListForFilters(this._authUser);
         },
         link: (data) => {
           return data.responsibleUserId ?
@@ -803,7 +1059,7 @@ export class EntityFollowUpHelperService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canView(definitions.authUser);
+          return !UserModel.canView(this._authUser);
         },
         link: (data) => {
           return data.createdBy ?
@@ -838,7 +1094,7 @@ export class EntityFollowUpHelperService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canView(definitions.authUser);
+          return !UserModel.canView(this._authUser);
         },
         link: (data) => {
           return data.updatedBy ?
@@ -868,7 +1124,6 @@ export class EntityFollowUpHelperService {
    * Advanced filters
    */
   generateAdvancedFilters(data: {
-    authUser: UserModel,
     contactFollowUpTemplate: () => QuestionModel[],
     options: {
       team: ILabelValuePairModel[],
@@ -1023,7 +1278,7 @@ export class EntityFollowUpHelperService {
     ];
 
     // allowed to filter by user ?
-    if (UserModel.canListForFilters(data.authUser)) {
+    if (UserModel.canListForFilters(this._authUser)) {
       advancedFilters.push(
         {
           type: V2AdvancedFilterType.MULTISELECT,
@@ -1124,7 +1379,7 @@ export class EntityFollowUpHelperService {
       )
       .pipe(
         map((followUps: FollowUpModel[]) => {
-          return FollowUpModel.determineAlertness(
+          return this.determineAlertness(
             outbreak.contactFollowUpTemplate,
             followUps
           );

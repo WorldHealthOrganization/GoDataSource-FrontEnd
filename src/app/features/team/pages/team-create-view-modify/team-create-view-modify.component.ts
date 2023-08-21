@@ -4,7 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -14,7 +13,6 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -27,7 +25,8 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Location } from '@angular/common';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -44,23 +43,22 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected toastV2Service: ToastV2Service,
-    protected i18nService: I18nService,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected teamDataService: TeamDataService,
-    protected location: Location,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected location: Location
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -72,7 +70,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     super.onDestroy();
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_USER_IN_MULTIPLE_TEAMS);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_USER_IN_MULTIPLE_TEAMS);
   }
 
   /**
@@ -158,7 +156,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_TEAM_TITLE', {
             name: this.itemData.name
           }
@@ -168,7 +166,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_TEAM_TITLE', {
             name: this.itemData.name
           }
@@ -197,8 +195,8 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -425,7 +423,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
               })
             ).subscribe((outbreak) => {
               // display message
-              this.toastV2Service.success(
+              this.createViewModifyHelperService.toastV2Service.success(
                 type === CreateViewModifyV2ActionType.CREATE ?
                   'LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE' :
                   'LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE'
@@ -537,7 +535,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     }
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_USER_IN_MULTIPLE_TEAMS);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_USER_IN_MULTIPLE_TEAMS);
 
     // nothing to check ?
     if (!this.itemData.userIds?.length) {
@@ -612,7 +610,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
         });
 
         // display alert
-        this.toastV2Service.notice(
+        this.createViewModifyHelperService.toastV2Service.notice(
           'LNG_DIALOG_CONFIRM_ADD_USER_TEAM',
           {
             assigned

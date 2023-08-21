@@ -32,6 +32,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { Moment } from 'moment';
 import * as momentOriginal from 'moment';
+import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 
 @Component({
   selector: 'app-lab-results',
@@ -79,7 +80,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
     private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
-    private referenceDataHelperService: ReferenceDataHelperService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private entityLabResultHelperService: EntityLabResultHelperService
   ) {
     super(
       listHelperService, {
@@ -449,9 +451,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
             }]
           }
         ],
-        forms: (_column, data: LabResultModel): V2ColumnStatusForm[] => LabResultModel.getStatusForms({
-          item: data,
-          i18nService: this.i18nService
+        forms: (_column, data: LabResultModel): V2ColumnStatusForm[] => this.entityLabResultHelperService.getStatusForms({
+          item: data
         })
       },
       {
@@ -881,8 +882,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = LabResultModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.advancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersAggregate({
       selectedOutbreak: () => this.selectedOutbreak,
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -1463,7 +1463,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       .pipe(
         // determine alertness
         map((data: LabResultModel[]) => {
-          return LabResultModel.determineAlertness(
+          return this.entityLabResultHelperService.determineAlertness(
             this.selectedOutbreak.labResultsTemplate,
             data
           );

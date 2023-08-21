@@ -4,7 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -14,14 +13,14 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -35,22 +34,21 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected toastV2Service: ToastV2Service,
-    protected i18nService: I18nService,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
-    protected languageDataService: LanguageDataService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected languageDataService: LanguageDataService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -142,7 +140,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_LANGUAGE_TITLE', {
             name: this.itemData.name
           }
@@ -152,7 +150,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_LANGUAGE_TITLE', {
             name: this.itemData.name
           }
@@ -181,8 +179,8 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -339,7 +337,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
         takeUntil(this.destroyed$)
       ).subscribe((item: ClusterModel) => {
         // success creating / updating cluster
-        this.toastV2Service.success(
+        this.createViewModifyHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE'

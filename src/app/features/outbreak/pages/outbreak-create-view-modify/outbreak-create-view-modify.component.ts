@@ -4,7 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType, CreateViewModifyV2TabInput,
@@ -27,10 +26,8 @@ import * as _ from 'lodash';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { QuestionModel } from '../../../../core/models/question.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import {
   ITreeEditorDataCategory, ITreeEditorDataValue
@@ -41,6 +38,8 @@ import {
   IV2BottomDialogConfigButtonType
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { UserModel } from '../../../../core/models/user.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 
 /**
  * Component
@@ -65,23 +64,22 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    * Constructor
    */
   constructor(
-    protected outbreakDataService: OutbreakDataService,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected i18nService: I18nService,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected outbreakDataService: OutbreakDataService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
-    protected referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    toastV2Service: ToastV2Service,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
-      activatedRoute,
       authDataService,
+      activatedRoute,
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService,
       true
     );
   }
@@ -94,7 +92,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     super.onDestroy();
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
   }
 
   /**
@@ -137,6 +135,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
 
     // format reference data per disease to expected tree format
     this._diseaseSpecificReferenceData = this.referenceDataHelperService.convertRefCategoriesToTreeCategories(this.activatedRoute.snapshot.data.diseaseSpecificCategories.list);
+
+    // merge default fields
+    this.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.itemData);
   }
 
   /**
@@ -195,7 +196,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY', {
             name: this.itemData.name
           }
@@ -205,7 +206,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_OUTBREAK_TITLE', {
             name: this.itemData.name
           }
@@ -233,6 +234,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         // Map servers
         this.initializeTabsMapServers(),
 
+        // Visible and required fields
+        this.initializeTabsVisibleAndRequiredFields(),
+
         // Reference Data Per Outbreak
         this.initializeTabsReferenceDataPerOutbreak(),
 
@@ -246,8 +250,8 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -964,6 +968,29 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   }
 
   /**
+   * Initialize tabs - Visible and required fields
+   */
+  private initializeTabsVisibleAndRequiredFields(): ICreateViewModifyV2TabTable {
+    // init tab
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'visible_mandatory_fields',
+      label: 'LNG_OUTBREAK_FIELD_LABEL_VISIBLE_AND_MANDATORY_FIELDS',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY,
+        name: 'visibleAndMandatoryFields',
+        value: {
+          get: () => this.itemData.visibleAndMandatoryFields,
+          set: (value) => {
+            this.itemData.visibleAndMandatoryFields = value;
+          }
+        },
+        options: this.outbreakAndOutbreakTemplateHelperService.generateVisibleMandatoryOptions()
+      }
+    };
+  }
+
+  /**
    * Initialize tabs - Reference data per outbreak
    */
   private initializeTabsReferenceDataPerOutbreak(): ICreateViewModifyV2TabTable {
@@ -1240,7 +1267,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           !data.labResultsTemplate
         ) {
           // display message
-          this.toastV2Service.success(
+          this.createViewModifyHelperService.toastV2Service.success(
             type === CreateViewModifyV2ActionType.CREATE ?
               'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
               'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
@@ -1254,11 +1281,11 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         }
 
         // update language tokens to get the translation of submitted questions and answers
-        this.i18nService.loadUserLanguage()
+        this.createViewModifyHelperService.i18nService.loadUserLanguage()
           .pipe(
             catchError((err) => {
               // show err
-              this.toastV2Service.error(err);
+              this.createViewModifyHelperService.toastV2Service.error(err);
 
               // finished
               finished(err, undefined);
@@ -1269,7 +1296,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           )
           .subscribe(() => {
             // display message
-            this.toastV2Service.success(
+            this.createViewModifyHelperService.toastV2Service.success(
               type === CreateViewModifyV2ActionType.CREATE ?
                 'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
                 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
@@ -1368,7 +1395,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         .filter((item, index) => index !== entityMasks.indexOf(item))
         .filter((item) => item?.includes('9')).length
     ) {
-      this.toastV2Service.notice(
+      this.createViewModifyHelperService.toastV2Service.notice(
         'LNG_OUTBREAK_FIELD_CHECK_DUPLICATE_ENTITY_MASK',
         undefined,
         AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK
@@ -1379,7 +1406,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     }
 
     // hide warning if no mismatch found
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
   }
 
   /**
@@ -1395,7 +1422,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         message: {
           get: () => 'LNG_PAGE_CREATE_OUTBREAK_COPY_REF_FROM_DISEASE_DIALOG',
           data: () => ({
-            disease: this.i18nService.instant(this.itemData.disease)
+            disease: this.createViewModifyHelperService.i18nService.instant(this.itemData.disease)
           })
         }
       },

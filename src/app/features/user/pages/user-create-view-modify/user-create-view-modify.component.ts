@@ -2,9 +2,7 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2ActionType, CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
@@ -14,7 +12,6 @@ import {
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { PhoneNumberType, UserModel } from '../../../../core/models/user.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -23,9 +20,11 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { LanguageModel } from '../../../../core/models/language.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import * as _ from 'lodash';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -42,22 +41,21 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected toastV2Service: ToastV2Service,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected userDataService: UserDataService,
-    protected i18nService: I18nService,
     protected router: Router,
-    protected dialogV2Service: DialogV2Service,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected dialogV2Service: DialogV2Service
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -149,7 +147,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_USER_TITLE', {
             name: this.itemData.name
           }
@@ -159,7 +157,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_USER_TITLE', {
             name: this.itemData.name
           }
@@ -188,8 +186,8 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -383,7 +381,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               },
               replace: {
                 condition: () => !OutbreakModel.canList(this.authUser),
-                html: this.i18nService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ALL_OUTBREAKS')
+                html: this.createViewModifyHelperService.i18nService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ALL_OUTBREAKS')
               }
             },
             {
@@ -404,7 +402,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               },
               replace: {
                 condition: () => !OutbreakModel.canList(this.authUser),
-                html: this.i18nService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ACTIVE_OUTBREAK')
+                html: this.createViewModifyHelperService.i18nService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ACTIVE_OUTBREAK')
               }
             },
             {
@@ -564,7 +562,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
         })
       ).subscribe((outbreak) => {
         // display message
-        this.toastV2Service.success(
+        this.createViewModifyHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE'

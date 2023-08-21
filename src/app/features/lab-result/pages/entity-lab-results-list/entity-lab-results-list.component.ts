@@ -19,7 +19,6 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
@@ -38,6 +37,7 @@ import * as momentOriginal from 'moment/moment';
 import { Constants } from '../../../../core/models/constants';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 
 @Component({
   selector: 'app-entity-lab-results-list',
@@ -88,7 +88,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
     private outbreakDataService: OutbreakDataService,
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
-    private entityLabResultService: EntityLabResultService,
+    private entityLabResultHelperService: EntityLabResultHelperService,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
     private caseDataService: CaseDataService,
@@ -138,8 +138,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Table column - actions
    */
   protected initializeTableColumnActions(): void {
-    this.tableColumnActions = this.entityLabResultService.retrieveTableColumnActions({
-      authUser: this.authUser,
+    this.tableColumnActions = this.entityLabResultHelperService.retrieveTableColumnActions({
       personType: this.personType,
       selectedOutbreak: () => this.selectedOutbreak,
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -154,8 +153,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
-    this.tableColumns = this.entityLabResultService.retrieveTableColumns({
-      authUser: this.authUser,
+    this.tableColumns = this.entityLabResultHelperService.retrieveTableColumns({
       user: this.activatedRoute.snapshot.data.user,
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -267,8 +265,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityLabResultService.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.advancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersPerson({
       labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -838,7 +835,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return this.entityLabResultService.refreshListFields();
+    return this.entityLabResultHelperService.refreshListFields();
   }
 
   /**
@@ -856,7 +853,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
       }
 
       // retrieve the list of lab results
-      this.records$ = this.entityLabResultService
+      this.records$ = this.entityLabResultHelperService
         .retrieveRecords(
           this.selectedOutbreak,
           EntityModel.getLinkForEntityType(this.personType),
@@ -902,7 +899,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
       }
 
       // count
-      this.entityLabResultService
+      this.entityLabResultHelperService
         .retrieveRecordsCount(
           this.selectedOutbreak.id,
           this.personType,

@@ -133,7 +133,6 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    */
   protected initializeTableColumnActions(): void {
     this.tableColumnActions = this.entityFollowUpHelperService.retrieveTableColumnActions({
-      authUser: this.authUser,
       entityData: this.entityData,
       selectedOutbreak: () => this.selectedOutbreak,
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -150,7 +149,6 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    */
   protected initializeTableColumns(): void {
     this.tableColumns = this.entityFollowUpHelperService.retrieveTableColumns({
-      authUser: this.authUser,
       team: this.route.snapshot.data.team,
       user: this.route.snapshot.data.user,
       dailyFollowUpStatus: this.route.snapshot.data.dailyFollowUpStatus,
@@ -235,7 +233,6 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = this.entityFollowUpHelperService.generateAdvancedFilters({
-      authUser: this.authUser,
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       options: {
         team: (this.route.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,

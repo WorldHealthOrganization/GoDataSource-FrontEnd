@@ -107,7 +107,6 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
       selectedOutbreak: () => this.selectedOutbreak,
       entity: this._entity,
       relationshipType: this.relationshipType,
-      authUser: this.authUser,
       refreshList: () => {
         // reload data
         this.needsRefreshList(true);
@@ -120,7 +119,6 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
    */
   protected initializeTableColumns(): void {
     this.tableColumns = this.entityHelperService.retrieveTableColumns({
-      authUser: this.authUser,
       personType: this.activatedRoute.snapshot.data.personType,
       cluster: this.activatedRoute.snapshot.data.cluster,
       options: {

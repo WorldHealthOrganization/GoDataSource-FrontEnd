@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import {
   CreateViewModifyV2ActionType,
@@ -19,15 +18,9 @@ import {
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
-import { AgeModel } from '../../../../core/models/age.model';
-import { TimerCache } from '../../../../core/helperClasses/timer-cache';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { Moment, moment } from '../../../../core/helperClasses/x-moment';
-import { VaccineModel } from '../../../../core/models/vaccine.model';
-import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
+import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -40,7 +33,6 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Location } from '@angular/common';
@@ -55,16 +47,17 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
-import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { TeamModel } from '../../../../core/models/team.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
+import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -82,9 +75,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private _caseVisualIDMask: {
     mask: string
   };
-
-  // today
-  private _today: Moment = moment();
 
   // check for duplicate
   private _duplicateCheckingTimeout: number;
@@ -111,31 +101,30 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected router: Router,
     protected caseDataService: CaseDataService,
-    protected i18nService: I18nService,
     protected systemSettingsDataService: SystemSettingsDataService,
-    protected toastV2Service: ToastV2Service,
-    protected contactDataService: ContactDataService,
     protected location: Location,
     protected dialogV2Service: DialogV2Service,
     protected entityDataService: EntityDataService,
     protected entityHelperService: EntityHelperService,
-    protected entityLabResultService: EntityLabResultService,
+    protected entityLabResultHelperService: EntityLabResultHelperService,
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
     protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private entityCaseHelperService: EntityCaseHelperService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // do we need to use custom id ?
@@ -178,9 +167,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     }
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -214,7 +203,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   protected initializedData(): void {
     // initialize visual ID mask
     this._caseVisualIDMask = {
-      mask: CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+      mask: this.entityCaseHelperService.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
     };
 
     // set visual id for case
@@ -228,7 +217,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.isModify
     ) {
       // remove global notifications
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
       // show global notifications
       this.checkForPersonExistence();
@@ -315,7 +304,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     if (this.isCreate) {
       if (this.customCaseUUID) {
         this.breadcrumbs.push({
-          label: this.i18nService.instant(
+          label: this.createViewModifyHelperService.i18nService.instant(
             'LNG_PAGE_CREATE_CASE_WITH_UID_TITLE', {
               uid: this.customCaseUUID
             }
@@ -330,7 +319,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       }
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_CASE_TITLE', {
             name: this.itemData.name
           }
@@ -340,7 +329,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_CASE_TITLE', {
             name: this.itemData.name
           }
@@ -367,7 +356,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.breadcrumbInfos.push({
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
         tooltip: this.itemData.dateBecomeCase ?
-          `${this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -377,7 +366,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.breadcrumbInfos.push({
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
         tooltip: this.itemData.dateBecomeCase ?
-          `${this.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -455,8 +444,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -490,780 +479,76 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs - Personal
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    // create tab
-    const tab: ICreateViewModifyV2Tab = {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'personal',
-      label: this.isCreate ?
-        'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE' :
-        'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
-          inputs: [
-            {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'firstName',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-              description: () => 'LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
-              value: {
-                get: () => this.itemData.firstName,
-                set: (value) => {
-                  // set data
-                  this.itemData.firstName = value;
-
-                  // check for duplicates
-                  this.checkForPersonExistence();
-                }
-              },
-              validators: {
-                required: () => true
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'middleName',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-              description: () => 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
-              value: {
-                get: () => this.itemData.middleName,
-                set: (value) => {
-                  // set data
-                  this.itemData.middleName = value;
-
-                  // check for duplicates
-                  this.checkForPersonExistence();
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'lastName',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-              description: () => 'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION',
-              value: {
-                get: () => this.itemData.lastName,
-                set: (value) => {
-                  // set data
-                  this.itemData.lastName = value;
-
-                  // check for duplicates
-                  this.checkForPersonExistence();
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'gender',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_GENDER',
-              description: () => 'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              value: {
-                get: () => this.itemData.gender,
-                set: (value) => {
-                  // set gender
-                  this.itemData.gender = value;
-
-                  // reset pregnancy ?
-                  if (this.itemData.gender === Constants.GENDER_MALE) {
-                    // reset
-                    this.itemData.pregnancyStatus = null;
-
-                    // make sure we update pregnancy too
-                    tab.form.controls['pregnancyStatus'].markAsDirty();
-                  }
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'pregnancyStatus',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-              description: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
-              clearable: false,
-              options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              value: {
-                get: () => this.itemData.pregnancyStatus,
-                set: (value) => {
-                  this.itemData.pregnancyStatus = value;
-                }
-              },
-              disabled: () => {
-                return this.itemData.gender === Constants.GENDER_MALE;
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'occupation',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-              description: () => 'LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION',
-              options: this.referenceDataHelperService.filterPerOutbreakOptions(
-                this.selectedOutbreak,
-                (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                this.itemData.occupation
-              ),
-              value: {
-                get: () => this.itemData.occupation,
-                set: (value) => {
-                  this.itemData.occupation = value;
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH,
-              name: {
-                age: 'age',
-                dob: 'dob'
-              },
-              description: {
-                age: 'LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION',
-                dob: 'LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION'
-              },
-              ageChecked: !this.itemData.dob,
-              ageTypeYears: this.itemData.age?.months < 1,
-              value: {
-                age: {
-                  years: {
-                    get: () => this.itemData.age?.years,
-                    set: (value) => {
-                      // set value
-                      this.itemData.age = this.itemData.age || new AgeModel();
-                      this.itemData.age.years = value;
-
-                      // reset
-                      this.itemData.dob = null;
-                    }
-                  },
-                  months: {
-                    get: () => this.itemData.age?.months,
-                    set: (value) => {
-                      // set value
-                      this.itemData.age = this.itemData.age || new AgeModel();
-                      this.itemData.age.months = value;
-
-                      // reset
-                      this.itemData.dob = null;
-                    }
-                  }
-                },
-                dob: {
-                  get: () => this.itemData.dob,
-                  set: (value) => {
-                    // set value
-                    this.itemData.dob = value;
-
-                    // update age
-                    if (
-                      this.itemData.dob &&
-                      (this.itemData.dob as Moment).isValid()
-                    ) {
-                      // add age object if we don't have one
-                      this.itemData.age = this.itemData.age || new AgeModel();
-
-                      // add data
-                      const now = moment();
-                      this.itemData.age.years = now.diff(this.itemData.dob, 'years');
-                      this.itemData.age.months = this.itemData.age.years < 1 ? now.diff(this.itemData.dob, 'months') : 0;
-                    } else {
-                      this.itemData.age.months = 0;
-                      this.itemData.age.years = 0;
-                    }
-                  }
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
-              name: 'visualId',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-              description: () => this.i18nService.instant(
-                'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
-                this._caseVisualIDMask
-              ),
-              value: {
-                get: () => this.itemData.visualId,
-                set: (value) => {
-                  this.itemData.visualId = value;
-                }
-              },
-              suffixIconButtons: [
-                {
-                  icon: 'refresh',
-                  tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
-                  clickAction: (input) => {
-                    // nothing to do ?
-                    if (!this._caseVisualIDMask) {
-                      return;
-                    }
-
-                    // generate
-                    this.itemData.visualId = CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
-
-                    // mark as dirty
-                    input.control?.markAsDirty();
-                  }
-                }
-              ],
-              validators: {
-                async: new Observable((observer) => {
-                  // construct cache key
-                  const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
-                    this._caseVisualIDMask.mask +
-                    this.itemData.visualId +
-                    (
-                      this.isCreate ?
-                        '' :
-                        this.itemData.id
-                    );
-
-                  // get data from cache or execute validator
-                  TimerCache.run(
-                    cacheKey,
-                    this.caseDataService.checkCaseVisualIDValidity(
-                      this.selectedOutbreak.id,
-                      this._caseVisualIDMask.mask,
-                      this.itemData.visualId,
-                      this.isCreate ?
-                        undefined :
-                        this.itemData.id
-                    )
-                  ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                    observer.next(isValid);
-                    observer.complete();
-                  });
-                })
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'responsibleUserId',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-              description: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-              value: {
-                get: () => this.itemData.responsibleUserId,
-                set: (value) => {
-                  this.itemData.responsibleUserId = value;
-                }
-              },
-              replace: {
-                condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.i18nService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
-              }
-            }
-          ]
-        },
-
-        // Documents
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'documents',
-            items: this.itemData.documents,
-            itemsChanged: (list) => {
-              // update documents
-              this.itemData.documents = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
-                newItem: () => new DocumentModel()
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.DOCUMENT,
-                typeOptions: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.documents[index];
-                  }
-                }
-              }
-            }
-          }]
-        },
-
-        // Addresses
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'addresses',
-            items: this.itemData.addresses,
-            itemsChanged: (list) => {
-              // update addresses
-              this.itemData.addresses = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
-                newItem: () => new AddressModel({
-                  date: moment().toISOString()
-                })
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.ADDRESS,
-                typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.addresses[index];
-                  }
-                },
-                validators: {
-                  required: () => true
-                }
-              }
-            }
-          }]
-        }
-      ]
-    };
-
-    // finished
-    return tab;
+    return this.entityCaseHelperService.generateTabsPersonal(this.selectedOutbreak, {
+      selectedOutbreak: this.selectedOutbreak,
+      isCreate: this.isCreate,
+      itemData: this.itemData,
+      checkForPersonExistence: this.checkForPersonExistence,
+      caseVisualIDMask: this._caseVisualIDMask,
+      options: {
+        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.occupation
+        ),
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      }
+    });
   }
 
   /**
    * Initialize tabs - Epidemiology
    */
   private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'infection',
-      label: this.isCreate ?
-        'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE' :
-        'LNG_PAGE_MODIFY_CASE_TAB_INFECTION_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'classification',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-            description: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this.itemData.classification
-            ),
-            value: {
-              get: () => this.itemData.classification,
-              set: (value) => {
-                this.itemData.classification = value;
-              }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfOnset',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfOnset,
-              set: (value) => {
-                // set data
-                this.itemData.dateOfOnset = value;
-
-                // check onset after reporting
-                this.checkForOnsetAfterReporting();
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              required: () => !!this.selectedOutbreak.isDateOfOnsetRequired,
-              dateSameOrBefore: () => [
-                this._today,
-                'dateOfOutcome'
-              ],
-              dateSameOrAfter: () => [
-                'dateOfInfection'
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'isDateOfOnsetApproximate',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-            description: () => 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.isDateOfOnsetApproximate,
-              set: (value) => {
-                this.itemData.isDateOfOnsetApproximate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateBecomeCase',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateBecomeCase,
-              set: (value) => {
-                this.itemData.dateBecomeCase = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfInfection',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfInfection,
-              set: (value) => {
-                this.itemData.dateOfInfection = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today,
-                'dateOfOutcome',
-                'dateOfOnset'
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'investigationStatus',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
-            description: () => 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => this.itemData.investigationStatus,
-              set: (value) => {
-                this.itemData.investigationStatus = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateInvestigationCompleted',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateInvestigationCompleted,
-              set: (value) => {
-                this.itemData.dateInvestigationCompleted = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'outcomeId',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_OUTCOME',
-            description: () => 'LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this.itemData.outcomeId
-            ),
-            value: {
-              get: () => this.itemData.outcomeId,
-              set: (value) => {
-                // set data
-                this.itemData.outcomeId = value;
-
-                // reset data if not deceased
-                if (this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
-                  this.itemData.deathLocationId = null;
-                  this.itemData.safeBurial = null;
-                  this.itemData.dateOfBurial = null;
-                  this.itemData.burialLocationId = null;
-                  this.itemData.burialPlaceName = null;
-                }
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfOutcome',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfOutcome,
-              set: (value) => {
-                this.itemData.dateOfOutcome = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today,
-                'dateOfBurial'
-              ],
-              dateSameOrAfter: () => [
-                'dateOfOnset',
-                'dateOfInfection'
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'transferRefused',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-            description: () => 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
-            value: {
-              get: () => this.itemData.transferRefused,
-              set: (value) => {
-                this.itemData.transferRefused = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
-            name: 'deathLocationId',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
-            description: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID_DESCRIPTION',
-            useOutbreakLocations: true,
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.deathLocationId,
-              set: (value) => {
-                this.itemData.deathLocationId = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'safeBurial',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-            description: () => 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION',
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                false :
-                this.itemData.safeBurial,
-              set: (value) => {
-                this.itemData.safeBurial = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfBurial',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION',
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.dateOfBurial,
-              set: (value) => {
-                this.itemData.dateOfBurial = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today
-              ],
-              dateSameOrAfter: () => [
-                'dateOfOutcome'
-              ]
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
-            name: 'burialLocationId',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
-            description: () => 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION',
-            useOutbreakLocations: true,
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.burialLocationId,
-              set: (value) => {
-                this.itemData.burialLocationId = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'burialPlaceName',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
-            description: () => 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.burialPlaceName,
-              set: (value) => {
-                this.itemData.burialPlaceName = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfReporting',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfReporting,
-              set: (value) => {
-                // set data
-                this.itemData.dateOfReporting = value;
-
-                // check onset after reporting
-                this.checkForOnsetAfterReporting();
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              required: () => true,
-              dateSameOrBefore: () => [
-                this._today
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'isDateOfReportingApproximate',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.isDateOfReportingApproximate,
-              set: (value) => {
-                this.itemData.isDateOfReportingApproximate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'riskLevel',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-            description: () => 'LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              this.itemData.riskLevel
-            ),
-            value: {
-              get: () => this.itemData.riskLevel,
-              set: (value) => {
-                this.itemData.riskLevel = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: 'riskReason',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_RISK_REASON',
-            description: () => 'LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION',
-            value: {
-              get: () => this.itemData.riskReason,
-              set: (value) => {
-                this.itemData.riskReason = value;
-              }
-            }
-          }]
-        },
-
-        // Vaccines
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'vaccinesReceived',
-            items: this.itemData.vaccinesReceived,
-            itemsChanged: (list) => {
-              // update documents
-              this.itemData.vaccinesReceived = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
-                newItem: () => new VaccineModel()
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.VACCINE,
-                vaccineOptions: this.referenceDataHelperService.filterPerOutbreakOptions(
-                  this.selectedOutbreak,
-                  (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  this.itemData.vaccinesReceived?.map((vaccine) => vaccine.vaccine)
-                ),
-                vaccineStatusOptions: this.referenceDataHelperService.filterPerOutbreakOptions(
-                  this.selectedOutbreak,
-                  (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  this.itemData.vaccinesReceived?.map((vaccine) => vaccine.status)
-                ),
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.vaccinesReceived[index];
-                  }
-                }
-              }
-            }
-          }]
-        },
-
-        // Date ranges
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'dateRanges',
-            items: this.itemData.dateRanges,
-            itemsChanged: (list) => {
-              // update documents
-              this.itemData.dateRanges = list.items;
-
-              // validate hospitalization start date against date of onset
-              this.checkForOnsetAfterHospitalizationStartDate();
-            },
-            definition: {
-              add: {
-                label: 'LNG_COMMON_BUTTON_ADD_DATE_RANGE',
-                newItem: () => new CaseCenterDateRangeModel()
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE,
-                typeOptions: this.referenceDataHelperService.filterPerOutbreakOptions(
-                  this.selectedOutbreak,
-                  (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  this.itemData.dateRanges?.map((date) => date.typeId)
-                ),
-                centerOptions: this.referenceDataHelperService.filterPerOutbreakOptions(
-                  this.selectedOutbreak,
-                  (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  this.itemData.dateRanges?.map((date) => date.centerName)
-                ),
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.dateRanges[index];
-                  }
-                },
-                changed: () => {
-                  // validate hospitalization start date against date of onset
-                  this.checkForOnsetAfterHospitalizationStartDate();
-                }
-              }
-            }
-          }]
-        }
-      ]
-    };
+    return this.entityCaseHelperService.generateTabsEpidemiology({
+      selectedOutbreak: this.selectedOutbreak,
+      isCreate: this.isCreate,
+      itemData: this.itemData,
+      checkForOnsetAfterReporting: this.checkForOnsetAfterReporting,
+      checkForOnsetAfterHospitalizationStartDate: this.checkForOnsetAfterHospitalizationStartDate,
+      options: {
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.classification
+        ),
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.outcomeId
+        ),
+        risk: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.riskLevel
+        ),
+        vaccine: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.vaccinesReceived?.map((vaccine) => vaccine.vaccine)
+        ),
+        vaccineStatus: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.vaccinesReceived?.map((vaccine) => vaccine.status)
+        ),
+        dateRangeType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.dateRanges?.map((date) => date.typeId)
+        ),
+        dateRangeCenter: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.dateRanges?.map((date) => date.centerName)
+        )
+      }
+    });
   }
 
   /**
@@ -1307,7 +592,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
-      label: `${this.i18nService.instant(EntityType.CONTACT)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.createViewModifyHelperService.i18nService.instant(EntityType.CONTACT)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersContact',
@@ -1354,7 +639,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
           relationshipType: RelationshipType.CONTACT,
-          authUser: this.authUser,
           refreshList: () => {
             // reload data
             const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
@@ -1362,7 +646,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
         }),
         tableColumns: this.entityHelperService.retrieveTableColumns({
-          authUser: this.authUser,
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
@@ -1509,7 +792,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
           relationshipType: RelationshipType.EXPOSURE,
-          authUser: this.authUser,
           refreshList: () => {
             // reload data
             const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
@@ -1517,7 +799,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
         }),
         tableColumns: this.entityHelperService.retrieveTableColumns({
-          authUser: this.authUser,
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
@@ -1660,8 +941,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.CASE_LAB_FIELDS,
         advancedFilterType: Constants.APP_PAGE.CASE_LAB_RESULTS.value,
-        tableColumnActions: this.entityLabResultService.retrieveTableColumnActions({
-          authUser: this.authUser,
+        tableColumnActions: this.entityLabResultHelperService.retrieveTableColumnActions({
           personType: this.itemData.type,
           selectedOutbreak: () => this.selectedOutbreak,
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -1671,8 +951,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.entityLabResultService.retrieveTableColumns({
-          authUser: this.authUser,
+        tableColumns: this.entityLabResultHelperService.retrieveTableColumns({
           user: this.activatedRoute.snapshot.data.user,
           options: {
             labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -1708,8 +987,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             )
           }
         }),
-        advancedFilters: this.entityLabResultService.generateAdvancedFilters({
-          authUser: this.authUser,
+        advancedFilters: this.entityLabResultHelperService.generateAdvancedFiltersPerson({
           labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
           options: {
             labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -1753,14 +1031,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         refresh: (tab) => {
           // attach fields restrictions
           const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          const fields: string[] = this.entityLabResultService.refreshListFields();
+          const fields: string[] = this.entityLabResultHelperService.refreshListFields();
           if (fields.length > 0) {
             localTab.queryBuilder.clearFields();
             localTab.queryBuilder.fields(...fields);
           }
 
           // refresh data
-          localTab.records$ = this.entityLabResultService
+          localTab.records$ = this.entityLabResultHelperService
             .retrieveRecords(
               this.selectedOutbreak,
               EntityModel.getLinkForEntityType(this.itemData.type),
@@ -1806,7 +1084,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
 
           // count
-          this.entityLabResultService
+          this.entityLabResultHelperService
             .retrieveRecordsCount(
               this.selectedOutbreak.id,
               this.itemData.type,
@@ -1844,7 +1122,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         pageSettingsKey: UserSettings.CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value,
         tableColumnActions: this.entityFollowUpHelperService.retrieveTableColumnActions({
-          authUser: this.authUser,
           entityData: this.itemData,
           selectedOutbreak: () => this.selectedOutbreak,
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -1856,7 +1133,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
         }),
         tableColumns: this.entityFollowUpHelperService.retrieveTableColumns({
-          authUser: this.authUser,
           team: this.activatedRoute.snapshot.data.team,
           user: this.activatedRoute.snapshot.data.user,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,
@@ -1865,7 +1141,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
         }),
         advancedFilters: this.entityFollowUpHelperService.generateAdvancedFilters({
-          authUser: this.authUser,
           contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
           options: {
             team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
@@ -2226,7 +1501,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           // finished
           const finishedProcessingData = () => {
             // success creating / updating case
-            this.toastV2Service.success(
+            this.createViewModifyHelperService.toastV2Service.success(
               type === CreateViewModifyV2ActionType.CREATE ?
                 'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE' :
                 'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE'
@@ -2356,7 +1631,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
               // hide notification
               // - hide alert
-              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+              this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
               // construct list of actions
               const itemsToManage: IV2SideDialogConfigInputLinkWithAction[] = response.duplicates.map((item, index) => {
@@ -2365,9 +1640,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   name: `actionsLink[${item.model.id}]`,
                   placeholder: (index + 1) + '. ' + EntityModel.getDuplicatePersonDetails(
                     item,
-                    this.i18nService.instant(item.model.type),
-                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                    this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                    this.createViewModifyHelperService.i18nService.instant(item.model.type),
+                    this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                    this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
                   link: () => ['/cases', item.model.id, 'view'],
                   actions: {
@@ -2507,9 +1782,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
           if (!item.uiStatusForms) {
             // determine forms
-            const forms: V2ColumnStatusForm[] = CaseModel.getStatusForms({
+            const forms: V2ColumnStatusForm[] = this.entityCaseHelperService.getStatusForms({
               item,
-              i18nService: this.i18nService,
               classification: this.activatedRoute.snapshot.data.classification,
               outcome: this.activatedRoute.snapshot.data.outcome
             });
@@ -2556,8 +1830,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = CaseModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.expandListAdvancedFilters = this.entityCaseHelperService.generateAdvancedFilters({
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
         gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -2679,8 +1952,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
-    this.toastV2Service.notice(
-      this.i18nService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_PERSONS') +
+    this.createViewModifyHelperService.toastV2Service.notice(
+      this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_PERSONS') +
       ' ' +
       this._personDuplicates
         .map((item) => {
@@ -2697,7 +1970,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               !ContactOfContactModel.canView(this.authUser)
             )
           ) {
-            return `${item.model.name} (${this.i18nService.instant(item.type)})`;
+            return `${item.model.name} (${this.createViewModifyHelperService.i18nService.instant(item.type)})`;
           }
 
           // create url
@@ -2716,7 +1989,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           const url =  `${entityPath}/${item.model.id}/view`;
 
           // finished
-          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.i18nService.instant(item.model.type)})</span></a>`;
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.createViewModifyHelperService.i18nService.instant(item.model.type)})</span></a>`;
         })
         .join(', '),
       undefined,
@@ -2757,7 +2030,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         const updateAlert = () => {
           // must update message ?
           // - hide alert
-          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+          this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
           // show duplicates alert
           this.showDuplicatesAlert();
@@ -2823,7 +2096,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             // handle error
             catchError((err) => {
               // show error
-              this.toastV2Service.error(err);
+              this.createViewModifyHelperService.toastV2Service.error(err);
 
               // finished
               return throwError(err);
@@ -2857,13 +2130,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.itemData.dateOfReporting &&
       moment(this.itemData.dateOfOnset).isAfter(moment(this.itemData.dateOfReporting))
     ) {
-      this.toastV2Service.notice(
+      this.createViewModifyHelperService.toastV2Service.notice(
         'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_IS_AFTER_DATE_OF_REPORTING',
         undefined,
         AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
       );
     } else {
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
     }
   }
 
@@ -2878,7 +2151,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       !this.itemData.dateRanges?.length
     ) {
       // make sure that there is no warning
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
       return;
     }
@@ -2890,7 +2163,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         moment(item.startDate).isValid() &&
         moment(item.startDate).isBefore(moment(this.itemData.dateOfOnset))
       ) {
-        this.toastV2Service.notice(
+        this.createViewModifyHelperService.toastV2Service.notice(
           'LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE',
           undefined,
           AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
@@ -2902,6 +2175,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     }
 
     // hide warning if no mismatch found
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 }
