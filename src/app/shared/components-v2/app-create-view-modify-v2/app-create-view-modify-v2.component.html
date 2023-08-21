@@ -513,6 +513,7 @@
                   [class.gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-section-content-input-has-tree-editor]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-visible-and-mandatory]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY"
                   [class.gd-create-view-modify-bottom-section-content-input-has-select-groups]="input.type === CreateViewModifyV2TabInputType.SELECT_GROUPS"
                   [class.gd-create-view-modify-bottom-section-content-input-has-wysiwyg]="input.type === CreateViewModifyV2TabInputType.WYSIWYG"
                   [class.gd-create-view-modify-bottom-section-content-input-has-label]="input.type === CreateViewModifyV2TabInputType.LABEL"
@@ -559,6 +560,17 @@
                     [addNewItemVisible]="input.add && (!input.add.visible || input.add.visible())"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"
                     (addNewItem)="input.add ? input.add.callback($event) : undefined"></app-form-tree-editor-v2>
+
+                  <!-- Visible and mandatory -->
+                  <app-form-visible-mandatory-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [viewOnly]="isView || !input.value.set"
+                    [selectedTab]="selectedTab === tab"
+                    [options]="input.options"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-visible-mandatory-v2>
 
                   <!-- Text -->
                   <app-form-input-v2
@@ -1677,6 +1689,12 @@
                 [ngTemplateOutlet]="formRender"
                 [ngTemplateOutletContext]="{ tab }"></ng-template>
 
+              <!-- Visible and mandatory -->
+              <ng-template
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY"
+                [ngTemplateOutlet]="formRender"
+                [ngTemplateOutletContext]="{ tab }"></ng-template>
+
             </ng-container>
           </ng-template>
 
@@ -1735,6 +1753,7 @@
                   [class.gd-create-view-modify-bottom-content-edit-questionnaire]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-content-fill-questionnaire]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-content-tree-editor]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR"
+                  [class.gd-create-view-modify-bottom-content-visible-and-mandatory-editor]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY"
                   [ngSwitch]="tab.type">
 
                   <!-- Tab -->

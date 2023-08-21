@@ -5,9 +5,9 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
-import { IAnswerData, QuestionModel } from './question.model';
+import { IAnswerData } from './question.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { Moment, moment } from '../helperClasses/x-moment';
+import { Moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import {
@@ -27,20 +27,8 @@ import {
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
-import {
-  V2AdvancedFilter,
-  V2AdvancedFilterType
-} from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
-import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { LocationModel } from './location.model';
-import {
-  IV2ColumnStatusFormType,
-  V2ColumnStatusForm
-} from '../../shared/components-v2/app-list-table-v2/models/column.model';
-import { ReferenceDataEntryModel } from './reference-data.model';
 import { SafeHtml } from '@angular/platform-browser';
-import { I18nService } from '../services/helper/i18n.service';
 
 export class CaseModel
   extends BaseModel
@@ -149,518 +137,8 @@ export class CaseModel
   uiDateRanges: string;
 
   /**
-   * Advanced filters
+   * Static Permissions - IPermissionBasic
    */
-  static generateAdvancedFilters(data: {
-    authUser: UserModel,
-    caseInvestigationTemplate: () => QuestionModel[],
-    options: {
-      gender: ILabelValuePairModel[],
-      occupation: ILabelValuePairModel[],
-      risk: ILabelValuePairModel[],
-      classification: ILabelValuePairModel[],
-      yesNoAll: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[],
-      outcome: ILabelValuePairModel[],
-      clusterLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void,
-      pregnancy: ILabelValuePairModel[],
-      vaccine: ILabelValuePairModel[],
-      vaccineStatus: ILabelValuePairModel[],
-      user: ILabelValuePairModel[],
-      investigationStatus: ILabelValuePairModel[],
-      documentType: ILabelValuePairModel[],
-      addressType: ILabelValuePairModel[],
-      dateRangeType: ILabelValuePairModel[],
-      dateRangeCenter: ILabelValuePairModel[]
-    }
-  }): V2AdvancedFilter[] {
-    // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
-      // Case
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'firstName',
-        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'middleName',
-        label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'lastName',
-        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'gender',
-        label: 'LNG_CASE_FIELD_LABEL_GENDER',
-        options: data.options.gender,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_AGE,
-        field: 'age',
-        label: 'LNG_CASE_FIELD_LABEL_AGE'
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'addresses',
-        label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
-        field: 'addresses',
-        label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true,
-        sortable: 'addresses.phoneNumber'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dob',
-        label: 'LNG_CASE_FIELD_LABEL_DOB',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'occupation',
-        label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-        options: data.options.occupation,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'riskLevel',
-        label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-        options: data.options.risk,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'riskReason',
-        label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'visualId',
-        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'classification',
-        label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-        options: data.options.classification,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfInfection',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfOnset',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfOutcome',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateBecomeCase',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'safeBurial',
-        label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'isDateOfOnsetApproximate',
-        label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfReporting',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'isDateOfReportingApproximate',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'transferRefused',
-        label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'investigationStatus',
-        label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
-        options: data.options.investigationStatus,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateInvestigationCompleted',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'outcomeId',
-        label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-        options: data.options.outcome,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'wasContact',
-        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'wasContactOfContact',
-        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfContacts',
-        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfExposures',
-        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'clusterId',
-        label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
-        relationshipPath: ['relationships'],
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER',
-        optionsLoad: data.options.clusterLoad,
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-        field: 'questionnaireAnswers',
-        label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        template: data.caseInvestigationTemplate
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'pregnancyStatus',
-        label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-        options: data.options.pregnancy,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'vaccinesReceived.vaccine',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE',
-        options: data.options.vaccine,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'vaccinesReceived.status',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
-        options: data.options.vaccineStatus,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'vaccinesReceived.date',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'documents.type',
-        label: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
-        options: data.options.documentType,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'documents.number',
-        label: 'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'addresses.emailAddress',
-        label: 'LNG_CASE_FIELD_LABEL_EMAIL',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'addresses.geoLocationAccurate',
-        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
-        options: data.options.yesNo,
-        sortable: true,
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'addresses.typeId',
-        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_TYPE',
-        options: data.options.addressType,
-        sortable: true,
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'addresses.date',
-        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_DATE',
-        sortable: true,
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'addresses.city',
-        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_CITY',
-        sortable: true,
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'addresses.postalCode',
-        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_POSTAL_CODE',
-        sortable: true,
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
-      },
-      {
-        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
-        field: 'deathLocationId',
-        label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfBurial',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
-        field: 'burialLocationId',
-        label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'burialPlaceName',
-        label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'dateRanges.typeId',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID',
-        options: data.options.dateRangeType,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateRanges.startDate',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_START_DATE',
-        sortable: true,
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateRanges.endDate',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_END_DATE',
-        sortable: true,
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'dateRanges.centerName',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
-        options: data.options.dateRangeCenter,
-        sortable: true,
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
-      },
-      {
-        // parentLocationIdFilter is appended by the component
-        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
-        field: 'dateRanges',
-        label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION',
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'dateRanges.comments',
-        label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS',
-        sortable: true,
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
-      },
-      {
-        type: V2AdvancedFilterType.DELETED,
-        field: 'deleted',
-        label: 'LNG_CASE_FIELD_LABEL_DELETED',
-        yesNoAllOptions: data.options.yesNoAll,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'createdAt',
-        label: 'LNG_CASE_FIELD_LABEL_CREATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'updatedAt',
-        label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.DELETED_AT,
-        field: 'deletedAt',
-        label: 'LNG_CASE_FIELD_LABEL_DELETED_AT',
-        sortable: true
-      }
-    ];
-
-    // allowed to filter by user ?
-    if (UserModel.canListForFilters(data.authUser)) {
-      advancedFilters.push({
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user,
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'createdBy',
-        label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
-        options: data.options.user,
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'updatedBy',
-        label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
-        options: data.options.user,
-        sortable: true
-      });
-    }
-
-    // finished
-    return advancedFilters;
-  }
-
-  /**
-   * Retrieve statuses forms
-   */
-  static getStatusForms(
-    info: {
-      // required
-      item: CaseModel,
-      i18nService: I18nService,
-      classification: IResolverV2ResponseModel<ReferenceDataEntryModel>,
-      outcome: IResolverV2ResponseModel<ReferenceDataEntryModel>
-    }
-  ): V2ColumnStatusForm[] {
-    // construct list of forms that we need to display
-    const forms: V2ColumnStatusForm[] = [];
-
-    // classification
-    if (
-      info.item.classification &&
-      info.classification.map[info.item.classification]
-    ) {
-      forms.push({
-        type: IV2ColumnStatusFormType.CIRCLE,
-        color: info.classification.map[info.item.classification].getColorCode(),
-        tooltip: info.i18nService.instant(info.item.classification)
-      });
-    } else {
-      forms.push({
-        type: IV2ColumnStatusFormType.EMPTY
-      });
-    }
-
-    // outcome
-    if (
-      info.item.outcomeId &&
-      info.outcome.map[info.item.outcomeId]
-    ) {
-      forms.push({
-        type: IV2ColumnStatusFormType.HEXAGON,
-        color: info.outcome.map[info.item.outcomeId].getColorCode(),
-        tooltip: info.i18nService.instant(info.item.outcomeId)
-      });
-    } else {
-      forms.push({
-        type: IV2ColumnStatusFormType.EMPTY
-      });
-    }
-
-    // alerted
-    if (info.item.alerted) {
-      forms.push({
-        type: IV2ColumnStatusFormType.STAR,
-        color: 'var(--gd-danger)',
-        tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
-      });
-    } else {
-      forms.push({
-        type: IV2ColumnStatusFormType.EMPTY
-      });
-    }
-
-    // finished
-    return forms;
-  }
-
-  /**
-   * Return case id mask with data replaced
-   */
-  static generateCaseIDMask(caseIdMask: string): string {
-    // validate
-    if (_.isEmpty(caseIdMask)) {
-      return '';
-    }
-
-    // !!!!!!!!!!!!!!!
-    // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-    // !!!!!!!!!!!!!!!
-    return caseIdMask
-      .replace(/YYYY/g, moment().format('YYYY'))
-      .replace(/\*/g, '');
-  }
-
-  /**
-     * Static Permissions - IPermissionBasic
-     */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE) : false); }
@@ -668,8 +146,8 @@ export class CaseModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedRelationship
-     */
+   * Static Permissions - IPermissionRelatedRelationship
+   */
   static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_RELATIONSHIP_CONTACTS) : false); }
   static canViewRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW_RELATIONSHIP_CONTACTS) : false); }
   static canCreateRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE_RELATIONSHIP_CONTACTS) : false); }
@@ -689,8 +167,8 @@ export class CaseModel
   static canBulkDeleteRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_DELETE_RELATIONSHIP_EXPOSURES) : false); }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_RESTORE) : false); }
 
   /**
@@ -702,39 +180,39 @@ export class CaseModel
   static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_IMPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedContact
-     */
+   * Static Permissions - IPermissionRelatedContact
+   */
   static canCreateContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE_CONTACT) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedContactBulk
-     */
+   * Static Permissions - IPermissionRelatedContactBulk
+   */
   static canBulkCreateContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE_BULK_CONTACT) : false); }
 
   /**
-     * Static Permissions - IPermissionMovement
-     */
+   * Static Permissions - IPermissionMovement
+   */
   static canViewMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW_MOVEMENT_MAP) : false); }
   static canExportMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_MOVEMENT_MAP) : false); }
 
   /**
-     * Static Permissions - IPermissionChronology
-     */
+   * Static Permissions - IPermissionChronology
+   */
   static canViewChronologyChart(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW_CHRONOLOGY_CHART) : false); }
 
   /**
-     * Static Permissions - IPermissionCase
-     */
+   * Static Permissions - IPermissionCase
+   */
   static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_GENERATE_VISUAL_ID) : false); }
   static canConvertToContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CONVERT_TO_CONTACT) : false); }
   static canExportInvestigationForm(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_INVESTIGATION_FORM) : false); }
@@ -746,8 +224,8 @@ export class CaseModel
   static canListIsolatedCases(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_ISOLATED_CASES) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedLabResult
-     */
+   * Static Permissions - IPermissionRelatedLabResult
+   */
   static canViewLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW_LAB_RESULT) : false); }
   static canListLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_LAB_RESULT) : false); }
   static canCreateLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE_LAB_RESULT) : false); }
@@ -758,8 +236,8 @@ export class CaseModel
   static canExportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_LAB_RESULT) : false); }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 

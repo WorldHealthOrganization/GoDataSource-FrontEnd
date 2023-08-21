@@ -5,7 +5,7 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { Moment, moment } from '../helperClasses/x-moment';
+import { Moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import { UserModel } from './user.model';
@@ -22,13 +22,7 @@ import {
   IPermissionRelatedRelationship,
   IPermissionRestorable
 } from './permission.interface';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { SafeHtml } from '@angular/platform-browser';
-import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
-import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
-import { ReferenceDataEntryModel } from './reference-data.model';
-import { I18nService } from '../services/helper/i18n.service';
 import { IAnswerData } from './question.model';
 
 export interface IContactOfContactIsolated {
@@ -111,343 +105,8 @@ export class ContactOfContactModel
   uiVaccines: string;
 
   /**
-   * Advanced filters
+   * Static Permissions - IPermissionBasic
    */
-  static generateAdvancedFilters(data: {
-    authUser: UserModel,
-    options: {
-      occupation: ILabelValuePairModel[],
-      user: ILabelValuePairModel[],
-      yesNoAll: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[],
-      gender: ILabelValuePairModel[],
-      pregnancy: ILabelValuePairModel[],
-      documentType: ILabelValuePairModel[],
-      addressType: ILabelValuePairModel[],
-      risk: ILabelValuePairModel[],
-      vaccine: ILabelValuePairModel[],
-      vaccineStatus: ILabelValuePairModel[]
-    }
-  }): V2AdvancedFilter[] {
-    // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
-      // Contact of contact
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'firstName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'middleName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'lastName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'occupation',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
-        options: data.options.occupation,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_AGE,
-        field: 'age',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfReporting',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'isDateOfReportingApproximate',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dob',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'visualId',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'addresses',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
-        field: 'addresses',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true,
-        sortable: 'addresses.phoneNumber'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfLastContact',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'wasCase',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'wasContact',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfContacts',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfExposures',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'gender',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
-        options: data.options.gender,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'pregnancyStatus',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-        options: data.options.pregnancy,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'documents.type',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENT_TYPE',
-        options: data.options.documentType,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'documents.number',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENT_NUMBER',
-        sortable: true,
-        useLike: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'addresses.emailAddress',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_EMAIL',
-        sortable: true,
-        useLike: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'addresses.geoLocationAccurate',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
-        options: data.options.yesNo,
-        sortable: true,
-        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES'
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'addresses.typeId',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_TYPE',
-        options: data.options.addressType,
-        sortable: true,
-        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'addresses.date',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_DATE',
-        sortable: true,
-        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'addresses.city',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_CITY',
-        sortable: true,
-        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
-        useLike: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'addresses.postalCode',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_POSTAL_CODE',
-        sortable: true,
-        relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
-        useLike: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'riskLevel',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
-        options: data.options.risk,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'riskReason',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'vaccinesReceived.vaccine',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINE',
-        options: data.options.vaccine,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'vaccinesReceived.status',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINE_STATUS',
-        options: data.options.vaccineStatus,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'vaccinesReceived.date',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINE_DATE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.DELETED,
-        field: 'deleted',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED',
-        yesNoAllOptions: data.options.yesNoAll,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'createdAt',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'updatedAt',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.DELETED_AT,
-        field: 'deletedAt',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED_AT',
-        sortable: true
-      }
-    ];
-
-    // allowed to filter by user ?
-    if (UserModel.canListForFilters(data.authUser)) {
-      advancedFilters.push({
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user,
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'createdBy',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_BY',
-        options: data.options.user,
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'updatedBy',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_UPDATED_BY',
-        options: data.options.user,
-        sortable: true
-      });
-    }
-
-    // finished
-    return advancedFilters;
-  }
-
-  /**
-   * Retrieve statuses forms
-   */
-  static getStatusForms(
-    info: {
-      // required
-      item: ContactOfContactModel,
-      i18nService: I18nService,
-      risk: IResolverV2ResponseModel<ReferenceDataEntryModel>
-    }
-  ): V2ColumnStatusForm[] {
-    // construct list of forms that we need to display
-    const forms: V2ColumnStatusForm[] = [];
-
-    // risk
-    if (
-      info.item.riskLevel &&
-      info.risk.map[info.item.riskLevel]
-    ) {
-      forms.push({
-        type: IV2ColumnStatusFormType.TRIANGLE,
-        color: info.risk.map[info.item.riskLevel].getColorCode(),
-        tooltip: info.i18nService.instant(info.item.riskLevel)
-      });
-    } else {
-      forms.push({
-        type: IV2ColumnStatusFormType.EMPTY
-      });
-    }
-
-    // finished
-    return forms;
-  }
-
-  /**
-   * Return contact id mask with data replaced
-   */
-  static generateContactOfContactIDMask(contactOfContactIdMask: string): string {
-    // validate
-    if (_.isEmpty(contactOfContactIdMask)) {
-      return '';
-    }
-
-    // !!!!!!!!!!!!!!!
-    // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-    // !!!!!!!!!!!!!!!
-    return contactOfContactIdMask
-      .replace(/YYYY/g, moment().format('YYYY'))
-      .replace(/\*/g, '');
-  }
-
-  /**
-     * Static Permissions - IPermissionBasic
-     */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE) : false); }
@@ -455,13 +114,13 @@ export class ContactOfContactModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_IMPORT) : false); }
 
   /**
@@ -473,13 +132,13 @@ export class ContactOfContactModel
   static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedRelationship
-     */
+   * Static Permissions - IPermissionRelatedRelationship
+   */
   static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_RELATIONSHIP_CONTACTS) : false); }
   static canViewRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_CONTACTS) : false); }
   static canCreateRelationshipContacts(): boolean { return false; }
@@ -499,26 +158,26 @@ export class ContactOfContactModel
   static canBulkDeleteRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_DELETE_RELATIONSHIP_EXPOSURES) : false); }
 
   /**
-     * Static Permissions - IPermissionMovement
-     */
+   * Static Permissions - IPermissionMovement
+   */
   static canViewMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_MOVEMENT_MAP) : false); }
   static canExportMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_MOVEMENT_MAP) : false); }
 
   /**
-     * Static Permissions - IPermissionChronology
-     */
+   * Static Permissions - IPermissionChronology
+   */
   static canViewChronologyChart(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART) : false); }
 
   /**
-     * Static Permissions - IPermissionContactOfContacts
-     */
+   * Static Permissions - IPermissionContactOfContacts
+   */
   static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_GENERATE_VISUAL_ID) : false); }
   static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_DOSSIER) : false); }
   static canConvertToContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT) : false); }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 

@@ -3,20 +3,17 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { forkJoin, Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
-  CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -37,9 +34,10 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Location } from '@angular/common';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -48,9 +46,6 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComponent<RelationshipModel> implements OnDestroy {
   // constants
   private static readonly PROPERTY_LAST_CONTACT: string = 'contactDate';
-
-  // today
-  private _today: Moment = moment();
 
   // entity
   private _entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
@@ -89,26 +84,25 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected relationshipDataService: RelationshipDataService,
-    protected i18nService: I18nService,
-    protected toastV2Service: ToastV2Service,
     protected entityHelperService: EntityHelperService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
     protected location: Location,
-    protected referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve data from snapshot
@@ -147,7 +141,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     super.onDestroy();
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -182,7 +176,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       this.isModify
     ) {
       // remove global notifications
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
       // show global notifications
       this.checkForLastContactBeforeCaseOnSet(
@@ -266,7 +260,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE', {
             name: this.itemData.relatedEntity(this._entity.id)?.model?.name || ''
           }
@@ -276,7 +270,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_RELATIONSHIP_TITLE', {
             name: this.itemData.relatedEntity(this._entity.id)?.model?.name || ''
           }
@@ -305,8 +299,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             {
               name: this._entity.name
@@ -401,196 +395,38 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     name: (property: string) => string,
     relationshipData: RelationshipModel
   ): ICreateViewModifyV2Tab {
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: title,
-      label: title,
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: title,
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: name('dateOfFirstContact'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION',
-            value: {
-              get: () => relationshipData.dateOfFirstContact,
-              set: (value) => {
-                relationshipData.dateOfFirstContact = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today
-              ]
-            },
-            suffixIconButtons: this.createCopySuffixButtons('dateOfFirstContact')
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: name('contactDate'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
-            value: {
-              get: () => relationshipData.contactDate,
-              set: (value) => {
-                relationshipData.contactDate = value;
-
-                // validate against date of onset
-                this.checkForLastContactBeforeCaseOnSet(
-                  { [entityId]: title },
-                  relationshipData.contactDate
-                );
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              required: () => true,
-              dateSameOrBefore: () => [
-                this._today
-              ]
-            },
-            suffixIconButtons: this.createCopySuffixButtons('contactDate')
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: name('contactDateEstimated'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
-            value: {
-              get: () => relationshipData.contactDateEstimated,
-              set: (value) => {
-                // set data
-                relationshipData.contactDateEstimated = value;
-              }
-            },
-            suffixIconButtons: this.createCopySuffixButtons('contactDateEstimated')
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: name('certaintyLevelId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => relationshipData.certaintyLevelId,
-              set: (value) => {
-                relationshipData.certaintyLevelId = value;
-              }
-            },
-            validators: {
-              required: () => true
-            },
-            suffixIconButtons: this.createCopySuffixButtons('certaintyLevelId')
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: name('exposureTypeId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              relationshipData.exposureTypeId
-            ),
-            value: {
-              get: () => relationshipData.exposureTypeId,
-              set: (value) => {
-                relationshipData.exposureTypeId = value;
-              }
-            },
-            suffixIconButtons: this.createCopySuffixButtons('exposureTypeId')
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: name('exposureFrequencyId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              relationshipData.exposureFrequencyId
-            ),
-            value: {
-              get: () => relationshipData.exposureFrequencyId,
-              set: (value) => {
-                relationshipData.exposureFrequencyId = value;
-              }
-            },
-            suffixIconButtons: this.createCopySuffixButtons('exposureFrequencyId')
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: name('exposureDurationId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              relationshipData.exposureDurationId
-            ),
-            value: {
-              get: () => relationshipData.exposureDurationId,
-              set: (value) => {
-                relationshipData.exposureDurationId = value;
-              }
-            },
-            suffixIconButtons: this.createCopySuffixButtons('exposureDurationId')
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: name('socialRelationshipTypeId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
-            options: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              relationshipData.socialRelationshipTypeId
-            ),
-            value: {
-              get: () => relationshipData.socialRelationshipTypeId,
-              set: (value) => {
-                relationshipData.socialRelationshipTypeId = value;
-              }
-            },
-            suffixIconButtons: this.createCopySuffixButtons('socialRelationshipTypeId')
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: name('clusterId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => relationshipData.clusterId,
-              set: (value) => {
-                relationshipData.clusterId = value;
-              }
-            },
-            suffixIconButtons: this.createCopySuffixButtons('clusterId')
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: name('socialRelationshipDetail'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
-            value: {
-              get: () => relationshipData.socialRelationshipDetail,
-              set: (value) => {
-                relationshipData.socialRelationshipDetail = value;
-              }
-            },
-            suffixIconButtons: this.createCopySuffixButtons('socialRelationshipDetail')
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: name('comment'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
-            value: {
-              get: () => relationshipData.comment,
-              set: (value) => {
-                relationshipData.comment = value;
-              }
-            },
-            suffixIconButtons: this.createCopySuffixButtons('comment')
-          }]
-        }
-      ]
-    };
+    return this.entityHelperService.generateTabsDetails({
+      entityId,
+      title,
+      name,
+      itemData: relationshipData,
+      createCopySuffixButtons: this.createCopySuffixButtons,
+      checkForLastContactBeforeCaseOnSet: this.checkForLastContactBeforeCaseOnSet,
+      options: {
+        certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          relationshipData.exposureTypeId
+        ),
+        exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          relationshipData.exposureFrequencyId
+        ),
+        exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          relationshipData.exposureDurationId
+        ),
+        contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          relationshipData.socialRelationshipTypeId
+        ),
+        cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      }
+    });
   }
 
   /**
@@ -756,7 +592,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
         )
         .subscribe((items) => {
           // success creating / updating event
-          this.toastV2Service.success(
+          this.createViewModifyHelperService.toastV2Service.success(
             type === CreateViewModifyV2ActionType.CREATE ?
               (
                 items.length > 1 ?
@@ -1006,11 +842,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     });
 
     // hide current warning to re-display the updated message
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
     // show the updated message
     if (Object.keys(this._warnings.entities).length) {
-      this.toastV2Service.notice(
+      this.createViewModifyHelperService.toastV2Service.notice(
         this.isCreate ?
           (
             this.relationshipType === RelationshipType.CONTACT ?
@@ -1035,7 +871,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
                 !CaseModel.canView(this.authUser)
               )
             ) {
-              return `${item.name} (${this.i18nService.instant(item.type)})`;
+              return `${item.name} (${this.createViewModifyHelperService.i18nService.instant(item.type)})`;
             }
 
             // create url
@@ -1043,11 +879,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
             // finished
             const additionalInfo = this.isCreate && this.relationshipType === RelationshipType.EXPOSURE ?
-              this.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
+              this.createViewModifyHelperService.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
               '';
 
             // return entity as a link
-            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.i18nService.instant(item.type)}) ${additionalInfo}</span></a>`;
+            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.createViewModifyHelperService.i18nService.instant(item.type)}) ${additionalInfo}</span></a>`;
           })
             .join(', ')
         },

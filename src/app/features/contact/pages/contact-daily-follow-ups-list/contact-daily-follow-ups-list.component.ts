@@ -55,6 +55,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -126,7 +127,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     protected toastV2Service: ToastV2Service,
     protected activatedRoute: ActivatedRoute,
     protected dialogV2Service: DialogV2Service,
-    protected referenceDataHelperService: ReferenceDataHelperService
+    protected referenceDataHelperService: ReferenceDataHelperService,
+    private entityFollowUpHelperService: EntityFollowUpHelperService
   ) {
     super(
       listHelperService, {
@@ -859,9 +861,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             }]
           }
         ],
-        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
+        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => this.entityFollowUpHelperService.getStatusForms({
           item: data,
-          i18nService: this.i18nService,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
         })
       },
@@ -2581,7 +2582,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         map((followUps: FollowUpModel[]) => {
-          return FollowUpModel.determineAlertness(
+          return this.entityFollowUpHelperService.determineAlertness(
             this.selectedOutbreak.contactFollowUpTemplate,
             followUps
           );

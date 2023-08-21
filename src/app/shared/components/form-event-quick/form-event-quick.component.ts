@@ -9,6 +9,7 @@ import { EventModel } from '../../../core/models/event.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { EntityEventHelperService } from '../../../core/services/helper/entity-event-helper.service';
 
 @Component({
   selector: 'app-form-event-quick',
@@ -42,7 +43,7 @@ export class FormEventQuickComponent extends GroupBase<EventModel> implements On
       }
 
       // generate
-      this.event.visualId = EventModel.generateEventIDMask(this.selectedOutbreak.eventIdMask);
+      this.event.visualId = this.entityEventHelperService.generateEventIDMask(this.selectedOutbreak.eventIdMask);
       this.groupForm.controls.visualId.markAsDirty();
       this.onChange();
 
@@ -56,7 +57,8 @@ export class FormEventQuickComponent extends GroupBase<EventModel> implements On
     @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
     private outbreakDataService: OutbreakDataService,
-    private i18nService: I18nService
+    private i18nService: I18nService,
+    private entityEventHelperService: EntityEventHelperService
   ) {
     super(controlContainer, validators, asyncValidators);
   }
@@ -78,7 +80,7 @@ export class FormEventQuickComponent extends GroupBase<EventModel> implements On
     // set visual ID translate data
     this.visualIDTooltip = this.i18nService.instant(
       'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION', {
-        mask: EventModel.generateEventIDMask(this.selectedOutbreak.eventIdMask)
+        mask: this.entityEventHelperService.generateEventIDMask(this.selectedOutbreak.eventIdMask)
       }
     );
   }

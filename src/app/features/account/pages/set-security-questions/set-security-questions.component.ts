@@ -1,8 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { UserModel } from '../../../../core/models/user.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -11,7 +9,9 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { catchError } from 'rxjs/operators';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-set-security-questions',
@@ -29,21 +29,21 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
    * Constructor
    */
   constructor(
-    protected activatedRoute: ActivatedRoute,
     protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected userDataService: UserDataService,
-    protected router: Router,
-    toastV2Service: ToastV2Service,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected router: Router
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -315,7 +315,7 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
             .reloadAndPersistAuthUser()
             .subscribe((_authenticatedUser) => {
               // display message
-              this.toastV2Service.success('LNG_PAGE_SET_SECURITY_QUESTIONS_ACTION_SAVE_SUCCESS_MESSAGE');
+              this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_SET_SECURITY_QUESTIONS_ACTION_SAVE_SUCCESS_MESSAGE');
 
               // hide loading & redirect
               finished(undefined, null);

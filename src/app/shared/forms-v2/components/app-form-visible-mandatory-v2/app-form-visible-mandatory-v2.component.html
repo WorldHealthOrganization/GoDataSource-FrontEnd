@@ -1,0 +1,147 @@
+<form
+  class="gd-form-visible-mandatory-v2">
+
+  <!-- Top -->
+  <div
+    class="gd-form-visible-mandatory-v2-top"
+    fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0.8rem">
+
+    <!-- Filter -->
+    <app-form-input-v2
+      fxFlex
+      [ngModel]="searchValue"
+      name="filterValue"
+      placeholder="LNG_COMMON_LABEL_SEARCH"
+      autocomplete="off"
+      (ngModelChange)="filter($event, !!$event, true)"></app-form-input-v2>
+
+    <!-- Expand All -->
+    <button
+      type="button"
+      mat-flat-button
+      color="text"
+      [disabled]="!!searchValue"
+      (click)="collapseExpandAll(false, true)">
+      {{'LNG_COMMON_LABEL_EXPAND_ALL' | translate}}
+    </button>
+
+    <!-- Collapse All -->
+    <button
+      type="button"
+      mat-flat-button
+      color="text"
+      [disabled]="!!searchValue"
+      (click)="collapseExpandAll(true, true)">
+      {{'LNG_COMMON_LABEL_COLLAPSE_ALL' | translate}}
+    </button>
+
+  </div>
+
+  <!-- Records -->
+  <div
+    class="gd-form-visible-mandatory-v2-list">
+
+    <!-- Records -->
+    <cdk-virtual-scroll-viewport
+      #cdkViewport
+      [minBufferPx]="1024"
+      [maxBufferPx]="1024"
+      [itemSize]="31">
+      <!-- Item -->
+      <div
+        *cdkVirtualFor="let item of flattenedData; templateCacheSize: 0"
+        class="gd-form-visible-mandatory-v2-list-item"
+        [ngSwitch]="item.type">
+
+        <!-- Group -->
+        <div
+          *ngSwitchCase="FlattenType.GROUP"
+          class="gd-form-visible-mandatory-v2-list-item-group"
+          fxLayout="row" fxLayoutAlign="none center">
+
+          <!-- Collapse / Expand -->
+          <mat-icon
+            (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
+          <!-- Label -->
+          <div
+            class="gd-form-visible-mandatory-v2-list-item-group-content"
+            fxFlex
+            [innerHTML]="item.text | highlight:searchValue"></div>
+
+        </div>
+
+        <!-- Group tab -->
+        <div
+          *ngSwitchCase="FlattenType.GROUP_TAB"
+          class="gd-form-visible-mandatory-v2-list-item-group-tab"
+          fxLayout="row" fxLayoutAlign="none center">
+
+          <!-- Collapse / Expand -->
+          <mat-icon
+            (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
+          <!-- Label -->
+          <div
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-content"
+            fxFlex
+            [innerHTML]="item.text | highlight:searchValue"></div>
+
+        </div>
+
+        <!-- Group tab section -->
+        <div
+          *ngSwitchCase="FlattenType.GROUP_TAB_SECTION"
+          class="gd-form-visible-mandatory-v2-list-item-group-tab-section"
+          fxLayout="row" fxLayoutAlign="none center">
+
+          <!-- Collapse / Expand -->
+          <mat-icon
+            (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
+          <!-- Label -->
+          <div
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-section-content"
+            fxFlex
+            [innerHTML]="item.text | highlight:searchValue"></div>
+
+        </div>
+
+        <!-- Group tab section field -->
+        <div
+          *ngSwitchCase="FlattenType.GROUP_TAB_SECTION_FIELD"
+          class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field"
+          fxLayout="row" fxLayoutAlign="none center">
+
+          <!-- Visible Checkbox + label -->
+          <div
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible">
+            <app-form-checkbox-v2
+              [ngModel]="item.data.visibleMandatoryConf?.visible || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible)"
+              [name]="item.name.visible"
+              [placeholder]="item.data.label"
+              [disabled]="viewOnly || item.data.visibleMandatoryConf?.visible"
+              [highlightPlaceholder]="searchValue"
+              (ngModelChange)="selectedChanged(item, FieldSelectedType.VISIBLE, $event)"></app-form-checkbox-v2>
+          </div>
+
+          <!-- Required Checkbox -->
+          <div
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-required">
+            <app-form-checkbox-v2
+              *ngIf="item.data.visibleMandatoryConf?.required || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible)"
+              [ngModel]="item.data.visibleMandatoryConf?.required || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].mandatory)"
+              [name]="item.name.mandatory"
+              placeholder="LNG_COMMON_LABEL_REQUIRED"
+              [disabled]="viewOnly || item.data.visibleMandatoryConf?.required"
+              (ngModelChange)="selectedChanged(item, FieldSelectedType.MANDATORY, $event)"></app-form-checkbox-v2>
+          </div>
+
+        </div>
+
+      </div>
+    </cdk-virtual-scroll-viewport>
+
+  </div>
+
+</form>

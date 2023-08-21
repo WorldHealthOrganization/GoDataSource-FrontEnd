@@ -28,6 +28,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { EntityContactOfContactHelperService } from '../../../../core/services/helper/entity-contact-of-contact-helper.service';
 
 @Component({
   selector: 'app-contacts-of-contacts-bulk-create-modify',
@@ -75,7 +76,8 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
     protected toastV2Service: ToastV2Service,
     protected router: Router,
     protected bulkCacheHelperService: BulkCacheHelperService,
-    protected referenceDataHelperService: ReferenceDataHelperService
+    protected referenceDataHelperService: ReferenceDataHelperService,
+    private entityContactOfContactHelperService: EntityContactOfContactHelperService
   ) {
     // parent
     super(
@@ -291,7 +293,7 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
             return this.contactsOfContactsDataService
               .checkContactOfContactVisualIDValidity(
                 this.selectedOutbreak.id,
-                ContactOfContactModel.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask),
+                this.entityContactOfContactHelperService.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask),
                 (rowData.model as ContactOfContactModel).visualId
               );
           }

@@ -6,8 +6,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { DeviceModel } from '../../../../core/models/device.model';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { Observable } from 'rxjs';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder/request-filter-generator';
@@ -15,7 +13,8 @@ import { map, takeUntil } from 'rxjs/operators';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import * as _ from 'lodash';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-view-history-system-device',
@@ -31,20 +30,19 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
    * Constructor
    */
   constructor(
-    protected toastV2Service: ToastV2Service,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    private i18nService: I18nService,
-    private deviceDataService: DeviceDataService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    private deviceDataService: DeviceDataService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // get deviceId
@@ -82,7 +80,7 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
             // format status
             this._devicesHistoryPlaceholders.push(
               item.status ?
-                this.i18nService.instant(item.status) :
+                this.createViewModifyHelperService.i18nService.instant(item.status) :
                 ''
             );
 

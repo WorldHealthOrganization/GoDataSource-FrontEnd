@@ -5,8 +5,6 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
@@ -22,9 +20,10 @@ import {
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { MAT_ICONS } from '../../../../shared/forms-v2/core/mat-icons-v2';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { UserModel } from '../../../../core/models/user.model';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 /**
  * Component
@@ -38,22 +37,21 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     private router: Router,
     private clusterDataService: ClusterDataService,
-    private activatedRoute: ActivatedRoute,
-    private i18nService: I18nService,
-    private dialogV2Service: DialogV2Service,
-    authDataService: AuthDataService,
-    toastV2Service: ToastV2Service,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private dialogV2Service: DialogV2Service
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -143,7 +141,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_CLUSTER_TITLE', {
             name: this.itemData.name
           }
@@ -153,7 +151,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.i18nService.instant(
+        label: this.createViewModifyHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_CLUSTER_TITLE', {
             name: this.itemData.name
           }
@@ -182,8 +180,8 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_BUTTON'),
+          message: () => this.createViewModifyHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -395,7 +393,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
         takeUntil(this.destroyed$)
       ).subscribe((item: ClusterModel) => {
         // success creating / updating cluster
-        this.toastV2Service.success(
+        this.createViewModifyHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_CLUSTER_ACTION_MODIFY_CLUSTER_SUCCESS_MESSAGE'

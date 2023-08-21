@@ -3,20 +3,20 @@ import { IV2Breadcrumb, IV2BreadcrumbInfo } from '../../shared/components-v2/app
 import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel, UserSettings } from '../models/user.model';
 import { ICreateViewModifyV2, ICreateViewModifyV2Config } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { ActivatedRoute } from '@angular/router';
 import { Directive, Renderer2, ViewChild } from '@angular/core';
 import { TopnavComponent } from '../components/topnav/topnav.component';
-import { AuthDataService } from '../services/data/auth.data.service';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { ToastV2Service } from '../services/helper/toast-v2.service';
 import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
 import { Constants } from '../models/constants';
 import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { CreateViewModifyV2ExpandColumn } from '../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { ICreateViewModifyV2Refresh } from '../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
-import { RedirectService } from '../services/helper/redirect.service';
 import { AppCreateViewModifyV2Component } from '../../shared/components-v2/app-create-view-modify-v2/app-create-view-modify-v2.component';
+import { CreateViewModifyHelperService } from '../services/helper/create-view-modify-helper.service';
+import { AuthDataService } from '../services/data/auth.data.service';
+import { ActivatedRoute } from '@angular/router';
+import { OutbreakAndOutbreakTemplateHelperService } from '../services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T>
@@ -108,11 +108,11 @@ export abstract class CreateViewModifyComponent<T>
    * Constructor
    */
   protected constructor(
-    protected toastV2Service: ToastV2Service,
-    protected renderer2: Renderer2,
-    protected redirectService: RedirectService,
-    activatedRoute: ActivatedRoute,
     protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     dontDisableOutbreakSelect?: boolean
   ) {
     // initialize parent
@@ -124,13 +124,16 @@ export abstract class CreateViewModifyComponent<T>
     }
 
     // get auth data
-    this.authUser = authDataService.getAuthenticatedUser();
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
     // retrieve basic data
-    this.action = activatedRoute.snapshot.data.action;
+    this.action = this.activatedRoute.snapshot.data.action;
 
     // retrieve selected outbreak - since on create, view & modify select outbreak dropdown should be disabled
-    this.selectedOutbreak = activatedRoute.snapshot.data.outbreak;
+    this.selectedOutbreak = this.activatedRoute.snapshot.data.outbreak;
+
+    // merge default fields
+    this.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.selectedOutbreak);
 
     // create ?
     this.loadingPage = true;
@@ -313,7 +316,7 @@ export abstract class CreateViewModifyComponent<T>
         event.stopImmediatePropagation();
 
         // redirect
-        this.redirectService.to([event.target.parentElement.getAttribute('href')]);
+        this.createViewModifyHelperService.redirectService.to([event.target.parentElement.getAttribute('href')]);
       }
     );
   }
@@ -335,7 +338,7 @@ export abstract class CreateViewModifyComponent<T>
       .pipe(
         catchError((err) => {
           // error
-          this.toastV2Service.error(err);
+          this.createViewModifyHelperService.toastV2Service.error(err);
 
           // send error down the road
           return throwError(err);
@@ -367,7 +370,7 @@ export abstract class CreateViewModifyComponent<T>
     observer$.pipe(
       catchError((err) => {
         // show error
-        this.toastV2Service.error(err);
+        this.createViewModifyHelperService.toastV2Service.error(err);
 
         // send down
         return throwError(err);

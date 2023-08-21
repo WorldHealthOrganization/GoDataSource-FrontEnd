@@ -12,9 +12,7 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { CaseModel } from '../../../../core/models/case.model';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -22,6 +20,8 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-contact-follow-ups-bulk-modify',
@@ -38,21 +38,21 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private followUpsDataService: FollowUpsDataService,
-    protected toastV2Service: ToastV2Service,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private followUpsDataService: FollowUpsDataService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      createViewModifyHelperService,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -386,7 +386,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
       // something went wrong ?
       if (selectedFollowUpIds.length < 1) {
         // show error
-        this.toastV2Service.error('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
+        this.createViewModifyHelperService.toastV2Service.error('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
 
         // don't do anything
         return;
@@ -422,7 +422,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
         )
         .subscribe((items) => {
           // success updating event
-          this.toastV2Service.success('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
+          this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, items);

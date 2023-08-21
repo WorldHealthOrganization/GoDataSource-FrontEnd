@@ -31,6 +31,7 @@ import { throwError } from 'rxjs';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
 
 @Component({
   selector: 'app-contacts-bulk-create-modify',
@@ -89,7 +90,8 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     protected toastV2Service: ToastV2Service,
     protected router: Router,
     protected bulkCacheHelperService: BulkCacheHelperService,
-    protected referenceDataHelperService: ReferenceDataHelperService
+    protected referenceDataHelperService: ReferenceDataHelperService,
+    private entityContactHelperService: EntityContactHelperService
   ) {
     // parent
     super(
@@ -328,7 +330,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             return this.contactDataService
               .checkContactVisualIDValidity(
                 this.selectedOutbreak.id,
-                ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask),
+                this.entityContactHelperService.generateContactIDMask(this.selectedOutbreak.contactIdMask),
                 (rowData.model as ContactModel).visualId
               );
           }
