@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { I18nService } from './i18n.service';
-import { CreateViewModifyV2TabInput, CreateViewModifyV2TabInputType, ICreateViewModifyV2Section, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import {
+  CreateViewModifyV2TabInput,
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2Section,
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputValidatorRequired
+} from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IVisibleMandatoryDataGroupTab, IVisibleMandatoryDataGroupTabSectionField, IVisibleMandatoryDataValueField } from '../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { v4 as uuid } from 'uuid';
 import { ToastV2Service } from './toast-v2.service';
@@ -31,12 +36,21 @@ export class CreateViewModifyHelperService {
       case CreateViewModifyV2TabInputType.SELECT_SINGLE:
       case CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT:
       case CreateViewModifyV2TabInputType.DATE:
-      case CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX:
       case CreateViewModifyV2TabInputType.LOCATION_SINGLE:
       case CreateViewModifyV2TabInputType.TEXTAREA:
         return {
           id: input.name,
           label: input.placeholder(),
+          supportsRequired: true,
+          visibleMandatoryConf: input.visibleMandatoryConf,
+          definition: input
+        };
+
+      case CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX:
+        return {
+          id: input.name,
+          label: input.placeholder(),
+          supportsRequired: false,
           visibleMandatoryConf: input.visibleMandatoryConf,
           definition: input
         };
@@ -45,6 +59,7 @@ export class CreateViewModifyHelperService {
         return {
           id: 'ageDob',
           label: `${this.i18nService.instant('LNG_ENTITY_FIELD_LABEL_AGE')} / ${this.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DOB')}`,
+          supportsRequired: false,
           visibleMandatoryConf: undefined,
           definition: input
         };
@@ -53,6 +68,7 @@ export class CreateViewModifyHelperService {
         return {
           id: input.name,
           label: section.label,
+          supportsRequired: true,
           visibleMandatoryConf: undefined,
           definition: input
         };
@@ -61,13 +77,22 @@ export class CreateViewModifyHelperService {
 
         // handle list item types
         switch (input.definition.input.type) {
-          case CreateViewModifyV2TabInputType.DOCUMENT:
           case CreateViewModifyV2TabInputType.ADDRESS:
+            return {
+              id: input.name,
+              label: section.label,
+              supportsRequired: true,
+              visibleMandatoryConf: undefined,
+              definition: input
+            };
+
+          case CreateViewModifyV2TabInputType.DOCUMENT:
           case CreateViewModifyV2TabInputType.VACCINE:
           case CreateViewModifyV2TabInputType.CENTER_DATE_RANGE:
             return {
               id: input.name,
               label: section.label,
+              supportsRequired: false,
               visibleMandatoryConf: undefined,
               definition: input
             };
@@ -155,8 +180,43 @@ export class CreateViewModifyHelperService {
           throw new Error(`tabsFilter: couldn't determine field id for type '${input.type}'`);
         }
 
+        // always required ?
+        // IMPORTANT: if special rules are configured as default, then those take precedence
+        if (
+          fieldDef.supportsRequired && (
+            fieldDef.visibleMandatoryConf?.required ||
+            visibleAndMandatoryConf[fieldDef.id]?.mandatory
+          )
+        ) {
+          // check if we don't have a default required validator
+          const requiredInput: ICreateViewModifyV2TabInputValidatorRequired = input as ICreateViewModifyV2TabInputValidatorRequired;
+          if (requiredInput.validators?.required) {
+            // nothing to do, keep current validator
+          } else {
+            // must initialize validators ?
+            if (
+              !requiredInput.validators ||
+              Object.keys(requiredInput.validators).length < 1
+            ) {
+              requiredInput.validators = {};
+            }
+
+            // attach required
+            requiredInput.validators.required = () => true;
+          }
+        }
+
+        // always visible ?
+        if (fieldDef.visibleMandatoryConf?.visible) {
+          // make sure it is visible
+          section.inputs.push(input);
+
+          // finished
+          return;
+        }
+
         // must add field ?
-        if (visibleAndMandatoryConf[fieldDef.id]) {
+        if (visibleAndMandatoryConf[fieldDef.id]?.visible) {
           section.inputs.push(input);
         }
       });
