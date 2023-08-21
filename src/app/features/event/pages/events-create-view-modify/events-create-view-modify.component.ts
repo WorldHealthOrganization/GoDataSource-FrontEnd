@@ -316,6 +316,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    */
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = this.entityEventHelperService.generateAdvancedFilters({
+      eventInvestigationTemplate: () => this.selectedOutbreak.eventInvestigationTemplate,
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

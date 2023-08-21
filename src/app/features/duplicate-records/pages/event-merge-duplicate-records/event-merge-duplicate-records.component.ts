@@ -160,7 +160,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
               questionnaireAnswers: mergeRecords
                 .filter((item) => (item.model as EventModel).questionnaireAnswers && Object.keys((item.model as EventModel).questionnaireAnswers).length > 0)
                 .map((item, index) => ({
-                  label: `${ this.i18nService.instant('LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
+                  label: `${ this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
                   value: index,
                   data: (item.model as EventModel).questionnaireAnswers
                 }))
