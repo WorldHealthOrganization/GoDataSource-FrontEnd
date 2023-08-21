@@ -18,6 +18,7 @@ import {
   IPermissionRelatedRelationship,
   IPermissionRestorable
 } from './permission.interface';
+import { IAnswerData } from './question.model';
 
 export class EventModel
   extends BaseModel
@@ -42,6 +43,9 @@ export class EventModel
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
   endDate: string | Moment;
+  questionnaireAnswers: {
+    [variable: string]: IAnswerData[];
+  };
 
   numberOfContacts: number;
   numberOfExposures: number;
@@ -56,6 +60,9 @@ export class EventModel
 
   responsibleUserId: string;
   responsibleUser: UserModel;
+
+  // used by ui
+  alerted: boolean = false;
 
   /**
    * Static Permissions - IPermissionBasic
@@ -142,6 +149,8 @@ export class EventModel
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
     this.outbreakId = _.get(data, 'outbreakId');
     this.endDate = _.get(data, 'endDate');
+
+    this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
 
     this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
