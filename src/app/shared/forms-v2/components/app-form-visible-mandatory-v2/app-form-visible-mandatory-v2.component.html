@@ -87,6 +87,32 @@
             fxFlex
             [innerHTML]="item.text | highlight:searchValue"></div>
 
+          <!-- Buttons -->
+          <div
+            *ngIf="!viewOnly"
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-buttons"
+            fxGrow="0">
+
+            <!-- Check all visible -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_COMMON_BUTTON_CHECK_ALL' | translate"
+              (click)="checkUncheckAll(item, true)">
+              <mat-icon>done_all</mat-icon>
+            </button>
+
+            <!-- Uncheck all visible -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate"
+              (click)="checkUncheckAll(item, false)">
+              <mat-icon>remove_done</mat-icon>
+            </button>
+
+          </div>
+
         </div>
 
         <!-- Group tab section -->
@@ -104,6 +130,32 @@
             class="gd-form-visible-mandatory-v2-list-item-group-tab-section-content"
             fxFlex
             [innerHTML]="item.text | highlight:searchValue"></div>
+
+          <!-- Buttons -->
+          <div
+            *ngIf="!viewOnly"
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-section-buttons"
+            fxGrow="0">
+
+            <!-- Check all visible -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_COMMON_BUTTON_CHECK_ALL' | translate"
+              (click)="checkUncheckAll(item, true)">
+              <mat-icon>done_all</mat-icon>
+            </button>
+
+            <!-- Uncheck all visible -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate"
+              (click)="checkUncheckAll(item, false)">
+              <mat-icon>remove_done</mat-icon>
+            </button>
+
+          </div>
 
         </div>
 

@@ -54,6 +54,7 @@ interface IFlattenNodeGroupTab {
   parent: IFlattenNodeGroup;
   text: string;
   data: IVisibleMandatoryDataGroupTab;
+  sections: IFlattenNodeGroupTabSection[];
 }
 
 /**
@@ -65,6 +66,7 @@ interface IFlattenNodeGroupTabSection {
   parent: IFlattenNodeGroupTab;
   text: string;
   data: IVisibleMandatoryDataGroupTabSection;
+  fields: IFlattenNodeGroupTabSectionField[];
 }
 
 /**
@@ -305,7 +307,8 @@ export class AppFormVisibleMandatoryV2Component
           type: FlattenType.GROUP_TAB,
           parent: groupNode,
           text: this.i18nService.instant(tab.label),
-          data: tab
+          data: tab,
+          sections: []
         };
         this._allFlattenedData.push(groupTabNode);
 
@@ -316,9 +319,11 @@ export class AppFormVisibleMandatoryV2Component
             type: FlattenType.GROUP_TAB_SECTION,
             parent: groupTabNode,
             text: this.i18nService.instant(section.label),
-            data: section
+            data: section,
+            fields: []
           };
           this._allFlattenedData.push(groupTabSectionNode);
+          groupTabNode.sections.push(groupTabSectionNode);
 
           // fields
           section.children.forEach((field) => {
@@ -333,6 +338,7 @@ export class AppFormVisibleMandatoryV2Component
               data: field
             };
             this._allFlattenedData.push(groupTabSectionFieldNode);
+            groupTabSectionNode.fields.push(groupTabSectionFieldNode);
           });
         });
       });
@@ -569,9 +575,9 @@ export class AppFormVisibleMandatoryV2Component
   }
 
   /**
-   * Selected item changed
+   * Update field value
    */
-  selectedChanged(
+  private updateFieldValue(
     item: IFlattenNodeGroupTabSectionField,
     type: FieldSelectedType,
     checked: boolean
@@ -606,6 +612,59 @@ export class AppFormVisibleMandatoryV2Component
         }
       }
     }
+  }
+
+  /**
+   * Selected item changed
+   */
+  selectedChanged(
+    item: IFlattenNodeGroupTabSectionField,
+    type: FieldSelectedType,
+    checked: boolean
+  ): void {
+    // update value
+    this.updateFieldValue(
+      item,
+      type,
+      checked
+    );
+
+    // trigger on change
+    this.onChange(this.value);
+
+    // mark dirty
+    this.control?.markAsDirty();
+
+    // update ui
+    this.detectChanges();
+  }
+
+  /**
+   * Check / Uncheck all visible fields for a section
+   */
+  checkUncheckAll(
+    sectionOrTab: IFlattenNodeGroupTabSection | IFlattenNodeGroupTab,
+    checked: boolean
+  ): void {
+    // go through children
+    const sections: IFlattenNodeGroupTabSection[] = sectionOrTab.type === FlattenType.GROUP_TAB ?
+      sectionOrTab.sections :
+      [sectionOrTab];
+    sections.forEach((section) => {
+      section.fields.forEach((field) => {
+        // always visible ? then don't change
+        if (field.data.visibleMandatoryConf?.visible) {
+          return;
+        }
+
+        // show / hide
+        this.updateFieldValue(
+          field,
+          FieldSelectedType.VISIBLE,
+          checked
+        );
+      });
+    });
 
     // trigger on change
     this.onChange(this.value);
