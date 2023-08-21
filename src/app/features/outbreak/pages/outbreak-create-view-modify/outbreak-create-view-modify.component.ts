@@ -1336,8 +1336,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = OutbreakModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.expandListAdvancedFilters = this.outbreakAndOutbreakTemplateHelperService.generateOutbreakAdvancedFilters({
       options: {
         disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         country: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
