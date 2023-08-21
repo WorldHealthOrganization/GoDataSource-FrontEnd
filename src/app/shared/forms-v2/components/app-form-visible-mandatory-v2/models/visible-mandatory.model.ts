@@ -33,6 +33,7 @@ export interface IVisibleMandatoryDataGroupTabSectionField {
   // required
   id: string;
   label: string;
+  supportsRequired: boolean;
   visibleMandatoryConf: ICreateViewModifyV2TabInputToVisibleMandatoryConf;
   definition: CreateViewModifyV2TabInput;
 }

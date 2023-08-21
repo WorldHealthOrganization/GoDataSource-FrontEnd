@@ -735,6 +735,7 @@
                     [excludeLocationsIds]="input.excludeLocationsIds"
                     [clearable]="true"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-location-single-v2>
 
                   <!-- Location multiple -->
@@ -762,6 +763,7 @@
                     [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     [suffixIconButtons]="input.suffixIconButtons"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-textarea-v2>
 
                   <!-- Select groups -->

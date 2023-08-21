@@ -181,7 +181,7 @@
           <div
             class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-required">
             <app-form-checkbox-v2
-              *ngIf="item.data.visibleMandatoryConf?.required || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible)"
+              *ngIf="item.data.supportsRequired && (item.data.visibleMandatoryConf?.required || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible))"
               [ngModel]="item.data.visibleMandatoryConf?.required || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].mandatory)"
               [name]="item.name.mandatory"
               placeholder="LNG_COMMON_LABEL_REQUIRED"
