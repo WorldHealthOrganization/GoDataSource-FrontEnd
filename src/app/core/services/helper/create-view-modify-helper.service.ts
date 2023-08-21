@@ -5,6 +5,8 @@ import { IVisibleMandatoryDataGroupTab, IVisibleMandatoryDataGroupTabSectionFiel
 import { v4 as uuid } from 'uuid';
 import { ToastV2Service } from './toast-v2.service';
 import { RedirectService } from './redirect.service';
+import { OutbreakModel } from '../../models/outbreak.model';
+import * as _ from 'lodash';
 
 @Injectable()
 export class CreateViewModifyHelperService {
@@ -114,5 +116,48 @@ export class CreateViewModifyHelperService {
         })
       };
     });
+  }
+
+  /**
+   * Filter tabs according to outbreak settings
+   */
+  tabsFilter(
+    original: ICreateViewModifyV2Tab,
+    visibleMandatoryKey: string,
+    outbreak: OutbreakModel
+  ): ICreateViewModifyV2Tab {
+    // no changes required ?
+    if (
+      !outbreak ||
+      !outbreak.visibleAndMandatoryFields ||
+      !outbreak.visibleAndMandatoryFields[visibleMandatoryKey]
+    ) {
+      return original;
+    }
+
+    // visible and mandatory fields
+    // const visibleAndMandatoryConf: {
+    //   [fieldId: string]: IVisibleMandatoryDataValueField
+    // } = outbreak.visibleAndMandatoryFields[visibleMandatoryKey];
+
+    // filter
+    const filtered: ICreateViewModifyV2Tab = _.cloneDeep(original);
+    // filtered.sections.forEach((section) => {
+    //
+    //   // filter fields
+    //   let atLeastOneFieldFound: boolean = false;
+    //   section.inputs.forEach((field) => {
+    //
+    //   });
+    //
+    //   // delete section ?
+    //   // #TODO
+    // });
+    //
+    // // delete tab ?
+    // // #TODO
+
+    // console.log(7, filtered);
+    return filtered;
   }
 }

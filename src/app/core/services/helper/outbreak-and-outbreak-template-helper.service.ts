@@ -47,7 +47,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
         id: this.entityCaseHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_CASES_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
-          this.entityCaseHelperService.generateTabsPersonal({
+          this.entityCaseHelperService.generateTabsPersonal(undefined, {
             selectedOutbreak: new OutbreakModel(),
             isCreate: true,
             itemData: new CaseModel(),

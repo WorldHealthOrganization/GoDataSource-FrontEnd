@@ -479,7 +479,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs - Personal
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return this.entityCaseHelperService.generateTabsPersonal({
+    return this.entityCaseHelperService.generateTabsPersonal(this.selectedOutbreak, {
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,

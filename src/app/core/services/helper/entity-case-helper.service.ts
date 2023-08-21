@@ -23,6 +23,7 @@ import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/componen
 import { ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
+import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +39,8 @@ export class EntityCaseHelperService {
   constructor(
     private authDataService: AuthDataService,
     private i18nService: I18nService,
-    private caseDataService: CaseDataService
+    private caseDataService: CaseDataService,
+    private createViewModifyHelperService: CreateViewModifyHelperService
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
@@ -47,23 +49,26 @@ export class EntityCaseHelperService {
   /**
    * Generate tab - Personal
    */
-  generateTabsPersonal(data: {
-    selectedOutbreak: OutbreakModel,
-    isCreate: boolean,
-    itemData: CaseModel,
-    checkForPersonExistence: () => void,
-    caseVisualIDMask: {
-      mask: string
-    },
-    options: {
-      gender: ILabelValuePairModel[],
-      pregnancy: ILabelValuePairModel[],
-      occupation: ILabelValuePairModel[],
-      user: ILabelValuePairModel[],
-      documentType: ILabelValuePairModel[],
-      addressType: ILabelValuePairModel[]
+  generateTabsPersonal(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      selectedOutbreak: OutbreakModel,
+      isCreate: boolean,
+      itemData: CaseModel,
+      checkForPersonExistence: () => void,
+      caseVisualIDMask: {
+        mask: string
+      },
+      options: {
+        gender: ILabelValuePairModel[],
+        pregnancy: ILabelValuePairModel[],
+        occupation: ILabelValuePairModel[],
+        user: ILabelValuePairModel[],
+        documentType: ILabelValuePairModel[],
+        addressType: ILabelValuePairModel[]
+      }
     }
-  }): ICreateViewModifyV2Tab {
+  ): ICreateViewModifyV2Tab {
     // create tab
     const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
@@ -402,7 +407,11 @@ export class EntityCaseHelperService {
     };
 
     // finished
-    return tab;
+    return this.createViewModifyHelperService.tabsFilter(
+      tab,
+      this.visibleMandatoryKey,
+      useToFilterOutbreak
+    );
   }
 
   /**
