@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Moment, moment } from '../../helperClasses/x-moment';
-import { I18nService } from './i18n.service';
 import { CaseDataService } from '../data/case.data.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { UserModel } from '../../models/user.model';
@@ -38,7 +37,6 @@ export class EntityCaseHelperService {
    */
   constructor(
     private authDataService: AuthDataService,
-    private i18nService: I18nService,
     private caseDataService: CaseDataService,
     private createViewModifyHelperService: CreateViewModifyHelperService
   ) {
@@ -254,7 +252,7 @@ export class EntityCaseHelperService {
               type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
               name: 'visualId',
               placeholder: () => 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-              description: () => this.i18nService.instant(
+              description: () => this.createViewModifyHelperService.i18nService.instant(
                 'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 data.caseVisualIDMask
               ),
@@ -325,7 +323,7 @@ export class EntityCaseHelperService {
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this._authUser),
-                html: this.i18nService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -417,28 +415,31 @@ export class EntityCaseHelperService {
   /**
    * Generate tab - Epidemiology
    */
-  generateTabsEpidemiology(data: {
-    selectedOutbreak: OutbreakModel,
-    isCreate: boolean,
-    itemData: CaseModel,
-    checkForOnsetAfterReporting: () => void,
-    checkForOnsetAfterHospitalizationStartDate: () => void,
-    options: {
-      classification: ILabelValuePairModel[],
-      investigationStatus: ILabelValuePairModel[],
-      outcome: ILabelValuePairModel[],
-      risk: ILabelValuePairModel[],
-      vaccine: ILabelValuePairModel[],
-      vaccineStatus: ILabelValuePairModel[],
-      dateRangeType: ILabelValuePairModel[],
-      dateRangeCenter: ILabelValuePairModel[]
+  generateTabsEpidemiology(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      selectedOutbreak: OutbreakModel,
+      isCreate: boolean,
+      itemData: CaseModel,
+      checkForOnsetAfterReporting: () => void,
+      checkForOnsetAfterHospitalizationStartDate: () => void,
+      options: {
+        classification: ILabelValuePairModel[],
+        investigationStatus: ILabelValuePairModel[],
+        outcome: ILabelValuePairModel[],
+        risk: ILabelValuePairModel[],
+        vaccine: ILabelValuePairModel[],
+        vaccineStatus: ILabelValuePairModel[],
+        dateRangeType: ILabelValuePairModel[],
+        dateRangeCenter: ILabelValuePairModel[]
+      }
     }
-  }): ICreateViewModifyV2Tab {
+  ): ICreateViewModifyV2Tab {
     // today
     const today: Moment = moment();
 
-    // finished
-    return {
+    // create tab
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'infection',
       label: data.isCreate ?
@@ -843,6 +844,13 @@ export class EntityCaseHelperService {
         }
       ]
     };
+
+    // finished
+    return this.createViewModifyHelperService.tabsFilter(
+      tab,
+      this.visibleMandatoryKey,
+      useToFilterOutbreak
+    );
   }
 
   /**
@@ -1295,7 +1303,7 @@ export class EntityCaseHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.CIRCLE,
         color: info.classification.map[info.item.classification].getColorCode(),
-        tooltip: this.i18nService.instant(info.item.classification)
+        tooltip: this.createViewModifyHelperService.i18nService.instant(info.item.classification)
       });
     } else {
       forms.push({
@@ -1311,7 +1319,7 @@ export class EntityCaseHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.HEXAGON,
         color: info.outcome.map[info.item.outcomeId].getColorCode(),
-        tooltip: this.i18nService.instant(info.item.outcomeId)
+        tooltip: this.createViewModifyHelperService.i18nService.instant(info.item.outcomeId)
       });
     } else {
       forms.push({
@@ -1324,7 +1332,7 @@ export class EntityCaseHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     } else {
       forms.push({

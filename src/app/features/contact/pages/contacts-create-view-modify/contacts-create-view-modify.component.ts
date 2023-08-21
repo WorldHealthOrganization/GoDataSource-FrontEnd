@@ -500,7 +500,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Personal
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return this.entityContactHelperService.generateTabsPersonal({
+    return this.entityContactHelperService.generateTabsPersonal(this.selectedOutbreak, {
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,
@@ -530,7 +530,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Epidemiology
    */
   private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
-    return this.entityContactHelperService.generateTabsEpidemiology({
+    return this.entityContactHelperService.generateTabsEpidemiology(this.selectedOutbreak, {
       isCreate: this.isCreate,
       itemData: this.itemData,
       options: {

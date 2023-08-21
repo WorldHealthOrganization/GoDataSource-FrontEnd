@@ -466,7 +466,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Details
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return this.entityFollowUpHelperService.generateTabsPersonal({
+    return this.entityFollowUpHelperService.generateTabsPersonal(this.selectedOutbreak, {
       isCreate: this.isCreate,
       isModify: this.isModify,
       itemData: this.itemData,

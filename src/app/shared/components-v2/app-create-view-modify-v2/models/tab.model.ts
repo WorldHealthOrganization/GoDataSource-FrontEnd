@@ -661,7 +661,7 @@ export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICrea
 /**
  * Tab section
  */
-interface ICreateViewModifyV2Section {
+export interface ICreateViewModifyV2Section {
   // required
   type: CreateViewModifyV2TabInputType.SECTION;
   inputs: CreateViewModifyV2TabInput[];

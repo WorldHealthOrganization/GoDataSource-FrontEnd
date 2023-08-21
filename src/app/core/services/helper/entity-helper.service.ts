@@ -14,8 +14,6 @@ import * as _ from 'lodash';
 import { Moment, moment } from '../../helperClasses/x-moment';
 import { Constants } from '../../models/constants';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
-import { I18nService } from './i18n.service';
-import { ToastV2Service } from './toast-v2.service';
 import { IV2Column, IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { RelationshipType } from '../../enums/relationship-type.enum';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -33,6 +31,7 @@ import { catchError } from 'rxjs/operators';
 import { AuthDataService } from '../data/auth.data.service';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IAppFormIconButtonV2 } from '../../../shared/forms-v2/core/app-form-icon-button-v2';
+import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
 
 /**
  * From ?
@@ -171,8 +170,7 @@ export class EntityHelperService {
     private authDataService: AuthDataService,
     private dialogV2Service: DialogV2Service,
     private relationshipDataService: RelationshipDataService,
-    private i18nService: I18nService,
-    private toastV2Service: ToastV2Service
+    private createViewModifyHelperService: CreateViewModifyHelperService
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
@@ -181,32 +179,35 @@ export class EntityHelperService {
   /**
    * Generate tab - Details
    */
-  generateTabsDetails(data: {
-    entityId: string,
-    title: string,
-    name: (property: string) => string
-    itemData: RelationshipModel,
-    createCopySuffixButtons: (prop: string) => IAppFormIconButtonV2[],
-    checkForLastContactBeforeCaseOnSet: (
-      entities: {
-        [id: string]: string
-      },
-      contactDate: Moment | string
-    ) => void
-    options: {
-      certaintyLevel: ILabelValuePairModel[],
-      exposureType: ILabelValuePairModel[],
-      exposureFrequency: ILabelValuePairModel[],
-      exposureDuration: ILabelValuePairModel[],
-      contextOfTransmission: ILabelValuePairModel[],
-      cluster: ILabelValuePairModel[]
+  generateTabsDetails(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      entityId: string,
+      title: string,
+      name: (property: string) => string
+      itemData: RelationshipModel,
+      createCopySuffixButtons: (prop: string) => IAppFormIconButtonV2[],
+      checkForLastContactBeforeCaseOnSet: (
+        entities: {
+          [id: string]: string
+        },
+        contactDate: Moment | string
+      ) => void
+      options: {
+        certaintyLevel: ILabelValuePairModel[],
+        exposureType: ILabelValuePairModel[],
+        exposureFrequency: ILabelValuePairModel[],
+        exposureDuration: ILabelValuePairModel[],
+        contextOfTransmission: ILabelValuePairModel[],
+        cluster: ILabelValuePairModel[]
+      }
     }
-  }): ICreateViewModifyV2Tab {
+  ): ICreateViewModifyV2Tab {
     // today
     const today: Moment = moment();
 
-    // finished
-    return {
+    // create tab
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       name: data.title,
       label: data.title,
@@ -384,6 +385,13 @@ export class EntityHelperService {
         }
       ]
     };
+
+    // finished
+    return this.createViewModifyHelperService.tabsFilter(
+      tab,
+      this.visibleMandatoryKey,
+      useToFilterOutbreak
+    );
   }
 
   /**
@@ -418,7 +426,7 @@ export class EntityHelperService {
             .pipe(
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.createViewModifyHelperService.toastV2Service.error(err);
 
                 // hide
                 handler.hide();
@@ -713,12 +721,12 @@ export class EntityHelperService {
       );
 
       // display age. decide between years and months
-      let ageUnit: string = this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
+      let ageUnit: string = this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
       let ageValue: number = _.get(entity, 'age.years', 0);
       const ageMonths = _.get(entity, 'age.months', 0);
       if (ageMonths > 0) {
         // show age in months
-        ageUnit = this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+        ageUnit = this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
         ageValue = ageMonths;
       }
 
@@ -1012,7 +1020,7 @@ export class EntityHelperService {
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.createViewModifyHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -1023,7 +1031,7 @@ export class EntityHelperService {
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+                        this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -1153,7 +1161,7 @@ export class EntityHelperService {
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: definitions.personType.map[data.type].getColorCode(),
-              tooltip: this.i18nService.instant(data.type)
+              tooltip: this.createViewModifyHelperService.i18nService.instant(data.type)
             });
           } else {
             forms.push({
@@ -1209,7 +1217,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
         format: {
           type: (item) => item.relationship?.certaintyLevelId ?
-            this.i18nService.instant(item.relationship?.certaintyLevelId) :
+            this.createViewModifyHelperService.i18nService.instant(item.relationship?.certaintyLevelId) :
             item.relationship?.certaintyLevelId
         },
         filter: {
@@ -1224,7 +1232,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
         format: {
           type: (item) => item.relationship?.exposureTypeId ?
-            this.i18nService.instant(item.relationship?.exposureTypeId) :
+            this.createViewModifyHelperService.i18nService.instant(item.relationship?.exposureTypeId) :
             item.relationship?.exposureTypeId
         },
         filter: {
@@ -1239,7 +1247,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
         format: {
           type: (item) => item.relationship?.exposureFrequencyId ?
-            this.i18nService.instant(item.relationship?.exposureFrequencyId) :
+            this.createViewModifyHelperService.i18nService.instant(item.relationship?.exposureFrequencyId) :
             item.relationship?.exposureFrequencyId
         },
         filter: {
@@ -1254,7 +1262,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
         format: {
           type: (item) => item.relationship?.exposureDurationId ?
-            this.i18nService.instant(item.relationship?.exposureDurationId) :
+            this.createViewModifyHelperService.i18nService.instant(item.relationship?.exposureDurationId) :
             item.relationship?.exposureDurationId
         },
         filter: {
@@ -1269,7 +1277,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
         format: {
           type: (item) => item.relationship?.socialRelationshipTypeId ?
-            this.i18nService.instant(item.relationship?.socialRelationshipTypeId) :
+            this.createViewModifyHelperService.i18nService.instant(item.relationship?.socialRelationshipTypeId) :
             item.relationship?.socialRelationshipTypeId
         },
         filter: {
@@ -1449,7 +1457,7 @@ export class EntityHelperService {
         )
     ).pipe(
       catchError((err) => {
-        this.toastV2Service.error(err);
+        this.createViewModifyHelperService.toastV2Service.error(err);
         return throwError(err);
       })
     );

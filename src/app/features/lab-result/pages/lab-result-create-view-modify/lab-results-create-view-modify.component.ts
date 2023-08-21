@@ -408,7 +408,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Initialize tabs - Details
    */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
-    return this.entityLabResultHelperService.generateTabsDetails({
+    return this.entityLabResultHelperService.generateTabsDetails(this.selectedOutbreak, {
       isCreate: this.isCreate,
       itemData: this.itemData,
       options: {

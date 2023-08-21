@@ -62,7 +62,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
               addressType: []
             }
           }),
-          this.entityCaseHelperService.generateTabsEpidemiology({
+          this.entityCaseHelperService.generateTabsEpidemiology(undefined, {
             selectedOutbreak: new OutbreakModel(),
             isCreate: true,
             itemData: new CaseModel(),
@@ -87,7 +87,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
         id: this.entityEventHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_EVENTS_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
-          this.entityEventHelperService.generateTabsDetails({
+          this.entityEventHelperService.generateTabsDetails(undefined, {
             selectedOutbreak: new OutbreakModel(),
             isCreate: true,
             itemData: new EventModel(),
@@ -106,7 +106,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
         id: this.entityContactHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
-          this.entityContactHelperService.generateTabsPersonal({
+          this.entityContactHelperService.generateTabsPersonal(undefined, {
             selectedOutbreak: new OutbreakModel(),
             isCreate: true,
             itemData: new ContactModel(),
@@ -123,7 +123,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
               addressType: []
             }
           }),
-          this.entityContactHelperService.generateTabsEpidemiology({
+          this.entityContactHelperService.generateTabsEpidemiology(undefined, {
             isCreate: true,
             itemData: new ContactModel(),
             options: {
@@ -143,7 +143,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
         id: this.entityContactOfContactHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
-          this.entityContactOfContactHelperService.generateTabsPersonal({
+          this.entityContactOfContactHelperService.generateTabsPersonal(undefined, {
             selectedOutbreak: new OutbreakModel(),
             isCreate: true,
             itemData: new ContactOfContactModel(),
@@ -160,7 +160,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
               addressType: []
             }
           }),
-          this.entityContactOfContactHelperService.generateTabsEpidemiology({
+          this.entityContactOfContactHelperService.generateTabsEpidemiology(undefined, {
             isCreate: true,
             itemData: new ContactOfContactModel(),
             options: {
@@ -177,7 +177,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
         id: this.entityFollowUpHelperService.visibleMandatoryKey,
         label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOW_UP',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
-          this.entityFollowUpHelperService.generateTabsPersonal({
+          this.entityFollowUpHelperService.generateTabsPersonal(undefined, {
             isCreate: true,
             isModify: false,
             itemData: new FollowUpModel(),
@@ -197,7 +197,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
         id: this.entityLabResultHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
-          this.entityLabResultHelperService.generateTabsDetails({
+          this.entityLabResultHelperService.generateTabsDetails(undefined, {
             isCreate: true,
             itemData: new LabResultModel(),
             options: {
@@ -218,7 +218,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
         id: this.entityHelperService.visibleMandatoryKey,
         label: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_TITLE',
         children: this.createViewModifyHelperService.tabsToGroupTabs([
-          this.entityHelperService.generateTabsDetails({
+          this.entityHelperService.generateTabsDetails(undefined, {
             entityId: 'LNG_COMMON_MODEL_FIELD_LABEL_ID',
             title: 'LNG_COMMON_LABEL_DETAILS',
             name: (property) => property,
