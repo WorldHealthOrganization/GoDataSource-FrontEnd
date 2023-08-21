@@ -250,6 +250,10 @@ export class EntityHelperService {
                 );
               }
             },
+            visibleMandatoryConf: {
+              visible: true,
+              required: false
+            },
             maxDate: today,
             validators: {
               required: () => true,

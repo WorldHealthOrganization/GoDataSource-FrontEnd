@@ -99,7 +99,8 @@ export class EntityContactOfContactHelperService {
                 required: () => true
               },
               visibleMandatoryConf: {
-                alwaysRequired: true
+                visible: true,
+                required: true
               }
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,
@@ -128,6 +129,10 @@ export class EntityContactOfContactHelperService {
                   // check for duplicates
                   data.checkForPersonExistence();
                 }
+              },
+              visibleMandatoryConf: {
+                visible: true,
+                required: false
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,

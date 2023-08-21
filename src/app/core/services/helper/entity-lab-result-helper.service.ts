@@ -84,6 +84,10 @@ export class EntityLabResultHelperService {
                   // set data
                   data.itemData.sampleIdentifier = value;
                 }
+              },
+              visibleMandatoryConf: {
+                visible: true,
+                required: false
               }
             },
             {

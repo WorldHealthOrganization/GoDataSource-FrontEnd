@@ -5,7 +5,8 @@ import { CreateViewModifyV2TabInput } from '../../../../components-v2/app-create
  */
 export interface ICreateViewModifyV2TabInputToVisibleMandatoryConf {
   // required
-  alwaysRequired: boolean;
+  visible: boolean;
+  required: boolean;
 }
 
 /**
