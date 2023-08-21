@@ -3,7 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   forwardRef,
-  Host,
+  Host, HostListener,
   Input,
   OnDestroy,
   Optional,
@@ -24,6 +24,7 @@ import {
   IVisibleMandatoryDataValue
 } from './models/visible-mandatory.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
 
 /**
  * Flatten type
@@ -159,6 +160,9 @@ export class AppFormVisibleMandatoryV2Component
   // filter
   searchValue: string;
 
+  // small screen mode ?
+  isSmallScreenMode: boolean = false;
+
   // timers
   private _filterTimer: number;
 
@@ -180,6 +184,9 @@ export class AppFormVisibleMandatoryV2Component
       i18nService,
       changeDetectorRef
     );
+
+    // update render mode
+    this.updateRenderMode();
 
     // subscribe to language change
     this.initializeLanguageChangeListener();
@@ -674,5 +681,14 @@ export class AppFormVisibleMandatoryV2Component
 
     // update ui
     this.detectChanges();
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // small screen mode ?
+    this.isSmallScreenMode = determineIfSmallScreenMode();
   }
 }

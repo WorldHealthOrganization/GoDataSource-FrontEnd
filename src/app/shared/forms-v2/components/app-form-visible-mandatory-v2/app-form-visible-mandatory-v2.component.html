@@ -196,4 +196,39 @@
 
   </div>
 
+  <!-- Legend -->
+  <div
+    *ngIf="!viewOnly && !isSmallScreenMode"
+    class="gd-form-visible-mandatory-v2-legend"
+    fxLayout="row" fxLayoutAlign="start center" fxLayoutAlign.sm="start start">
+
+    <!-- Header -->
+    <div
+      class="gd-form-visible-mandatory-v2-legend-title">
+      {{'LNG_COMMON_LABEL_LEGEND' | translate}}
+    </div>
+
+    <!-- Items -->
+    <div
+      class="gd-form-visible-mandatory-v2-legend-items"
+      fxLayout="row wrap" fxLayoutAlign="start center">
+
+      <!-- Check all -->
+      <div
+        class="gd-form-visible-mandatory-v2-legend-items-item">
+        <mat-icon>done_all</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_CHECK_ALL' | translate}}</span>
+      </div>
+
+      <!-- Uncheck all -->
+      <div
+        class="gd-form-visible-mandatory-v2-legend-items-item">
+        <mat-icon>remove_done</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate}}</span>
+      </div>
+
+    </div>
+
+  </div>
+
 </form>
