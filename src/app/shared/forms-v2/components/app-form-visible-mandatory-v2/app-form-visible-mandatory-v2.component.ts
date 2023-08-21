@@ -199,11 +199,11 @@ export class AppFormVisibleMandatoryV2Component
     // parent
     super.onDestroy();
 
-    // stop timers
-    this.stopFilterTimer();
-
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
+
+    // stop timers
+    this.stopFilterTimer();
   }
 
   /**
