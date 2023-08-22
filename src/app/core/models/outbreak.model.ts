@@ -40,6 +40,7 @@ export class OutbreakModel
   noDaysNewContacts: number;
   caseInvestigationTemplate: QuestionModel[];
   contactInvestigationTemplate: QuestionModel[];
+  eventInvestigationTemplate: QuestionModel[];
   contactFollowUpTemplate: QuestionModel[];
   labResultsTemplate: QuestionModel[];
   eventIdMask: string;
@@ -386,6 +387,7 @@ export class OutbreakModel
      */
   static canModifyCaseQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE) : false; }
   static canModifyContactQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CONTACT_QUESTIONNAIRE) : false; }
+  static canModifyEventQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_EVENT_QUESTIONNAIRE) : false; }
   static canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE) : false; }
   static canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE) : false; }
 
@@ -444,6 +446,12 @@ export class OutbreakModel
     // CONTACT INVESTIGATION TEMPLATE
     this.contactInvestigationTemplate = _.map(
       _.get(data, 'contactInvestigationTemplate', []),
+      (lData: any) => {
+        return new QuestionModel(lData);
+      });
+    // EVENT TEMPLATE
+    this.eventInvestigationTemplate = _.map(
+      _.get(data, 'eventInvestigationTemplate', []),
       (lData: any) => {
         return new QuestionModel(lData);
       });

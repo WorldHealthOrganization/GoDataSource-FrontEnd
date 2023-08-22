@@ -12,6 +12,11 @@ import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validat
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { EventModel } from '../../models/event.model';
 import { EventDataService } from '../data/event.data.service';
+import {
+  IV2ColumnStatusFormType,
+  V2ColumnStatusForm
+} from '../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { QuestionModel } from '../../models/question.model';
 
 @Injectable({
   providedIn: 'root'
@@ -252,6 +257,7 @@ export class EntityEventHelperService {
    * Advanced filters
    */
   generateAdvancedFilters(data: {
+    eventInvestigationTemplate: () => QuestionModel[],
     options: {
       user: ILabelValuePairModel[],
       eventCategory: ILabelValuePairModel[],
@@ -316,6 +322,12 @@ export class EntityEventHelperService {
         field: 'visualId',
         label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+        field: 'questionnaireAnswers',
+        label: 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        template: data.eventInvestigationTemplate
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
@@ -433,6 +445,35 @@ export class EntityEventHelperService {
 
     // finished
     return advancedFilters;
+  }
+
+  /**
+   * Retrieve statuses forms
+   */
+  getStatusForms(
+    info: {
+      // required
+      item: EventModel
+    }
+  ): V2ColumnStatusForm[] {
+    // construct list of forms that we need to display
+    const forms: V2ColumnStatusForm[] = [];
+
+    // alerted
+    if (info.item.alerted) {
+      forms.push({
+        type: IV2ColumnStatusFormType.STAR,
+        color: 'var(--gd-danger)',
+        tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    } else {
+      forms.push({
+        type: IV2ColumnStatusFormType.EMPTY
+      });
+    }
+
+    // finished
+    return forms;
   }
 
   /**
