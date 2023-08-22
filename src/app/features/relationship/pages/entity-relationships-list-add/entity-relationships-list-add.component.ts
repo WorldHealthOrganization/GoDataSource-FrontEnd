@@ -322,7 +322,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
             this.needsRefreshList();
           }
         }
-      },
+      }
     ];
   }
 
