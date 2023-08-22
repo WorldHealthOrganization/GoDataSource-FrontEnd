@@ -19,6 +19,7 @@ import {
   IPermissionRestorable
 } from './permission.interface';
 import { IAnswerData } from './question.model';
+import { SafeHtml } from '@angular/platform-browser';
 
 export class EventModel
   extends BaseModel
@@ -62,6 +63,7 @@ export class EventModel
   responsibleUser: UserModel;
 
   // used by ui
+  uiStatusForms: SafeHtml;
   alerted: boolean = false;
 
   /**

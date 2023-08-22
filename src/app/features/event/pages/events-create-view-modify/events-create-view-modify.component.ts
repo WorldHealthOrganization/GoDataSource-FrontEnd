@@ -46,6 +46,9 @@ import {
   IV2SideDialogConfigInputToggleCheckbox,
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -76,6 +79,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     protected eventDataService: EventDataService,
     protected dialogV2Service: DialogV2Service,
     protected entityHelperService: EntityHelperService,
+    protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
     private entityEventHelperService: EntityEventHelperService
   ) {
@@ -86,6 +90,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       createViewModifyHelperService,
       outbreakAndOutbreakTemplateHelperService
     );
+
     // do we have tabs options already saved ?
     const generalSettings: {
       [key: string]: any
@@ -367,10 +372,39 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    */
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: EventModel) => ['/events', item.id, 'view'],
+      statusVisible: this.expandListColumnRenderer?.statusVisible === undefined ?
+        true :
+        this.expandListColumnRenderer.statusVisible,
+      maxNoOfStatusForms: 1,
       get: {
-        text: (item: EventModel) => item.name
+        status: (item: EventModel) => {
+          // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
+          if (!item.uiStatusForms) {
+            // determine forms
+            const forms: V2ColumnStatusForm[] = this.entityEventHelperService.getStatusForms({
+              item
+            });
+
+            // create html
+            let html: string = '';
+            forms.forEach((form, formIndex) => {
+              html += AppListTableV2Component.renderStatusForm(
+                form,
+                formIndex < forms.length - 1
+              );
+            });
+
+            // convert to safe html
+            item.uiStatusForms = this.domSanitizer.bypassSecurityTrustHtml(html);
+          }
+
+          // finished
+          return item.uiStatusForms;
+        },
+        text: (item: EventModel) => item.name,
+        details: (item: EventModel) => item.visualId
       }
     };
   }
@@ -733,7 +767,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
-      label: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
+      label: 'LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswers',

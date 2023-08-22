@@ -47,6 +47,8 @@ export class ImportEventDataComponent implements OnInit, OnDestroy {
   ImportServerModelNames = ImportServerModelNames;
 
   fieldsWithoutTokens = {
+    questionnaireAnswers: 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+
     // !must be empty token - logic depends on it!
     'address.geoLocation': ''
   };
