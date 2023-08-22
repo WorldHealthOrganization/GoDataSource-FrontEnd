@@ -19,7 +19,11 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { catchError, takeUntil } from 'rxjs/operators';
+import {
+  catchError,
+  map,
+  takeUntil
+} from 'rxjs/operators';
 import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
@@ -37,16 +41,30 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { EntityEventHelperService } from '../../../../core/services/helper/entity-event-helper.service';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import {
+  IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-events-create-view-modify',
   templateUrl: './events-create-view-modify.component.html'
 })
 export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<EventModel> implements OnDestroy {
+  // constants
+  private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
+
   // event visual id mask
   private _eventVisualIDMask: {
     mask: string
   };
+
+  // hide/show question numbers
+  hideQuestionNumbers: boolean = false;
 
   /**
    * Constructor
@@ -61,6 +79,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     protected eventDataService: EventDataService,
     protected dialogV2Service: DialogV2Service,
     protected entityHelperService: EntityHelperService,
+    protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
     private entityEventHelperService: EntityEventHelperService
   ) {
@@ -71,6 +90,21 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       createViewModifyHelperService,
       outbreakAndOutbreakTemplateHelperService
     );
+
+    // do we have tabs options already saved ?
+    const generalSettings: {
+      [key: string]: any
+    } = this.authDataService
+      .getAuthenticatedUser()
+      .getSettings(UserSettings.EVENT_GENERAL);
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
+      undefined;
+
+    // use the saved options
+    this.hideQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] : false;
   }
 
   /**
@@ -113,6 +147,14 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         data.queryBuilder
       )
       .pipe(
+        // determine alertness
+        map((events: EventModel[]) => {
+          return EntityModel.determineAlertness(
+            this.selectedOutbreak.eventInvestigationTemplate,
+            events
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
@@ -243,11 +285,48 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Initialize tabs
    */
   protected initializeTabs(): void {
+    // tab custom configuration
+    this.tabConfiguration = {
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TAB_OPTIONS'
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_EVENT_TAB_OPTION_SHOW_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_EVENT_TAB_OPTION_SHOW_QUESTION_NUMBERS',
+          value: !this.hideQuestionNumbers
+        }
+      ],
+      apply: (data, finish) => {
+        // save settings
+        const hideQuestionNumbers: boolean = !(data.map[EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
+        this.updateGeneralSettings(
+          `${UserSettings.EVENT_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideQuestionNumbers = hideQuestionNumbers;
+            this.tabsV2Component.detectChanges();
+
+            // finish
+            finish();
+          });
+      }
+    };
+
+    // tabs
     this.tabData = {
       // tabs
       tabs: [
         // Details
         this.initializeTabsDetails(),
+
+        // Questionnaires
+        this.initializeTabsQuestionnaire(),
 
         // Contacts, exposures ...
         this.initializeTabsContacts(),
@@ -293,10 +372,39 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    */
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: EventModel) => ['/events', item.id, 'view'],
+      statusVisible: this.expandListColumnRenderer?.statusVisible === undefined ?
+        true :
+        this.expandListColumnRenderer.statusVisible,
+      maxNoOfStatusForms: 1,
       get: {
-        text: (item: EventModel) => item.name
+        status: (item: EventModel) => {
+          // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
+          if (!item.uiStatusForms) {
+            // determine forms
+            const forms: V2ColumnStatusForm[] = this.entityEventHelperService.getStatusForms({
+              item
+            });
+
+            // create html
+            let html: string = '';
+            forms.forEach((form, formIndex) => {
+              html += AppListTableV2Component.renderStatusForm(
+                form,
+                formIndex < forms.length - 1
+              );
+            });
+
+            // convert to safe html
+            item.uiStatusForms = this.domSanitizer.bypassSecurityTrustHtml(html);
+          }
+
+          // finished
+          return item.uiStatusForms;
+        },
+        text: (item: EventModel) => item.name,
+        details: (item: EventModel) => item.visualId
       }
     };
   }
@@ -307,7 +415,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   protected initializeExpandListQueryFields(): void {
     this.expandListQueryFields = [
       'id',
-      'name'
+      'name',
+      'questionnaireAnswers'
     ];
   }
 
@@ -316,6 +425,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    */
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = this.entityEventHelperService.generateAdvancedFilters({
+      eventInvestigationTemplate: () => this.selectedOutbreak.eventInvestigationTemplate,
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -647,6 +757,39 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
 
     // finished
     return newTab;
+  }
+
+  /**
+   * Initialize tabs - Questionnaire
+   */
+  private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+      label: 'LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
+        name: 'questionnaireAnswers',
+        questionnaire: this.selectedOutbreak.eventInvestigationTemplate,
+        value: {
+          get: () => this.itemData.questionnaireAnswers,
+          set: (value) => {
+            this.itemData.questionnaireAnswers = value;
+          }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideQuestionNumbers;
+        },
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
+      },
+      visible: () => this.selectedOutbreak.eventInvestigationTemplate?.length > 0
+    };
   }
 
   /**

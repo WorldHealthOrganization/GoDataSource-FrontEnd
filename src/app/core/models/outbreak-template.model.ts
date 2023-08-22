@@ -32,6 +32,7 @@ export class OutbreakTemplateModel
   longPeriodsBetweenCaseOnset: number;
   caseInvestigationTemplate: QuestionModel[];
   contactInvestigationTemplate: QuestionModel[];
+  eventInvestigationTemplate: QuestionModel[];
   contactFollowUpTemplate: QuestionModel[];
   labResultsTemplate: QuestionModel[];
   isContactLabResultsActive: boolean;
@@ -63,6 +64,7 @@ export class OutbreakTemplateModel
    */
   static canModifyCaseQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE) : false; }
   static canModifyContactQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_QUESTIONNAIRE) : false; }
+  static canModifyEventQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_EVENT_QUESTIONNAIRE) : false; }
   static canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE) : false; }
   static canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE) : false; }
 
@@ -119,6 +121,12 @@ export class OutbreakTemplateModel
       (lData: any) => {
         return new QuestionModel(lData);
       });
+    // EVENT TEMPLATE
+    this.eventInvestigationTemplate = _.map(
+      _.get(data, 'eventInvestigationTemplate', []),
+      (lData: any) => {
+        return new QuestionModel(lData);
+      });
     // CONTACT FOLLOW_UP INVESTIGATION TEMPLATE
     this.contactFollowUpTemplate = _.map(
       _.get(data, 'contactFollowUpTemplate', []),
@@ -151,6 +159,7 @@ export class OutbreakTemplateModel
    */
   canModifyCaseQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyCaseQuestionnaire(user); }
   canModifyContactQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyContactQuestionnaire(user); }
+  canModifyEventQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyEventQuestionnaire(user); }
   canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyContactFollowUpQuestionnaire(user); }
   canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyCaseLabResultQuestionnaire(user); }
 
