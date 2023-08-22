@@ -504,7 +504,10 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,
-      checkForPersonExistence: this.checkForPersonExistence,
+      checkForPersonExistence: () => {
+        // we need arrow function to keep context (or use apply)
+        this.checkForPersonExistence();
+      },
       detectChanges: () => {
         // update ui
         this.tabsV2Component.detectChanges();
