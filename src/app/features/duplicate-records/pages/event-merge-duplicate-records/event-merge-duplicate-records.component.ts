@@ -355,9 +355,6 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
         // Personal
         this.initializeTabsDetails(),
 
-        // Epidemiology
-        this.initializeTabsEpidemiology(),
-
         // Questionnaires
         this.initializeTabsQuestionnaire()
       ],
@@ -396,48 +393,6 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
    * Refresh expand list
    */
   refreshExpandList(_data): void {}
-
-  /**
-   * Initialize tab - Epidemiology
-   */
-  private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'infection',
-      label: 'LNG_PAGE_CREATE_EVENT_TAB_INFECTION_TITLE',
-      sections: [
-        // Questionnaires
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE',
-          inputs: [
-            // answers
-            {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: '_selectedQuestionnaireAnswers',
-              placeholder: () => 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-              options: this._uniqueOptions.questionnaireAnswers,
-              value: {
-                get: () => this._selectedQuestionnaireAnswers as any,
-                set: (value) => {
-                  // set data
-                  this._selectedQuestionnaireAnswers = value as any;
-
-                  // hack to force re-render without throwing errors because some bindings are missing
-                  this.itemData.questionnaireAnswers = {};
-                  setTimeout(() => {
-                    this.itemData.questionnaireAnswers = this._selectedQuestionnaireAnswers || this._selectedQuestionnaireAnswers === 0 ?
-                      this._uniqueOptions.questionnaireAnswers[this._selectedQuestionnaireAnswers].data :
-                      null;
-                  });
-                }
-              }
-            }
-          ]
-        }
-      ]
-    };
-  }
 
   /**
    * Initialize tab - Questionnaire
@@ -741,6 +696,35 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
               },
               visible: () => !!this.itemData.address,
               readonly: true
+            }
+          ]
+        },
+        // Questionnaires
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE',
+          inputs: [
+            // answers
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: '_selectedQuestionnaireAnswers',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+              options: this._uniqueOptions.questionnaireAnswers,
+              value: {
+                get: () => this._selectedQuestionnaireAnswers as any,
+                set: (value) => {
+                  // set data
+                  this._selectedQuestionnaireAnswers = value as any;
+
+                  // hack to force re-render without throwing errors because some bindings are missing
+                  this.itemData.questionnaireAnswers = {};
+                  setTimeout(() => {
+                    this.itemData.questionnaireAnswers = this._selectedQuestionnaireAnswers || this._selectedQuestionnaireAnswers === 0 ?
+                      this._uniqueOptions.questionnaireAnswers[this._selectedQuestionnaireAnswers].data :
+                      null;
+                  });
+                }
+              }
             }
           ]
         }
