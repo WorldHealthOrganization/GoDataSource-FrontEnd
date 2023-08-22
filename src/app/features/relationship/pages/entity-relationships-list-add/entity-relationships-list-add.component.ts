@@ -558,6 +558,15 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       );
     }
 
+    // exclude discarded cases always
+    if (this._entity.type === EntityType.CONTACT_OF_CONTACT) {
+      countQueryBuilder.filter.where({
+        classification: {
+          neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+        }
+      });
+    }
+
     // count
     this.entityDataService
       .getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder)
