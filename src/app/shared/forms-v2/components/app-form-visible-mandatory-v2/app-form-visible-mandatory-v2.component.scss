@@ -41,10 +41,6 @@
       min-height: 10rem;
     }
 
-    //@include breakpoint('sm') {
-    //  height: calc(100% - 12.6rem);
-    //}
-
     .cdk-virtual-scroll-viewport {
       height: 100%;
       overflow-y: overlay;
