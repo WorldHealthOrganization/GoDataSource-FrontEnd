@@ -483,7 +483,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,
-      checkForPersonExistence: this.checkForPersonExistence,
+      checkForPersonExistence: () => {
+        // we need arrow function to keep context (or use apply)
+        this.checkForPersonExistence();
+      },
       caseVisualIDMask: this._caseVisualIDMask,
       options: {
         gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -508,8 +511,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,
-      checkForOnsetAfterReporting: this.checkForOnsetAfterReporting,
-      checkForOnsetAfterHospitalizationStartDate: this.checkForOnsetAfterHospitalizationStartDate,
+      checkForOnsetAfterReporting: () => {
+        // we need arrow function to keep context (or use apply)
+        this.checkForOnsetAfterReporting();
+      },
+      checkForOnsetAfterHospitalizationStartDate: () => {
+        // we need arrow function to keep context (or use apply)
+        this.checkForOnsetAfterHospitalizationStartDate();
+      },
       options: {
         classification: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,

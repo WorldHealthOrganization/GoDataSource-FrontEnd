@@ -400,8 +400,14 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       title,
       name,
       itemData: relationshipData,
-      createCopySuffixButtons: this.createCopySuffixButtons,
-      checkForLastContactBeforeCaseOnSet: this.checkForLastContactBeforeCaseOnSet,
+      createCopySuffixButtons: (prop): IAppFormIconButtonV2[] => {
+        // we need arrow function to keep context (or use apply)
+        return this.createCopySuffixButtons(prop);
+      },
+      checkForLastContactBeforeCaseOnSet: (entities, contactDate) => {
+        // we need arrow function to keep context (or use apply)
+        this.checkForLastContactBeforeCaseOnSet(entities, contactDate);
+      },
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
