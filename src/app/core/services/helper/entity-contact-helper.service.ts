@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Moment, moment } from '../../helperClasses/x-moment';
-import { I18nService } from './i18n.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { OutbreakModel } from '../../models/outbreak.model';
@@ -30,6 +29,7 @@ import { TeamModel } from '../../models/team.model';
 import { FollowUpModel } from '../../models/follow-up.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { EntityType } from '../../models/entity-type';
+import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -44,9 +44,9 @@ export class EntityContactHelperService {
    */
   constructor(
     private authDataService: AuthDataService,
-    private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
-    private contactDataService: ContactDataService
+    private contactDataService: ContactDataService,
+    private createViewModifyHelperService: CreateViewModifyHelperService
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
@@ -55,25 +55,28 @@ export class EntityContactHelperService {
   /**
    * Generate tab - Personal
    */
-  generateTabsPersonal(data: {
-    selectedOutbreak: OutbreakModel,
-    isCreate: boolean,
-    itemData: ContactModel,
-    checkForPersonExistence: () => void,
-    detectChanges: () => void,
-    contactVisualIDMask: {
-      mask: string
-    },
-    parentEntity: CaseModel | EventModel,
-    options: {
-      gender: ILabelValuePairModel[],
-      pregnancy: ILabelValuePairModel[],
-      occupation: ILabelValuePairModel[],
-      user: ILabelValuePairModel[],
-      documentType: ILabelValuePairModel[],
-      addressType: ILabelValuePairModel[]
+  generateTabsPersonal(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      selectedOutbreak: OutbreakModel,
+      isCreate: boolean,
+      itemData: ContactModel,
+      checkForPersonExistence: () => void,
+      detectChanges: () => void,
+      contactVisualIDMask: {
+        mask: string
+      },
+      parentEntity: CaseModel | EventModel,
+      options: {
+        gender: ILabelValuePairModel[],
+        pregnancy: ILabelValuePairModel[],
+        occupation: ILabelValuePairModel[],
+        user: ILabelValuePairModel[],
+        documentType: ILabelValuePairModel[],
+        addressType: ILabelValuePairModel[]
+      }
     }
-  }): ICreateViewModifyV2Tab {
+  ): ICreateViewModifyV2Tab {
     // create tab
     const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
@@ -259,7 +262,7 @@ export class EntityContactHelperService {
               type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
               name: 'visualId',
               placeholder: () => 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.i18nService.instant(
+              description: () => this.createViewModifyHelperService.i18nService.instant(
                 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 data.contactVisualIDMask
               ),
@@ -330,7 +333,7 @@ export class EntityContactHelperService {
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this._authUser),
-                html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -450,29 +453,36 @@ export class EntityContactHelperService {
     };
 
     // finished
-    return tab;
+    return this.createViewModifyHelperService.tabsFilter(
+      tab,
+      this.visibleMandatoryKey,
+      useToFilterOutbreak
+    );
   }
 
   /**
    * Generate tab - Epidemiology
    */
-  generateTabsEpidemiology(data: {
-    isCreate: boolean,
-    itemData: ContactModel,
-    options: {
-      outcome: ILabelValuePairModel[],
-      risk: ILabelValuePairModel[],
-      team: ILabelValuePairModel[],
-      followUpStatus: ILabelValuePairModel[],
-      vaccine: ILabelValuePairModel[],
-      vaccineStatus: ILabelValuePairModel[]
+  generateTabsEpidemiology(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      isCreate: boolean,
+      itemData: ContactModel,
+      options: {
+        outcome: ILabelValuePairModel[],
+        risk: ILabelValuePairModel[],
+        team: ILabelValuePairModel[],
+        followUpStatus: ILabelValuePairModel[],
+        vaccine: ILabelValuePairModel[],
+        vaccineStatus: ILabelValuePairModel[]
+      }
     }
-  }): ICreateViewModifyV2Tab {
+  ): ICreateViewModifyV2Tab {
     // today
     const today: Moment = moment();
 
     // finished
-    return {
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'infection',
       label: data.isCreate ?
@@ -595,7 +605,7 @@ export class EntityContactHelperService {
             },
             replace: {
               condition: () => !TeamModel.canList(this._authUser),
-              html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
+              html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -654,6 +664,13 @@ export class EntityContactHelperService {
         }
       ]
     };
+
+    // finished
+    return this.createViewModifyHelperService.tabsFilter(
+      tab,
+      this.visibleMandatoryKey,
+      useToFilterOutbreak
+    );
   }
 
   /**
@@ -1676,7 +1693,7 @@ export class EntityContactHelperService {
           field: 'dateRanges.startDate',
           label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_START_DATE',
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: `${this.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          relationshipLabel: `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         },
         {
@@ -1684,7 +1701,7 @@ export class EntityContactHelperService {
           field: 'dateRanges.endDate',
           label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_END_DATE',
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: `${this.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          relationshipLabel: `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         },
         {
@@ -1693,7 +1710,7 @@ export class EntityContactHelperService {
           label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
           options: data.options.dateRangeCenter,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: `${this.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          relationshipLabel: `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         },
         {
@@ -1702,7 +1719,7 @@ export class EntityContactHelperService {
           field: 'dateRanges',
           label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION',
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: `${this.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          relationshipLabel: `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         },
         {
@@ -1710,7 +1727,7 @@ export class EntityContactHelperService {
           field: 'dateRanges.comments',
           label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS',
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: `${this.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          relationshipLabel: `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         },
         {
@@ -1804,7 +1821,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.HEXAGON,
         color: info.outcome.map[info.item.outcomeId].getColorCode(),
-        tooltip: this.i18nService.instant(info.item.outcomeId)
+        tooltip: this.createViewModifyHelperService.i18nService.instant(info.item.outcomeId)
       });
     } else {
       forms.push({
@@ -1820,7 +1837,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.TRIANGLE,
         color: info.risk.map[info.item.riskLevel].getColorCode(),
-        tooltip: this.i18nService.instant(info.item.riskLevel)
+        tooltip: this.createViewModifyHelperService.i18nService.instant(info.item.riskLevel)
       });
     } else {
       forms.push({
@@ -1836,7 +1853,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
         color: 'var(--gd-status-follow-up-not-started)',
-        tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED')
+        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED')
       });
     } else if (
       info.item.followUp?.startDate &&
@@ -1851,7 +1868,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
         color: 'var(--gd-status-under-follow-up)',
-        tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP')
+        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP')
       });
     } else if (
       info.item.followUp?.endDate &&
@@ -1860,7 +1877,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
         color: 'var(--gd-status-follow-up-ended)',
-        tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP')
+        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP')
       });
     } else {
       forms.push({
@@ -1873,7 +1890,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     } else {
       forms.push({

@@ -317,7 +317,7 @@ interface ICreateViewModifyV2TabInputToggleCheckbox extends Omit<ICreateViewModi
 /**
  * Input - location single
  */
-interface ICreateViewModifyV2TabInputLocationSingle extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputLocationSingle extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.LOCATION_SINGLE;
   value: ICreateViewModifyV2TabInputValue<string>;
@@ -325,6 +325,9 @@ interface ICreateViewModifyV2TabInputLocationSingle extends Omit<ICreateViewModi
   // optional
   useOutbreakLocations?: boolean;
   excludeLocationsIds?: string[];
+  validators?: {
+    required?: () => boolean
+  };
 }
 
 /**
@@ -345,13 +348,16 @@ interface ICreateViewModifyV2TabInputLocationMultiple extends Omit<ICreateViewMo
 /**
  * Input - textarea
  */
-interface ICreateViewModifyV2TabInputTextArea extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+interface ICreateViewModifyV2TabInputTextArea extends Omit<ICreateViewModifyV2TabInputBase, 'value'>, ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.TEXTAREA;
   value: ICreateViewModifyV2TabInputValue<string>;
 
   // optional
   suffixIconButtons?: IAppFormIconButtonV2[];
+  validators?: {
+    required?: () => boolean
+  };
 }
 
 /**
@@ -661,7 +667,7 @@ export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICrea
 /**
  * Tab section
  */
-interface ICreateViewModifyV2Section {
+export interface ICreateViewModifyV2Section {
   // required
   type: CreateViewModifyV2TabInputType.SECTION;
   inputs: CreateViewModifyV2TabInput[];

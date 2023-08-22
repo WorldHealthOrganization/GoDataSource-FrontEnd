@@ -12,7 +12,6 @@ import { EntityType } from '../../models/entity-type';
 import { IAnswerData, QuestionModel } from '../../models/question.model';
 import { UserModel } from '../../models/user.model';
 import { DialogV2Service } from './dialog-v2.service';
-import { ToastV2Service } from './toast-v2.service';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { FollowUpsDataService } from '../data/follow-ups.data.service';
 import { AddressModel } from '../../models/address.model';
@@ -29,10 +28,10 @@ import { LocationModel } from '../../models/location.model';
 import { LocationDataService } from '../data/location.data.service';
 import * as moment from 'moment';
 import { ReferenceDataEntryModel } from '../../models/reference-data.model';
-import { I18nService } from './i18n.service';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { AuthDataService } from '../data/auth.data.service';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -49,9 +48,8 @@ export class EntityFollowUpHelperService {
     private authDataService: AuthDataService,
     private dialogV2Service: DialogV2Service,
     private followUpsDataService: FollowUpsDataService,
-    private toastV2Service: ToastV2Service,
-    private i18nService: I18nService,
-    private locationDataService: LocationDataService
+    private locationDataService: LocationDataService,
+    private createViewModifyHelperService: CreateViewModifyHelperService
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
@@ -60,19 +58,23 @@ export class EntityFollowUpHelperService {
   /**
    * Generate tab - Personal
    */
-  generateTabsPersonal(data: {
-    isCreate: boolean,
-    isModify: boolean,
-    itemData: FollowUpModel,
-    entityData: ContactOfContactModel | ContactModel | CaseModel,
-    options: {
-      dailyFollowUpStatus: ILabelValuePairModel[],
-      user: ILabelValuePairModel[],
-      team: ILabelValuePairModel[],
-      addressType: ILabelValuePairModel[]
+  generateTabsPersonal(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      isCreate: boolean,
+      isModify: boolean,
+      itemData: FollowUpModel,
+      entityData: ContactOfContactModel | ContactModel | CaseModel,
+      options: {
+        dailyFollowUpStatus: ILabelValuePairModel[],
+        user: ILabelValuePairModel[],
+        team: ILabelValuePairModel[],
+        addressType: ILabelValuePairModel[]
+      }
     }
-  }): ICreateViewModifyV2Tab {
-    return {
+  ): ICreateViewModifyV2Tab {
+    // create tab
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'details',
       label: data.isCreate ?
@@ -144,7 +146,7 @@ export class EntityFollowUpHelperService {
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this._authUser),
-                html: this.i18nService.instant('LNG_PAGE_MODIFY_FOLLOW_UP_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_FOLLOW_UP_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -179,6 +181,13 @@ export class EntityFollowUpHelperService {
         }
       ]
     };
+
+    // finished
+    return this.createViewModifyHelperService.tabsFilter(
+      tab,
+      this.visibleMandatoryKey,
+      useToFilterOutbreak
+    );
   }
 
   /**
@@ -281,7 +290,7 @@ export class EntityFollowUpHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.CIRCLE,
         color: info.dailyFollowUpStatus.map[info.item.statusId].getColorCode(),
-        tooltip: this.i18nService.instant(info.item.statusId)
+        tooltip: this.createViewModifyHelperService.i18nService.instant(info.item.statusId)
       });
     } else {
       forms.push({
@@ -294,7 +303,7 @@ export class EntityFollowUpHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     } else {
       forms.push({
@@ -418,7 +427,7 @@ export class EntityFollowUpHelperService {
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.createViewModifyHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -429,7 +438,7 @@ export class EntityFollowUpHelperService {
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
+                        this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -496,7 +505,7 @@ export class EntityFollowUpHelperService {
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.createViewModifyHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -507,7 +516,7 @@ export class EntityFollowUpHelperService {
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
+                        this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -613,7 +622,7 @@ export class EntityFollowUpHelperService {
                         )
                         .pipe(
                           catchError((err) => {
-                            this.toastV2Service.error(err);
+                            this.createViewModifyHelperService.toastV2Service.error(err);
                             return throwError(err);
                           })
                         )
@@ -622,7 +631,7 @@ export class EntityFollowUpHelperService {
                           item.targeted = ((response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
 
                           // success message
-                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
+                          this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
 
                           // close popup
                           response.handler.hide();
@@ -706,13 +715,13 @@ export class EntityFollowUpHelperService {
                         )
                         .pipe(
                           catchError((err) => {
-                            this.toastV2Service.error(err);
+                            this.createViewModifyHelperService.toastV2Service.error(err);
                             return throwError(err);
                           })
                         )
                         .subscribe(() => {
                           // success message
-                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_SUCCESS_MESSAGE');
+                          this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_SUCCESS_MESSAGE');
 
                           // close popup
                           response.handler.hide();
@@ -847,8 +856,8 @@ export class EntityFollowUpHelperService {
         format: {
           type: (item: FollowUpModel) => {
             return item && item.id && item.targeted ?
-              this.i18nService.instant('LNG_COMMON_LABEL_YES') :
-              this.i18nService.instant('LNG_COMMON_LABEL_NO');
+              this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_LABEL_YES') :
+              this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_LABEL_NO');
           }
         },
         filter: {
@@ -1401,7 +1410,7 @@ export class EntityFollowUpHelperService {
       )
       .pipe(
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.createViewModifyHelperService.toastV2Service.error(err);
           return throwError(err);
         })
       );

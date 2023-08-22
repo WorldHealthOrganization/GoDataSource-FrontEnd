@@ -18,13 +18,12 @@ import { IAnswerData, QuestionModel } from '../../models/question.model';
 import { UserModel } from '../../models/user.model';
 import { LabResultDataService } from '../data/lab-result.data.service';
 import { DialogV2Service } from './dialog-v2.service';
-import { ToastV2Service } from './toast-v2.service';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
-import { I18nService } from './i18n.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { Constants } from '../../models/constants';
+import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,8 +40,7 @@ export class EntityLabResultHelperService {
     private authDataService: AuthDataService,
     private dialogV2Service: DialogV2Service,
     private labResultDataService: LabResultDataService,
-    private toastV2Service: ToastV2Service,
-    private i18nService: I18nService
+    private createViewModifyHelperService: CreateViewModifyHelperService
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
@@ -51,20 +49,24 @@ export class EntityLabResultHelperService {
   /**
    * Generate tab - Details
    */
-  generateTabsDetails(data: {
-    isCreate: boolean,
-    itemData: LabResultModel,
-    options: {
-      labName: ILabelValuePairModel[],
-      labSampleType: ILabelValuePairModel[],
-      labTestType: ILabelValuePairModel[],
-      labTestResult: ILabelValuePairModel[],
-      labResultProgress: ILabelValuePairModel[],
-      labSequenceLaboratory: ILabelValuePairModel[],
-      labSequenceResult: ILabelValuePairModel[]
+  generateTabsDetails(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      isCreate: boolean,
+      itemData: LabResultModel,
+      options: {
+        labName: ILabelValuePairModel[],
+        labSampleType: ILabelValuePairModel[],
+        labTestType: ILabelValuePairModel[],
+        labTestResult: ILabelValuePairModel[],
+        labResultProgress: ILabelValuePairModel[],
+        labSequenceLaboratory: ILabelValuePairModel[],
+        labSequenceResult: ILabelValuePairModel[]
+      }
     }
-  }): ICreateViewModifyV2Tab {
-    return {
+  ): ICreateViewModifyV2Tab {
+    // create tab
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'details',
       label: data.isCreate ? 'LNG_PAGE_CREATE_LAB_RESULT_TAB_DETAILS' : 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE',
@@ -376,6 +378,13 @@ export class EntityLabResultHelperService {
         }
       ]
     };
+
+    // finished
+    return this.createViewModifyHelperService.tabsFilter(
+      tab,
+      this.visibleMandatoryKey,
+      useToFilterOutbreak
+    );
   }
 
   /**
@@ -707,7 +716,7 @@ export class EntityLabResultHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     } else {
       forms.push({
@@ -826,7 +835,7 @@ export class EntityLabResultHelperService {
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.createViewModifyHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -837,7 +846,7 @@ export class EntityLabResultHelperService {
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
+                        this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -925,7 +934,7 @@ export class EntityLabResultHelperService {
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.createViewModifyHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -936,7 +945,7 @@ export class EntityLabResultHelperService {
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
+                        this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -1553,7 +1562,7 @@ export class EntityLabResultHelperService {
       )
       .pipe(
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.createViewModifyHelperService.toastV2Service.error(err);
           return throwError(err);
         })
       );

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { moment } from '../../helperClasses/x-moment';
-import { I18nService } from './i18n.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { OutbreakModel } from '../../models/outbreak.model';
@@ -12,6 +11,7 @@ import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validat
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { EventModel } from '../../models/event.model';
 import { EventDataService } from '../data/event.data.service';
+import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
 import {
   IV2ColumnStatusFormType,
   V2ColumnStatusForm
@@ -31,8 +31,8 @@ export class EntityEventHelperService {
    */
   constructor(
     private authDataService: AuthDataService,
-    private i18nService: I18nService,
-    private eventDataService: EventDataService
+    private eventDataService: EventDataService,
+    private createViewModifyHelperService: CreateViewModifyHelperService
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
@@ -41,20 +41,24 @@ export class EntityEventHelperService {
   /**
    * Generate tab - Details
    */
-  generateTabsDetails(data: {
-    selectedOutbreak: OutbreakModel,
-    isCreate: boolean,
-    itemData: EventModel,
-    eventVisualIDMask: {
-      mask: string
-    },
-    options: {
-      user: ILabelValuePairModel[],
-      eventCategory: ILabelValuePairModel[],
-      addressType: ILabelValuePairModel[]
+  generateTabsDetails(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      selectedOutbreak: OutbreakModel,
+      isCreate: boolean,
+      itemData: EventModel,
+      eventVisualIDMask: {
+        mask: string
+      },
+      options: {
+        user: ILabelValuePairModel[],
+        eventCategory: ILabelValuePairModel[],
+        addressType: ILabelValuePairModel[]
+      }
     }
-  }): ICreateViewModifyV2Tab {
-    return {
+  ): ICreateViewModifyV2Tab {
+    // create tab
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'details',
       label: data.isCreate ?
@@ -128,7 +132,7 @@ export class EntityEventHelperService {
             type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
             name: 'visualId',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
-            description: () => this.i18nService.instant(
+            description: () => this.createViewModifyHelperService.i18nService.instant(
               'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
               data.eventVisualIDMask
             ),
@@ -199,7 +203,7 @@ export class EntityEventHelperService {
             },
             replace: {
               condition: () => !UserModel.canListForFilters(this._authUser),
-              html: this.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
+              html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -251,6 +255,13 @@ export class EntityEventHelperService {
         }
       ]
     };
+
+    // finished
+    return this.createViewModifyHelperService.tabsFilter(
+      tab,
+      this.visibleMandatoryKey,
+      useToFilterOutbreak
+    );
   }
 
   /**
@@ -464,7 +475,7 @@ export class EntityEventHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     } else {
       forms.push({

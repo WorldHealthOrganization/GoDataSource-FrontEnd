@@ -395,7 +395,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     name: (property: string) => string,
     relationshipData: RelationshipModel
   ): ICreateViewModifyV2Tab {
-    return this.entityHelperService.generateTabsDetails({
+    return this.entityHelperService.generateTabsDetails(this.selectedOutbreak, {
       entityId,
       title,
       name,

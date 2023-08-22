@@ -9,20 +9,37 @@
     border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
     padding: 1.6rem;
 
-    //@include breakpoint('xs') {
-    //  padding: 0.4rem;
-    //}
+    @include breakpoint('xs') {
+      padding: 0.4rem;
+    }
+
+    button.mat-flat-button,
+    a.mat-flat-button {
+      @include breakpoint('xxs') {
+        padding: 0.8rem;
+      }
+    }
+
+    /* Search */
+    app-form-input-v2 {
+      .mat-form-field-wrapper {
+        .mat-form-field-subscript-wrapper {
+          min-height: 0;
+          padding: 0;
+        }
+      }
+    }
   }
 
   /* Visible and Mandatory List */
   .gd-form-visible-mandatory-v2-list {
-    height: calc(100% - 8.9rem);
+    height: calc(100% - 11.2rem);
     min-height: 19rem;
 
-    //@include breakpoint('xs') {
-    //  height: calc(100% - 4.9rem);
-    //  min-height: 10rem;
-    //}
+    @include breakpoint('xs') {
+      height: calc(100% - 4.9rem);
+      min-height: 10rem;
+    }
     //
     //@include breakpoint('sm') {
     //  height: calc(100% - 12.6rem);
@@ -51,6 +68,31 @@
 
         .gd-form-visible-mandatory-v2-list-item-group-tab-section-field {
           padding: 0 1.6rem 0 9.6rem;
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-buttons,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-buttons {
+          @include flex_align_items(center);
+          @include flex(flex);
+          @include flex_direction(row);
+          gap: 0.8rem;
+
+          @include breakpoint('xs') {
+            gap: 0.4rem;
+            padding-right: 0.4rem;
+          }
+
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            min-width: 2.4rem;
+            padding: 0.4rem;
+            width: 2.4rem;
+
+            .mat-icon {
+              font-size: 1.6rem;
+            }
+          }
         }
 
       //  &.gd-form-tree-editor-v2-list-item-expanded {
@@ -219,6 +261,52 @@
       //    }
       //
       //  }
+      }
+    }
+  }
+
+  /* Editor Legend Section */
+  .gd-form-visible-mandatory-v2-legend {
+    border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 0.8rem 0;
+
+    .gd-form-visible-mandatory-v2-legend-title {
+      color: var(--gd-secondary);
+      font-size: 1.2rem;
+      margin-left: 0.8rem;
+      text-transform: uppercase;
+
+      @include breakpoint('sm') {
+        position: relative;
+        top: 0.2rem;
+      }
+    }
+
+    .gd-form-visible-mandatory-v2-legend-items {
+      .gd-form-visible-mandatory-v2-legend-items-item {
+        @include flex_align_items(center);
+        @include flex(flex);
+        @include flex_direction(row);
+        font-size: 1.2rem;
+        margin-left: 0.8rem;
+
+        span {
+          color: var(--gd-secondary);
+          font-style: italic;
+        }
+
+        .mat-icon {
+          font-size: 2.4rem;
+          height: 2.2rem;
+          margin-right: 0.4rem;
+          width: 2.2rem;
+
+          + span {
+            color: var(--gd-text);
+            font-style: normal;
+            white-space: nowrap;
+          }
+        }
       }
     }
   }

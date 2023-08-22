@@ -440,7 +440,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Initialize tab details
    */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
-    return this.entityEventHelperService.generateTabsDetails({
+    return this.entityEventHelperService.generateTabsDetails(this.selectedOutbreak, {
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,

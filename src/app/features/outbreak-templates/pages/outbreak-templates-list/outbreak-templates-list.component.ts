@@ -22,6 +22,7 @@ import { V2SideDialogConfigInputType, IV2SideDialogConfigButtonType, IV2SideDial
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { UserModel } from '../../../../core/models/user.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-outbreak-templates-list',
@@ -41,7 +42,8 @@ export class OutbreakTemplatesListComponent
     private outbreakTemplateDataService: OutbreakTemplateDataService,
     private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService
   ) {
     super(
       listHelperService, {
@@ -710,8 +712,7 @@ export class OutbreakTemplatesListComponent
    */
   protected initializeTableAdvancedFilters(): void {
     // Outbreak template
-    this.advancedFilters = OutbreakTemplateModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.advancedFilters = this.outbreakAndOutbreakTemplateHelperService.generateOutbreakTemplateAdvancedFilters({
       options: {
         disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

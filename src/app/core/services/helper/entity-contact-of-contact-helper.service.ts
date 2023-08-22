@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Moment, moment } from '../../helperClasses/x-moment';
-import { I18nService } from './i18n.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { UserModel } from '../../models/user.model';
 import { OutbreakModel } from '../../models/outbreak.model';
@@ -24,6 +23,7 @@ import { ContactModel } from '../../models/contact.model';
 import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from '../data/contacts-of-contacts.data.service';
+import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,9 +38,9 @@ export class EntityContactOfContactHelperService {
    */
   constructor(
     private authDataService: AuthDataService,
-    private i18nService: I18nService,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private createViewModifyHelperService: CreateViewModifyHelperService
   ) {
     // get the authenticated user
     this._authUser = this.authDataService.getAuthenticatedUser();
@@ -49,25 +49,28 @@ export class EntityContactOfContactHelperService {
   /**
    * Generate tab - Personal
    */
-  generateTabsPersonal(data: {
-    selectedOutbreak: OutbreakModel,
-    isCreate: boolean,
-    itemData: ContactOfContactModel,
-    checkForPersonExistence: () => void,
-    detectChanges: () => void,
-    cocVisualIDMask: {
-      mask: string
-    },
-    parentEntity: ContactModel,
-    options: {
-      gender: ILabelValuePairModel[],
-      pregnancy: ILabelValuePairModel[],
-      occupation: ILabelValuePairModel[],
-      user: ILabelValuePairModel[],
-      documentType: ILabelValuePairModel[],
-      addressType: ILabelValuePairModel[]
+  generateTabsPersonal(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      selectedOutbreak: OutbreakModel,
+      isCreate: boolean,
+      itemData: ContactOfContactModel,
+      checkForPersonExistence: () => void,
+      detectChanges: () => void,
+      cocVisualIDMask: {
+        mask: string
+      },
+      parentEntity: ContactModel,
+      options: {
+        gender: ILabelValuePairModel[],
+        pregnancy: ILabelValuePairModel[],
+        occupation: ILabelValuePairModel[],
+        user: ILabelValuePairModel[],
+        documentType: ILabelValuePairModel[],
+        addressType: ILabelValuePairModel[]
+      }
     }
-  }): ICreateViewModifyV2Tab {
+  ): ICreateViewModifyV2Tab {
     // create tab
     const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
@@ -250,7 +253,7 @@ export class EntityContactOfContactHelperService {
               type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
               name: 'visualId',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.i18nService.instant(
+              description: () => this.createViewModifyHelperService.i18nService.instant(
                 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 data.cocVisualIDMask
               ),
@@ -321,7 +324,7 @@ export class EntityContactOfContactHelperService {
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this._authUser),
-                html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -441,26 +444,33 @@ export class EntityContactOfContactHelperService {
     };
 
     // finished
-    return tab;
+    return this.createViewModifyHelperService.tabsFilter(
+      tab,
+      this.visibleMandatoryKey,
+      useToFilterOutbreak
+    );
   }
 
   /**
    * Generate tab - Epidemiology
    */
-  generateTabsEpidemiology(data: {
-    isCreate: boolean,
-    itemData: ContactOfContactModel,
-    options: {
-      risk: ILabelValuePairModel[],
-      vaccine: ILabelValuePairModel[],
-      vaccineStatus: ILabelValuePairModel[]
+  generateTabsEpidemiology(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      isCreate: boolean,
+      itemData: ContactOfContactModel,
+      options: {
+        risk: ILabelValuePairModel[],
+        vaccine: ILabelValuePairModel[],
+        vaccineStatus: ILabelValuePairModel[]
+      }
     }
-  }): ICreateViewModifyV2Tab {
+  ): ICreateViewModifyV2Tab {
     // today
     const today: Moment = moment();
 
     // finished
-    return {
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'infection',
       label: data.isCreate ?
@@ -562,6 +572,13 @@ export class EntityContactOfContactHelperService {
         }
       ]
     };
+
+    // finished
+    return this.createViewModifyHelperService.tabsFilter(
+      tab,
+      this.visibleMandatoryKey,
+      useToFilterOutbreak
+    );
   }
 
   /**
@@ -868,7 +885,7 @@ export class EntityContactOfContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.TRIANGLE,
         color: info.risk.map[info.item.riskLevel].getColorCode(),
-        tooltip: this.i18nService.instant(info.item.riskLevel)
+        tooltip: this.createViewModifyHelperService.i18nService.instant(info.item.riskLevel)
       });
     } else {
       forms.push({

@@ -87,6 +87,32 @@
             fxFlex
             [innerHTML]="item.text | highlight:searchValue"></div>
 
+          <!-- Buttons -->
+          <div
+            *ngIf="!viewOnly"
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-buttons"
+            fxGrow="0">
+
+            <!-- Check all visible -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_COMMON_BUTTON_CHECK_ALL' | translate"
+              (click)="checkUncheckAll(item, true)">
+              <mat-icon>done_all</mat-icon>
+            </button>
+
+            <!-- Uncheck all visible -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate"
+              (click)="checkUncheckAll(item, false)">
+              <mat-icon>remove_done</mat-icon>
+            </button>
+
+          </div>
+
         </div>
 
         <!-- Group tab section -->
@@ -104,6 +130,32 @@
             class="gd-form-visible-mandatory-v2-list-item-group-tab-section-content"
             fxFlex
             [innerHTML]="item.text | highlight:searchValue"></div>
+
+          <!-- Buttons -->
+          <div
+            *ngIf="!viewOnly"
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-section-buttons"
+            fxGrow="0">
+
+            <!-- Check all visible -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_COMMON_BUTTON_CHECK_ALL' | translate"
+              (click)="checkUncheckAll(item, true)">
+              <mat-icon>done_all</mat-icon>
+            </button>
+
+            <!-- Uncheck all visible -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate"
+              (click)="checkUncheckAll(item, false)">
+              <mat-icon>remove_done</mat-icon>
+            </button>
+
+          </div>
 
         </div>
 
@@ -129,7 +181,7 @@
           <div
             class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-required">
             <app-form-checkbox-v2
-              *ngIf="item.data.visibleMandatoryConf?.required || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible)"
+              *ngIf="item.data.supportsRequired && (item.data.visibleMandatoryConf?.required || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible))"
               [ngModel]="item.data.visibleMandatoryConf?.required || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].mandatory)"
               [name]="item.name.mandatory"
               placeholder="LNG_COMMON_LABEL_REQUIRED"
@@ -141,6 +193,41 @@
 
       </div>
     </cdk-virtual-scroll-viewport>
+
+  </div>
+
+  <!-- Legend -->
+  <div
+    *ngIf="!viewOnly && !isSmallScreenMode"
+    class="gd-form-visible-mandatory-v2-legend"
+    fxLayout="row" fxLayoutAlign="start center" fxLayoutAlign.sm="start start">
+
+    <!-- Header -->
+    <div
+      class="gd-form-visible-mandatory-v2-legend-title">
+      {{'LNG_COMMON_LABEL_LEGEND' | translate}}
+    </div>
+
+    <!-- Items -->
+    <div
+      class="gd-form-visible-mandatory-v2-legend-items"
+      fxLayout="row wrap" fxLayoutAlign="start center">
+
+      <!-- Check all -->
+      <div
+        class="gd-form-visible-mandatory-v2-legend-items-item">
+        <mat-icon>done_all</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_CHECK_ALL' | translate}}</span>
+      </div>
+
+      <!-- Uncheck all -->
+      <div
+        class="gd-form-visible-mandatory-v2-legend-items-item">
+        <mat-icon>remove_done</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_UNCHECK_ALL' | translate}}</span>
+      </div>
+
+    </div>
 
   </div>
 

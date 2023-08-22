@@ -29,6 +29,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 
 @Component({
   selector: 'app-outbreak-list',
@@ -48,7 +49,8 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
-    private locationDataService: LocationDataService
+    private locationDataService: LocationDataService,
+    private outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService
   ) {
     super(
       listHelperService, {
@@ -1114,8 +1116,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
    */
   protected initializeTableAdvancedFilters(): void {
     // Outbreak
-    this.advancedFilters = OutbreakModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.advancedFilters = this.outbreakAndOutbreakTemplateHelperService.generateOutbreakAdvancedFilters({
       options: {
         disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         country: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

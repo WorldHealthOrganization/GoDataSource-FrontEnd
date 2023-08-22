@@ -3,7 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   forwardRef,
-  Host,
+  Host, HostListener,
   Input,
   OnDestroy,
   Optional,
@@ -24,6 +24,7 @@ import {
   IVisibleMandatoryDataValue
 } from './models/visible-mandatory.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
 
 /**
  * Flatten type
@@ -54,6 +55,7 @@ interface IFlattenNodeGroupTab {
   parent: IFlattenNodeGroup;
   text: string;
   data: IVisibleMandatoryDataGroupTab;
+  sections: IFlattenNodeGroupTabSection[];
 }
 
 /**
@@ -65,6 +67,7 @@ interface IFlattenNodeGroupTabSection {
   parent: IFlattenNodeGroupTab;
   text: string;
   data: IVisibleMandatoryDataGroupTabSection;
+  fields: IFlattenNodeGroupTabSectionField[];
 }
 
 /**
@@ -157,6 +160,9 @@ export class AppFormVisibleMandatoryV2Component
   // filter
   searchValue: string;
 
+  // small screen mode ?
+  isSmallScreenMode: boolean = false;
+
   // timers
   private _filterTimer: number;
 
@@ -179,6 +185,9 @@ export class AppFormVisibleMandatoryV2Component
       changeDetectorRef
     );
 
+    // update render mode
+    this.updateRenderMode();
+
     // subscribe to language change
     this.initializeLanguageChangeListener();
   }
@@ -190,11 +199,11 @@ export class AppFormVisibleMandatoryV2Component
     // parent
     super.onDestroy();
 
-    // stop timers
-    this.stopFilterTimer();
-
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
+
+    // stop timers
+    this.stopFilterTimer();
   }
 
   /**
@@ -305,7 +314,8 @@ export class AppFormVisibleMandatoryV2Component
           type: FlattenType.GROUP_TAB,
           parent: groupNode,
           text: this.i18nService.instant(tab.label),
-          data: tab
+          data: tab,
+          sections: []
         };
         this._allFlattenedData.push(groupTabNode);
 
@@ -316,9 +326,11 @@ export class AppFormVisibleMandatoryV2Component
             type: FlattenType.GROUP_TAB_SECTION,
             parent: groupTabNode,
             text: this.i18nService.instant(section.label),
-            data: section
+            data: section,
+            fields: []
           };
           this._allFlattenedData.push(groupTabSectionNode);
+          groupTabNode.sections.push(groupTabSectionNode);
 
           // fields
           section.children.forEach((field) => {
@@ -333,6 +345,7 @@ export class AppFormVisibleMandatoryV2Component
               data: field
             };
             this._allFlattenedData.push(groupTabSectionFieldNode);
+            groupTabSectionNode.fields.push(groupTabSectionFieldNode);
           });
         });
       });
@@ -569,9 +582,9 @@ export class AppFormVisibleMandatoryV2Component
   }
 
   /**
-   * Selected item changed
+   * Update field value
    */
-  selectedChanged(
+  private updateFieldValue(
     item: IFlattenNodeGroupTabSectionField,
     type: FieldSelectedType,
     checked: boolean
@@ -606,6 +619,22 @@ export class AppFormVisibleMandatoryV2Component
         }
       }
     }
+  }
+
+  /**
+   * Selected item changed
+   */
+  selectedChanged(
+    item: IFlattenNodeGroupTabSectionField,
+    type: FieldSelectedType,
+    checked: boolean
+  ): void {
+    // update value
+    this.updateFieldValue(
+      item,
+      type,
+      checked
+    );
 
     // trigger on change
     this.onChange(this.value);
@@ -615,5 +644,51 @@ export class AppFormVisibleMandatoryV2Component
 
     // update ui
     this.detectChanges();
+  }
+
+  /**
+   * Check / Uncheck all visible fields for a section
+   */
+  checkUncheckAll(
+    sectionOrTab: IFlattenNodeGroupTabSection | IFlattenNodeGroupTab,
+    checked: boolean
+  ): void {
+    // go through children
+    const sections: IFlattenNodeGroupTabSection[] = sectionOrTab.type === FlattenType.GROUP_TAB ?
+      sectionOrTab.sections :
+      [sectionOrTab];
+    sections.forEach((section) => {
+      section.fields.forEach((field) => {
+        // always visible ? then don't change
+        if (field.data.visibleMandatoryConf?.visible) {
+          return;
+        }
+
+        // show / hide
+        this.updateFieldValue(
+          field,
+          FieldSelectedType.VISIBLE,
+          checked
+        );
+      });
+    });
+
+    // trigger on change
+    this.onChange(this.value);
+
+    // mark dirty
+    this.control?.markAsDirty();
+
+    // update ui
+    this.detectChanges();
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // small screen mode ?
+    this.isSmallScreenMode = determineIfSmallScreenMode();
   }
 }
