@@ -17,7 +17,11 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import {
+  V2FilterType,
+  V2FilterTextType,
+  IV2FilterBoolean
+} from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
@@ -42,6 +46,9 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
 
   // available entities as exposures
   private _availableTypes: string[] = [];
+
+  // used to filter cases
+  notACaseFilter: boolean | '' = false;
 
   /**
    * Constructor
@@ -292,7 +299,30 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         format: {
           type: 'mainAddress.fullAddress'
         }
-      }
+      },
+      {
+        field: 'notACase',
+        label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN,
+          value: (data) => {
+            return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
+          }
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: this.notACaseFilter,
+          defaultValue: this.notACaseFilter,
+          search: (column) => {
+            // update not a case
+            this.notACaseFilter = (column.filter as IV2FilterBoolean).value;
+
+            // refresh
+            this.needsRefreshList();
+          }
+        }
+      },
     ];
   }
 
@@ -511,14 +541,8 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
    * Re(load) the available Entities list, based on the applied filter, sort criteria
    */
   refreshList() {
-    // exclude discarded cases always
-    if (this._entity.type === EntityType.CONTACT_OF_CONTACT) {
-      this.queryBuilder.filter.where({
-        classification: {
-          neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-        }
-      });
-    }
+    // classification conditions - not really necessary since refreshListCount is always called before this one
+    this.addClassificationConditions();
 
     // retrieve the list of Relationships
     this.records$ = this.entityDataService
@@ -543,6 +567,9 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
     if (applyHasMoreLimit !== undefined) {
       this.applyHasMoreLimit = applyHasMoreLimit;
     }
+
+    // classification conditions
+    this.addClassificationConditions();
 
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
@@ -576,5 +603,38 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       ).subscribe((response) => {
         this.pageCount = response;
       });
+  }
+
+  /**
+   * Classification conditions
+   */
+  private addClassificationConditions() {
+    // create classification condition
+    const trueCondition = { classification: { eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE } };
+    const falseCondition = { classification: { neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE } };
+
+    // remove existing filter
+    this.queryBuilder.filter.removeExactCondition(trueCondition);
+    this.queryBuilder.filter.removeExactCondition(falseCondition);
+
+    // check if we are searching by not a case classification
+    let notACaseFilter = this.notACaseFilter;
+    if (_.isEqual(
+      this.queryBuilder.filter.get('classification'),
+      {
+        classification: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+      }
+    )) {
+      notACaseFilter = true;
+    }
+
+    // filter by classification
+    if (notACaseFilter === true) {
+      // show cases that are NOT classified as Not a Case
+      this.queryBuilder.filter.where(trueCondition);
+    } else if (notACaseFilter === false) {
+      // show cases classified as Not a Case
+      this.queryBuilder.filter.where(falseCondition);
+    }
   }
 }
