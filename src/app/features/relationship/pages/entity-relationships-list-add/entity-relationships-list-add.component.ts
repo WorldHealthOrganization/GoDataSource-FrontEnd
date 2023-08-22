@@ -19,8 +19,7 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import {
   V2FilterType,
-  V2FilterTextType,
-  IV2FilterBoolean
+  V2FilterTextType
 } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
@@ -30,6 +29,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
   selector: 'app-entity-relationships-list-add',
@@ -46,9 +46,6 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
 
   // available entities as exposures
   private _availableTypes: string[] = [];
-
-  // used to filter cases
-  notACaseFilter: boolean | '' = false;
 
   /**
    * Constructor
@@ -267,7 +264,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
             this.selectedOutbreak,
             (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             undefined
-          )
+          ).filter((item) => item.value !==  Constants.CASE_CLASSIFICATION.NOT_A_CASE)
         }
       },
       {
@@ -298,29 +295,6 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
         format: {
           type: 'mainAddress.fullAddress'
-        }
-      },
-      {
-        field: 'notACase',
-        label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE',
-        notVisible: true,
-        format: {
-          type: V2ColumnFormat.BOOLEAN,
-          value: (data) => {
-            return data.classification === Constants.CASE_CLASSIFICATION.NOT_A_CASE;
-          }
-        },
-        filter: {
-          type: V2FilterType.BOOLEAN,
-          value: this.notACaseFilter,
-          defaultValue: this.notACaseFilter,
-          search: (column) => {
-            // update not a case
-            this.notACaseFilter = (column.filter as IV2FilterBoolean).value;
-
-            // refresh
-            this.needsRefreshList();
-          }
         }
       }
     ];
@@ -542,7 +516,9 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
    */
   refreshList() {
     // classification conditions - not really necessary since refreshListCount is always called before this one
-    this.addClassificationConditions();
+    if (this._entity.type === EntityType.CONTACT_OF_CONTACT) {
+      this.addClassificationConditions(this.queryBuilder);
+    }
 
     // retrieve the list of Relationships
     this.records$ = this.entityDataService
@@ -568,9 +544,6 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       this.applyHasMoreLimit = applyHasMoreLimit;
     }
 
-    // classification conditions
-    this.addClassificationConditions();
-
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
@@ -587,11 +560,8 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
 
     // exclude discarded cases always
     if (this._entity.type === EntityType.CONTACT_OF_CONTACT) {
-      countQueryBuilder.filter.where({
-        classification: {
-          neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-        }
-      });
+      // classification conditions
+      this.addClassificationConditions(countQueryBuilder);
     }
 
     // count
@@ -608,33 +578,14 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
   /**
    * Classification conditions
    */
-  private addClassificationConditions() {
+  private addClassificationConditions(qb: RequestQueryBuilder) {
     // create classification condition
-    const trueCondition = { classification: { eq: Constants.CASE_CLASSIFICATION.NOT_A_CASE } };
     const falseCondition = { classification: { neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE } };
 
     // remove existing filter
-    this.queryBuilder.filter.removeExactCondition(trueCondition);
-    this.queryBuilder.filter.removeExactCondition(falseCondition);
+    qb.filter.removeExactCondition(falseCondition);
 
-    // check if we are searching by not a case classification
-    let notACaseFilter = this.notACaseFilter;
-    if (_.isEqual(
-      this.queryBuilder.filter.get('classification'),
-      {
-        classification: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-      }
-    )) {
-      notACaseFilter = true;
-    }
-
-    // filter by classification
-    if (notACaseFilter === true) {
-      // show cases that are NOT classified as Not a Case
-      this.queryBuilder.filter.where(trueCondition);
-    } else if (notACaseFilter === false) {
-      // show cases classified as Not a Case
-      this.queryBuilder.filter.where(falseCondition);
-    }
+    // show cases classified as Not a Case
+    qb.filter.where(falseCondition);
   }
 }
