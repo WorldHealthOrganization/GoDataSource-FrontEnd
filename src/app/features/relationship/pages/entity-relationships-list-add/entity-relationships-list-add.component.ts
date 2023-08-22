@@ -511,6 +511,15 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
    * Re(load) the available Entities list, based on the applied filter, sort criteria
    */
   refreshList() {
+    // exclude discarded cases always
+    if (this._entity.type === EntityType.CONTACT_OF_CONTACT) {
+      this.queryBuilder.filter.where({
+        classification: {
+          neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+        }
+      });
+    }
+
     // retrieve the list of Relationships
     this.records$ = this.entityDataService
       .getEntitiesList(
