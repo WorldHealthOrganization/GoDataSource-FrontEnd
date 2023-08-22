@@ -51,6 +51,8 @@
       <div
         *cdkVirtualFor="let item of flattenedData; templateCacheSize: 0"
         class="gd-form-visible-mandatory-v2-list-item"
+        [class.gd-form-visible-mandatory-v2-list-item-group-expanded]="item.type === FlattenType.GROUP && !item.data.collapsed && !viewOnly"
+        [class.gd-form-visible-mandatory-v2-list-item-group-tab-expanded]="item.type === FlattenType.GROUP_TAB && !item.data.collapsed && !viewOnly"
         [ngSwitch]="item.type">
 
         <!-- Group -->

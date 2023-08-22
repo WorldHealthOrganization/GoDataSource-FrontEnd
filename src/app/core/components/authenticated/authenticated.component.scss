@@ -27,6 +27,10 @@ mat-sidenav-container {
       @include transition(all 0.24s ease-in-out 0s);
       width: var(--gd-menu-width-collapsed);
 
+      @include breakpoint('lg') {
+        @include box-shadow(0.2rem 5.4rem 0.2rem rgba(var(--gd-text-rgb), 0.1));
+      }
+
       @include breakpoint('lt-md') {
         width: 0;
       }
