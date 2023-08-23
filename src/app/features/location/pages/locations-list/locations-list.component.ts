@@ -29,7 +29,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleLocation, 
   selector: 'app-locations-list',
   templateUrl: './locations-list.component.html'
 })
-export class LocationsListComponent extends ListComponent<LocationModel> implements OnDestroy {
+export class LocationsListComponent extends ListComponent<LocationModel, IV2Column> implements OnDestroy {
   // parent location ID
   private _parentId: string;
 

@@ -5,9 +5,18 @@ import { applyFilterBy, IV2Column, IV2ColumnAction } from '../../shared/componen
 /**
  * Applied filters
  */
-export abstract class ListQueryComponent {
+export abstract class ListQueryComponent<T extends IV2Column> {
   // table columns
-  tableColumns: IV2Column[] = [];
+  private _tableColumns: T[] = [];
+  get tableColumns(): T[] {
+    return this._tableColumns;
+  }
+  set tableColumns(tableColumns: T[]) {
+    // set value
+    this._tableColumns = tableColumns;
+  }
+
+  // table columns actions
   tableColumnActions: IV2ColumnAction;
 
   // query

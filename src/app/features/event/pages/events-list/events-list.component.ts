@@ -38,7 +38,7 @@ import {
   IV2ColumnPinned,
   V2ColumnFormat,
   IV2ColumnStatusFormType,
-  V2ColumnStatusForm
+  V2ColumnStatusForm, IV2Column
 } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -51,7 +51,7 @@ import { EntityEventHelperService } from '../../../../core/services/helper/entit
   templateUrl: './events-list.component.html'
 })
 export class EventsListComponent
-  extends ListComponent<EventModel>
+  extends ListComponent<EventModel, IV2Column>
   implements OnDestroy {
 
   // event fields

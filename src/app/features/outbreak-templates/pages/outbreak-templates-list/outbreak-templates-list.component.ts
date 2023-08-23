@@ -13,7 +13,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -29,7 +29,7 @@ import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/servi
   templateUrl: './outbreak-templates-list.component.html'
 })
 export class OutbreakTemplatesListComponent
-  extends ListComponent<OutbreakTemplateModel>
+  extends ListComponent<OutbreakTemplateModel, IV2Column>
   implements OnDestroy {
   /**
    * Constructor

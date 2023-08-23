@@ -12,7 +12,7 @@ import { AuditLogDataService } from '../../../../core/services/data/audit-log.da
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IV2ColumnPinned, V2ColumnExpandRowType, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnExpandRowType, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
@@ -29,7 +29,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
   templateUrl: './audit-logs-list.component.html'
 })
 export class AuditLogsListComponent
-  extends ListComponent<AuditLogModel>
+  extends ListComponent<AuditLogModel, IV2Column>
   implements OnDestroy {
 
   // audit-log fields

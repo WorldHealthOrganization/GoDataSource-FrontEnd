@@ -12,7 +12,7 @@ import { ExportDataExtension, ExportDataMethod } from '../../../../core/services
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
@@ -20,7 +20,7 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
   templateUrl: './languages-list.component.html'
 })
 export class LanguagesListComponent
-  extends ListComponent<LanguageModel>
+  extends ListComponent<LanguageModel, IV2Column>
   implements OnDestroy {
 
   /**

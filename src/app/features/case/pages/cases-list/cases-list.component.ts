@@ -52,7 +52,7 @@ import { EntityCaseHelperService } from '../../../../core/services/helper/entity
   selector: 'app-cases-list',
   templateUrl: './cases-list.component.html'
 })
-export class CasesListComponent extends ListComponent<CaseModel> implements OnDestroy {
+export class CasesListComponent extends ListComponent<CaseModel, IV2Column> implements OnDestroy {
   // case fields
   private caseFields: ILabelValuePairModel[] = [
     { label: 'LNG_CASE_FIELD_LABEL_ID', value: 'id' },

@@ -21,7 +21,7 @@ import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-da
   selector: 'app-team-workload',
   templateUrl: './team-workload.component.html'
 })
-export class TeamWorkloadComponent extends ListComponent<any> implements OnDestroy {
+export class TeamWorkloadComponent extends ListComponent<any, IV2Column> implements OnDestroy {
   // default table columns
   defaultTableColumns: IV2Column[] = [
     {

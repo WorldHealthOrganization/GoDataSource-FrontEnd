@@ -35,7 +35,7 @@ import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/servi
   selector: 'app-outbreak-list',
   templateUrl: './outbreak-list.component.html'
 })
-export class OutbreakListComponent extends ListComponent<OutbreakModel> implements OnDestroy {
+export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */

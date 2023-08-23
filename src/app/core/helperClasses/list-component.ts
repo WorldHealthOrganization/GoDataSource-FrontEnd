@@ -9,7 +9,7 @@ import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey, StorageService } from '../services/helper/storage.service';
 import { UserModel, UserSettings } from '../models/user.model';
 import * as LzString from 'lz-string';
-import { applyResetOnAllFilters, applySortBy } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { applyResetOnAllFilters, applySortBy, IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import {
   IV2ActionIconLabel,
@@ -37,7 +37,7 @@ import { IV2ProcessSelectedData } from '../../shared/components-v2/app-list-tabl
  * List component
  */
 @Directive()
-export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
+export abstract class ListComponent<T, U extends IV2Column> extends ListAppliedFiltersComponent<U> {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
 

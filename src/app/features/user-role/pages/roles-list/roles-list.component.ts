@@ -14,7 +14,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { PermissionModel } from '../../../../core/models/permission.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -29,7 +29,7 @@ import * as momentOriginal from 'moment/moment';
   selector: 'app-roles-list',
   templateUrl: './roles-list.component.html'
 })
-export class RolesListComponent extends ListComponent<UserRoleModel> implements OnDestroy {
+export class RolesListComponent extends ListComponent<UserRoleModel, IV2Column> implements OnDestroy {
   // role fields
   roleFields: ILabelValuePairModel[] = [
     { label: 'LNG_USER_ROLE_FIELD_LABEL_NAME', value: 'name' },

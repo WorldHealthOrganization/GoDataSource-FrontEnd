@@ -61,7 +61,7 @@ import { EntityFollowUpHelperService } from '../../../../core/services/helper/en
   selector: 'app-daily-follow-ups-list',
   templateUrl: './contact-daily-follow-ups-list.component.html'
 })
-export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpModel> implements OnDestroy {
+export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpModel, IV2Column> implements OnDestroy {
   // constants
   private static readonly CREATED_BY_USER: string = 'createdByUser';
   private static readonly UPDATED_BY_USER: string = 'updatedByUser';

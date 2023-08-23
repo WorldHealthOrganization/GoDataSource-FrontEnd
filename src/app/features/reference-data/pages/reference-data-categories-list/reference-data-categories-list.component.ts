@@ -14,7 +14,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as moment from 'moment';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ActivatedRoute } from '@angular/router';
@@ -24,7 +24,7 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './reference-data-categories-list.component.html'
 })
 export class ReferenceDataCategoriesListComponent
-  extends ListComponent<ReferenceDataCategoryModel>
+  extends ListComponent<ReferenceDataCategoryModel, IV2Column>
   implements OnDestroy {
 
   // hidden categories

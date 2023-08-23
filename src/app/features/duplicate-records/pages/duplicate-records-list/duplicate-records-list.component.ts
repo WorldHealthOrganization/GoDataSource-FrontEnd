@@ -25,6 +25,7 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import {
   AppFormCheckboxV2Component
 } from '../../../../shared/forms-v2/components/app-form-checkbox-v2/app-form-checkbox-v2.component';
+import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-duplicate-records-list',
@@ -32,7 +33,7 @@ import {
   templateUrl: './duplicate-records-list.component.html',
   styleUrls: ['./duplicate-records-list.component.scss']
 })
-export class DuplicateRecordsListComponent extends ListComponent<any> implements OnDestroy {
+export class DuplicateRecordsListComponent extends ListComponent<any, IV2Column> implements OnDestroy {
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
 

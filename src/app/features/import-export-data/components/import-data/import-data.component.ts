@@ -78,6 +78,7 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { LanguageModel } from '../../../../core/models/language.model';
+import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -153,7 +154,7 @@ interface IImportErrorDetailsProcessedImported {
   styleUrls: ['./import-data.component.scss']
 })
 export class ImportDataComponent
-  extends ListComponent<any>
+  extends ListComponent<any, IV2Column>
   implements OnInit, OnDestroy {
 
   // Extension mapped to mimes
