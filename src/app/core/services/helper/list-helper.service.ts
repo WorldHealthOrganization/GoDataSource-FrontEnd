@@ -6,6 +6,7 @@ import { StorageService } from './storage.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { OutbreakDataService } from '../data/outbreak.data.service';
 import { ToastV2Service } from './toast-v2.service';
+import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
 
 @Injectable()
 export class ListHelperService {
@@ -21,7 +22,8 @@ export class ListHelperService {
     public location: Location,
     public storageService: StorageService,
     public authDataService: AuthDataService,
-    public outbreakDataService: OutbreakDataService
+    public outbreakDataService: OutbreakDataService,
+    public createViewModifyHelperService: CreateViewModifyHelperService
   ) {}
 
   /**

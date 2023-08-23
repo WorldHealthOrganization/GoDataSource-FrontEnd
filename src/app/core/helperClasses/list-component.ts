@@ -1384,18 +1384,10 @@ export abstract class ListComponent<T, U extends IV2Column> extends ListAppliedF
     visibleMandatoryKey: string,
     prop: string
   ): boolean {
-    // no custom settings found ?
-    if (
-      !this.selectedOutbreak ||
-      !this.selectedOutbreak.visibleAndMandatoryFields ||
-      !this.selectedOutbreak.visibleAndMandatoryFields[visibleMandatoryKey] ||
-      this.selectedOutbreak.visibleAndMandatoryFields[visibleMandatoryKey][prop]?.visible ||
-      Object.keys(this.selectedOutbreak.visibleAndMandatoryFields[visibleMandatoryKey]).length < 1
-    ) {
-      return true;
-    }
-
-    // matched
-    return false;
+    return this.listHelperService.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+      this.selectedOutbreak,
+      visibleMandatoryKey,
+      prop
+    );
   }
 }
