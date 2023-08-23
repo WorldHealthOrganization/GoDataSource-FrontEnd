@@ -233,7 +233,10 @@ export class EntityHelperService {
                 today
               ]
             },
-            suffixIconButtons: data.createCopySuffixButtons('dateOfFirstContact')
+            suffixIconButtons: data.createCopySuffixButtons('dateOfFirstContact'),
+            visibleMandatoryConf: {
+              originalName: 'dateOfFirstContact'
+            }
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
             name: data.name('contactDate'),
@@ -253,7 +256,8 @@ export class EntityHelperService {
             },
             visibleMandatoryConf: {
               visible: true,
-              required: false
+              required: false,
+              originalName: 'contactDate'
             },
             maxDate: today,
             validators: {
@@ -275,7 +279,10 @@ export class EntityHelperService {
                 data.itemData.contactDateEstimated = value;
               }
             },
-            suffixIconButtons: data.createCopySuffixButtons('contactDateEstimated')
+            suffixIconButtons: data.createCopySuffixButtons('contactDateEstimated'),
+            visibleMandatoryConf: {
+              originalName: 'contactDateEstimated'
+            }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: data.name('certaintyLevelId'),
@@ -291,7 +298,10 @@ export class EntityHelperService {
             validators: {
               required: () => true
             },
-            suffixIconButtons: data.createCopySuffixButtons('certaintyLevelId')
+            suffixIconButtons: data.createCopySuffixButtons('certaintyLevelId'),
+            visibleMandatoryConf: {
+              originalName: 'certaintyLevelId'
+            }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: data.name('exposureTypeId'),
@@ -304,7 +314,10 @@ export class EntityHelperService {
                 data.itemData.exposureTypeId = value;
               }
             },
-            suffixIconButtons: data.createCopySuffixButtons('exposureTypeId')
+            suffixIconButtons: data.createCopySuffixButtons('exposureTypeId'),
+            visibleMandatoryConf: {
+              originalName: 'exposureTypeId'
+            }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: data.name('exposureFrequencyId'),
@@ -317,7 +330,10 @@ export class EntityHelperService {
                 data.itemData.exposureFrequencyId = value;
               }
             },
-            suffixIconButtons: data.createCopySuffixButtons('exposureFrequencyId')
+            suffixIconButtons: data.createCopySuffixButtons('exposureFrequencyId'),
+            visibleMandatoryConf: {
+              originalName: 'exposureFrequencyId'
+            }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: data.name('exposureDurationId'),
@@ -330,7 +346,10 @@ export class EntityHelperService {
                 data.itemData.exposureDurationId = value;
               }
             },
-            suffixIconButtons: data.createCopySuffixButtons('exposureDurationId')
+            suffixIconButtons: data.createCopySuffixButtons('exposureDurationId'),
+            visibleMandatoryConf: {
+              originalName: 'exposureDurationId'
+            }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: data.name('socialRelationshipTypeId'),
@@ -343,7 +362,10 @@ export class EntityHelperService {
                 data.itemData.socialRelationshipTypeId = value;
               }
             },
-            suffixIconButtons: data.createCopySuffixButtons('socialRelationshipTypeId')
+            suffixIconButtons: data.createCopySuffixButtons('socialRelationshipTypeId'),
+            visibleMandatoryConf: {
+              originalName: 'socialRelationshipTypeId'
+            }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: data.name('clusterId'),
@@ -356,7 +378,10 @@ export class EntityHelperService {
                 data.itemData.clusterId = value;
               }
             },
-            suffixIconButtons: data.createCopySuffixButtons('clusterId')
+            suffixIconButtons: data.createCopySuffixButtons('clusterId'),
+            visibleMandatoryConf: {
+              originalName: 'clusterId'
+            }
           }, {
             type: CreateViewModifyV2TabInputType.TEXT,
             name: data.name('socialRelationshipDetail'),
@@ -368,7 +393,10 @@ export class EntityHelperService {
                 data.itemData.socialRelationshipDetail = value;
               }
             },
-            suffixIconButtons: data.createCopySuffixButtons('socialRelationshipDetail')
+            suffixIconButtons: data.createCopySuffixButtons('socialRelationshipDetail'),
+            visibleMandatoryConf: {
+              originalName: 'socialRelationshipDetail'
+            }
           }, {
             type: CreateViewModifyV2TabInputType.TEXTAREA,
             name: data.name('comment'),
@@ -380,7 +408,10 @@ export class EntityHelperService {
                 data.itemData.comment = value;
               }
             },
-            suffixIconButtons: data.createCopySuffixButtons('comment')
+            suffixIconButtons: data.createCopySuffixButtons('comment'),
+            visibleMandatoryConf: {
+              originalName: 'comment'
+            }
           }]
         }
       ]

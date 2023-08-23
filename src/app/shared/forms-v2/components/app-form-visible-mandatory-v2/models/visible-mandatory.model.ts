@@ -22,9 +22,10 @@ export type V2AdvancedFilterToVisibleMandatoryConf = V2AdvancedFilter & {
  * Used by create/view/modify input to configure specific things for visible/mandatory
  */
 export interface ICreateViewModifyV2TabInputToVisibleMandatoryConf {
-  // required
-  visible: boolean;
-  required: boolean;
+  // optional
+  visible?: boolean;
+  required?: boolean;
+  originalName?: string;
 }
 
 /**

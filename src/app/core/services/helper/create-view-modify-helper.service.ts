@@ -222,7 +222,12 @@ export class CreateViewModifyHelperService {
         }
 
         // must add field ?
-        if (visibleAndMandatoryConf[fieldDef.id]?.visible) {
+        if (
+          visibleAndMandatoryConf[fieldDef.id]?.visible || (
+            fieldDef.visibleMandatoryConf?.originalName &&
+            visibleAndMandatoryConf[fieldDef.visibleMandatoryConf?.originalName]?.visible
+          )
+        ) {
           section.inputs.push(input);
         }
       });
