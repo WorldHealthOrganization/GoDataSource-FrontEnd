@@ -44,6 +44,7 @@ interface IFlattenNodeGroup {
   type: FlattenType.GROUP;
   text: string;
   data: IVisibleMandatoryDataGroup;
+  tabs: IFlattenNodeGroupTab[];
 }
 
 /**
@@ -303,7 +304,8 @@ export class AppFormVisibleMandatoryV2Component
       const groupNode: IFlattenNodeGroup = {
         type: FlattenType.GROUP,
         text: this.i18nService.instant(group.label),
-        data: group
+        data: group,
+        tabs: []
       };
       this._allFlattenedData.push(groupNode);
 
@@ -318,6 +320,7 @@ export class AppFormVisibleMandatoryV2Component
           sections: []
         };
         this._allFlattenedData.push(groupTabNode);
+        groupNode.tabs.push(groupTabNode);
 
         // sections
         tab.children.forEach((section) => {
@@ -650,13 +653,22 @@ export class AppFormVisibleMandatoryV2Component
    * Check / Uncheck all visible fields for a section
    */
   checkUncheckAll(
-    sectionOrTab: IFlattenNodeGroupTabSection | IFlattenNodeGroupTab,
+    item: IFlattenNodeGroup | IFlattenNodeGroupTab | IFlattenNodeGroupTabSection,
     checked: boolean
   ): void {
     // go through children
-    const sections: IFlattenNodeGroupTabSection[] = sectionOrTab.type === FlattenType.GROUP_TAB ?
-      sectionOrTab.sections :
-      [sectionOrTab];
+    let sections: IFlattenNodeGroupTabSection[];
+    switch (item.type) {
+      case FlattenType.GROUP:
+        sections = item.tabs.flatMap((tab) => tab.sections);
+        break;
+      case FlattenType.GROUP_TAB:
+        sections = item.sections;
+        break;
+      case FlattenType.GROUP_TAB_SECTION:
+        sections = [item];
+        break;
+    }
     sections.forEach((section) => {
       section.fields.forEach((field) => {
         // always visible ? then don't change
