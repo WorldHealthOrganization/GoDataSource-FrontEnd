@@ -261,7 +261,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
             this.selectedOutbreak,
             (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             undefined
-          ).filter((item) => item.value !==  Constants.CASE_CLASSIFICATION.NOT_A_CASE)
+          ).filter((option) => option.value !== Constants.CASE_CLASSIFICATION.NOT_A_CASE)
         }
       },
       {
@@ -512,10 +512,8 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
    * Re(load) the available Entities list, based on the applied filter, sort criteria
    */
   refreshList() {
-    // classification conditions - not really necessary since refreshListCount is always called before this one
-    if (this._entity.type === EntityType.CONTACT_OF_CONTACT) {
-      this.addClassificationConditions(this.queryBuilder);
-    }
+    // exclude discarded cases always
+    this.addClassificationConditions(this.queryBuilder);
 
     // retrieve the list of Relationships
     this.records$ = this.entityDataService
@@ -556,10 +554,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
     }
 
     // exclude discarded cases always
-    if (this._entity.type === EntityType.CONTACT_OF_CONTACT) {
-      // classification conditions
-      this.addClassificationConditions(countQueryBuilder);
-    }
+    this.addClassificationConditions(countQueryBuilder);
 
     // count
     this.entityDataService
@@ -576,6 +571,11 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
    * Classification conditions
    */
   private addClassificationConditions(qb: RequestQueryBuilder) {
+    // condition applies only for specific cases
+    if (this._entity.type !== EntityType.CONTACT_OF_CONTACT) {
+      return;
+    }
+
     // create classification condition
     const falseCondition = { classification: { neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE } };
 
