@@ -7,6 +7,7 @@ import { AuthDataService } from '../data/auth.data.service';
 import { OutbreakDataService } from '../data/outbreak.data.service';
 import { ToastV2Service } from './toast-v2.service';
 import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from './outbreak-and-outbreak-template-helper.service';
 
 @Injectable()
 export class ListHelperService {
@@ -23,7 +24,8 @@ export class ListHelperService {
     public storageService: StorageService,
     public authDataService: AuthDataService,
     public outbreakDataService: OutbreakDataService,
-    public createViewModifyHelperService: CreateViewModifyHelperService
+    public createViewModifyHelperService: CreateViewModifyHelperService,
+    public outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService
   ) {}
 
   /**

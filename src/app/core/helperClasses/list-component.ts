@@ -336,6 +336,9 @@ export abstract class ListComponent<T, U extends IV2Column> extends ListAppliedF
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
 
+        // merge default fields
+        this.listHelperService.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.selectedOutbreak);
+
         // stop previous
         this.stopOutbreakChangedTimer();
 
