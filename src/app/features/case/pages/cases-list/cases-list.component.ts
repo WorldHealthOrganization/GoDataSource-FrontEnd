@@ -21,7 +21,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
-import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -47,12 +47,13 @@ import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 @Component({
   selector: 'app-cases-list',
   templateUrl: './cases-list.component.html'
 })
-export class CasesListComponent extends ListComponent<CaseModel, IV2Column> implements OnDestroy {
+export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
   // case fields
   private caseFields: ILabelValuePairModel[] = [
     { label: 'LNG_CASE_FIELD_LABEL_ID', value: 'id' },
@@ -824,6 +825,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'lastName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -834,6 +839,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'firstName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -844,6 +853,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'middleName'
+        ),
         notVisible: true,
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -855,6 +868,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'visualId',
         label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'visualId'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -865,6 +882,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
@@ -929,6 +947,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'classification',
         label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'classification'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -937,7 +959,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
             (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             undefined
           ),
-          search: (column: IV2Column) => {
+          search: (column) => {
             // create condition
             const values: string[] = (column.filter as IV2FilterMultipleSelect).value;
             const condition = {
@@ -968,6 +990,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'pregnancyStatus',
         label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'pregnancyStatus'
+        ),
         notVisible: true,
         sortable: true,
         filter: {
@@ -979,6 +1005,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'investigationStatus',
         label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'investigationStatus'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -989,6 +1019,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'dateInvestigationCompleted',
         label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'dateInvestigationCompleted'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1001,6 +1035,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'outcomeId',
         label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'outcomeId'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1015,6 +1053,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'dateOfOutcome',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'dateOfOutcome'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1027,6 +1069,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'dateBecomeCase',
         label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'dateBecomeCase'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1039,6 +1085,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'dateOfInfection',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'dateOfInfection'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1051,6 +1101,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'deathLocationId',
         label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'deathLocationId'
+        ),
         format: {
           type: 'deathLocation.name'
         },
@@ -1068,6 +1122,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'dob',
         label: 'LNG_CASE_FIELD_LABEL_DOB',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'ageDob'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1080,6 +1138,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'age',
         label: 'LNG_CASE_FIELD_LABEL_AGE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'ageDob'
+        ),
         format: {
           type: V2ColumnFormat.AGE
         },
@@ -1093,6 +1155,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'gender'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1102,6 +1168,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'riskLevel',
         label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'riskLevel'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1115,6 +1185,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'riskReason',
         label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'riskReason'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -1124,6 +1198,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'occupation',
         label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'occupation'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1137,6 +1215,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'phoneNumber',
         label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         format: {
           type: 'mainAddress.phoneNumber'
         },
@@ -1151,6 +1233,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'location',
         label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         format: {
           type: 'mainAddress.location.name'
         },
@@ -1169,6 +1255,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'addresses.emailAddress',
         label: 'LNG_CASE_FIELD_LABEL_EMAIL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.emailAddress'
@@ -1185,6 +1275,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'addresses.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
@@ -1201,6 +1295,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.city'
@@ -1217,6 +1315,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'addresses.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
@@ -1225,6 +1327,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'addresses.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
@@ -1233,6 +1339,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
@@ -1249,6 +1359,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -1267,6 +1381,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'dateOfOnset',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'dateOfOnset'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1278,6 +1396,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'isDateOfOnsetApproximate',
         label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'isDateOfOnsetApproximate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1292,6 +1414,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'transferRefused',
         label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'transferRefused'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1306,6 +1432,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'dateOfReporting',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'dateOfReporting'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -1318,6 +1448,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'isDateOfReportingApproximate',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'isDateOfReportingApproximate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1332,6 +1466,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'dateOfBurial',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'dateOfBurial'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -1344,6 +1482,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'burialLocationId',
         label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'burialLocationId'
+        ),
         format: {
           type: 'burialLocation.name'
         },
@@ -1361,6 +1503,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'burialPlaceName',
         label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'burialPlaceName'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -1370,6 +1516,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'safeBurial',
         label: 'LNG_CASE_FIELD_LABEL_SAFE_BURIAL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'safeBurial'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1384,6 +1534,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'notACase',
         label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -1407,6 +1558,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'wasContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1421,6 +1573,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'wasContactOfContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1435,6 +1588,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'responsibleUserId',
         label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'responsibleUserId'
+        ),
         notVisible: true,
         format: {
           type: 'responsibleUser.nameAndEmail'
@@ -1456,6 +1613,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'documents',
         label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'documents'
+        ),
         format: {
           type: (item: CaseModel): string => {
             // must format ?
@@ -1475,6 +1636,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'vaccinesReceived',
         label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'vaccinesReceived'
+        ),
         format: {
           type: (item: CaseModel): string => {
             // must format ?
@@ -1494,6 +1659,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'dateRanges',
         label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'dateRanges'
+        ),
         format: {
           type: (item: CaseModel): string => {
             // must format ?
@@ -1519,6 +1688,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
         {
           field: 'numberOfContacts',
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
+          visibleMandatoryIf: () => true,
           format: {
             type: V2ColumnFormat.BUTTON
           },
@@ -1549,6 +1719,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
         {
           field: 'numberOfExposures',
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+          visibleMandatoryIf: () => true,
           format: {
             type: V2ColumnFormat.BUTTON
           },
@@ -1584,6 +1755,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'deleted',
         label: 'LNG_CASE_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1598,6 +1770,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'deletedAt',
         label: 'LNG_CASE_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1610,6 +1783,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'createdBy',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: 'createdByUser.nameAndEmail'
@@ -1631,6 +1805,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'createdAt',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1643,6 +1818,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'updatedBy',
         label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: 'updatedByUser.nameAndEmail'
@@ -1664,6 +1840,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2Column> impl
       {
         field: 'updatedAt',
         label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME

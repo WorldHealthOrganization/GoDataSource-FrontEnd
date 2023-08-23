@@ -1376,4 +1376,26 @@ export abstract class ListComponent<T, U extends IV2Column> extends ListAppliedF
       }
     }
   }
+
+  /**
+   * Check if a column should be visible depending on outbreak visible/mandatory settings
+   */
+  protected shouldVisibleMandatoryTableColumnBeVisible(
+    visibleMandatoryKey: string,
+    prop: string
+  ): boolean {
+    // no custom settings found ?
+    if (
+      !this.selectedOutbreak ||
+      !this.selectedOutbreak.visibleAndMandatoryFields ||
+      !this.selectedOutbreak.visibleAndMandatoryFields[visibleMandatoryKey] ||
+      this.selectedOutbreak.visibleAndMandatoryFields[visibleMandatoryKey][prop]?.visible ||
+      Object.keys(this.selectedOutbreak.visibleAndMandatoryFields[visibleMandatoryKey]).length < 1
+    ) {
+      return true;
+    }
+
+    // matched
+    return false;
+  }
 }
