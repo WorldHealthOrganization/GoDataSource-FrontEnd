@@ -15,7 +15,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { Constants } from '../../../../core/models/constants';
-import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -32,7 +32,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
   selector: 'app-available-entities-list',
   templateUrl: './available-entities-list.component.html'
 })
-export class AvailableEntitiesListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+export class AvailableEntitiesListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel, IV2Column> implements OnDestroy {
   // route
   private _relationshipType: RelationshipType;
 

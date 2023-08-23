@@ -21,7 +21,7 @@ import { RequestFilterOperator } from '../../../../core/helperClasses/request-qu
   selector: 'app-user-workload',
   templateUrl: './user-workload.component.html'
 })
-export class UserWorkloadComponent extends ListComponent<any> implements OnDestroy {
+export class UserWorkloadComponent extends ListComponent<any, IV2Column> implements OnDestroy {
   // default table columns
   defaultTableColumns: IV2Column[] = [
     {

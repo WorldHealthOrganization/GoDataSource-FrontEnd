@@ -7,11 +7,12 @@ import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../mode
 import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { ListQueryComponent } from './list-query-component';
+import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 
 /**
  * Applied filters
  */
-export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
+export abstract class ListAppliedFiltersComponent<T extends IV2Column> extends ListQueryComponent<T> {
   // Applied list filter on this list page
   appliedListFilter: ApplyListFilter;
 

@@ -10,13 +10,13 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-report-relationships-long-period',
   templateUrl: './report-relationships-long-period-list.component.html'
 })
-export class ReportRelationshipsLongPeriodListComponent extends ListComponent<ReportDifferenceOnsetRelationshipModel> implements OnDestroy {
+export class ReportRelationshipsLongPeriodListComponent extends ListComponent<ReportDifferenceOnsetRelationshipModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */

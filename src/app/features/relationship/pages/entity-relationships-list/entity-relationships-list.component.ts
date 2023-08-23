@@ -26,12 +26,13 @@ import { UserModel } from '../../../../core/models/user.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-entity-relationships-list',
   templateUrl: './entity-relationships-list.component.html'
 })
-export class EntityRelationshipsListComponent extends ListComponent<EntityModel> implements OnDestroy {
+export class EntityRelationshipsListComponent extends ListComponent<EntityModel, IV2Column> implements OnDestroy {
   // list of relationships
   private _relationshipsListRecordsMap: {
     [idRelationship: string]: EntityModel

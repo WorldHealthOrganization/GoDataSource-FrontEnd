@@ -26,7 +26,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -40,7 +40,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
   templateUrl: './marked-not-duplicates-list.component.html'
 })
 export class MarkedNotDuplicatesListComponent
-  extends ListComponent<EventModel | CaseModel | ContactModel | ContactOfContactModel>
+  extends ListComponent<EventModel | CaseModel | ContactModel | ContactOfContactModel, IV2Column>
   implements OnDestroy {
 
   // list of not duplicates

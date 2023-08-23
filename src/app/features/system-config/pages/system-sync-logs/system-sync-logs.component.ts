@@ -32,7 +32,7 @@ import { ExportSyncErrorModel, ExportSyncErrorModelCode } from '../../../../core
   templateUrl: './system-sync-logs.component.html'
 })
 export class SystemSyncLogsComponent
-  extends ListComponent<SystemSyncLogModel>
+  extends ListComponent<SystemSyncLogModel, IV2Column>
   implements OnDestroy {
   /**
   * Constructor

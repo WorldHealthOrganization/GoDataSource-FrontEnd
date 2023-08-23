@@ -33,7 +33,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
   selector: 'app-clusters-people-list',
   templateUrl: './clusters-people-list.component.html'
 })
-export class ClustersPeopleListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+export class ClustersPeopleListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel, IV2Column> implements OnDestroy {
   // present cluster
   private _selectedCluster: ClusterModel;
 

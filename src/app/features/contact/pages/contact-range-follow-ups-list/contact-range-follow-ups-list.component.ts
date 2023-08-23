@@ -47,7 +47,7 @@ import { EntityFollowUpHelperService } from '../../../../core/services/helper/en
   encapsulation: ViewEncapsulation.None
 })
 export class ContactRangeFollowUpsListComponent
-  extends ListComponent<any>
+  extends ListComponent<any, IV2Column>
   implements OnDestroy {
 
   // filter address

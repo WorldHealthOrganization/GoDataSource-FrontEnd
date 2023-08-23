@@ -6,7 +6,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { ActivatedRoute } from '@angular/router';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -32,7 +32,7 @@ import * as momentOriginal from 'moment/moment';
   selector: 'app-team-list',
   templateUrl: './team-list.component.html'
 })
-export class TeamListComponent extends ListComponent<TeamModel> implements OnDestroy {
+export class TeamListComponent extends ListComponent<TeamModel, IV2Column> implements OnDestroy {
   // team fields
   teamFields: ILabelValuePairModel[] = [
     { label: 'LNG_TEAM_FIELD_LABEL_NAME', value: 'name' },

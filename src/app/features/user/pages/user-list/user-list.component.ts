@@ -32,7 +32,7 @@ import * as momentOriginal from 'moment/moment';
   selector: 'app-user-list',
   templateUrl: './user-list.component.html'
 })
-export class UserListComponent extends ListComponent<UserModel> implements OnDestroy {
+export class UserListComponent extends ListComponent<UserModel, IV2Column> implements OnDestroy {
   // user fields
   userFields: ILabelValuePairModel[] = [
     { label: 'LNG_USER_FIELD_LABEL_EMAIL', value: 'email' },

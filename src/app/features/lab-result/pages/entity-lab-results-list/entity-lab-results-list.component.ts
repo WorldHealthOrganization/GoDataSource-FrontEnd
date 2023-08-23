@@ -38,12 +38,13 @@ import { Constants } from '../../../../core/models/constants';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
+import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-entity-lab-results-list',
   templateUrl: './entity-lab-results-list.component.html'
 })
-export class EntityLabResultsListComponent extends ListComponent<LabResultModel> implements OnDestroy {
+export class EntityLabResultsListComponent extends ListComponent<LabResultModel, IV2Column> implements OnDestroy {
   // entity
   personType: EntityType;
   entityData: CaseModel | ContactModel;

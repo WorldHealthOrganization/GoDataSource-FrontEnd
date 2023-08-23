@@ -1,13 +1,29 @@
 import { RequestQueryBuilder } from './request-query-builder';
 import { IExtendedColDef } from '../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { applyFilterBy, IV2Column, IV2ColumnAction } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 /**
  * Applied filters
  */
-export abstract class ListQueryComponent {
+export abstract class ListQueryComponent<T extends IV2Column> {
   // table columns
-  tableColumns: IV2Column[] = [];
+  private _tableColumns: T[] = [];
+  get tableColumns(): T[] {
+    return this._tableColumns;
+  }
+  set tableColumns(tableColumns: T[]) {
+    // set value
+    this._tableColumns = (tableColumns || []).filter((column) => {
+      if ((column as IV2ColumnToVisibleMandatoryConf).visibleMandatoryIf) {
+        return (column as IV2ColumnToVisibleMandatoryConf).visibleMandatoryIf();
+      } else {
+        return true;
+      }
+    });
+  }
+
+  // table columns actions
   tableColumnActions: IV2ColumnAction;
 
   // query

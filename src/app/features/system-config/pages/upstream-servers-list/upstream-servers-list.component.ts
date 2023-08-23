@@ -16,13 +16,13 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-upstream-servers-list',
   templateUrl: './upstream-servers-list.component.html'
 })
-export class UpstreamServersListComponent extends ListComponent<SystemUpstreamServerModel> implements OnDestroy {
+export class UpstreamServersListComponent extends ListComponent<SystemUpstreamServerModel, IV2Column> implements OnDestroy {
   // timers
   private _syncCheckIfDoneTimer: number;
 

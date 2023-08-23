@@ -20,6 +20,7 @@ import {
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import {
+  IV2Column,
   IV2ColumnPinned,
   V2ColumnFormat
 } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
@@ -50,7 +51,7 @@ import { RestoreLogDataService } from '../../../../core/services/data/restore-lo
   selector: 'app-backups',
   templateUrl: './backups.component.html'
 })
-export class BackupsComponent extends ListComponent<BackupModel> implements OnDestroy {
+export class BackupsComponent extends ListComponent<BackupModel, IV2Column> implements OnDestroy {
   // used to determine when a backup has finished, so we can start the restore process...
   private _waitForBackupIdToBeReady: string;
 

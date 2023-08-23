@@ -11,14 +11,14 @@ import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-report-cases-date-onset-list',
   templateUrl: './report-cases-date-onset-list.component.html'
 })
-export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCasesWithOnsetModel> implements OnDestroy {
+export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCasesWithOnsetModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */

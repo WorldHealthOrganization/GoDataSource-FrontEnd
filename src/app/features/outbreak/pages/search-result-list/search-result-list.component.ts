@@ -15,7 +15,7 @@ import { GlobalEntitySearchDataService } from '../../../../core/services/data/gl
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import * as _ from 'lodash';
-import { IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
@@ -29,7 +29,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
   selector: 'app-search-result-list',
   templateUrl: './search-result-list.component.html'
 })
-export class SearchResultListComponent extends ListComponent<CaseModel | ContactModel | ContactOfContactModel | EventModel> implements OnDestroy {
+export class SearchResultListComponent extends ListComponent<CaseModel | ContactModel | ContactOfContactModel | EventModel, IV2Column> implements OnDestroy {
   // search by value
   private _searchValue: string;
 

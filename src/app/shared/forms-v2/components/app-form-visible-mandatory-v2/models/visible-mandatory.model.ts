@@ -1,12 +1,31 @@
 import { CreateViewModifyV2TabInput } from '../../../../components-v2/app-create-view-modify-v2/models/tab.model';
+import { IV2Column } from '../../../../components-v2/app-list-table-v2/models/column.model';
+import { V2AdvancedFilter } from '../../../../components-v2/app-list-table-v2/models/advanced-filter.model';
+
+/**
+ * Used by lists to configure specific things for visible/mandatory columns
+ */
+export type IV2ColumnToVisibleMandatoryConf = IV2Column & {
+  // required
+  visibleMandatoryIf: () => boolean;
+};
+
+/**
+ * Used by lists to configure specific things for visible/mandatory advanced filters
+ */
+export type V2AdvancedFilterToVisibleMandatoryConf = V2AdvancedFilter & {
+  // required
+  visibleMandatoryIf: () => boolean;
+};
 
 /**
  * Used by create/view/modify input to configure specific things for visible/mandatory
  */
 export interface ICreateViewModifyV2TabInputToVisibleMandatoryConf {
-  // required
-  visible: boolean;
-  required: boolean;
+  // optional
+  visible?: boolean;
+  required?: boolean;
+  originalName?: string;
 }
 
 /**

@@ -9,7 +9,7 @@ import { RestoreLogDataService } from '../../../../core/services/data/restore-lo
 import { RestoreLogModel } from '../../../../core/models/restore-log.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { BackupModel } from '../../../../core/models/backup.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -21,7 +21,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
   selector: 'app-backups-restores',
   templateUrl: './backups-restores.component.html'
 })
-export class BackupsRestoresComponent extends ListComponent<RestoreLogModel> implements OnDestroy {
+export class BackupsRestoresComponent extends ListComponent<RestoreLogModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */

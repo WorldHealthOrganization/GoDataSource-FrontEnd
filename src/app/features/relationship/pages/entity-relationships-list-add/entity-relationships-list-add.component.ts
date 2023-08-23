@@ -16,7 +16,7 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
@@ -32,7 +32,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
   selector: 'app-entity-relationships-list-add',
   templateUrl: './entity-relationships-list-add.component.html'
 })
-export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel, IV2Column> implements OnDestroy {
   // entity
   private _entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
   // selected records
@@ -261,7 +261,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
             this.selectedOutbreak,
             (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             undefined
-          ).filter((item) => item.value !==  Constants.CASE_CLASSIFICATION.NOT_A_CASE)
+          ).filter((option) => option.value !== Constants.CASE_CLASSIFICATION.NOT_A_CASE)
         }
       },
       {
@@ -512,10 +512,8 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
    * Re(load) the available Entities list, based on the applied filter, sort criteria
    */
   refreshList() {
-    // classification conditions - not really necessary since refreshListCount is always called before this one
-    if (this._entity.type === EntityType.CONTACT_OF_CONTACT) {
-      this.addClassificationConditions(this.queryBuilder);
-    }
+    // exclude discarded cases always
+    this.addClassificationConditions(this.queryBuilder);
 
     // retrieve the list of Relationships
     this.records$ = this.entityDataService
@@ -556,10 +554,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
     }
 
     // exclude discarded cases always
-    if (this._entity.type === EntityType.CONTACT_OF_CONTACT) {
-      // classification conditions
-      this.addClassificationConditions(countQueryBuilder);
-    }
+    this.addClassificationConditions(countQueryBuilder);
 
     // count
     this.entityDataService
@@ -576,6 +571,11 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
    * Classification conditions
    */
   private addClassificationConditions(qb: RequestQueryBuilder) {
+    // condition applies only for specific cases
+    if (this._entity.type !== EntityType.CONTACT_OF_CONTACT) {
+      return;
+    }
+
     // create classification condition
     const falseCondition = { classification: { neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE } };
 

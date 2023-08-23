@@ -32,12 +32,13 @@ import { EntityFollowUpHelperService } from '../../../../core/services/helper/en
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-individual-contact-follow-ups-list',
   templateUrl: './individual-contact-follow-ups-list.component.html'
 })
-export class IndividualContactFollowUpsListComponent extends ListComponent<FollowUpModel> implements OnDestroy {
+export class IndividualContactFollowUpsListComponent extends ListComponent<FollowUpModel, IV2Column> implements OnDestroy {
   // data
   entityData: ContactOfContactModel | ContactModel | CaseModel;
 

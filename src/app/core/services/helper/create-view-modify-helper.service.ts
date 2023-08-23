@@ -6,12 +6,18 @@ import {
   ICreateViewModifyV2Section,
   ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputValidatorRequired
 } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { IVisibleMandatoryDataGroupTab, IVisibleMandatoryDataGroupTabSectionField, IVisibleMandatoryDataValueField } from '../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import {
+  IVisibleMandatoryDataGroupTab,
+  IVisibleMandatoryDataGroupTabSectionField,
+  IVisibleMandatoryDataValueField,
+  V2AdvancedFilterToVisibleMandatoryConf
+} from '../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { v4 as uuid } from 'uuid';
 import { ToastV2Service } from './toast-v2.service';
 import { RedirectService } from './redirect.service';
 import { OutbreakModel } from '../../models/outbreak.model';
 import * as _ from 'lodash';
+import { V2AdvancedFilter } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 @Injectable()
 export class CreateViewModifyHelperService {
@@ -216,7 +222,12 @@ export class CreateViewModifyHelperService {
         }
 
         // must add field ?
-        if (visibleAndMandatoryConf[fieldDef.id]?.visible) {
+        if (
+          visibleAndMandatoryConf[fieldDef.id]?.visible || (
+            fieldDef.visibleMandatoryConf?.originalName &&
+            visibleAndMandatoryConf[fieldDef.visibleMandatoryConf?.originalName]?.visible
+          )
+        ) {
           section.inputs.push(input);
         }
       });
@@ -234,5 +245,37 @@ export class CreateViewModifyHelperService {
 
     // finished
     return filteredTab;
+  }
+
+  /**
+   * Check if a column should be visible depending on outbreak visible/mandatory settings
+   */
+  shouldVisibleMandatoryTableColumnBeVisible(
+    outbreak: OutbreakModel,
+    visibleMandatoryKey: string,
+    prop: string
+  ): boolean {
+    // no custom settings found ?
+    if (
+      !outbreak ||
+      !outbreak.visibleAndMandatoryFields ||
+      !outbreak.visibleAndMandatoryFields[visibleMandatoryKey] ||
+      outbreak.visibleAndMandatoryFields[visibleMandatoryKey][prop]?.visible ||
+      Object.keys(outbreak.visibleAndMandatoryFields[visibleMandatoryKey]).length < 1
+    ) {
+      return true;
+    }
+
+    // matched
+    return false;
+  }
+
+  /**
+   * Filter advanced filters depending on outbreak visible/mandatory settings
+   */
+  filterVisibleMandatoryAdvancedFilters(advancedFilters: V2AdvancedFilterToVisibleMandatoryConf[]): V2AdvancedFilter[] {
+    return (advancedFilters || []).filter((filter) => {
+      return filter.visibleMandatoryIf();
+    });
   }
 }

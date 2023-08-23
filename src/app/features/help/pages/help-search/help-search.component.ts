@@ -7,7 +7,7 @@ import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
@@ -20,7 +20,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
   selector: 'app-help-search',
   templateUrl: './help-search.component.html'
 })
-export class HelpSearchComponent extends ListComponent<HelpItemModel> implements OnDestroy {
+export class HelpSearchComponent extends ListComponent<HelpItemModel, IV2Column> implements OnDestroy {
   // help items
   helpItemsList$: Observable<HelpItemModel[]>;
 
