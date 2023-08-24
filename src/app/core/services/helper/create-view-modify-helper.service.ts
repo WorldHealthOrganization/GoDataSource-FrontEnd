@@ -16,7 +16,6 @@ import { v4 as uuid } from 'uuid';
 import { ToastV2Service } from './toast-v2.service';
 import { RedirectService } from './redirect.service';
 import { OutbreakModel } from '../../models/outbreak.model';
-import * as _ from 'lodash';
 import { V2AdvancedFilter } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 @Injectable()
