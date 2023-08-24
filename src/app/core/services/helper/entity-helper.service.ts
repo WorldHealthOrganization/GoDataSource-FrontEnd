@@ -183,8 +183,10 @@ export class EntityHelperService {
     useToFilterOutbreak: OutbreakModel,
     data: {
       entityId: string,
-      title: string,
-      name: (property: string) => string
+      tabName: string,
+      tabLabel: string,
+      tabVisible: () => boolean,
+      inputName: (property: string) => string
       itemData: RelationshipModel,
       createCopySuffixButtons: (prop: string) => IAppFormIconButtonV2[],
       checkForLastContactBeforeCaseOnSet: (
@@ -210,16 +212,17 @@ export class EntityHelperService {
     const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
       {
         type: CreateViewModifyV2TabInputType.TAB,
-        name: data.title,
-        label: data.title,
+        name: data.tabName,
+        label: data.tabLabel,
+        visible: data.tabVisible,
         sections: [
           // Details
           {
             type: CreateViewModifyV2TabInputType.SECTION,
-            label: data.title,
+            label: 'LNG_COMMON_LABEL_DETAILS',
             inputs: [{
               type: CreateViewModifyV2TabInputType.DATE,
-              name: data.name('dateOfFirstContact'),
+              name: data.inputName('dateOfFirstContact'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION',
               value: {
@@ -240,7 +243,7 @@ export class EntityHelperService {
               }
             }, {
               type: CreateViewModifyV2TabInputType.DATE,
-              name: data.name('contactDate'),
+              name: data.inputName('contactDate'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
               value: {
@@ -250,7 +253,7 @@ export class EntityHelperService {
 
                   // validate against date of onset
                   data.checkForLastContactBeforeCaseOnSet(
-                    { [data.entityId]: data.title },
+                    { [data.entityId]: data.tabLabel },
                     data.itemData.contactDate
                   );
                 }
@@ -270,7 +273,7 @@ export class EntityHelperService {
               suffixIconButtons: data.createCopySuffixButtons('contactDate')
             }, {
               type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: data.name('contactDateEstimated'),
+              name: data.inputName('contactDateEstimated'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
               value: {
@@ -286,7 +289,7 @@ export class EntityHelperService {
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: data.name('certaintyLevelId'),
+              name: data.inputName('certaintyLevelId'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
               options: data.options.certaintyLevel,
@@ -305,7 +308,7 @@ export class EntityHelperService {
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: data.name('exposureTypeId'),
+              name: data.inputName('exposureTypeId'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
               options: data.options.exposureType,
@@ -321,7 +324,7 @@ export class EntityHelperService {
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: data.name('exposureFrequencyId'),
+              name: data.inputName('exposureFrequencyId'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
               options: data.options.exposureFrequency,
@@ -337,7 +340,7 @@ export class EntityHelperService {
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: data.name('exposureDurationId'),
+              name: data.inputName('exposureDurationId'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
               options: data.options.exposureDuration,
@@ -353,7 +356,7 @@ export class EntityHelperService {
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: data.name('socialRelationshipTypeId'),
+              name: data.inputName('socialRelationshipTypeId'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
               options: data.options.contextOfTransmission,
@@ -369,7 +372,7 @@ export class EntityHelperService {
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: data.name('clusterId'),
+              name: data.inputName('clusterId'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
               options: data.options.cluster,
@@ -385,7 +388,7 @@ export class EntityHelperService {
               }
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,
-              name: data.name('socialRelationshipDetail'),
+              name: data.inputName('socialRelationshipDetail'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
               value: {
@@ -400,7 +403,7 @@ export class EntityHelperService {
               }
             }, {
               type: CreateViewModifyV2TabInputType.TEXTAREA,
-              name: data.name('comment'),
+              name: data.inputName('comment'),
               placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
               description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
               value: {

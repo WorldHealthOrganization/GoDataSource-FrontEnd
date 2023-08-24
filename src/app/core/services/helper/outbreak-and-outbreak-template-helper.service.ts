@@ -231,10 +231,12 @@ export class OutbreakAndOutbreakTemplateHelperService {
         children: this.createViewModifyHelperService.tabsToGroupTabs([
           this.entityHelperService.generateTabsDetails(undefined, {
             entityId: 'LNG_COMMON_MODEL_FIELD_LABEL_ID',
-            title: 'LNG_COMMON_LABEL_DETAILS',
-            name: (property) => property,
+            tabName: 'details',
+            tabLabel: 'LNG_COMMON_LABEL_DETAILS',
+            tabVisible: () => true,
+            inputName: (property) => property,
             itemData: new RelationshipModel(),
-            createCopySuffixButtons: () => [],
+            createCopySuffixButtons: () => undefined,
             checkForLastContactBeforeCaseOnSet: () => {},
             options: {
               certaintyLevel: [],
