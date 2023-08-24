@@ -207,222 +207,222 @@ export class EntityHelperService {
     const today: Moment = moment();
 
     // create tab
-    const tab: ICreateViewModifyV2Tab = {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: data.title,
-      label: data.title,
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: data.title,
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: data.name('dateOfFirstContact'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION',
-            value: {
-              get: () => data.itemData.dateOfFirstContact,
-              set: (value) => {
-                data.itemData.dateOfFirstContact = value;
+    const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
+      {
+        type: CreateViewModifyV2TabInputType.TAB,
+        name: data.title,
+        label: data.title,
+        sections: [
+          // Details
+          {
+            type: CreateViewModifyV2TabInputType.SECTION,
+            label: data.title,
+            inputs: [{
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: data.name('dateOfFirstContact'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION',
+              value: {
+                get: () => data.itemData.dateOfFirstContact,
+                set: (value) => {
+                  data.itemData.dateOfFirstContact = value;
+                }
+              },
+              maxDate: today,
+              validators: {
+                dateSameOrBefore: () => [
+                  today
+                ]
+              },
+              suffixIconButtons: data.createCopySuffixButtons('dateOfFirstContact'),
+              visibleMandatoryConf: {
+                originalName: 'dateOfFirstContact'
               }
-            },
-            maxDate: today,
-            validators: {
-              dateSameOrBefore: () => [
-                today
-              ]
-            },
-            suffixIconButtons: data.createCopySuffixButtons('dateOfFirstContact'),
-            visibleMandatoryConf: {
-              originalName: 'dateOfFirstContact'
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: data.name('contactDate'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
-            value: {
-              get: () => data.itemData.contactDate,
-              set: (value) => {
-                data.itemData.contactDate = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: data.name('contactDate'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
+              value: {
+                get: () => data.itemData.contactDate,
+                set: (value) => {
+                  data.itemData.contactDate = value;
 
-                // validate against date of onset
-                data.checkForLastContactBeforeCaseOnSet(
-                  { [data.entityId]: data.title },
-                  data.itemData.contactDate
-                );
+                  // validate against date of onset
+                  data.checkForLastContactBeforeCaseOnSet(
+                    { [data.entityId]: data.title },
+                    data.itemData.contactDate
+                  );
+                }
+              },
+              visibleMandatoryConf: {
+                visible: true,
+                required: false,
+                originalName: 'contactDate'
+              },
+              maxDate: today,
+              validators: {
+                required: () => true,
+                dateSameOrBefore: () => [
+                  today
+                ]
+              },
+              suffixIconButtons: data.createCopySuffixButtons('contactDate')
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: data.name('contactDateEstimated'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
+              value: {
+                get: () => data.itemData.contactDateEstimated,
+                set: (value) => {
+                  // set data
+                  data.itemData.contactDateEstimated = value;
+                }
+              },
+              suffixIconButtons: data.createCopySuffixButtons('contactDateEstimated'),
+              visibleMandatoryConf: {
+                originalName: 'contactDateEstimated'
               }
-            },
-            visibleMandatoryConf: {
-              visible: true,
-              required: false,
-              originalName: 'contactDate'
-            },
-            maxDate: today,
-            validators: {
-              required: () => true,
-              dateSameOrBefore: () => [
-                today
-              ]
-            },
-            suffixIconButtons: data.createCopySuffixButtons('contactDate')
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: data.name('contactDateEstimated'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
-            value: {
-              get: () => data.itemData.contactDateEstimated,
-              set: (value) => {
-                // set data
-                data.itemData.contactDateEstimated = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: data.name('certaintyLevelId'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
+              options: data.options.certaintyLevel,
+              value: {
+                get: () => data.itemData.certaintyLevelId,
+                set: (value) => {
+                  data.itemData.certaintyLevelId = value;
+                }
+              },
+              validators: {
+                required: () => true
+              },
+              suffixIconButtons: data.createCopySuffixButtons('certaintyLevelId'),
+              visibleMandatoryConf: {
+                originalName: 'certaintyLevelId'
               }
-            },
-            suffixIconButtons: data.createCopySuffixButtons('contactDateEstimated'),
-            visibleMandatoryConf: {
-              originalName: 'contactDateEstimated'
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: data.name('certaintyLevelId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
-            options: data.options.certaintyLevel,
-            value: {
-              get: () => data.itemData.certaintyLevelId,
-              set: (value) => {
-                data.itemData.certaintyLevelId = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: data.name('exposureTypeId'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
+              options: data.options.exposureType,
+              value: {
+                get: () => data.itemData.exposureTypeId,
+                set: (value) => {
+                  data.itemData.exposureTypeId = value;
+                }
+              },
+              suffixIconButtons: data.createCopySuffixButtons('exposureTypeId'),
+              visibleMandatoryConf: {
+                originalName: 'exposureTypeId'
               }
-            },
-            validators: {
-              required: () => true
-            },
-            suffixIconButtons: data.createCopySuffixButtons('certaintyLevelId'),
-            visibleMandatoryConf: {
-              originalName: 'certaintyLevelId'
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: data.name('exposureTypeId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
-            options: data.options.exposureType,
-            value: {
-              get: () => data.itemData.exposureTypeId,
-              set: (value) => {
-                data.itemData.exposureTypeId = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: data.name('exposureFrequencyId'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
+              options: data.options.exposureFrequency,
+              value: {
+                get: () => data.itemData.exposureFrequencyId,
+                set: (value) => {
+                  data.itemData.exposureFrequencyId = value;
+                }
+              },
+              suffixIconButtons: data.createCopySuffixButtons('exposureFrequencyId'),
+              visibleMandatoryConf: {
+                originalName: 'exposureFrequencyId'
               }
-            },
-            suffixIconButtons: data.createCopySuffixButtons('exposureTypeId'),
-            visibleMandatoryConf: {
-              originalName: 'exposureTypeId'
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: data.name('exposureFrequencyId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
-            options: data.options.exposureFrequency,
-            value: {
-              get: () => data.itemData.exposureFrequencyId,
-              set: (value) => {
-                data.itemData.exposureFrequencyId = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: data.name('exposureDurationId'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
+              options: data.options.exposureDuration,
+              value: {
+                get: () => data.itemData.exposureDurationId,
+                set: (value) => {
+                  data.itemData.exposureDurationId = value;
+                }
+              },
+              suffixIconButtons: data.createCopySuffixButtons('exposureDurationId'),
+              visibleMandatoryConf: {
+                originalName: 'exposureDurationId'
               }
-            },
-            suffixIconButtons: data.createCopySuffixButtons('exposureFrequencyId'),
-            visibleMandatoryConf: {
-              originalName: 'exposureFrequencyId'
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: data.name('exposureDurationId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
-            options: data.options.exposureDuration,
-            value: {
-              get: () => data.itemData.exposureDurationId,
-              set: (value) => {
-                data.itemData.exposureDurationId = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: data.name('socialRelationshipTypeId'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
+              options: data.options.contextOfTransmission,
+              value: {
+                get: () => data.itemData.socialRelationshipTypeId,
+                set: (value) => {
+                  data.itemData.socialRelationshipTypeId = value;
+                }
+              },
+              suffixIconButtons: data.createCopySuffixButtons('socialRelationshipTypeId'),
+              visibleMandatoryConf: {
+                originalName: 'socialRelationshipTypeId'
               }
-            },
-            suffixIconButtons: data.createCopySuffixButtons('exposureDurationId'),
-            visibleMandatoryConf: {
-              originalName: 'exposureDurationId'
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: data.name('socialRelationshipTypeId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
-            options: data.options.contextOfTransmission,
-            value: {
-              get: () => data.itemData.socialRelationshipTypeId,
-              set: (value) => {
-                data.itemData.socialRelationshipTypeId = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: data.name('clusterId'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
+              options: data.options.cluster,
+              value: {
+                get: () => data.itemData.clusterId,
+                set: (value) => {
+                  data.itemData.clusterId = value;
+                }
+              },
+              suffixIconButtons: data.createCopySuffixButtons('clusterId'),
+              visibleMandatoryConf: {
+                originalName: 'clusterId'
               }
-            },
-            suffixIconButtons: data.createCopySuffixButtons('socialRelationshipTypeId'),
-            visibleMandatoryConf: {
-              originalName: 'socialRelationshipTypeId'
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: data.name('clusterId'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
-            options: data.options.cluster,
-            value: {
-              get: () => data.itemData.clusterId,
-              set: (value) => {
-                data.itemData.clusterId = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: data.name('socialRelationshipDetail'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
+              value: {
+                get: () => data.itemData.socialRelationshipDetail,
+                set: (value) => {
+                  data.itemData.socialRelationshipDetail = value;
+                }
+              },
+              suffixIconButtons: data.createCopySuffixButtons('socialRelationshipDetail'),
+              visibleMandatoryConf: {
+                originalName: 'socialRelationshipDetail'
               }
-            },
-            suffixIconButtons: data.createCopySuffixButtons('clusterId'),
-            visibleMandatoryConf: {
-              originalName: 'clusterId'
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: data.name('socialRelationshipDetail'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
-            value: {
-              get: () => data.itemData.socialRelationshipDetail,
-              set: (value) => {
-                data.itemData.socialRelationshipDetail = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: data.name('comment'),
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
+              value: {
+                get: () => data.itemData.comment,
+                set: (value) => {
+                  data.itemData.comment = value;
+                }
+              },
+              suffixIconButtons: data.createCopySuffixButtons('comment'),
+              visibleMandatoryConf: {
+                originalName: 'comment'
               }
-            },
-            suffixIconButtons: data.createCopySuffixButtons('socialRelationshipDetail'),
-            visibleMandatoryConf: {
-              originalName: 'socialRelationshipDetail'
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: data.name('comment'),
-            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
-            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
-            value: {
-              get: () => data.itemData.comment,
-              set: (value) => {
-                data.itemData.comment = value;
-              }
-            },
-            suffixIconButtons: data.createCopySuffixButtons('comment'),
-            visibleMandatoryConf: {
-              originalName: 'comment'
-            }
-          }]
-        }
-      ]
-    };
-
-    // finished
-    return this.createViewModifyHelperService.tabsFilter(
-      tab,
+            }]
+          }
+        ]
+      },
       this.visibleMandatoryKey,
       useToFilterOutbreak
     );
+
+    // finished
+    return tab;
   }
 
   /**

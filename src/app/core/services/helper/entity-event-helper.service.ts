@@ -58,210 +58,210 @@ export class EntityEventHelperService {
     }
   ): ICreateViewModifyV2Tab {
     // create tab
-    const tab: ICreateViewModifyV2Tab = {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'details',
-      label: data.isCreate ?
-        'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' :
-        'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: data.isCreate ?
-            'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' :
-            'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'name',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_NAME',
-            description: () => 'LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION',
-            value: {
-              get: () => data.itemData.name,
-              set: (value) => {
-                data.itemData.name = value;
+    const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
+      {
+        type: CreateViewModifyV2TabInputType.TAB,
+        name: 'details',
+        label: data.isCreate ?
+          'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' :
+          'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
+        sections: [
+          // Details
+          {
+            type: CreateViewModifyV2TabInputType.SECTION,
+            label: data.isCreate ?
+              'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' :
+              'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
+            inputs: [{
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'name',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_NAME',
+              description: () => 'LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION',
+              value: {
+                get: () => data.itemData.name,
+                set: (value) => {
+                  data.itemData.name = value;
+                }
+              },
+              validators: {
+                required: () => true
+              },
+              visibleMandatoryConf: {
+                visible: true,
+                required: true
               }
-            },
-            validators: {
-              required: () => true
-            },
-            visibleMandatoryConf: {
-              visible: true,
-              required: true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'date',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION',
-            value: {
-              get: () => data.itemData.date,
-              set: (value) => {
-                data.itemData.date = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'date',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE',
+              description: () => 'LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION',
+              value: {
+                get: () => data.itemData.date,
+                set: (value) => {
+                  data.itemData.date = value;
+                }
+              },
+              validators: {
+                required: () => true
               }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfReporting',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
-            value: {
-              get: () => data.itemData.dateOfReporting,
-              set: (value) => {
-                data.itemData.dateOfReporting = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'dateOfReporting',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+              description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+              value: {
+                get: () => data.itemData.dateOfReporting,
+                set: (value) => {
+                  data.itemData.dateOfReporting = value;
+                }
+              },
+              validators: {
+                required: () => true
               }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'isDateOfReportingApproximate',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
-            value: {
-              get: () => data.itemData.isDateOfReportingApproximate,
-              set: (value) => {
-                data.itemData.isDateOfReportingApproximate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
-            name: 'visualId',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
-            description: () => this.createViewModifyHelperService.i18nService.instant(
-              'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
-              data.eventVisualIDMask
-            ),
-            value: {
-              get: () => data.itemData.visualId,
-              set: (value) => {
-                data.itemData.visualId = value;
-              }
-            },
-            suffixIconButtons: [
-              {
-                icon: 'refresh',
-                tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
-                clickAction: (input) => {
-                  // nothing to do ?
-                  if (!data.eventVisualIDMask) {
-                    return;
-                  }
-
-                  // generate
-                  data.itemData.visualId = this.generateEventIDMask(data.selectedOutbreak.eventIdMask);
-
-                  // mark as dirty
-                  input.control?.markAsDirty();
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'isDateOfReportingApproximate',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+              description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
+              value: {
+                get: () => data.itemData.isDateOfReportingApproximate,
+                set: (value) => {
+                  data.itemData.isDateOfReportingApproximate = value;
                 }
               }
-            ],
-            validators: {
-              async: new Observable((observer) => {
-                // construct cache key
-                const cacheKey: string = 'CEV_' + data.selectedOutbreak.id +
-                  data.eventVisualIDMask.mask +
-                  data.itemData.visualId +
-                  (
-                    data.isCreate ?
-                      '' :
-                      data.itemData.id
-                  );
+            }, {
+              type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
+              name: 'visualId',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+              description: () => this.createViewModifyHelperService.i18nService.instant(
+                'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+                data.eventVisualIDMask
+              ),
+              value: {
+                get: () => data.itemData.visualId,
+                set: (value) => {
+                  data.itemData.visualId = value;
+                }
+              },
+              suffixIconButtons: [
+                {
+                  icon: 'refresh',
+                  tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+                  clickAction: (input) => {
+                    // nothing to do ?
+                    if (!data.eventVisualIDMask) {
+                      return;
+                    }
 
-                // get data from cache or execute validator
-                TimerCache.run(
-                  cacheKey,
-                  this.eventDataService.checkEventVisualIDValidity(
-                    data.selectedOutbreak.id,
-                    data.eventVisualIDMask.mask,
-                    data.itemData.visualId,
-                    data.isCreate ?
-                      undefined :
-                      data.itemData.id
-                  )
-                ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                  observer.next(isValid);
-                  observer.complete();
-                });
-              })
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'responsibleUserId',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-            description: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-            options: data.options.user,
-            value: {
-              get: () => data.itemData.responsibleUserId,
-              set: (value) => {
-                data.itemData.responsibleUserId = value;
-              }
-            },
-            replace: {
-              condition: () => !UserModel.canListForFilters(this._authUser),
-              html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'eventCategory',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
-            description: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY_DESCRIPTION',
-            options: data.options.eventCategory,
-            value: {
-              get: () => data.itemData.eventCategory,
-              set: (value) => {
-                data.itemData.eventCategory = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'endDate',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_END_DATE',
-            description: () => 'LNG_EVENT_FIELD_LABEL_END_DATE_DESCRIPTION',
-            value: {
-              get: () => data.itemData.endDate,
-              set: (value) => {
-                data.itemData.endDate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: 'description',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
-            value: {
-              get: () => data.itemData.description,
-              set: (value) => {
-                data.itemData.description = value;
-              }
-            }
-          }]
-        },
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.ADDRESS,
-            typeOptions: data.options.addressType,
-            name: 'address',
-            value: {
-              get: () => data.itemData.address
-            }
-          }]
-        }
-      ]
-    };
+                    // generate
+                    data.itemData.visualId = this.generateEventIDMask(data.selectedOutbreak.eventIdMask);
 
-    // finished
-    return this.createViewModifyHelperService.tabsFilter(
-      tab,
+                    // mark as dirty
+                    input.control?.markAsDirty();
+                  }
+                }
+              ],
+              validators: {
+                async: new Observable((observer) => {
+                  // construct cache key
+                  const cacheKey: string = 'CEV_' + data.selectedOutbreak.id +
+                    data.eventVisualIDMask.mask +
+                    data.itemData.visualId +
+                    (
+                      data.isCreate ?
+                        '' :
+                        data.itemData.id
+                    );
+
+                  // get data from cache or execute validator
+                  TimerCache.run(
+                    cacheKey,
+                    this.eventDataService.checkEventVisualIDValidity(
+                      data.selectedOutbreak.id,
+                      data.eventVisualIDMask.mask,
+                      data.itemData.visualId,
+                      data.isCreate ?
+                        undefined :
+                        data.itemData.id
+                    )
+                  ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                    observer.next(isValid);
+                    observer.complete();
+                  });
+                })
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'responsibleUserId',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+              description: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
+              options: data.options.user,
+              value: {
+                get: () => data.itemData.responsibleUserId,
+                set: (value) => {
+                  data.itemData.responsibleUserId = value;
+                }
+              },
+              replace: {
+                condition: () => !UserModel.canListForFilters(this._authUser),
+                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'eventCategory',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
+              description: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY_DESCRIPTION',
+              options: data.options.eventCategory,
+              value: {
+                get: () => data.itemData.eventCategory,
+                set: (value) => {
+                  data.itemData.eventCategory = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'endDate',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_END_DATE',
+              description: () => 'LNG_EVENT_FIELD_LABEL_END_DATE_DESCRIPTION',
+              value: {
+                get: () => data.itemData.endDate,
+                set: (value) => {
+                  data.itemData.endDate = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'description',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+              description: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+              value: {
+                get: () => data.itemData.description,
+                set: (value) => {
+                  data.itemData.description = value;
+                }
+              }
+            }]
+          },
+          {
+            type: CreateViewModifyV2TabInputType.SECTION,
+            label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
+            inputs: [{
+              type: CreateViewModifyV2TabInputType.ADDRESS,
+              typeOptions: data.options.addressType,
+              name: 'address',
+              value: {
+                get: () => data.itemData.address
+              }
+            }]
+          }
+        ]
+      },
       this.visibleMandatoryKey,
       useToFilterOutbreak
     );
+
+    // finished
+    return tab;
   }
 
   /**
