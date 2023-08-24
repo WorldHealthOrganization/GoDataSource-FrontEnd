@@ -74,120 +74,120 @@ export class EntityFollowUpHelperService {
     }
   ): ICreateViewModifyV2Tab {
     // create tab
-    const tab: ICreateViewModifyV2Tab = {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'details',
-      label: data.isCreate ?
-        'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE' :
-        'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_COMMON_LABEL_DETAILS',
-          inputs: [
-            {
-              type: CreateViewModifyV2TabInputType.DATE,
-              name: 'date',
-              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION',
-              value: {
-                get: () => data.itemData.date,
-                set: (value) => {
-                  data.itemData.date = value;
+    const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
+      {
+        type: CreateViewModifyV2TabInputType.TAB,
+        name: 'details',
+        label: data.isCreate ?
+          'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE' :
+          'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE',
+        sections: [
+          // Details
+          {
+            type: CreateViewModifyV2TabInputType.SECTION,
+            label: 'LNG_COMMON_LABEL_DETAILS',
+            inputs: [
+              {
+                type: CreateViewModifyV2TabInputType.DATE,
+                name: 'date',
+                placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+                description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION',
+                value: {
+                  get: () => data.itemData.date,
+                  set: (value) => {
+                    data.itemData.date = value;
+                  }
+                },
+                validators: {
+                  required: () => true
+                },
+                disabled: () => data.isModify,
+                visibleMandatoryConf: {
+                  visible: true,
+                  required: true
                 }
-              },
-              validators: {
-                required: () => true
-              },
-              disabled: () => data.isModify,
-              visibleMandatoryConf: {
-                visible: true,
-                required: true
+              }, {
+                type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+                name: 'targeted',
+                placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+                description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION',
+                value: {
+                  get: () => data.itemData.targeted,
+                  set: (value) => {
+                    data.itemData.targeted = value;
+                  }
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+                name: 'statusId',
+                placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+                description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION',
+                options: data.options.dailyFollowUpStatus,
+                value: {
+                  get: () => data.itemData.statusId,
+                  set: (value) => {
+                    data.itemData.statusId = value;
+                  }
+                },
+                validators: {
+                  required: () => true
+                },
+                disabled: () => data.isModify && Constants.isDateInTheFuture(data.itemData.date)
+              }, {
+                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+                name: 'responsibleUserId',
+                placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
+                options: data.options.user,
+                value: {
+                  get: () => data.itemData.responsibleUserId,
+                  set: (value) => {
+                    data.itemData.responsibleUserId = value;
+                  }
+                },
+                replace: {
+                  condition: () => !UserModel.canListForFilters(this._authUser),
+                  html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_FOLLOW_UP_CANT_SET_RESPONSIBLE_ID_TITLE')
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+                name: 'teamId',
+                placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+                description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION',
+                options: data.options.team,
+                value: {
+                  get: () => data.itemData.teamId,
+                  set: (value) => {
+                    data.itemData.teamId = value;
+                  }
+                }
               }
-            }, {
-              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: 'targeted',
-              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION',
-              value: {
-                get: () => data.itemData.targeted,
-                set: (value) => {
-                  data.itemData.targeted = value;
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'statusId',
-              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION',
-              options: data.options.dailyFollowUpStatus,
-              value: {
-                get: () => data.itemData.statusId,
-                set: (value) => {
-                  data.itemData.statusId = value;
-                }
-              },
-              validators: {
-                required: () => true
-              },
-              disabled: () => data.isModify && Constants.isDateInTheFuture(data.itemData.date)
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'responsibleUserId',
-              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
-              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-              options: data.options.user,
-              value: {
-                get: () => data.itemData.responsibleUserId,
-                set: (value) => {
-                  data.itemData.responsibleUserId = value;
-                }
-              },
-              replace: {
-                condition: () => !UserModel.canListForFilters(this._authUser),
-                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_FOLLOW_UP_CANT_SET_RESPONSIBLE_ID_TITLE')
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'teamId',
-              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION',
-              options: data.options.team,
-              value: {
-                get: () => data.itemData.teamId,
-                set: (value) => {
-                  data.itemData.teamId = value;
-                }
-              }
-            }
-          ]
-        },
+            ]
+          },
 
-        // Address
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.ADDRESS,
-            typeOptions: data.options.addressType,
-            name: 'address',
-            value: {
-              get: () => data.isCreate ?
-                data.entityData.mainAddress :
-                data.itemData.address
-            }
-          }]
-        }
-      ]
-    };
-
-    // finished
-    return this.createViewModifyHelperService.tabsFilter(
-      tab,
+          // Address
+          {
+            type: CreateViewModifyV2TabInputType.SECTION,
+            label: 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_LABEL_ADDRESS',
+            inputs: [{
+              type: CreateViewModifyV2TabInputType.ADDRESS,
+              typeOptions: data.options.addressType,
+              name: 'address',
+              value: {
+                get: () => data.isCreate ?
+                  data.entityData.mainAddress :
+                  data.itemData.address
+              }
+            }]
+          }
+        ]
+      },
       this.visibleMandatoryKey,
       useToFilterOutbreak
     );
+
+    // finished
+    return tab;
   }
 
   /**

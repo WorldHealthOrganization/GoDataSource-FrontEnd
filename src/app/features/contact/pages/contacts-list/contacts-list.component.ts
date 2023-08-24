@@ -31,7 +31,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
@@ -57,13 +57,14 @@ import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { Moment } from 'moment';
 import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 @Component({
   selector: 'app-contacts-list',
   templateUrl: './contacts-list.component.html'
 })
 export class ContactsListComponent
-  extends ListComponent<ContactModel, IV2Column>
+  extends ListComponent<ContactModel, IV2ColumnToVisibleMandatoryConf>
   implements OnDestroy
 {
   // constants
@@ -926,6 +927,10 @@ export class ContactsListComponent
       {
         field: 'lastName',
         label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'lastName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -936,6 +941,10 @@ export class ContactsListComponent
       {
         field: 'middleName',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'middleName'
+        ),
         notVisible: true,
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -947,6 +956,10 @@ export class ContactsListComponent
       {
         field: 'firstName',
         label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'firstName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -957,6 +970,10 @@ export class ContactsListComponent
       {
         field: 'visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'visualId'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -967,6 +984,10 @@ export class ContactsListComponent
       {
         field: 'pregnancyStatus',
         label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'pregnancyStatus'
+        ),
         notVisible: true,
         sortable: true,
         filter: {
@@ -978,6 +999,10 @@ export class ContactsListComponent
       {
         field: 'location',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         format: {
           type: 'mainAddress.location.name'
         },
@@ -996,6 +1021,10 @@ export class ContactsListComponent
       {
         field: 'addresses.emailAddress',
         label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.emailAddress'
@@ -1012,6 +1041,10 @@ export class ContactsListComponent
       {
         field: 'addresses.addressLine1',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
@@ -1028,6 +1061,10 @@ export class ContactsListComponent
       {
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.city'
@@ -1044,6 +1081,10 @@ export class ContactsListComponent
       {
         field: 'addresses.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
@@ -1052,6 +1093,10 @@ export class ContactsListComponent
       {
         field: 'addresses.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
@@ -1060,6 +1105,10 @@ export class ContactsListComponent
       {
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
@@ -1076,6 +1125,10 @@ export class ContactsListComponent
       {
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -1094,6 +1147,10 @@ export class ContactsListComponent
       {
         field: 'age',
         label: 'LNG_CONTACT_FIELD_LABEL_AGE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'ageDob'
+        ),
         format: {
           type: V2ColumnFormat.AGE
         },
@@ -1107,6 +1164,10 @@ export class ContactsListComponent
       {
         field: 'dob',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'ageDob'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -1119,6 +1180,10 @@ export class ContactsListComponent
       {
         field: 'gender',
         label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'gender'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1128,6 +1193,10 @@ export class ContactsListComponent
       {
         field: 'phoneNumber',
         label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'addresses'
+        ),
         format: {
           type: 'mainAddress.phoneNumber'
         },
@@ -1142,6 +1211,10 @@ export class ContactsListComponent
       {
         field: 'outcomeId',
         label: 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'outcomeId'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1156,6 +1229,10 @@ export class ContactsListComponent
       {
         field: 'dateOfOutcome',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'dateOfOutcome'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1168,6 +1245,10 @@ export class ContactsListComponent
       {
         field: 'transferRefused',
         label: 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'transferRefused'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1182,6 +1263,10 @@ export class ContactsListComponent
       {
         field: 'riskLevel',
         label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'riskLevel'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1196,6 +1281,10 @@ export class ContactsListComponent
       {
         field: 'riskReason',
         label: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'riskReason'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -1205,6 +1294,10 @@ export class ContactsListComponent
       {
         field: 'occupation',
         label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'occupation'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1218,6 +1311,10 @@ export class ContactsListComponent
       {
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'dateOfLastContact'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -1230,6 +1327,10 @@ export class ContactsListComponent
       {
         field: 'followUpTeamId',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'followUpTeamId'
+        ),
         notVisible: true,
         format: {
           type: (contact) => {
@@ -1256,6 +1357,7 @@ export class ContactsListComponent
       {
         field: 'followUp.endDate',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -1268,6 +1370,7 @@ export class ContactsListComponent
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
@@ -1361,6 +1464,7 @@ export class ContactsListComponent
       {
         field: 'followUp.status',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+        visibleMandatoryIf: () => true,
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1370,6 +1474,7 @@ export class ContactsListComponent
       {
         field: 'wasCase',
         label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1384,6 +1489,7 @@ export class ContactsListComponent
       {
         field: 'wasContactOfContact',
         label: 'LNG_CONTACT_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1398,6 +1504,10 @@ export class ContactsListComponent
       {
         field: 'documents',
         label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'documents'
+        ),
         format: {
           type: (item: ContactModel): string => {
             // must format ?
@@ -1417,6 +1527,10 @@ export class ContactsListComponent
       {
         field: 'vaccinesReceived',
         label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'vaccinesReceived'
+        ),
         format: {
           type: (item: ContactModel): string => {
             // must format ?
@@ -1436,6 +1550,10 @@ export class ContactsListComponent
       {
         field: 'dateOfReporting',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'dateOfReporting'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -1448,6 +1566,10 @@ export class ContactsListComponent
       {
         field: 'isDateOfReportingApproximate',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'isDateOfReportingApproximate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1462,6 +1584,10 @@ export class ContactsListComponent
       {
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'responsibleUserId'
+        ),
         notVisible: true,
         format: {
           type: 'responsibleUser.nameAndEmail'
@@ -1483,6 +1609,7 @@ export class ContactsListComponent
       {
         field: 'numberOfContacts',
         label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.BUTTON
         },
@@ -1513,6 +1640,7 @@ export class ContactsListComponent
       {
         field: 'numberOfExposures',
         label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.BUTTON
         },
@@ -1543,6 +1671,7 @@ export class ContactsListComponent
       {
         field: 'deleted',
         label: 'LNG_CONTACT_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1557,6 +1686,7 @@ export class ContactsListComponent
       {
         field: 'deletedAt',
         label: 'LNG_CONTACT_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1569,6 +1699,7 @@ export class ContactsListComponent
       {
         field: 'createdBy',
         label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: 'createdByUser.nameAndEmail'
@@ -1590,6 +1721,7 @@ export class ContactsListComponent
       {
         field: 'createdAt',
         label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1602,6 +1734,7 @@ export class ContactsListComponent
       {
         field: 'updatedBy',
         label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: 'updatedByUser.nameAndEmail'
@@ -1623,6 +1756,7 @@ export class ContactsListComponent
       {
         field: 'updatedAt',
         label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1709,7 +1843,7 @@ export class ContactsListComponent
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityContactHelperService.generateAdvancedFilters({
+    this.advancedFilters = this.entityContactHelperService.generateAdvancedFilters(this.selectedOutbreak, {
       contactInvestigationTemplate: () => this.selectedOutbreak.contactInvestigationTemplate,
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
