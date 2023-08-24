@@ -963,7 +963,8 @@ export class EntityContactHelperService {
         field: 'questionnaireAnswers',
         label: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
         visibleMandatoryIf: () => true,
-        template: data.contactInvestigationTemplate
+        template: data.contactInvestigationTemplate,
+        useLike: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
