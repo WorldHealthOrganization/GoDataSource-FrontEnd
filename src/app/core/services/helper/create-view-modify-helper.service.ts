@@ -147,7 +147,7 @@ export class CreateViewModifyHelperService {
    * Filter tabs according to outbreak settings
    */
   tabsFilter(
-    originalTab: ICreateViewModifyV2Tab,
+    tab: ICreateViewModifyV2Tab,
     visibleMandatoryKey: string,
     outbreak: OutbreakModel
   ): ICreateViewModifyV2Tab {
@@ -158,7 +158,7 @@ export class CreateViewModifyHelperService {
       !outbreak.visibleAndMandatoryFields[visibleMandatoryKey] ||
       Object.keys(outbreak.visibleAndMandatoryFields[visibleMandatoryKey]).length < 1
     ) {
-      return originalTab;
+      return tab;
     }
 
     // visible and mandatory fields
@@ -167,9 +167,8 @@ export class CreateViewModifyHelperService {
     } = outbreak.visibleAndMandatoryFields[visibleMandatoryKey];
 
     // filter
-    const filteredTab: ICreateViewModifyV2Tab = _.cloneDeep(originalTab);
-    const previousSections = filteredTab.sections;
-    filteredTab.sections = [];
+    const previousSections = tab.sections;
+    tab.sections = [];
     previousSections.forEach((section) => {
       // filter fields
       const previousInputs = section.inputs;
@@ -234,17 +233,17 @@ export class CreateViewModifyHelperService {
 
       // must add section ?
       if (section.inputs.length > 0) {
-        filteredTab.sections.push(section);
+        tab.sections.push(section);
       }
     });
 
     // remove tab ?
-    if (filteredTab.sections.length < 1) {
-      filteredTab.visible = () => false;
+    if (tab.sections.length < 1) {
+      tab.visible = () => false;
     }
 
     // finished
-    return filteredTab;
+    return tab;
   }
 
   /**
