@@ -973,6 +973,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    */
   private initializeTabsVisibleAndRequiredFields(): ICreateViewModifyV2TabTable {
     // init tab
+    let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: 'visible_mandatory_fields',
@@ -986,7 +987,13 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             this.itemData.visibleAndMandatoryFields = value;
           }
         },
-        options: this.outbreakAndOutbreakTemplateHelperService.generateVisibleMandatoryOptions()
+        options: this.outbreakAndOutbreakTemplateHelperService.generateVisibleMandatoryOptions(),
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
       }
     };
   }

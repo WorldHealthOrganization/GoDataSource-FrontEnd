@@ -26,6 +26,13 @@ export interface ICreateViewModifyV2TabInputToVisibleMandatoryConf {
   visible?: boolean;
   required?: boolean;
   originalName?: string;
+  needs?: {
+    // required
+    field: string,
+
+    // optional
+    group?: string
+  }[];
 }
 
 /**

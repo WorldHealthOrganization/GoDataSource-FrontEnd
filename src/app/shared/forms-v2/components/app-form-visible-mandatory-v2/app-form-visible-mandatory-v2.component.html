@@ -196,6 +196,7 @@
           <!-- Visible Checkbox + label -->
           <div
             class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible">
+            <!-- Checkbox -->
             <app-form-checkbox-v2
               [ngModel]="item.data.visibleMandatoryConf?.visible || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible)"
               [name]="item.name.visible"
@@ -203,6 +204,23 @@
               [disabled]="viewOnly || item.data.visibleMandatoryConf?.visible"
               [highlightPlaceholder]="searchValue"
               (ngModelChange)="selectedChanged(item, FieldSelectedType.VISIBLE, $event)"></app-form-checkbox-v2>
+
+            <!-- Needs -->
+            <div
+              *ngIf="!!item.needs?.length"
+              class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs"
+              fxLayout="row">
+              <!-- Header -->
+              <div
+               fxGrow="0">{{'LNG_COMMON_LABEL_NEEDS' | translate}}</div>
+
+              <!-- Fields -->
+              <div
+                *ngFor="let needField of item.needs; let first = first"
+                fxGrow="0">
+                {{ (first ? '' : ', ') + flattenedFieldsDataMap[needField.groupId][needField.fieldId].parent.parent.parent.text + ' ' + (flattenedFieldsDataMap[needField.groupId][needField.fieldId].data.label | translate) }}
+              </div>
+            </div>
           </div>
 
           <!-- Required Checkbox -->
