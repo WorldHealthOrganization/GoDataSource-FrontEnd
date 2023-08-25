@@ -960,7 +960,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.entityLabResultHelperService.retrieveTableColumns({
+        tableColumns: this.entityLabResultHelperService.retrieveTableColumns(this.selectedOutbreak, {
           user: this.activatedRoute.snapshot.data.user,
           options: {
             labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -996,7 +996,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             )
           }
         }),
-        advancedFilters: this.entityLabResultHelperService.generateAdvancedFiltersPerson({
+        advancedFilters: this.entityLabResultHelperService.generateAdvancedFiltersPerson(this.selectedOutbreak, {
           labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
           options: {
             labName: this.referenceDataHelperService.filterPerOutbreakOptions(

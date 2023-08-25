@@ -38,13 +38,13 @@ import { Constants } from '../../../../core/models/constants';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
-import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 @Component({
   selector: 'app-entity-lab-results-list',
   templateUrl: './entity-lab-results-list.component.html'
 })
-export class EntityLabResultsListComponent extends ListComponent<LabResultModel, IV2Column> implements OnDestroy {
+export class EntityLabResultsListComponent extends ListComponent<LabResultModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
   // entity
   personType: EntityType;
   entityData: CaseModel | ContactModel;
@@ -154,7 +154,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
-    this.tableColumns = this.entityLabResultHelperService.retrieveTableColumns({
+    this.tableColumns = this.entityLabResultHelperService.retrieveTableColumns(this.selectedOutbreak, {
       user: this.activatedRoute.snapshot.data.user,
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -266,7 +266,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersPerson({
+    this.advancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(

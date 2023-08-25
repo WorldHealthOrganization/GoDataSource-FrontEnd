@@ -24,7 +24,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { Constants } from '../../../../core/models/constants';
@@ -33,12 +33,15 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import { Moment } from 'moment';
 import * as momentOriginal from 'moment';
 import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
+import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
 
 @Component({
   selector: 'app-lab-results',
   templateUrl: './lab-results-list.component.html'
 })
-export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Column> implements OnDestroy {
+export class LabResultsListComponent extends ListComponent<LabResultModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
 
   // lab fields
   private labFields: ILabelValuePairModel[] = [
@@ -81,7 +84,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private entityLabResultHelperService: EntityLabResultHelperService
+    private entityLabResultHelperService: EntityLabResultHelperService,
+    private entityCaseHelperService: EntityCaseHelperService,
+    private entityContactHelperService: EntityContactHelperService
   ) {
     super(
       listHelperService, {
@@ -357,6 +362,13 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
           type: 'person.visualId'
         },
         label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'visualId'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -383,6 +395,13 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
           type: 'person.lastName'
         },
         label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'lastName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -409,6 +428,13 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
           type: 'person.firstName'
         },
         label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'firstName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -432,6 +458,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
@@ -463,6 +490,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
             ''
         },
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityCaseHelperService.visibleMandatoryKey,
+          'classification'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -477,6 +508,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'sampleIdentifier',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'sampleIdentifier'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -486,6 +521,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'dateSampleTaken',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'dateSampleTaken'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -497,6 +536,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'dateSampleDelivered',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'dateSampleDelivered'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -508,6 +551,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'dateOfResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'dateOfResult'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -519,6 +566,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'labName',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'labName'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -532,6 +583,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'sampleType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'sampleType'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -545,6 +600,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'testType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'testType'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -558,6 +617,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'result',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'result'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -571,6 +634,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'status',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'status'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -580,6 +647,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'testedFor',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'testedFor'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -589,6 +660,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'sequence.hasSequence',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'sequence[hasSequence]'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -604,6 +679,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'sequence.dateSampleSent',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'sequence[dateSampleSent]'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -617,6 +696,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'sequence.labId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'sequence[labId]'
+        ),
         notVisible: true,
         sortable: true,
         filter: {
@@ -631,6 +714,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'sequence.dateResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'sequence[dateResult]'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -644,6 +731,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'sequence.resultId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'sequence[resultId]'
+        ),
         notVisible: true,
         sortable: true,
         filter: {
@@ -658,6 +749,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'sequence.noSequenceReason',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'sequence[noSequenceReason]'
+        ),
         notVisible: true,
         sortable: true,
         filter: {
@@ -669,6 +764,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'dateTesting',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'dateTesting'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -680,6 +779,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'quantitativeResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'quantitativeResult'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -689,6 +792,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'notes',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityLabResultHelperService.visibleMandatoryKey,
+          'notes'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -698,6 +805,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'deleted',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -712,6 +820,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'deletedAt',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -724,6 +833,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'createdBy',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
@@ -747,6 +857,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'createdAt',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -759,6 +870,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'updatedBy',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
@@ -782,6 +894,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       {
         field: 'updatedAt',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -798,6 +911,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       this.tableColumns.push({
         field: 'personType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         filter: {
@@ -882,8 +996,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersAggregate({
-      selectedOutbreak: () => this.selectedOutbreak,
+    this.advancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,

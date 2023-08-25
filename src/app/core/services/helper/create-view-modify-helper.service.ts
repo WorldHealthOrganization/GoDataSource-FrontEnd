@@ -7,6 +7,7 @@ import {
   ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputValidatorRequired
 } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import {
+  IV2ColumnToVisibleMandatoryConf,
   IVisibleMandatoryDataGroupTab,
   IVisibleMandatoryDataGroupTabSectionField,
   IVisibleMandatoryDataValueField,
@@ -17,6 +18,7 @@ import { ToastV2Service } from './toast-v2.service';
 import { RedirectService } from './redirect.service';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { V2AdvancedFilter } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { IV2Column } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Injectable()
 export class CreateViewModifyHelperService {
@@ -279,5 +281,15 @@ export class CreateViewModifyHelperService {
     return (advancedFilters || []).filter((filter) => {
       return filter.visibleMandatoryIf();
     });
+  }
+
+  /**
+   * Filter table columns depending on outbreak visible/mandatory settings
+   */
+  filterVisibleMandatoryTableColumns<T extends IV2Column>(items: IV2ColumnToVisibleMandatoryConf[]): T[] {
+    return (items || []).filter((column) => column.visibleMandatoryIf ?
+      column.visibleMandatoryIf() :
+      true
+    ) as unknown as T[];
   }
 }

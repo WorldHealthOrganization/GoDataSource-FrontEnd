@@ -38,20 +38,21 @@ import {
   IV2ColumnPinned,
   V2ColumnFormat,
   IV2ColumnStatusFormType,
-  V2ColumnStatusForm, IV2Column
+  V2ColumnStatusForm
 } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Moment } from 'moment';
 import { EntityEventHelperService } from '../../../../core/services/helper/entity-event-helper.service';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 @Component({
   selector: 'app-events-list',
   templateUrl: './events-list.component.html'
 })
 export class EventsListComponent
-  extends ListComponent<EventModel, IV2Column>
+  extends ListComponent<EventModel, IV2ColumnToVisibleMandatoryConf>
   implements OnDestroy {
 
   // event fields
@@ -121,7 +122,12 @@ export class EventsListComponent
     private activatedRoute: ActivatedRoute,
     private entityEventHelperService: EntityEventHelperService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
+    );
   }
 
   /**
@@ -479,6 +485,10 @@ export class EventsListComponent
       {
         field: 'name',
         label: 'LNG_EVENT_FIELD_LABEL_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'name'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -489,6 +499,10 @@ export class EventsListComponent
       {
         field: 'visualId',
         label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'visualId'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -499,6 +513,10 @@ export class EventsListComponent
       {
         field: 'date',
         label: 'LNG_EVENT_FIELD_LABEL_DATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'date'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -510,6 +528,10 @@ export class EventsListComponent
       {
         field: 'eventCategory',
         label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'eventCategory'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -520,6 +542,10 @@ export class EventsListComponent
       {
         field: 'endDate',
         label: 'LNG_EVENT_FIELD_LABEL_END_DATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'endDate'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -531,6 +557,10 @@ export class EventsListComponent
       {
         field: 'description',
         label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'description'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -540,6 +570,10 @@ export class EventsListComponent
       {
         field: 'phoneNumber',
         label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -555,6 +589,10 @@ export class EventsListComponent
       {
         field: 'address.emailAddress',
         label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.emailAddress'
@@ -572,6 +610,10 @@ export class EventsListComponent
       {
         field: 'responsibleUserId',
         label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'responsibleUserId'
+        ),
         notVisible: true,
         format: {
           type: 'responsibleUser.nameAndEmail'
@@ -593,6 +635,10 @@ export class EventsListComponent
       {
         field: 'dateOfReporting',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'dateOfReporting'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -605,6 +651,10 @@ export class EventsListComponent
       {
         field: 'isDateOfReportingApproximate',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'isDateOfReportingApproximate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -619,6 +669,7 @@ export class EventsListComponent
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
@@ -652,6 +703,7 @@ export class EventsListComponent
         {
           field: 'numberOfContacts',
           label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+          visibleMandatoryIf: () => true,
           format: {
             type: V2ColumnFormat.BUTTON
           },
@@ -679,6 +731,7 @@ export class EventsListComponent
         {
           field: 'numberOfExposures',
           label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+          visibleMandatoryIf: () => true,
           format: {
             type: V2ColumnFormat.BUTTON
           },
@@ -711,6 +764,7 @@ export class EventsListComponent
       {
         field: 'deleted',
         label: 'LNG_EVENT_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.BOOLEAN
         },
@@ -724,6 +778,7 @@ export class EventsListComponent
       {
         field: 'deletedAt',
         label: 'LNG_EVENT_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -736,6 +791,7 @@ export class EventsListComponent
       {
         field: 'createdBy',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: 'createdByUser.nameAndEmail'
@@ -757,6 +813,7 @@ export class EventsListComponent
       {
         field: 'createdAt',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -769,6 +826,7 @@ export class EventsListComponent
       {
         field: 'updatedBy',
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: 'updatedByUser.nameAndEmail'
@@ -790,6 +848,7 @@ export class EventsListComponent
       {
         field: 'updatedAt',
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         filter: {
           type: V2FilterType.DATE_RANGE
@@ -802,6 +861,10 @@ export class EventsListComponent
       {
         field: 'location',
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.location.name'
@@ -821,6 +884,10 @@ export class EventsListComponent
       {
         field: 'address.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
@@ -838,6 +905,10 @@ export class EventsListComponent
       {
         field: 'address.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.city'
@@ -855,6 +926,10 @@ export class EventsListComponent
       {
         field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
@@ -863,6 +938,10 @@ export class EventsListComponent
       {
         field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
@@ -871,6 +950,10 @@ export class EventsListComponent
       {
         field: 'address.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
@@ -888,6 +971,10 @@ export class EventsListComponent
       {
         field: 'address.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityEventHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -980,7 +1067,7 @@ export class EventsListComponent
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityEventHelperService.generateAdvancedFilters({
+    this.advancedFilters = this.entityEventHelperService.generateAdvancedFilters(this.selectedOutbreak, {
       eventInvestigationTemplate: () => this.selectedOutbreak.eventInvestigationTemplate,
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
