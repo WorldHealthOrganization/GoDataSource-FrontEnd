@@ -1575,7 +1575,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = this.entityContactOfContactHelperService.generateAdvancedFilters({
+    this.expandListAdvancedFilters = this.entityContactOfContactHelperService.generateAdvancedFilters(this.selectedOutbreak, {
       options: {
         occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
