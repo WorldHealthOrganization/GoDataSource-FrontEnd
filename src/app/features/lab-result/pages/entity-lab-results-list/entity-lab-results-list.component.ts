@@ -32,6 +32,8 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import {
   IV2BottomDialogConfigButtonType
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { Moment } from 'moment/moment';
+import * as momentOriginal from 'moment/moment';
 import { Constants } from '../../../../core/models/constants';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { UserModel } from '../../../../core/models/user.model';
