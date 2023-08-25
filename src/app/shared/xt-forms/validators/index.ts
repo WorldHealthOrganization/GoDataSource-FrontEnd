@@ -11,6 +11,7 @@ import { GroupOptionRequirementsValidator } from './group-option-requirements-va
 import { RegexValidatorDirective } from './regex-validator.directive';
 import { NoSpacesValidatorDirective } from './no-spaces-validator.directive';
 import { QuestionnaireAnswersValidatorDirective } from './questionnaire-answers-validator.directive';
+import { VisibleMandatoryValidatorDirective } from './visible-mandatory-validator.directive';
 
 export const validatorDirectives: any[] = [
   EmailValidatorDirective,
@@ -25,5 +26,6 @@ export const validatorDirectives: any[] = [
   GroupOptionRequirementsValidator,
   RegexValidatorDirective,
   NoSpacesValidatorDirective,
-  QuestionnaireAnswersValidatorDirective
+  QuestionnaireAnswersValidatorDirective,
+  VisibleMandatoryValidatorDirective
 ];

@@ -781,6 +781,7 @@ interface ICreateViewModifyV2TabTableVisibleAndMandatory {
   name: string;
   value: ICreateViewModifyV2TabInputValue<IVisibleMandatoryDataValue>;
   options: IVisibleMandatoryDataGroup[];
+  updateErrors: (errorsHTML: string) => void;
 }
 
 /**

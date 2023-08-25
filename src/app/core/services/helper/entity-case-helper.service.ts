@@ -158,7 +158,9 @@ export class EntityCaseHelperService {
                       data.itemData.pregnancyStatus = null;
 
                       // make sure we update pregnancy too
-                      tab.form.controls['pregnancyStatus'].markAsDirty();
+                      if (tab.form.controls['pregnancyStatus']) {
+                        tab.form.controls['pregnancyStatus'].markAsDirty();
+                      }
                     }
                   }
                 }
@@ -177,6 +179,9 @@ export class EntityCaseHelperService {
                 },
                 disabled: () => {
                   return data.itemData.gender === Constants.GENDER_MALE;
+                },
+                visibleMandatoryConf: {
+                  needs: [{ field: 'gender' }]
                 }
               }, {
                 type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -636,6 +641,9 @@ export class EntityCaseHelperService {
               },
               disabled: () => {
                 return data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+              },
+              visibleMandatoryConf: {
+                needs: [{ field: 'outcomeId' }]
               }
             }, {
               type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
@@ -652,6 +660,9 @@ export class EntityCaseHelperService {
               },
               disabled: () => {
                 return data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+              },
+              visibleMandatoryConf: {
+                needs: [{ field: 'outcomeId' }]
               }
             }, {
               type: CreateViewModifyV2TabInputType.DATE,
@@ -677,6 +688,9 @@ export class EntityCaseHelperService {
               },
               disabled: () => {
                 return data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+              },
+              visibleMandatoryConf: {
+                needs: [{ field: 'outcomeId' }]
               }
             }, {
               type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
@@ -694,6 +708,9 @@ export class EntityCaseHelperService {
               },
               disabled: () => {
                 return data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+              },
+              visibleMandatoryConf: {
+                needs: [{ field: 'outcomeId' }]
               }
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,
@@ -710,6 +727,9 @@ export class EntityCaseHelperService {
               },
               disabled: () => {
                 return data.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
+              },
+              visibleMandatoryConf: {
+                needs: [{ field: 'outcomeId' }]
               }
             }, {
               type: CreateViewModifyV2TabInputType.DATE,

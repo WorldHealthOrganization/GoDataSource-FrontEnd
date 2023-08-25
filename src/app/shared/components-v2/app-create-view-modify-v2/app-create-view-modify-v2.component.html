@@ -570,7 +570,9 @@
                     [viewOnly]="isView || !input.value.set"
                     [selectedTab]="selectedTab === tab"
                     [options]="input.options"
-                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-visible-mandatory-v2>
+                    app-visible-mandatory-validator
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"
+                    (errorsChanged)="input.updateErrors($event)"></app-form-visible-mandatory-v2>
 
                   <!-- Text -->
                   <app-form-input-v2
