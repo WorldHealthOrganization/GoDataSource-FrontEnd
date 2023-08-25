@@ -1,6 +1,7 @@
 import { RequestQueryBuilder } from './request-query-builder';
 import { IExtendedColDef } from '../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { applyFilterBy, IV2Column, IV2ColumnAction } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { ListHelperService } from '../services/helper/list-helper.service';
 import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 /**
@@ -13,18 +14,13 @@ export abstract class ListQueryComponent<T extends IV2Column> {
     return this._tableColumns;
   }
   set tableColumns(tableColumns: T[]) {
-    // filter
-    const filter = (items) => (items || []).filter((column) => (column as IV2ColumnToVisibleMandatoryConf).visibleMandatoryIf ?
-      (column as IV2ColumnToVisibleMandatoryConf).visibleMandatoryIf() :
-      true
-    );
-
     // set value
-    this._tableColumns = filter(tableColumns);
+    this._tableColumns = this.listHelperService.createViewModifyHelperService.filterVisibleMandatoryTableColumns<T>(tableColumns as unknown as IV2ColumnToVisibleMandatoryConf[]);
 
     // overwrite push items, otherwise we might push items that shouldn't be visible
+    const self = this;
     this._tableColumns.push = function(...args) {
-      return Array.prototype.push.apply(this, filter(args));
+      return Array.prototype.push.apply(this, self.listHelperService.createViewModifyHelperService.filterVisibleMandatoryTableColumns(args as unknown as IV2ColumnToVisibleMandatoryConf[]));
     };
   }
 
@@ -43,6 +39,7 @@ export abstract class ListQueryComponent<T extends IV2Column> {
    * Constructor
    */
   protected constructor(
+    protected listHelperService: ListHelperService,
     private queryBuilderChangedCallback: () => void,
     private refreshCall: (
       instant?: boolean,
