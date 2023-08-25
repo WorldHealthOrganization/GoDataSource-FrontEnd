@@ -43,6 +43,7 @@
 
     <!-- Records -->
     <cdk-virtual-scroll-viewport
+      *ngIf="flattenedData?.length; else noSearchMatches"
       #cdkViewport
       [minBufferPx]="1024"
       [maxBufferPx]="1024"
@@ -196,6 +197,7 @@
           <!-- Visible Checkbox + label -->
           <div
             class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible">
+            <!-- Checkbox -->
             <app-form-checkbox-v2
               [ngModel]="item.data.visibleMandatoryConf?.visible || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible)"
               [name]="item.name.visible"
@@ -203,6 +205,24 @@
               [disabled]="viewOnly || item.data.visibleMandatoryConf?.visible"
               [highlightPlaceholder]="searchValue"
               (ngModelChange)="selectedChanged(item, FieldSelectedType.VISIBLE, $event)"></app-form-checkbox-v2>
+
+            <!-- Needs -->
+            <div
+              *ngIf="!viewOnly && !!item.needs?.length"
+              class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs"
+              [class.gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs-invalid]="errorsMap[item.parent.parent.parent.data.id] && errorsMap[item.parent.parent.parent.data.id][item.data.id]?.length"
+              fxLayout="row">
+              <!-- Header -->
+              <div
+               fxGrow="0">{{'LNG_COMMON_LABEL_NEEDS' | translate}}</div>
+
+              <!-- Fields -->
+              <div
+                *ngFor="let needField of item.needs; let first = first"
+                fxGrow="0">
+                {{ (first ? '' : ', ') + flattenedFieldsDataMap[needField.groupId][needField.fieldId].parent.parent.parent.text + ' ' + (flattenedFieldsDataMap[needField.groupId][needField.fieldId].data.label | translate) }}
+              </div>
+            </div>
           </div>
 
           <!-- Required Checkbox -->
@@ -222,6 +242,22 @@
       </div>
     </cdk-virtual-scroll-viewport>
 
+    <!-- No matches image -->
+    <ng-template
+      #noSearchMatches>
+      <div
+        fxLayout="column" fxLayoutAlign="center center"
+        class="gd-form-visible-mandatory-v2-list-empty">
+
+        <!-- Image -->
+        <div
+          class="gd-form-visible-mandatory-v2-list-empty-image"></div>
+
+        <!-- Message -->
+        <div
+          class="gd-form-visible-mandatory-v2-list-empty-text">{{'LNG_COMMON_LABEL_NO_SEARCH_MATCHES' | translate}}</div>
+      </div>
+    </ng-template>
   </div>
 
   <!-- Legend -->

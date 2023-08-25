@@ -1,12 +1,12 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, EventEmitter,
   forwardRef,
   Host, HostListener,
   Input,
   OnDestroy,
-  Optional,
+  Optional, Output,
   SkipSelf,
   ViewChild,
   ViewEncapsulation
@@ -72,6 +72,15 @@ interface IFlattenNodeGroupTabSection {
 }
 
 /**
+ * Need field
+ */
+interface IFlattenNodeGroupTabSectionFieldNeed {
+  // required
+  groupId: string;
+  fieldId: string;
+}
+
+/**
  * Flatten node - group tab section field
  */
 interface IFlattenNodeGroupTabSectionField {
@@ -83,6 +92,9 @@ interface IFlattenNodeGroupTabSectionField {
     mandatory: string
   };
   data: IVisibleMandatoryDataGroupTabSectionField;
+
+  // optional
+  needs?: IFlattenNodeGroupTabSectionFieldNeed[];
 }
 
 /**
@@ -146,17 +158,32 @@ export class AppFormVisibleMandatoryV2Component
       false,
       true
     );
+
+    // update errors
+    this.validateAll();
+
+    // update error message
+    this.updateErrorsMessage();
   }
   get options(): IVisibleMandatoryDataGroup[] {
     return this._options;
   }
 
+  // errors changed
+  @Output() errorsChanged = new EventEmitter<string>();
+
   // language handler
   private _languageSubscription: Subscription;
 
   // flattened data
+  private _allFlattenedFields: IFlattenNodeGroupTabSectionField[] = [];
   private _allFlattenedData: (IFlattenNodeGroup | IFlattenNodeGroupTab | IFlattenNodeGroupTabSection | IFlattenNodeGroupTabSectionField)[] = [];
   flattenedData: (IFlattenNodeGroup | IFlattenNodeGroupTab | IFlattenNodeGroupTabSection | IFlattenNodeGroupTabSectionField)[] = [];
+  flattenedFieldsDataMap: {
+    [groupId: string]: {
+      [fieldId: string]: IFlattenNodeGroupTabSectionField
+    }
+  } = {};
 
   // filter
   searchValue: string;
@@ -166,6 +193,17 @@ export class AppFormVisibleMandatoryV2Component
 
   // timers
   private _filterTimer: number;
+
+  // handle errors
+  private _errorsCount: number;
+  errorsMap: {
+    [groupId: string]: {
+      [fieldId: string]: IFlattenNodeGroupTabSectionFieldNeed[]
+    }
+  } = {};
+  get hasErrors(): boolean {
+    return this._errorsCount > 0;
+  }
 
   // constants
   FlattenType = FlattenType;
@@ -231,6 +269,12 @@ export class AppFormVisibleMandatoryV2Component
       false,
       true
     );
+
+    // update errors
+    this.validateAll();
+
+    // update error message
+    this.updateErrorsMessage();
   }
 
   /**
@@ -253,6 +297,9 @@ export class AppFormVisibleMandatoryV2Component
         // redraw
         // - detect changes is triggered by this.nonFlatToFlat function
         this.nonFlatToFlat();
+
+        // update errors
+        this.updateErrorsMessage();
       });
   }
 
@@ -289,6 +336,8 @@ export class AppFormVisibleMandatoryV2Component
   private flatten(): void {
     // reset
     this._allFlattenedData = [];
+    this._allFlattenedFields = [];
+    this.flattenedFieldsDataMap = {};
 
     // nothing to do ?
     if (
@@ -348,7 +397,32 @@ export class AppFormVisibleMandatoryV2Component
               data: field
             };
             this._allFlattenedData.push(groupTabSectionFieldNode);
+            this._allFlattenedFields.push(groupTabSectionFieldNode);
             groupTabSectionNode.fields.push(groupTabSectionFieldNode);
+
+            // initialize field group map if necessary
+            if (!this.flattenedFieldsDataMap[group.id]) {
+              this.flattenedFieldsDataMap[group.id] = {};
+            }
+
+            // add field to map
+            this.flattenedFieldsDataMap[group.id][field.id] = groupTabSectionFieldNode;
+
+            // attach needs if necessary
+            if (field.visibleMandatoryConf?.needs?.length) {
+              // initialize
+              groupTabSectionFieldNode.needs = [];
+
+              // add need fields
+              field.visibleMandatoryConf.needs.forEach((needField) => {
+                groupTabSectionFieldNode.needs.push({
+                  groupId: needField.group ?
+                    needField.group :
+                    group.id,
+                  fieldId: needField.field
+                });
+              });
+            }
           });
         });
       });
@@ -544,6 +618,7 @@ export class AppFormVisibleMandatoryV2Component
     } else {
       item.data.collapsed = true;
     }
+
     // redraw
     // - detect changes is triggered by this.nonFlatToFlat function
     this.nonFlatToFlat();
@@ -645,6 +720,12 @@ export class AppFormVisibleMandatoryV2Component
     // mark dirty
     this.control?.markAsDirty();
 
+    // validate field
+    this.validateAll();
+
+    // update error message
+    this.updateErrorsMessage();
+
     // update ui
     this.detectChanges();
   }
@@ -691,8 +772,89 @@ export class AppFormVisibleMandatoryV2Component
     // mark dirty
     this.control?.markAsDirty();
 
+    // update errors
+    this.validateAll();
+
+    // update error message
+    this.updateErrorsMessage();
+
     // update ui
     this.detectChanges();
+  }
+
+  /**
+   * Validate component
+   */
+  private validateAll(): void {
+    // reset
+    this.errorsMap = {};
+    this._errorsCount = 0;
+
+    // go through fields and validate
+    this._allFlattenedFields?.forEach((field) => {
+      // nothing to validate ?
+      if (
+        !field.needs?.length ||
+        !this.value ||
+        !this.value[field.parent.parent.parent.data.id] ||
+        !this.value[field.parent.parent.parent.data.id][field.data.id]?.visible
+      ) {
+        // finished
+        return;
+      }
+
+      // validate field
+      field.needs.forEach((needField) => {
+        // validate
+        if (
+          !this.value ||
+          !this.value[needField.groupId] ||
+          !this.value[needField.groupId][needField.fieldId]?.visible
+        ) {
+          // must initialize group ?
+          if (!this.errorsMap[field.parent.parent.parent.data.id]) {
+            this.errorsMap[field.parent.parent.parent.data.id] = {};
+          }
+
+          // must initialize errors ?
+          if (!this.errorsMap[field.parent.parent.parent.data.id][field.data.id]) {
+            this.errorsMap[field.parent.parent.parent.data.id][field.data.id] = [];
+          }
+
+          // append error
+          this.errorsMap[field.parent.parent.parent.data.id][field.data.id].push(needField);
+          this._errorsCount++;
+        }
+      });
+    });
+  }
+
+  /**
+   * Update errors message
+   */
+  private updateErrorsMessage(): void {
+    // construct errors html
+    let errorsString: string = '';
+    for (const groupId in this.errorsMap) {
+      // retrieve group errors
+      const groupErrors = this.errorsMap[groupId];
+      for (const fieldId in groupErrors) {
+        // retrieve field errors
+        const fieldErrors = groupErrors[fieldId];
+        errorsString += `<br/>- '${this.flattenedFieldsDataMap[groupId][fieldId].parent.parent.parent.text} ${this.i18nService.instant(this.flattenedFieldsDataMap[groupId][fieldId].data.label)}' ${this.i18nService.instant('LNG_COMMON_LABEL_REQUIRES')}`;
+        fieldErrors.forEach((needField, index) => {
+          errorsString += (index === 0 ? ' ' : ', ') + `'${this.flattenedFieldsDataMap[needField.groupId][needField.fieldId].parent.parent.parent.text} ${this.i18nService.instant(this.flattenedFieldsDataMap[needField.groupId][needField.fieldId].data.label)}'`;
+        });
+      }
+    }
+
+    // make sure we update control
+    if (!this.viewOnly) {
+      this.control?.updateValueAndValidity();
+    }
+
+    // emit errors updated
+    this.errorsChanged.emit(errorsString);
   }
 
   /**

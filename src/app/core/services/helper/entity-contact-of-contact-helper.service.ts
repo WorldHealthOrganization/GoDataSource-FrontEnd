@@ -156,7 +156,9 @@ export class EntityContactOfContactHelperService {
                       data.itemData.pregnancyStatus = null;
 
                       // make sure we update pregnancy too
-                      tab.form.controls['pregnancyStatus'].markAsDirty();
+                      if (tab.form.controls['pregnancyStatus']) {
+                        tab.form.controls['pregnancyStatus'].markAsDirty();
+                      }
                     }
                   }
                 }
@@ -175,6 +177,9 @@ export class EntityContactOfContactHelperService {
                 },
                 disabled: () => {
                   return data.itemData.gender === Constants.GENDER_MALE;
+                },
+                visibleMandatoryConf: {
+                  needs: [{ field: 'gender' }]
                 }
               }, {
                 type: CreateViewModifyV2TabInputType.SELECT_SINGLE,

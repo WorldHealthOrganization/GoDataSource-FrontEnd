@@ -186,27 +186,31 @@ export class CreateViewModifyHelperService {
 
         // always required ?
         // IMPORTANT: if special rules are configured as default, then those take precedence
-        if (
-          fieldDef.supportsRequired && (
+        if (fieldDef.supportsRequired) {
+          // must apply required ?
+          const requiredInput: ICreateViewModifyV2TabInputValidatorRequired = input as ICreateViewModifyV2TabInputValidatorRequired;
+          if (
             fieldDef.visibleMandatoryConf?.required ||
             visibleAndMandatoryConf[fieldDef.id]?.mandatory
-          )
-        ) {
-          // check if we don't have a default required validator
-          const requiredInput: ICreateViewModifyV2TabInputValidatorRequired = input as ICreateViewModifyV2TabInputValidatorRequired;
-          if (requiredInput.validators?.required) {
-            // nothing to do, keep current validator
-          } else {
-            // must initialize validators ?
-            if (
-              !requiredInput.validators ||
-              Object.keys(requiredInput.validators).length < 1
-            ) {
-              requiredInput.validators = {};
-            }
+          ) {
+            // check if we don't have a default required validator
+            if (requiredInput.validators?.required) {
+              // nothing to do, keep current validator
+            } else {
+              // must initialize validators ?
+              if (
+                !requiredInput.validators ||
+                Object.keys(requiredInput.validators).length < 1
+              ) {
+                requiredInput.validators = {};
+              }
 
-            // attach required
-            requiredInput.validators.required = () => true;
+              // attach required
+              requiredInput.validators.required = () => true;
+            }
+          } else if (requiredInput.validators?.required) {
+            // must remove required
+            delete requiredInput.validators.required;
           }
         }
 
