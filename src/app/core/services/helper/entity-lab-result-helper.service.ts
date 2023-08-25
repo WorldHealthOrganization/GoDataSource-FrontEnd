@@ -227,6 +227,9 @@ export class EntityLabResultHelperService {
                 },
                 validators: {
                   required: () => data.itemData.status === Constants.LAB_TEST_RESULT_STATUS.COMPLETED
+                },
+                visibleMandatoryConf: {
+                  needs: [{ field: 'status' }]
                 }
               },
               {
@@ -319,7 +322,10 @@ export class EntityLabResultHelperService {
                     data.itemData.sequence.dateSampleSent = value;
                   }
                 },
-                disabled: () => !data.itemData.sequence.hasSequence
+                disabled: () => !data.itemData.sequence.hasSequence,
+                visibleMandatoryConf: {
+                  needs: [{ field: 'sequence[hasSequence]' }]
+                }
               },
               {
                 type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -333,7 +339,10 @@ export class EntityLabResultHelperService {
                     data.itemData.sequence.labId = value;
                   }
                 },
-                disabled: () => !data.itemData.sequence.hasSequence
+                disabled: () => !data.itemData.sequence.hasSequence,
+                visibleMandatoryConf: {
+                  needs: [{ field: 'sequence[hasSequence]' }]
+                }
               },
               {
                 type: CreateViewModifyV2TabInputType.DATE,
@@ -346,7 +355,10 @@ export class EntityLabResultHelperService {
                     data.itemData.sequence.dateResult = value;
                   }
                 },
-                disabled: () => !data.itemData.sequence.hasSequence
+                disabled: () => !data.itemData.sequence.hasSequence,
+                visibleMandatoryConf: {
+                  needs: [{ field: 'sequence[hasSequence]' }]
+                }
               },
               {
                 type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -360,7 +372,10 @@ export class EntityLabResultHelperService {
                     data.itemData.sequence.resultId = value;
                   }
                 },
-                disabled: () => !data.itemData.sequence.hasSequence
+                disabled: () => !data.itemData.sequence.hasSequence,
+                visibleMandatoryConf: {
+                  needs: [{ field: 'sequence[hasSequence]' }]
+                }
               },
               {
                 type: CreateViewModifyV2TabInputType.TEXTAREA,
@@ -373,7 +388,10 @@ export class EntityLabResultHelperService {
                     data.itemData.sequence.noSequenceReason = value;
                   }
                 },
-                disabled: () => data.itemData.sequence.hasSequence
+                disabled: () => data.itemData.sequence.hasSequence,
+                visibleMandatoryConf: {
+                  needs: [{ field: 'sequence[hasSequence]' }]
+                }
               }
             ]
           }
