@@ -43,6 +43,7 @@
 
     <!-- Records -->
     <cdk-virtual-scroll-viewport
+      *ngIf="flattenedData?.length; else noSearchMatches"
       #cdkViewport
       [minBufferPx]="1024"
       [maxBufferPx]="1024"
@@ -207,7 +208,7 @@
 
             <!-- Needs -->
             <div
-              *ngIf="!!item.needs?.length"
+              *ngIf="!viewOnly && !!item.needs?.length"
               class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs"
               [class.gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs-invalid]="errorsMap[item.parent.parent.parent.data.id] && errorsMap[item.parent.parent.parent.data.id][item.data.id]?.length"
               fxLayout="row">
@@ -241,6 +242,22 @@
       </div>
     </cdk-virtual-scroll-viewport>
 
+    <!-- No matches image -->
+    <ng-template
+      #noSearchMatches>
+      <div
+        fxLayout="column" fxLayoutAlign="center center"
+        class="gd-form-visible-mandatory-v2-list-empty">
+
+        <!-- Image -->
+        <div
+          class="gd-form-visible-mandatory-v2-list-empty-image"></div>
+
+        <!-- Message -->
+        <div
+          class="gd-form-visible-mandatory-v2-list-empty-text">{{'LNG_COMMON_LABEL_NO_SEARCH_MATCHES' | translate}}</div>
+      </div>
+    </ng-template>
   </div>
 
   <!-- Legend -->
