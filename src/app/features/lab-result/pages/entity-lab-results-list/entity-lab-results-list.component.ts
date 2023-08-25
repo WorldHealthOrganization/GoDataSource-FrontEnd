@@ -266,7 +266,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersPerson({
+    this.advancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(

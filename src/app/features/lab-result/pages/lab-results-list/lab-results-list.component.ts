@@ -996,8 +996,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersAggregate({
-      selectedOutbreak: () => this.selectedOutbreak,
+    this.advancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
