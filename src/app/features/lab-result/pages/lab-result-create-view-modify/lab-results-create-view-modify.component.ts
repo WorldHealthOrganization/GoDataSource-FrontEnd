@@ -41,6 +41,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 /**
  * Component
@@ -54,7 +55,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
   private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
 
   // data
-  entityData: CaseModel | ContactModel;
+  entityData: CaseModel | ContactModel | ContactOfContactModel;
   private _personType: EntityType;
 
   // constants
@@ -197,6 +198,18 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
     // entity list
     if (
+      this._personType === EntityType.CONTACT_OF_CONTACT &&
+      ContactOfContactModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+          action: {
+            link: ['/contacts-of-contacts']
+          }
+        }
+      );
+    } else if (
       this._personType === EntityType.CONTACT &&
       ContactModel.canList(this.authUser)
     ) {
@@ -226,6 +239,18 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     if (this.entityData) {
       // entity view
       if (
+        this._personType === EntityType.CONTACT_OF_CONTACT &&
+        ContactOfContactModel.canView(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          {
+            label: this.entityData.name,
+            action: this.entityData.deleted ? null : {
+              link: [`/contacts-of-contacts/${this.entityData.id}/view`]
+            }
+          }
+        );
+      } else if (
         this._personType === EntityType.CONTACT &&
         ContactModel.canView(this.authUser)
       ) {
@@ -253,6 +278,18 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
       // lab result list
       if (
+        this._personType === EntityType.CONTACT_OF_CONTACT &&
+        ContactOfContactModel.canListLabResult(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          {
+            label: `${this.createViewModifyHelperService.i18nService.instant(this.entityData.name)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
+            action: this.entityData.deleted ? null : {
+              link: [`/lab-results/contacts-of-contacts/${this.entityData.id}`]
+            }
+          }
+        );
+      } else if (
         this._personType === EntityType.CONTACT &&
         ContactModel.canListLabResult(this.authUser)
       ) {

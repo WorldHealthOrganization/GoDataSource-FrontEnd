@@ -302,6 +302,12 @@ export enum PERMISSION {
   CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART = 'contact_of_contact_view_chronology_chart',
   CONTACT_OF_CONTACT_EXPORT_DOSSIER = 'contact_of_contact_export_dossier',
   CONTACT_OF_CONTACT_CONVERT_TO_CONTACT = 'contact_of_contact_convert_to_contact',
+  CONTACT_OF_CONTACT_LIST_LAB_RESULT = 'contact_of_contact_list_lab_result',
+  CONTACT_OF_CONTACT_VIEW_LAB_RESULT = 'contact_of_contact_view_lab_result',
+  CONTACT_OF_CONTACT_MODIFY_LAB_RESULT = 'contact_of_contact_modify_lab_result',
+  CONTACT_OF_CONTACT_DELETE_LAB_RESULT = 'contact_of_contact_delete_lab_result',
+  CONTACT_OF_CONTACT_RESTORE_LAB_RESULT = 'contact_of_contact_restore_lab_result',
+  CONTACT_OF_CONTACT_EXPORT_LAB_RESULT = 'contact_of_contact_export_lab_result',
 
   // case
   CASE_LIST = 'case_list',

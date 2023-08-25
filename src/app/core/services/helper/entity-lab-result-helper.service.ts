@@ -10,6 +10,7 @@ import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
+import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { EntityModel } from '../../models/entity-and-relationship.model';
 import { EntityType } from '../../models/entity-type';
 import { LabResultModel } from '../../models/lab-result.model';
@@ -762,6 +763,9 @@ export class EntityLabResultHelperService {
                 ) || (
                   definitions.personType === EntityType.CONTACT &&
                   ContactModel.canViewLabResult(this._authUser)
+                ) || (
+                  definitions.personType === EntityType.CONTACT_OF_CONTACT &&
+                  ContactOfContactModel.canViewLabResult(this._authUser)
                 )
               );
           }
@@ -788,6 +792,9 @@ export class EntityLabResultHelperService {
                 ) || (
                   definitions.personType === EntityType.CONTACT &&
                   ContactModel.canModifyLabResult(this._authUser)
+                ) || (
+                  definitions.personType === EntityType.CONTACT_OF_CONTACT &&
+                  ContactOfContactModel.canModifyLabResult(this._authUser)
                 )
               );
           }
@@ -868,6 +875,9 @@ export class EntityLabResultHelperService {
                     ) || (
                       definitions.personType === EntityType.CONTACT &&
                       ContactModel.canDeleteLabResult(this._authUser)
+                    ) || (
+                      definitions.personType === EntityType.CONTACT_OF_CONTACT &&
+                      ContactOfContactModel.canDeleteLabResult(this._authUser)
                     )
                   );
               }
@@ -887,6 +897,9 @@ export class EntityLabResultHelperService {
                     ) || (
                       definitions.personType === EntityType.CONTACT &&
                       ContactModel.canDeleteLabResult(this._authUser)
+                    ) || (
+                      definitions.personType === EntityType.CONTACT_OF_CONTACT &&
+                      ContactOfContactModel.canDeleteLabResult(this._authUser)
                     )
                   );
               }
@@ -967,6 +980,9 @@ export class EntityLabResultHelperService {
                     ) || (
                       definitions.personType === EntityType.CONTACT &&
                       ContactModel.canRestoreLabResult(this._authUser)
+                    ) || (
+                      definitions.personType === EntityType.CONTACT_OF_CONTACT &&
+                      ContactOfContactModel.canRestoreLabResult(this._authUser)
                     )
                   );
               }
