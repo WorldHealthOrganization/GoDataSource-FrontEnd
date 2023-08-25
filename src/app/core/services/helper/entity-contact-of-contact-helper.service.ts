@@ -72,383 +72,383 @@ export class EntityContactOfContactHelperService {
     }
   ): ICreateViewModifyV2Tab {
     // create tab
-    const tab: ICreateViewModifyV2Tab = {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'personal',
-      label: data.isCreate ?
-        'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE' :
-        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DETAILS',
-          inputs: [
-            {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'firstName',
-              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
-              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
-              value: {
-                get: () => data.itemData.firstName,
-                set: (value) => {
-                  data.itemData.firstName = value;
-
-                  // check for duplicates
-                  data.checkForPersonExistence();
-                }
-              },
-              validators: {
-                required: () => true
-              },
-              visibleMandatoryConf: {
-                visible: true,
-                required: true
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'middleName',
-              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
-              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
-              value: {
-                get: () => data.itemData.middleName,
-                set: (value) => {
-                  data.itemData.middleName = value;
-
-                  // check for duplicates
-                  data.checkForPersonExistence();
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'lastName',
-              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
-              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION',
-              value: {
-                get: () => data.itemData.lastName,
-                set: (value) => {
-                  data.itemData.lastName = value;
-
-                  // check for duplicates
-                  data.checkForPersonExistence();
-                }
-              },
-              visibleMandatoryConf: {
-                visible: true,
-                required: false
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'gender',
-              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
-              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION',
-              options: data.options.gender,
-              value: {
-                get: () => data.itemData.gender,
-                set: (value) => {
-                  // set gender
-                  data.itemData.gender = value;
-
-                  // reset pregnancy ?
-                  if (data.itemData.gender === Constants.GENDER_MALE) {
-                    // reset
-                    data.itemData.pregnancyStatus = null;
-
-                    // make sure we update pregnancy too
-                    tab.form.controls['pregnancyStatus'].markAsDirty();
-                  }
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'pregnancyStatus',
-              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
-              clearable: false,
-              options: data.options.pregnancy,
-              value: {
-                get: () => data.itemData.pregnancyStatus,
-                set: (value) => {
-                  data.itemData.pregnancyStatus = value;
-                }
-              },
-              disabled: () => {
-                return data.itemData.gender === Constants.GENDER_MALE;
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'occupation',
-              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
-              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION',
-              options: data.options.occupation,
-              value: {
-                get: () => data.itemData.occupation,
-                set: (value) => {
-                  data.itemData.occupation = value;
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH,
-              name: {
-                age: 'age',
-                dob: 'dob'
-              },
-              description: {
-                age: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_DESCRIPTION',
-                dob: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB_DESCRIPTION'
-              },
-              ageChecked: !data.itemData.dob,
-              ageTypeYears: data.itemData.age?.months < 1,
-              value: {
-                age: {
-                  years: {
-                    get: () => data.itemData.age?.years,
-                    set: (value) => {
-                      // set value
-                      data.itemData.age = data.itemData.age || new AgeModel();
-                      data.itemData.age.years = value;
-
-                      // reset
-                      data.itemData.dob = null;
-                    }
-                  },
-                  months: {
-                    get: () => data.itemData.age?.months,
-                    set: (value) => {
-                      // set value
-                      data.itemData.age = data.itemData.age || new AgeModel();
-                      data.itemData.age.months = value;
-
-                      // reset
-                      data.itemData.dob = null;
-                    }
-                  }
-                },
-                dob: {
-                  get: () => data.itemData.dob,
-                  set: (value) => {
-                    // set value
-                    data.itemData.dob = value;
-
-                    // update age
-                    if (
-                      data.itemData.dob &&
-                      (data.itemData.dob as Moment).isValid()
-                    ) {
-                      // add age object if we don't have one
-                      data.itemData.age = data.itemData.age || new AgeModel();
-
-                      // add data
-                      const now = moment();
-                      data.itemData.age.years = now.diff(data.itemData.dob, 'years');
-                      data.itemData.age.months = data.itemData.age.years < 1 ? now.diff(data.itemData.dob, 'months') : 0;
-                    } else {
-                      data.itemData.age.months = 0;
-                      data.itemData.age.years = 0;
-                    }
-                  }
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
-              name: 'visualId',
-              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.createViewModifyHelperService.i18nService.instant(
-                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
-                data.cocVisualIDMask
-              ),
-              value: {
-                get: () => data.itemData.visualId,
-                set: (value) => {
-                  data.itemData.visualId = value;
-                }
-              },
-              suffixIconButtons: [
-                {
-                  icon: 'refresh',
-                  tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
-                  clickAction: (input) => {
-                    // nothing to do ?
-                    if (!data.cocVisualIDMask) {
-                      return;
-                    }
-
-                    // generate
-                    data.itemData.visualId = this.generateContactOfContactIDMask(data.selectedOutbreak.contactOfContactIdMask);
-
-                    // mark as dirty
-                    input.control?.markAsDirty();
-                  }
-                }
-              ],
-              validators: {
-                async: new Observable((observer) => {
-                  // construct cache key
-                  const cacheKey: string = 'CCC_' + data.selectedOutbreak.id +
-                    data.cocVisualIDMask.mask +
-                    data.itemData.visualId +
-                    (
-                      data.isCreate ?
-                        '' :
-                        data.itemData.id
-                    );
-
-                  // get data from cache or execute validator
-                  TimerCache.run(
-                    cacheKey,
-                    this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
-                      data.selectedOutbreak.id,
-                      data.cocVisualIDMask.mask,
-                      data.itemData.visualId,
-                      data.isCreate ?
-                        undefined :
-                        data.itemData.id
-                    )
-                  ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                    observer.next(isValid);
-                    observer.complete();
-                  });
-                })
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'responsibleUserId',
-              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-              options: data.options.user,
-              value: {
-                get: () => data.itemData.responsibleUserId,
-                set: (value) => {
-                  data.itemData.responsibleUserId = value;
-                }
-              },
-              replace: {
-                condition: () => !UserModel.canListForFilters(this._authUser),
-                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
-              }
-            }
-          ]
-        },
-
-        // Documents
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'documents',
-            items: data.itemData.documents,
-            itemsChanged: (list) => {
-              // update documents
-              data.itemData.documents = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
-                newItem: () => new DocumentModel()
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.DOCUMENT,
-                typeOptions: data.options.documentType,
-                value: {
-                  get: (index: number) => {
-                    return data.itemData.documents[index];
-                  }
-                }
-              }
-            }
-          }]
-        },
-
-        // Addresses
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'addresses',
-            items: data.itemData.addresses,
-            itemsChanged: (list) => {
-              // update addresses
-              data.itemData.addresses = list.items;
-            },
-            actionIconButtons: [
-              // copy parent address
+    const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
+      {
+        type: CreateViewModifyV2TabInputType.TAB,
+        name: 'personal',
+        label: data.isCreate ?
+          'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE' :
+          'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE',
+        sections: [
+          // Details
+          {
+            type: CreateViewModifyV2TabInputType.SECTION,
+            label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DETAILS',
+            inputs: [
               {
-                icon: 'file_copy',
-                tooltip: 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP',
-                click: (
-                  _input,
-                  addressIndex: number
-                ) => {
-                  this.dialogV2Service.showConfirmDialog({
-                    config: {
-                      title: {
-                        get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
-                      },
-                      message: {
-                        get: () => 'LNG_DIALOG_CONFIRM_COPY_PARENT_ENTITY_ADDRESS'
-                      }
-                    }
-                  }).subscribe((response) => {
-                    // canceled ?
-                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                      // finished
-                      return;
-                    }
-
-                    // copy parent address - clone
-                    data.itemData.addresses[addressIndex] = new AddressModel(data.parentEntity.mainAddress);
-
-                    // update ui
-                    data.detectChanges();
-                  });
-                },
-                visible: () => {
-                  return data.isCreate &&
-                    !!data.parentEntity?.mainAddress?.typeId;
-                }
-              }
-            ],
-            definition: {
-              add: {
-                label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
-                newItem: () => new AddressModel({
-                  date: moment().toISOString()
-                })
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.ADDRESS,
-                typeOptions: data.options.addressType,
+                type: CreateViewModifyV2TabInputType.TEXT,
+                name: 'firstName',
+                placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
+                description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
                 value: {
-                  get: (index: number) => {
-                    return data.itemData.addresses[index];
+                  get: () => data.itemData.firstName,
+                  set: (value) => {
+                    data.itemData.firstName = value;
+
+                    // check for duplicates
+                    data.checkForPersonExistence();
                   }
                 },
                 validators: {
                   required: () => true
+                },
+                visibleMandatoryConf: {
+                  visible: true,
+                  required: true
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.TEXT,
+                name: 'middleName',
+                placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
+                description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
+                value: {
+                  get: () => data.itemData.middleName,
+                  set: (value) => {
+                    data.itemData.middleName = value;
+
+                    // check for duplicates
+                    data.checkForPersonExistence();
+                  }
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.TEXT,
+                name: 'lastName',
+                placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
+                description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION',
+                value: {
+                  get: () => data.itemData.lastName,
+                  set: (value) => {
+                    data.itemData.lastName = value;
+
+                    // check for duplicates
+                    data.checkForPersonExistence();
+                  }
+                },
+                visibleMandatoryConf: {
+                  visible: true,
+                  required: false
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+                name: 'gender',
+                placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
+                description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION',
+                options: data.options.gender,
+                value: {
+                  get: () => data.itemData.gender,
+                  set: (value) => {
+                    // set gender
+                    data.itemData.gender = value;
+
+                    // reset pregnancy ?
+                    if (data.itemData.gender === Constants.GENDER_MALE) {
+                      // reset
+                      data.itemData.pregnancyStatus = null;
+
+                      // make sure we update pregnancy too
+                      tab.form.controls['pregnancyStatus'].markAsDirty();
+                    }
+                  }
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+                name: 'pregnancyStatus',
+                placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+                description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
+                clearable: false,
+                options: data.options.pregnancy,
+                value: {
+                  get: () => data.itemData.pregnancyStatus,
+                  set: (value) => {
+                    data.itemData.pregnancyStatus = value;
+                  }
+                },
+                disabled: () => {
+                  return data.itemData.gender === Constants.GENDER_MALE;
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+                name: 'occupation',
+                placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
+                description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION',
+                options: data.options.occupation,
+                value: {
+                  get: () => data.itemData.occupation,
+                  set: (value) => {
+                    data.itemData.occupation = value;
+                  }
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH,
+                name: {
+                  age: 'age',
+                  dob: 'dob'
+                },
+                description: {
+                  age: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_DESCRIPTION',
+                  dob: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB_DESCRIPTION'
+                },
+                ageChecked: !data.itemData.dob,
+                ageTypeYears: data.itemData.age?.months < 1,
+                value: {
+                  age: {
+                    years: {
+                      get: () => data.itemData.age?.years,
+                      set: (value) => {
+                        // set value
+                        data.itemData.age = data.itemData.age || new AgeModel();
+                        data.itemData.age.years = value;
+
+                        // reset
+                        data.itemData.dob = null;
+                      }
+                    },
+                    months: {
+                      get: () => data.itemData.age?.months,
+                      set: (value) => {
+                        // set value
+                        data.itemData.age = data.itemData.age || new AgeModel();
+                        data.itemData.age.months = value;
+
+                        // reset
+                        data.itemData.dob = null;
+                      }
+                    }
+                  },
+                  dob: {
+                    get: () => data.itemData.dob,
+                    set: (value) => {
+                      // set value
+                      data.itemData.dob = value;
+
+                      // update age
+                      if (
+                        data.itemData.dob &&
+                        (data.itemData.dob as Moment).isValid()
+                      ) {
+                        // add age object if we don't have one
+                        data.itemData.age = data.itemData.age || new AgeModel();
+
+                        // add data
+                        const now = moment();
+                        data.itemData.age.years = now.diff(data.itemData.dob, 'years');
+                        data.itemData.age.months = data.itemData.age.years < 1 ? now.diff(data.itemData.dob, 'months') : 0;
+                      } else {
+                        data.itemData.age.months = 0;
+                        data.itemData.age.years = 0;
+                      }
+                    }
+                  }
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
+                name: 'visualId',
+                placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
+                description: () => this.createViewModifyHelperService.i18nService.instant(
+                  'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+                  data.cocVisualIDMask
+                ),
+                value: {
+                  get: () => data.itemData.visualId,
+                  set: (value) => {
+                    data.itemData.visualId = value;
+                  }
+                },
+                suffixIconButtons: [
+                  {
+                    icon: 'refresh',
+                    tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+                    clickAction: (input) => {
+                      // nothing to do ?
+                      if (!data.cocVisualIDMask) {
+                        return;
+                      }
+
+                      // generate
+                      data.itemData.visualId = this.generateContactOfContactIDMask(data.selectedOutbreak.contactOfContactIdMask);
+
+                      // mark as dirty
+                      input.control?.markAsDirty();
+                    }
+                  }
+                ],
+                validators: {
+                  async: new Observable((observer) => {
+                    // construct cache key
+                    const cacheKey: string = 'CCC_' + data.selectedOutbreak.id +
+                      data.cocVisualIDMask.mask +
+                      data.itemData.visualId +
+                      (
+                        data.isCreate ?
+                          '' :
+                          data.itemData.id
+                      );
+
+                    // get data from cache or execute validator
+                    TimerCache.run(
+                      cacheKey,
+                      this.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
+                        data.selectedOutbreak.id,
+                        data.cocVisualIDMask.mask,
+                        data.itemData.visualId,
+                        data.isCreate ?
+                          undefined :
+                          data.itemData.id
+                      )
+                    ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                      observer.next(isValid);
+                      observer.complete();
+                    });
+                  })
+                }
+              }, {
+                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+                name: 'responsibleUserId',
+                placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+                description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
+                options: data.options.user,
+                value: {
+                  get: () => data.itemData.responsibleUserId,
+                  set: (value) => {
+                    data.itemData.responsibleUserId = value;
+                  }
+                },
+                replace: {
+                  condition: () => !UserModel.canListForFilters(this._authUser),
+                  html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
                 }
               }
-            }
-          }]
-        }
-      ]
-    };
+            ]
+          },
 
-    // finished
-    return this.createViewModifyHelperService.tabsFilter(
-      tab,
+          // Documents
+          {
+            type: CreateViewModifyV2TabInputType.SECTION,
+            label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS',
+            inputs: [{
+              type: CreateViewModifyV2TabInputType.LIST,
+              name: 'documents',
+              items: data.itemData.documents,
+              itemsChanged: (list) => {
+                // update documents
+                data.itemData.documents = list.items;
+              },
+              definition: {
+                add: {
+                  label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
+                  newItem: () => new DocumentModel()
+                },
+                remove: {
+                  label: 'LNG_COMMON_BUTTON_DELETE',
+                  confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
+                },
+                input: {
+                  type: CreateViewModifyV2TabInputType.DOCUMENT,
+                  typeOptions: data.options.documentType,
+                  value: {
+                    get: (index: number) => {
+                      return data.itemData.documents[index];
+                    }
+                  }
+                }
+              }
+            }]
+          },
+
+          // Addresses
+          {
+            type: CreateViewModifyV2TabInputType.SECTION,
+            label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
+            inputs: [{
+              type: CreateViewModifyV2TabInputType.LIST,
+              name: 'addresses',
+              items: data.itemData.addresses,
+              itemsChanged: (list) => {
+                // update addresses
+                data.itemData.addresses = list.items;
+              },
+              actionIconButtons: [
+                // copy parent address
+                {
+                  icon: 'file_copy',
+                  tooltip: 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP',
+                  click: (
+                    _input,
+                    addressIndex: number
+                  ) => {
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_COPY_PARENT_ENTITY_ADDRESS'
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // copy parent address - clone
+                      data.itemData.addresses[addressIndex] = new AddressModel(data.parentEntity.mainAddress);
+
+                      // update ui
+                      data.detectChanges();
+                    });
+                  },
+                  visible: () => {
+                    return data.isCreate &&
+                      !!data.parentEntity?.mainAddress?.typeId;
+                  }
+                }
+              ],
+              definition: {
+                add: {
+                  label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
+                  newItem: () => new AddressModel({
+                    date: moment().toISOString()
+                  })
+                },
+                remove: {
+                  label: 'LNG_COMMON_BUTTON_DELETE',
+                  confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
+                },
+                input: {
+                  type: CreateViewModifyV2TabInputType.ADDRESS,
+                  typeOptions: data.options.addressType,
+                  value: {
+                    get: (index: number) => {
+                      return data.itemData.addresses[index];
+                    }
+                  },
+                  validators: {
+                    required: () => true
+                  }
+                }
+              }
+            }]
+          }
+        ]
+      },
       this.visibleMandatoryKey,
       useToFilterOutbreak
     );
+
+    // finished
+    return tab;
   }
 
   /**
@@ -470,115 +470,115 @@ export class EntityContactOfContactHelperService {
     const today: Moment = moment();
 
     // finished
-    const tab: ICreateViewModifyV2Tab = {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'infection',
-      label: data.isCreate ?
-        'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_INFECTION_TITLE' :
-        'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_INFECTION_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfReporting',
-            placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-            description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
-            value: {
-              get: () => data.itemData.dateOfReporting,
-              set: (value) => {
-                data.itemData.dateOfReporting = value;
+    const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
+      {
+        type: CreateViewModifyV2TabInputType.TAB,
+        name: 'infection',
+        label: data.isCreate ?
+          'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_INFECTION_TITLE' :
+          'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_INFECTION_TITLE',
+        sections: [
+          // Details
+          {
+            type: CreateViewModifyV2TabInputType.SECTION,
+            label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DETAILS',
+            inputs: [{
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'dateOfReporting',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+              value: {
+                get: () => data.itemData.dateOfReporting,
+                set: (value) => {
+                  data.itemData.dateOfReporting = value;
+                }
+              },
+              maxDate: today,
+              validators: {
+                required: () => true,
+                dateSameOrBefore: () => [
+                  today
+                ]
               }
-            },
-            maxDate: today,
-            validators: {
-              required: () => true,
-              dateSameOrBefore: () => [
-                today
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'isDateOfReportingApproximate',
-            placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-            description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
-            value: {
-              get: () => data.itemData.isDateOfReportingApproximate,
-              set: (value) => {
-                data.itemData.isDateOfReportingApproximate = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'isDateOfReportingApproximate',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
+              value: {
+                get: () => data.itemData.isDateOfReportingApproximate,
+                set: (value) => {
+                  data.itemData.isDateOfReportingApproximate = value;
+                }
               }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'riskLevel',
-            placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
-            description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
-            options: data.options.risk,
-            value: {
-              get: () => data.itemData.riskLevel,
-              set: (value) => {
-                data.itemData.riskLevel = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'riskLevel',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
+              options: data.options.risk,
+              value: {
+                get: () => data.itemData.riskLevel,
+                set: (value) => {
+                  data.itemData.riskLevel = value;
+                }
               }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: 'riskReason',
-            placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
-            description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION',
-            value: {
-              get: () => data.itemData.riskReason,
-              set: (value) => {
-                data.itemData.riskReason = value;
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'riskReason',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION',
+              value: {
+                get: () => data.itemData.riskReason,
+                set: (value) => {
+                  data.itemData.riskReason = value;
+                }
               }
-            }
-          }]
-        },
+            }]
+          },
 
-        // Vaccines
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'vaccinesReceived',
-            items: data.itemData.vaccinesReceived,
-            itemsChanged: (list) => {
-              // update documents
-              data.itemData.vaccinesReceived = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
-                newItem: () => new VaccineModel()
+          // Vaccines
+          {
+            type: CreateViewModifyV2TabInputType.SECTION,
+            label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
+            inputs: [{
+              type: CreateViewModifyV2TabInputType.LIST,
+              name: 'vaccinesReceived',
+              items: data.itemData.vaccinesReceived,
+              itemsChanged: (list) => {
+                // update documents
+                data.itemData.vaccinesReceived = list.items;
               },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.VACCINE,
-                vaccineOptions: data.options.vaccine,
-                vaccineStatusOptions: data.options.vaccineStatus,
-                value: {
-                  get: (index: number) => {
-                    return data.itemData.vaccinesReceived[index];
+              definition: {
+                add: {
+                  label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
+                  newItem: () => new VaccineModel()
+                },
+                remove: {
+                  label: 'LNG_COMMON_BUTTON_DELETE',
+                  confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
+                },
+                input: {
+                  type: CreateViewModifyV2TabInputType.VACCINE,
+                  vaccineOptions: data.options.vaccine,
+                  vaccineStatusOptions: data.options.vaccineStatus,
+                  value: {
+                    get: (index: number) => {
+                      return data.itemData.vaccinesReceived[index];
+                    }
                   }
                 }
               }
-            }
-          }]
-        }
-      ]
-    };
-
-    // finished
-    return this.createViewModifyHelperService.tabsFilter(
-      tab,
+            }]
+          }
+        ]
+      },
       this.visibleMandatoryKey,
       useToFilterOutbreak
     );
+
+    // finished
+    return tab;
   }
 
   /**

@@ -367,6 +367,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     if (!this.isCreate) {
       return [this.initializeTabsDetails(
         'LNG_COMMON_MODEL_FIELD_LABEL_ID',
+        'details',
         'LNG_COMMON_LABEL_DETAILS',
         (property) => property,
         this.itemData
@@ -380,6 +381,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       return this.initializeTabsDetails(
         item.id,
         item.name,
+        item.name,
         (property) => `r_${_.camelCase(item.id)}[${item.id}][${property}]`,
         this._createRelationships[index]
       );
@@ -391,14 +393,19 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
    */
   private initializeTabsDetails(
     entityId: string,
-    title: string,
-    name: (property: string) => string,
+    tabName: string,
+    tabLabel: string,
+    inputName: (property: string) => string,
     relationshipData: RelationshipModel
   ): ICreateViewModifyV2Tab {
     return this.entityHelperService.generateTabsDetails(this.selectedOutbreak, {
       entityId,
-      title,
-      name,
+      tabName,
+      tabLabel,
+      tabVisible: () => true,
+      inputName: (property) => {
+        return inputName(property);
+      },
       itemData: relationshipData,
       createCopySuffixButtons: (prop): IAppFormIconButtonV2[] => {
         // we need arrow function to keep context (or use apply)
@@ -795,10 +802,6 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
   /**
    * Check if "Date of Last Contact" is before "Date of Onset" of the source case
-   *
-   * @param entities A list of pairs: entity id/name
-   * @param contactDate Contact Date
-   * @private
    */
   private checkForLastContactBeforeCaseOnSet(
     entities: {
