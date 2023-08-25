@@ -17,6 +17,7 @@ import {
   V2ColumnStatusForm
 } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { QuestionModel } from '../../models/question.model';
+import { V2AdvancedFilterToVisibleMandatoryConf } from '../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 @Injectable({
   providedIn: 'root'
@@ -267,34 +268,52 @@ export class EntityEventHelperService {
   /**
    * Advanced filters
    */
-  generateAdvancedFilters(data: {
-    eventInvestigationTemplate: () => QuestionModel[],
-    options: {
-      user: ILabelValuePairModel[],
-      eventCategory: ILabelValuePairModel[],
-      addressType: ILabelValuePairModel[],
-      yesNoAll: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[]
+  generateAdvancedFilters(
+    selectedOutbreak: OutbreakModel,
+    data: {
+      eventInvestigationTemplate: () => QuestionModel[],
+      options: {
+        user: ILabelValuePairModel[],
+        eventCategory: ILabelValuePairModel[],
+        addressType: ILabelValuePairModel[],
+        yesNoAll: ILabelValuePairModel[],
+        yesNo: ILabelValuePairModel[]
+      }
     }
-  }): V2AdvancedFilter[] {
+  ): V2AdvancedFilter[] {
     // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
+    const advancedFilters: V2AdvancedFilterToVisibleMandatoryConf[] = [
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'name',
         label: 'LNG_EVENT_FIELD_LABEL_NAME',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'name'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
         label: 'LNG_EVENT_FIELD_LABEL_DATE',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'date'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'eventCategory',
         label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'eventCategory'
+        ),
         options: data.options.eventCategory,
         sortable: true
       },
@@ -302,60 +321,98 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'description',
         label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'description'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.ADDRESS,
         field: 'address',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         isArray: false
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfReporting',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'dateOfReporting'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'isDateOfReportingApproximate',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'isDateOfReportingApproximate'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'endDate',
         label: 'LNG_EVENT_FIELD_LABEL_END_DATE',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'endDate'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
         label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'visualId'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        visibleMandatoryIf: () => true,
         template: data.eventInvestigationTemplate
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfContacts',
         label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        visibleMandatoryIf: () => true,
         sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfExposures',
         label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        visibleMandatoryIf: () => true,
         sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'address.typeId',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_TYPE',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         options: data.options.addressType,
         sortable: true,
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
@@ -365,18 +422,33 @@ export class EntityEventHelperService {
         field: 'address.date',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_DATE',
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.emailAddress',
         label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
         field: 'address',
         label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         isArray: false,
         sortable: 'address.phoneNumber'
       },
@@ -384,6 +456,11 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.city',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_CITY',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         sortable: true,
         useLike: true,
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
@@ -392,6 +469,11 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.postalCode',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_POSTAL_CODE',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         sortable: true,
         useLike: true,
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
@@ -400,6 +482,11 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'address.geoLocationAccurate',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         options: data.options.yesNo,
         sortable: true,
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS'
@@ -408,6 +495,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.DELETED,
         field: 'deleted',
         label: 'LNG_EVENT_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         yesNoAllOptions: data.options.yesNoAll,
         sortable: true
       },
@@ -415,18 +503,21 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'createdAt',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'updatedAt',
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         sortable: true
       },
       {
         type: V2AdvancedFilterType.DELETED_AT,
         field: 'deletedAt',
         label: 'LNG_EVENT_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
         sortable: true
       }
     ];
@@ -437,25 +528,32 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'responsibleUserId',
         label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'responsibleUserId'
+        ),
         options: data.options.user,
         sortable: true
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'createdBy',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         options: data.options.user,
         sortable: true
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'updatedBy',
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         options: data.options.user,
         sortable: true
       });
     }
 
     // finished
-    return advancedFilters;
+    return this.createViewModifyHelperService.filterVisibleMandatoryAdvancedFilters(advancedFilters);
   }
 
   /**
