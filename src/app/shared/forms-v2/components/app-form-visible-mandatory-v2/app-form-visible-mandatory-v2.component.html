@@ -209,6 +209,7 @@
             <div
               *ngIf="!!item.needs?.length"
               class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs"
+              [class.gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs-invalid]="errorsMap[item.parent.parent.parent.data.id] && errorsMap[item.parent.parent.parent.data.id][item.data.id]?.length"
               fxLayout="row">
               <!-- Header -->
               <div

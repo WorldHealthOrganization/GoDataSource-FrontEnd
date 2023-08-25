@@ -196,7 +196,7 @@ export class AppFormVisibleMandatoryV2Component
 
   // handle errors
   private _errorsCount: number;
-  private _errors: {
+  errorsMap: {
     [groupId: string]: {
       [fieldId: string]: IFlattenNodeGroupTabSectionFieldNeed[]
     }
@@ -787,7 +787,7 @@ export class AppFormVisibleMandatoryV2Component
    */
   private validateAll(): void {
     // reset
-    this._errors = {};
+    this.errorsMap = {};
     this._errorsCount = 0;
 
     // go through fields and validate
@@ -812,17 +812,17 @@ export class AppFormVisibleMandatoryV2Component
           !this.value[needField.groupId][needField.fieldId]?.visible
         ) {
           // must initialize group ?
-          if (!this._errors[field.parent.parent.parent.data.id]) {
-            this._errors[field.parent.parent.parent.data.id] = {};
+          if (!this.errorsMap[field.parent.parent.parent.data.id]) {
+            this.errorsMap[field.parent.parent.parent.data.id] = {};
           }
 
           // must initialize errors ?
-          if (!this._errors[field.parent.parent.parent.data.id][field.data.id]) {
-            this._errors[field.parent.parent.parent.data.id][field.data.id] = [];
+          if (!this.errorsMap[field.parent.parent.parent.data.id][field.data.id]) {
+            this.errorsMap[field.parent.parent.parent.data.id][field.data.id] = [];
           }
 
           // append error
-          this._errors[field.parent.parent.parent.data.id][field.data.id].push(needField);
+          this.errorsMap[field.parent.parent.parent.data.id][field.data.id].push(needField);
           this._errorsCount++;
         }
       });
@@ -835,9 +835,9 @@ export class AppFormVisibleMandatoryV2Component
   private updateErrorsMessage(): void {
     // construct errors html
     let errorsString: string = '';
-    for (const groupId in this._errors) {
+    for (const groupId in this.errorsMap) {
       // retrieve group errors
-      const groupErrors = this._errors[groupId];
+      const groupErrors = this.errorsMap[groupId];
       for (const fieldId in groupErrors) {
         // retrieve field errors
         const fieldErrors = groupErrors[fieldId];
