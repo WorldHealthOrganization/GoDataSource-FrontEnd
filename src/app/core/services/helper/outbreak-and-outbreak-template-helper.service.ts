@@ -279,18 +279,19 @@ export class OutbreakAndOutbreakTemplateHelperService {
           tab.children.forEach((section) => {
             section.children.forEach((field) => {
               // field not visible by default
-              if (!field.visibleMandatoryConf?.visible) {
+              if (
+                !field.visibleMandatoryConf?.visible ||
+                item.visibleAndMandatoryFields[group.id][field.id]?.visible
+              ) {
                 return;
               }
 
               // make field visible if necessary
-              if (!item.visibleAndMandatoryFields[group.id][field.id]) {
-                item.visibleAndMandatoryFields[group.id][field.id] = {
-                  visible: true,
-                  // if method exists is enough, no need to execute, otherwise some might not return required because we sent an empty model when we generate groups, and some required might depend on db data
-                  mandatory: !!(field.definition as ICreateViewModifyV2TabInputValidatorRequired).validators?.required || !!field.visibleMandatoryConf?.required
-                };
-              }
+              item.visibleAndMandatoryFields[group.id][field.id] = {
+                visible: true,
+                // if method exists is enough, no need to execute, otherwise some might not return required because we sent an empty model when we generate groups, and some required might depend on db data
+                mandatory: !!(field.definition as ICreateViewModifyV2TabInputValidatorRequired).validators?.required || !!field.visibleMandatoryConf?.required
+              };
             });
           });
         });
