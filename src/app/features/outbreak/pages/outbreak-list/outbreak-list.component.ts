@@ -271,6 +271,8 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
                         })
                       )
                       .subscribe(() => {
+                        // refresh list of top nav outbreaks
+                        TopnavComponent.REFRESH_OUTBREAK_LIST();
 
                         // reload user data to get the updated data regarding active outbreak
                         this.authDataService

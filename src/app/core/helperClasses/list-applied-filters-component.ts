@@ -38,6 +38,7 @@ export abstract class ListAppliedFiltersComponent<T extends IV2Column> extends L
     ) => void
   ) {
     super(
+      listHelperService,
       queryBuilderChangedCallback,
       refreshCallback
     );

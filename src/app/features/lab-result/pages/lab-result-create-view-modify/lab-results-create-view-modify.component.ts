@@ -764,8 +764,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersAggregate({
-      selectedOutbreak: () => this.selectedOutbreak,
+    this.expandListAdvancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
