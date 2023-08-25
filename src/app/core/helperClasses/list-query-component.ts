@@ -13,14 +13,19 @@ export abstract class ListQueryComponent<T extends IV2Column> {
     return this._tableColumns;
   }
   set tableColumns(tableColumns: T[]) {
+    // filter
+    const filter = (items) => (items || []).filter((column) => (column as IV2ColumnToVisibleMandatoryConf).visibleMandatoryIf ?
+      (column as IV2ColumnToVisibleMandatoryConf).visibleMandatoryIf() :
+      true
+    );
+
     // set value
-    this._tableColumns = (tableColumns || []).filter((column) => {
-      if ((column as IV2ColumnToVisibleMandatoryConf).visibleMandatoryIf) {
-        return (column as IV2ColumnToVisibleMandatoryConf).visibleMandatoryIf();
-      } else {
-        return true;
-      }
-    });
+    this._tableColumns = filter(tableColumns);
+
+    // overwrite push items, otherwise we might push items that shouldn't be visible
+    this._tableColumns.push = function(...args) {
+      return Array.prototype.push.apply(this, filter(args));
+    };
   }
 
   // table columns actions
