@@ -16,14 +16,9 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
@@ -33,18 +28,16 @@ import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import * as moment from 'moment';
 import { IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputMultiDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EventModel } from '../../../../core/models/event.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { Moment } from 'moment';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { EntityContactOfContactHelperService } from '../../../../core/services/helper/entity-contact-of-contact-helper.service';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -125,19 +118,12 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
    */
   constructor(
     protected listHelperService: ListHelperService,
-    private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private i18nService: I18nService,
-    private locationDataService: LocationDataService,
-    private dialogV2Service: DialogV2Service,
     private activatedRoute: ActivatedRoute,
-    private entityHelperService: EntityHelperService,
     private router: Router,
     private bulkCacheHelperService: BulkCacheHelperService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private relationshipDataService: RelationshipDataService,
-    private entityContactOfContactHelperService: EntityContactOfContactHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       listHelperService, {
@@ -222,7 +208,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               action: {
                 click: (item: ContactOfContactModel): void => {
                   // determine what we need to delete
-                  this.dialogV2Service.showConfirmDialog({
+                  this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
@@ -244,10 +230,10 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                     // delete Contact of contact
-                    this.contactsOfContactsDataService
+                    this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
                       .deleteContactOfContact(
                         this.selectedOutbreak.id,
                         item.id
@@ -255,7 +241,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -266,7 +252,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
+                        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -303,14 +289,14 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               action: {
                 click: (item: ContactOfContactModel): void => {
                   // show confirm dialog to confirm the action
-                  this.dialogV2Service
+                  this.personAndRelatedHelperService.dialogV2Service
                     .showConfirmDialog({
                       config: {
                         title: {
                           get: () => 'LNG_COMMON_LABEL_CONVERT',
                           data: () => ({
                             name: item.name,
-                            type: this.i18nService.instant(EntityType.CONTACT)
+                            type: this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)
                           })
                         },
                         message: {
@@ -327,7 +313,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                       }
 
                       // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
+                      const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                       // check if there is at least one legacy exposure (case/event)
                       const qb = new RequestQueryBuilder();
@@ -337,7 +323,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                         }
                       });
                       qb.limit(1);
-                      this.relationshipDataService
+                      this.personAndRelatedHelperService.relationship.relationshipDataService
                         .getEntityExposures(
                           this.selectedOutbreak.id,
                           item.type,
@@ -347,7 +333,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                         .pipe(
                           catchError((err) => {
                             // show error
-                            this.toastV2Service.error(err);
+                            this.personAndRelatedHelperService.toastV2Service.error(err);
 
                             // hide loading
                             loading.close();
@@ -369,12 +355,12 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                             return;
                           } else {
                             // convert
-                            this.contactsOfContactsDataService
+                            this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
                               .convertContactOfContactToContact(this.selectedOutbreak.id, item.id)
                               .pipe(
                                 catchError((err) => {
                                   // show error
-                                  this.toastV2Service.error(err);
+                                  this.personAndRelatedHelperService.toastV2Service.error(err);
 
                                   // hide loading
                                   loading.close();
@@ -385,7 +371,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                               )
                               .subscribe(() => {
                                 // success
-                                this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+                                this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
 
                                 // hide loading
                                 loading.close();
@@ -548,7 +534,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               action: {
                 click: (item: ContactOfContactModel) => {
                   // show confirm dialog to confirm the action
-                  this.dialogV2Service.showConfirmDialog({
+                  this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
@@ -568,10 +554,10 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                     // convert
-                    this.contactsOfContactsDataService
+                    this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
                       .restoreContactOfContact(
                         this.selectedOutbreak.id,
                         item.id
@@ -579,7 +565,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -590,7 +576,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+                        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -627,7 +613,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'lastName',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'lastName'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -641,7 +627,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'middleName',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'middleName'
         ),
         notVisible: true,
@@ -656,7 +642,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'firstName',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'firstName'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -670,7 +656,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'visualId',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'visualId'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -708,7 +694,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             })
           }
         ],
-        forms: (_column, data: ContactOfContactModel): V2ColumnStatusForm[] => this.entityContactOfContactHelperService.getStatusForms({
+        forms: (_column, data: ContactOfContactModel): V2ColumnStatusForm[] => this.personAndRelatedHelperService.contactOfContact.getStatusForms({
           item: data,
           risk: this.activatedRoute.snapshot.data.risk
         })
@@ -717,7 +703,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'pregnancyStatus',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'pregnancyStatus'
         ),
         notVisible: true,
@@ -732,7 +718,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'occupation',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'occupation'
         ),
         sortable: true,
@@ -749,7 +735,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'location',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses'
         ),
         format: {
@@ -771,7 +757,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'addresses.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -790,7 +776,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -810,7 +796,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'addresses.emailAddress',
         label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -830,7 +816,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'addresses.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -842,7 +828,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'addresses.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -854,7 +840,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -874,7 +860,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -896,7 +882,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'dob',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'ageDob'
         ),
         format: {
@@ -912,7 +898,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'age',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'ageDob'
         ),
         format: {
@@ -929,7 +915,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'gender',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'gender'
         ),
         sortable: true,
@@ -942,7 +928,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'phoneNumber',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses'
         ),
         format: {
@@ -960,7 +946,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'riskLevel',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'riskLevel'
         ),
         sortable: true,
@@ -978,7 +964,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'riskReason',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'riskReason'
         ),
         sortable: true,
@@ -990,10 +976,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
       {
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
-          'dateOfLastContact'
-        ),
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1036,7 +1019,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'responsibleUserId'
         ),
         notVisible: true,
@@ -1082,7 +1065,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           }
 
           // display dialog
-          this.entityHelperService.contacts(this.selectedOutbreak, item);
+          this.personAndRelatedHelperService.relationship.contacts(this.selectedOutbreak, item);
         },
         disabled: (data) =>
           !RelationshipModel.canList(this.authUser) ||
@@ -1112,7 +1095,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           }
 
           // display dialog
-          this.entityHelperService.exposures(
+          this.personAndRelatedHelperService.relationship.exposures(
             this.selectedOutbreak,
             item
           );
@@ -1123,7 +1106,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'dateOfReporting',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'dateOfReporting'
         ),
         notVisible: true,
@@ -1139,7 +1122,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'isDateOfReportingApproximate',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'isDateOfReportingApproximate'
         ),
         notVisible: true,
@@ -1157,7 +1140,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'documents',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'documents'
         ),
         format: {
@@ -1165,7 +1148,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             // must format ?
             if (!item.uiDocuments) {
               item.uiDocuments = DocumentModel.arrayToString(
-                this.i18nService,
+                this.personAndRelatedHelperService.i18nService,
                 item.documents
               );
             }
@@ -1180,7 +1163,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         field: 'vaccinesReceived',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'vaccinesReceived'
         ),
         format: {
@@ -1188,7 +1171,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             // must format ?
             if (!item.uiVaccines) {
               item.uiVaccines = VaccineModel.arrayToString(
-                this.i18nService,
+                this.personAndRelatedHelperService.i18nService,
                 item.vaccinesReceived
               );
             }
@@ -1374,7 +1357,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityContactOfContactHelperService.generateAdvancedFilters(this.selectedOutbreak, {
+    this.advancedFilters = this.personAndRelatedHelperService.contactOfContact.generateAdvancedFilters(this.selectedOutbreak, {
       options: {
         occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -1584,7 +1567,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                 });
 
               // export dossier
-              this.dialogV2Service.showExportData({
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
                 title: {
                   get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE'
                 },
@@ -1592,7 +1575,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   url: `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/dossier`,
                   async: false,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant(
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant(
                     'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE'
                   )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                   extraFormData: {
@@ -1703,12 +1686,12 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
           tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
-            this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS_DESCRIPTION') :
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS_DESCRIPTION') :
             undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -1727,7 +1710,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
                   loading.message({
                     message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS_WAIT_MESSAGE',
                     messageData: {
@@ -1743,14 +1726,14 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   const nextDelete = () => {
                     // finished ?
                     if (selectedShallowClone.length < 1) {
-                      this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_OF_CONTACTS_SUCCESS_MESSAGE');
                       loading.close();
                       this.needsRefreshList(true);
                       return;
                     }
 
                     // delete
-                    this.contactsOfContactsDataService
+                    this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
                       .deleteContactOfContact(
                         this.selectedOutbreak.id,
                         selectedShallowClone.shift()
@@ -1761,7 +1744,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                           loading.close();
 
                           // error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
                           return throwError(err);
                         })
                       )
@@ -1821,12 +1804,12 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
           tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allDeleted ?
-            this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS_DESCRIPTION') :
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS_DESCRIPTION') :
             undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -1845,7 +1828,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
                   loading.message({
                     message: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS_WAIT_MESSAGE',
                     messageData: {
@@ -1861,14 +1844,14 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   const nextRestore = () => {
                     // finished ?
                     if (selectedShallowClone.length < 1) {
-                      this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_OF_CONTACTS_SUCCESS_MESSAGE');
                       loading.close();
                       this.needsRefreshList(true);
                       return;
                     }
 
                     // restore
-                    this.contactsOfContactsDataService
+                    this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
                       .restoreContactOfContact(
                         this.selectedOutbreak.id,
                         selectedShallowClone.shift()
@@ -1879,7 +1862,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                           loading.close();
 
                           // error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
                           return throwError(err);
                         })
                       )
@@ -2001,7 +1984,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           clonedQueryBuilder.filter.remove('riskLevel');
 
           // load data
-          return this.contactsOfContactsDataService
+          return this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
             .getContactsOfContactsGroupedByRiskLevel(
               this.selectedOutbreak.id,
               clonedQueryBuilder
@@ -2035,7 +2018,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               values = values.sort((item1, item2) => {
                 // if same order, compare labels
                 if (item1.order === item2.order) {
-                  return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
+                  return this.personAndRelatedHelperService.i18nService.instant(item1.label).localeCompare(this.personAndRelatedHelperService.i18nService.instant(item2.label));
                 }
 
                 // format order
@@ -2079,7 +2062,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
    * Export contacts of contacts data
    */
   private exportContactsOfContacts(qb: RequestQueryBuilder): void {
-    this.dialogV2Service.showExportDataAfterLoadingData({
+    this.personAndRelatedHelperService.dialogV2Service.showExportDataAfterLoadingData({
       title: {
         get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_TITLE'
       },
@@ -2091,7 +2074,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             // handle errors
             catchError((err) => {
               // show error
-              this.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
 
               // send error further
               return throwError(err);
@@ -2119,7 +2102,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                 url: `/outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 queryBuilder: qb,
                 allow: {
                   types: [
@@ -2259,7 +2242,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
    * Export contacts of contacts relationships
    */
   private exportContactsOfContactsRelationships(qb: RequestQueryBuilder): void {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showExportDataAfterLoadingData({
         title: {
           get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIPS_TITLE'
@@ -2272,7 +2255,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               // handle errors
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // send error further
                 return throwError(err);
@@ -2300,7 +2283,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -2407,7 +2390,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     }
 
     // retrieve the list of Contacts
-    this.records$ = this.contactsOfContactsDataService
+    this.records$ = this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
       .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         switchMap((data) => {
@@ -2445,7 +2428,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           );
 
           // retrieve locations
-          return this.locationDataService
+          return this.personAndRelatedHelperService.locationDataService
             .getLocationsList(qb)
             .pipe(
               map((locations) => {
@@ -2505,10 +2488,10 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     }
 
     // count
-    this.contactsOfContactsDataService.getContactsOfContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(
+    this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService.getContactsOfContactsCount(this.selectedOutbreak.id, countQueryBuilder).pipe(
       // error
       catchError((err) => {
-        this.toastV2Service.error(err);
+        this.personAndRelatedHelperService.toastV2Service.error(err);
         return throwError(err);
       }),
 

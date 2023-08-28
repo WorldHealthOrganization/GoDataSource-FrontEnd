@@ -17,8 +17,10 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { Constants } from '../../../../core/models/constants';
 import { catchError } from 'rxjs/operators';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -35,8 +37,10 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected systemSettingsDataService: SystemSettingsDataService,
     protected router: Router
   ) {
@@ -45,7 +49,8 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
   }
@@ -138,8 +143,8 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -329,7 +334,7 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
             )
             .subscribe(() => {
               // display success message
-              this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
 
               // hide loading & redirect
               finished(undefined, settings);

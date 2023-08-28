@@ -15,12 +15,12 @@ export abstract class ListQueryComponent<T extends IV2Column> {
   }
   set tableColumns(tableColumns: T[]) {
     // set value
-    this._tableColumns = this.listHelperService.createViewModifyHelperService.filterVisibleMandatoryTableColumns<T>(tableColumns as unknown as IV2ColumnToVisibleMandatoryConf[]);
+    this._tableColumns = this.listHelperService.model.filterVisibleMandatoryTableColumns(tableColumns as unknown as IV2ColumnToVisibleMandatoryConf[]);
 
     // overwrite push items, otherwise we might push items that shouldn't be visible
     const self = this;
     this._tableColumns.push = function(...args) {
-      return Array.prototype.push.apply(this, self.listHelperService.createViewModifyHelperService.filterVisibleMandatoryTableColumns(args as unknown as IV2ColumnToVisibleMandatoryConf[]));
+      return Array.prototype.push.apply(this, self.listHelperService.model.filterVisibleMandatoryTableColumns(args as unknown as IV2ColumnToVisibleMandatoryConf[]));
     };
   }
 

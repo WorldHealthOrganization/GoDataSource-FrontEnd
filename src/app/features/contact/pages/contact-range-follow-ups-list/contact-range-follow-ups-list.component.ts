@@ -4,7 +4,6 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { catchError, map, takeUntil } from 'rxjs/operators';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import * as _ from 'lodash';
@@ -20,12 +19,10 @@ import { Location } from '@angular/common';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import * as momentOriginal from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
@@ -34,11 +31,10 @@ import { UserModel } from '../../../../core/models/user.model';
 import {
   FollowUpCreateViewModifyComponent
 } from '../follow-up-create-view-modify/follow-up-create-view-modify.component';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -77,14 +73,10 @@ export class ContactRangeFollowUpsListComponent
    */
   constructor(
     protected listHelperService: ListHelperService,
-    private followUpsDataService: FollowUpsDataService,
     private activatedRoute: ActivatedRoute,
     private location: Location,
-    private toastV2Service: ToastV2Service,
-    private dialogV2Service: DialogV2Service,
-    private i18nService: I18nService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private entityFollowUpHelperService: EntityFollowUpHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
@@ -303,7 +295,7 @@ export class ContactRangeFollowUpsListComponent
       },
       {
         field: 'followUpTeamId',
-        label: `${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.i18nService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM').toLowerCase()}`,
+        label: `${this.personAndRelatedHelperService.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.personAndRelatedHelperService.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.personAndRelatedHelperService.i18nService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM').toLowerCase()}`,
         format: {
           type: (data) => {
             return data.person.followUpTeamId && (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
@@ -330,7 +322,7 @@ export class ContactRangeFollowUpsListComponent
         notVisible: true,
         format: {
           type: (data) => data.person?.type ?
-            this.i18nService.instant(data.person.type) :
+            this.personAndRelatedHelperService.i18nService.instant(data.person.type) :
             ''
         },
         filter: {
@@ -345,7 +337,7 @@ export class ContactRangeFollowUpsListComponent
         notVisible: true,
         format: {
           type: (data) => data.person?.occupation ?
-            this.i18nService.instant(data.person.occupation) :
+            this.personAndRelatedHelperService.i18nService.instant(data.person.occupation) :
             ''
         },
         filter: {
@@ -364,7 +356,7 @@ export class ContactRangeFollowUpsListComponent
         notVisible: true,
         format: {
           type: (data) => data.person?.riskLevel ?
-            this.i18nService.instant(data.person.riskLevel) :
+            this.personAndRelatedHelperService.i18nService.instant(data.person.riskLevel) :
             ''
         },
         filter: {
@@ -425,7 +417,7 @@ export class ContactRangeFollowUpsListComponent
    */
   protected initializeTableAdvancedFilters(): void {
     // data
-    const personLabel: string = `${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')}`;
+    const personLabel: string = `${this.personAndRelatedHelperService.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.personAndRelatedHelperService.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')}`;
 
     // advanced filters
     this.advancedFilters = [
@@ -635,7 +627,7 @@ export class ContactRangeFollowUpsListComponent
           },
           action: {
             click: () => {
-              this.dialogV2Service.showExportData({
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
                 title: {
                   get: () => 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_TITLE'
                 },
@@ -643,7 +635,7 @@ export class ContactRangeFollowUpsListComponent
                   url: `outbreaks/${this.selectedOutbreak.id}/contacts/range-list/export`,
                   async: false,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
                   allow: {
                     types: [
                       ExportDataExtension.PDF
@@ -765,7 +757,7 @@ export class ContactRangeFollowUpsListComponent
       );
 
     // retrieve list
-    this.records$ = this.followUpsDataService
+    this.records$ = this.personAndRelatedHelperService.followUp.followUpsDataService
       .getRangeFollowUpsList(
         this.selectedOutbreak.id,
         this.queryBuilder
@@ -788,7 +780,7 @@ export class ContactRangeFollowUpsListComponent
             }
           }[] = (rangeData || []).map((data) => {
             // determine follow-up questionnaire alertness
-            data.followUps = this.entityFollowUpHelperService.determineAlertness(
+            data.followUps = this.personAndRelatedHelperService.followUp.determineAlertness(
               this.selectedOutbreak.contactFollowUpTemplate,
               data.followUps
             );
@@ -948,7 +940,7 @@ export class ContactRangeFollowUpsListComponent
     countQueryBuilder.clearFields();
 
     // count
-    this.followUpsDataService
+    this.personAndRelatedHelperService.followUp.followUpsDataService
       .getRangeFollowUpsListCount(
         this.selectedOutbreak.id,
         countQueryBuilder
@@ -956,7 +948,7 @@ export class ContactRangeFollowUpsListComponent
       .pipe(
         // error
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         }),
 

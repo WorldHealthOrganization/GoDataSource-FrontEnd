@@ -15,10 +15,8 @@ import {
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
@@ -36,8 +34,8 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { Location } from '@angular/common';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -87,21 +85,20 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
-    protected relationshipDataService: RelationshipDataService,
-    protected entityHelperService: EntityHelperService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
     protected location: Location,
-    protected referenceDataHelperService: ReferenceDataHelperService
+    protected referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
@@ -141,7 +138,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     super.onDestroy();
 
     // remove global notifications
-    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -155,7 +152,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
    * Retrieve item
    */
   protected retrieveItem(record?: RelationshipModel): Observable<RelationshipModel> {
-    return this.relationshipDataService
+    return this.personAndRelatedHelperService.relationship.relationshipDataService
       .getEntityRelationship(
         this.selectedOutbreak.id,
         this._entity.type,
@@ -176,7 +173,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       this.isModify
     ) {
       // remove global notifications
-      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+      this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
       // show global notifications
       this.checkForLastContactBeforeCaseOnSet(
@@ -222,15 +219,15 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             ['/account/my-profile']
         }
       }, {
-        label: this.entityHelperService.entityMap[this._entity.type].label,
+        label: this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].label,
         action: {
-          link: [this.entityHelperService.entityMap[this._entity.type].link]
+          link: [this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link]
         }
       }, {
         label: this._entity.name,
         action: {
           link: [
-            this.entityHelperService.entityMap[this._entity.type].link,
+            this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link,
             this._entity.id,
             'view'
           ]
@@ -260,7 +257,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE', {
             name: this.itemData.relatedEntity(this._entity.id)?.model?.name || ''
           }
@@ -270,7 +267,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_RELATIONSHIP_TITLE', {
             name: this.itemData.relatedEntity(this._entity.id)?.model?.name || ''
           }
@@ -299,8 +296,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
+          message: () => this.personAndRelatedHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             {
               name: this._entity.name
@@ -398,7 +395,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     inputName: (property: string) => string,
     relationshipData: RelationshipModel
   ): ICreateViewModifyV2Tab {
-    return this.entityHelperService.generateTabsDetails(this.selectedOutbreak, {
+    return this.personAndRelatedHelperService.relationship.generateTabsDetails(this.selectedOutbreak, {
       entityId,
       tabName,
       tabLabel,
@@ -560,7 +557,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
             // add request
             requests$.push(
-              this.relationshipDataService
+              this.personAndRelatedHelperService.relationship.relationshipDataService
                 .createRelationship(
                   this.selectedOutbreak.id,
                   this.relationshipType === RelationshipType.CONTACT ?
@@ -577,7 +574,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       } else {
         // update
         requests$.push(
-          this.relationshipDataService
+          this.personAndRelatedHelperService.relationship.relationshipDataService
             .modifyRelationship(
               this.selectedOutbreak.id,
               this._entity.type,
@@ -605,7 +602,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
         )
         .subscribe((items) => {
           // success creating / updating event
-          this.createViewModifyHelperService.toastV2Service.success(
+          this.personAndRelatedHelperService.toastV2Service.success(
             type === CreateViewModifyV2ActionType.CREATE ?
               (
                 items.length > 1 ?
@@ -684,7 +681,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     }
 
     // retrieve data
-    this.expandListRecords$ = this.entityHelperService
+    this.expandListRecords$ = this.personAndRelatedHelperService.relationship
       .retrieveRecords(
         this.relationshipType,
         this.selectedOutbreak,
@@ -707,7 +704,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = this.entityHelperService.generateAdvancedFilters({
+    this.expandListAdvancedFilters = this.personAndRelatedHelperService.relationship.generateAdvancedFilters({
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -851,11 +848,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     });
 
     // hide current warning to re-display the updated message
-    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
     // show the updated message
     if (Object.keys(this._warnings.entities).length) {
-      this.createViewModifyHelperService.toastV2Service.notice(
+      this.personAndRelatedHelperService.toastV2Service.notice(
         this.isCreate ?
           (
             this.relationshipType === RelationshipType.CONTACT ?
@@ -880,7 +877,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
                 !CaseModel.canView(this.authUser)
               )
             ) {
-              return `${item.name} (${this.createViewModifyHelperService.i18nService.instant(item.type)})`;
+              return `${item.name} (${this.personAndRelatedHelperService.i18nService.instant(item.type)})`;
             }
 
             // create url
@@ -888,11 +885,11 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
             // finished
             const additionalInfo = this.isCreate && this.relationshipType === RelationshipType.EXPOSURE ?
-              this.createViewModifyHelperService.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
+              this.personAndRelatedHelperService.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
               '';
 
             // return entity as a link
-            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.createViewModifyHelperService.i18nService.instant(item.type)}) ${additionalInfo}</span></a>`;
+            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.personAndRelatedHelperService.i18nService.instant(item.type)}) ${additionalInfo}</span></a>`;
           })
             .join(', ')
         },

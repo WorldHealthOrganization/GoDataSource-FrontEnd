@@ -6,10 +6,8 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import * as _ from 'lodash';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
@@ -18,15 +16,14 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-entity-relationships-list',
@@ -53,12 +50,9 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
   constructor(
     protected listHelperService: ListHelperService,
     protected activatedRoute: ActivatedRoute,
-    protected relationshipDataService: RelationshipDataService,
-    protected toastV2Service: ToastV2Service,
     protected router: Router,
-    protected dialogV2Service: DialogV2Service,
-    protected entityHelperService: EntityHelperService,
-    protected referenceDataHelperService: ReferenceDataHelperService
+    protected referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
@@ -103,7 +97,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
    * Table column - actions
    */
   protected initializeTableColumnActions(): void {
-    this.tableColumnActions = this.entityHelperService.retrieveTableColumnActions({
+    this.tableColumnActions = this.personAndRelatedHelperService.relationship.retrieveTableColumnActions({
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
       selectedOutbreak: () => this.selectedOutbreak,
       entity: this._entity,
@@ -119,7 +113,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
-    this.tableColumns = this.entityHelperService.retrieveTableColumns({
+    this.tableColumns = this.personAndRelatedHelperService.relationship.retrieveTableColumns({
       personType: this.activatedRoute.snapshot.data.personType,
       cluster: this.activatedRoute.snapshot.data.cluster,
       options: {
@@ -163,7 +157,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityHelperService.generateAdvancedFilters({
+    this.advancedFilters = this.personAndRelatedHelperService.relationship.generateAdvancedFilters({
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -206,15 +200,15 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
       visible: () =>
         (
           RelationshipModel.canShare(this.authUser) &&
-          this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser) &&
+          this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser) &&
           this.selectedOutbreakIsActive
         ) || (
           this.relationshipType === RelationshipType.CONTACT &&
-          this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].changeSource(this.authUser) &&
+          this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].changeSource(this.authUser) &&
           this.selectedOutbreakIsActive
         ) || (
           RelationshipModel.canBulkDelete(this.authUser) &&
-          this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
+          this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
           this.selectedOutbreakIsActive
         ),
       actions: [
@@ -247,7 +241,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
           },
           visible: (): boolean => {
             return RelationshipModel.canShare(this.authUser) &&
-              this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser) &&
+              this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser) &&
               this.selectedOutbreakIsActive;
           },
           disable: (selected: string[]): boolean => {
@@ -283,7 +277,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
           },
           visible: (): boolean => {
             return this.relationshipType === RelationshipType.CONTACT &&
-              this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].changeSource(this.authUser) &&
+              this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].changeSource(this.authUser) &&
               this.selectedOutbreakIsActive;
           },
           disable: (selected: string[]): boolean => {
@@ -295,7 +289,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
         {
           visible: (): boolean => {
             return RelationshipModel.canBulkDelete(this.authUser) &&
-              this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
+              this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
               this.selectedOutbreakIsActive;
           }
         },
@@ -317,7 +311,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
               });
 
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -336,17 +330,17 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                   // delete relationships
-                  this.relationshipDataService
+                  this.personAndRelatedHelperService.relationship.relationshipDataService
                     .deleteBulkRelationships(
                       this.selectedOutbreak.id,
                       qb
                     )
                     .pipe(
                       catchError((err) => {
-                        this.toastV2Service.error(err);
+                        this.personAndRelatedHelperService.toastV2Service.error(err);
 
                         // hide loading
                         loading.close();
@@ -355,7 +349,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
                       })
                     )
                     .subscribe(() => {
-                      this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE');
 
                       // hide loading
                       loading.close();
@@ -367,7 +361,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
           },
           visible: (): boolean => {
             return RelationshipModel.canBulkDelete(this.authUser) &&
-              this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
+              this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
               this.selectedOutbreakIsActive;
           },
           disable: (selected: string[]): boolean => {
@@ -397,7 +391,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
       },
       visible: (): boolean => {
         return RelationshipModel.canCreate(this.authUser) &&
-          this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].create(this.authUser) &&
+          this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].create(this.authUser) &&
           this.selectedOutbreakIsActive;
       }
     };
@@ -422,15 +416,15 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
             ['/account/my-profile']
         }
       }, {
-        label: this.entityHelperService.entityMap[this._entity.type].label,
+        label: this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].label,
         action: {
-          link: [this.entityHelperService.entityMap[this._entity.type].link]
+          link: [this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link]
         }
       }, {
         label: this._entity.name,
         action: {
           link: [
-            this.entityHelperService.entityMap[this._entity.type].link,
+            this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link,
             this._entity.id,
             'view'
           ]
@@ -456,7 +450,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
    */
   refreshList(): void {
     // request data
-    this.records$ = this.entityHelperService
+    this.records$ = this.personAndRelatedHelperService.relationship
       .retrieveRecords(
         this.relationshipType,
         this.selectedOutbreak,
@@ -504,7 +498,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
     }
 
     // count
-    this.entityHelperService
+    this.personAndRelatedHelperService.relationship
       .retrieveRecordsCount(
         this.relationshipType,
         this.selectedOutbreak,

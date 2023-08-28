@@ -1,35 +1,20 @@
-import { Injectable } from '@angular/core';
-import { I18nService } from './i18n.service';
 import {
   CreateViewModifyV2TabInput,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Section,
-  ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputValidatorRequired
-} from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import {
-  IV2ColumnToVisibleMandatoryConf,
-  IVisibleMandatoryDataGroupTab,
-  IVisibleMandatoryDataGroupTabSectionField,
-  IVisibleMandatoryDataValueField,
-  V2AdvancedFilterToVisibleMandatoryConf
-} from '../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+  ICreateViewModifyV2Tab,
+  ICreateViewModifyV2TabInputValidatorRequired
+} from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { IVisibleMandatoryDataGroupTab, IVisibleMandatoryDataGroupTabSectionField, IVisibleMandatoryDataValueField } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { PersonAndRelatedHelperService } from '../person-and-related-helper.service';
 import { v4 as uuid } from 'uuid';
-import { ToastV2Service } from './toast-v2.service';
-import { RedirectService } from './redirect.service';
-import { OutbreakModel } from '../../models/outbreak.model';
-import { V2AdvancedFilter } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IV2Column } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { OutbreakModel } from '../../../models/outbreak.model';
 
-@Injectable()
-export class CreateViewModifyHelperService {
+export class CreateViewModifyHelperModel {
   /**
    * Constructor
    */
-  constructor(
-    public i18nService: I18nService,
-    public toastV2Service: ToastV2Service,
-    public redirectService: RedirectService
-  ) {}
+  constructor(private parent: PersonAndRelatedHelperService) {}
 
   /**
    * Determine visible / mandatory definition
@@ -65,7 +50,7 @@ export class CreateViewModifyHelperService {
       case CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH:
         return {
           id: 'ageDob',
-          label: `${this.i18nService.instant('LNG_ENTITY_FIELD_LABEL_AGE')} / ${this.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DOB')}`,
+          label: `${this.parent.i18nService.instant('LNG_ENTITY_FIELD_LABEL_AGE')} / ${this.parent.i18nService.instant('LNG_ENTITY_FIELD_LABEL_DOB')}`,
           supportsRequired: false,
           visibleMandatoryConf: undefined,
           definition: input
@@ -147,7 +132,7 @@ export class CreateViewModifyHelperService {
   /**
    * Filter tabs according to outbreak settings
    */
-  tabsFilter(
+  tabFilter(
     tab: ICreateViewModifyV2Tab,
     visibleMandatoryKey: string,
     outbreak: OutbreakModel
@@ -249,47 +234,5 @@ export class CreateViewModifyHelperService {
 
     // finished
     return tab;
-  }
-
-  /**
-   * Check if a column should be visible depending on outbreak visible/mandatory settings
-   */
-  shouldVisibleMandatoryTableColumnBeVisible(
-    outbreak: OutbreakModel,
-    visibleMandatoryKey: string,
-    prop: string
-  ): boolean {
-    // no custom settings found ?
-    if (
-      !outbreak ||
-      !outbreak.visibleAndMandatoryFields ||
-      !outbreak.visibleAndMandatoryFields[visibleMandatoryKey] ||
-      outbreak.visibleAndMandatoryFields[visibleMandatoryKey][prop]?.visible ||
-      Object.keys(outbreak.visibleAndMandatoryFields[visibleMandatoryKey]).length < 1
-    ) {
-      return true;
-    }
-
-    // matched
-    return false;
-  }
-
-  /**
-   * Filter advanced filters depending on outbreak visible/mandatory settings
-   */
-  filterVisibleMandatoryAdvancedFilters(advancedFilters: V2AdvancedFilterToVisibleMandatoryConf[]): V2AdvancedFilter[] {
-    return (advancedFilters || []).filter((filter) => {
-      return filter.visibleMandatoryIf();
-    });
-  }
-
-  /**
-   * Filter table columns depending on outbreak visible/mandatory settings
-   */
-  filterVisibleMandatoryTableColumns<T extends IV2Column>(items: IV2ColumnToVisibleMandatoryConf[]): T[] {
-    return (items || []).filter((column) => column.visibleMandatoryIf ?
-      column.visibleMandatoryIf() :
-      true
-    ) as unknown as T[];
   }
 }

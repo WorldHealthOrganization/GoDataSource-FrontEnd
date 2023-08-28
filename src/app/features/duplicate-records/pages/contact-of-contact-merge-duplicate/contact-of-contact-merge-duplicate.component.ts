@@ -19,8 +19,10 @@ import { UserModel } from '../../../../core/models/user.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-contact-of-contact-merge-duplicate',
@@ -54,15 +56,18 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     private outbreakDataService: OutbreakDataService
   ) {
     super(
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
@@ -389,7 +394,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
       createOrUpdate: this.initializeProcessData(),
       redirectAfterCreateUpdate: () => {
         // redirect to view
-        this.createViewModifyHelperService.redirectService.to(['/duplicated-records']);
+        this.redirectService.to(['/duplicated-records']);
       }
     };
   }
@@ -488,7 +493,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
         )
         .subscribe((item) => {
           // success creating / updating event
-          this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, item);
@@ -628,7 +633,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'visualId',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.createViewModifyHelperService.i18nService.instant(
+              description: () => this.i18nService.instant(
                 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this.selectedOutbreak.contactOfContactIdMask
               ),
@@ -653,7 +658,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -840,8 +845,8 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
         mergeRecords,
-        this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-        this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
       );
       case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);

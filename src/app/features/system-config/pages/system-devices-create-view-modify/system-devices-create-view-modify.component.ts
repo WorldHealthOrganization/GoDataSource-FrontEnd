@@ -17,8 +17,10 @@ import { DeviceDataService } from '../../../../core/services/data/device.data.se
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 /**
  * Component
@@ -35,8 +37,10 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected deviceDataService: DeviceDataService,
     protected dialogV2Service: DialogV2Service
@@ -45,7 +49,8 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
   }
@@ -130,7 +135,7 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
     // add info accordingly to page type
     if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE', {
             name: this.itemData.name
           }
@@ -140,7 +145,7 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE', {
             name: this.itemData.name
           }
@@ -327,7 +332,7 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
         )
         .subscribe((outbreak) => {
           // display message
-          this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_MODIFY_SYSTEM_DEVICE_ACTION_MODIFY_SYSTEM_DEVICE_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_MODIFY_SYSTEM_DEVICE_ACTION_MODIFY_SYSTEM_DEVICE_SUCCESS_MESSAGE');
 
           // hide loading & redirect
           finished(undefined, outbreak);

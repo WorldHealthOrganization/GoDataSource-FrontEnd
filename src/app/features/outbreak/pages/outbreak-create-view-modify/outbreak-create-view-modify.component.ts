@@ -39,7 +39,9 @@ import {
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 /**
  * Component
@@ -67,8 +69,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected outbreakDataService: OutbreakDataService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
@@ -78,7 +82,8 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService,
       true
     );
@@ -92,7 +97,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     super.onDestroy();
 
     // remove global notifications
-    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
   }
 
   /**
@@ -196,7 +201,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_OUTBREAK_LINK_MODIFY', {
             name: this.itemData.name
           }
@@ -206,7 +211,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_OUTBREAK_TITLE', {
             name: this.itemData.name
           }
@@ -251,8 +256,8 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -1307,7 +1312,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           !data.labResultsTemplate
         ) {
           // display message
-          this.createViewModifyHelperService.toastV2Service.success(
+          this.toastV2Service.success(
             type === CreateViewModifyV2ActionType.CREATE ?
               'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
               'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
@@ -1321,11 +1326,11 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         }
 
         // update language tokens to get the translation of submitted questions and answers
-        this.createViewModifyHelperService.i18nService.loadUserLanguage()
+        this.i18nService.loadUserLanguage()
           .pipe(
             catchError((err) => {
               // show err
-              this.createViewModifyHelperService.toastV2Service.error(err);
+              this.toastV2Service.error(err);
 
               // finished
               finished(err, undefined);
@@ -1336,7 +1341,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           )
           .subscribe(() => {
             // display message
-            this.createViewModifyHelperService.toastV2Service.success(
+            this.toastV2Service.success(
               type === CreateViewModifyV2ActionType.CREATE ?
                 'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
                 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
@@ -1434,7 +1439,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         .filter((item, index) => index !== entityMasks.indexOf(item))
         .filter((item) => item?.includes('9')).length
     ) {
-      this.createViewModifyHelperService.toastV2Service.notice(
+      this.toastV2Service.notice(
         'LNG_OUTBREAK_FIELD_CHECK_DUPLICATE_ENTITY_MASK',
         undefined,
         AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK
@@ -1445,7 +1450,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     }
 
     // hide warning if no mismatch found
-    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
   }
 
   /**
@@ -1461,7 +1466,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         message: {
           get: () => 'LNG_PAGE_CREATE_OUTBREAK_COPY_REF_FROM_DISEASE_DIALOG',
           data: () => ({
-            disease: this.createViewModifyHelperService.i18nService.instant(this.itemData.disease)
+            disease: this.i18nService.instant(this.itemData.disease)
           })
         }
       },

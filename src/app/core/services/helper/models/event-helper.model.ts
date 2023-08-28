@@ -1,43 +1,30 @@
-import { Injectable } from '@angular/core';
-import { moment } from '../../helperClasses/x-moment';
-import { AuthDataService } from '../data/auth.data.service';
-import { UserModel } from '../../models/user.model';
-import { OutbreakModel } from '../../models/outbreak.model';
-import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { OutbreakModel } from '../../../models/outbreak.model';
+import { PersonAndRelatedHelperService } from '../person-and-related-helper.service';
+import { EventModel } from '../../../models/event.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { Observable } from 'rxjs';
-import { TimerCache } from '../../helperClasses/timer-cache';
-import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { EventModel } from '../../models/event.model';
-import { EventDataService } from '../data/event.data.service';
-import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
-import {
-  IV2ColumnStatusFormType,
-  V2ColumnStatusForm
-} from '../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { QuestionModel } from '../../models/question.model';
-import { V2AdvancedFilterToVisibleMandatoryConf } from '../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { TimerCache } from '../../../helperClasses/timer-cache';
+import { EventDataService } from '../../data/event.data.service';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { UserModel } from '../../../models/user.model';
+import { QuestionModel } from '../../../models/question.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { moment } from '../../../helperClasses/x-moment';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class EntityEventHelperService {
+export class EventHelperModel {
   // data
   public readonly visibleMandatoryKey: string = 'events';
-  private _authUser: UserModel;
 
   /**
    * Constructor
    */
   constructor(
-    private authDataService: AuthDataService,
-    private eventDataService: EventDataService,
-    private createViewModifyHelperService: CreateViewModifyHelperService
-  ) {
-    // get the authenticated user
-    this._authUser = this.authDataService.getAuthenticatedUser();
-  }
+    private parent: PersonAndRelatedHelperService,
+    public eventDataService: EventDataService
+  ) {}
 
   /**
    * Generate tab - Details
@@ -59,7 +46,7 @@ export class EntityEventHelperService {
     }
   ): ICreateViewModifyV2Tab {
     // create tab
-    const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
+    const tab: ICreateViewModifyV2Tab = this.parent.createViewModify.tabFilter(
       {
         type: CreateViewModifyV2TabInputType.TAB,
         name: 'details',
@@ -134,7 +121,7 @@ export class EntityEventHelperService {
               type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
               name: 'visualId',
               placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.createViewModifyHelperService.i18nService.instant(
+              description: () => this.parent.i18nService.instant(
                 'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 data.eventVisualIDMask
               ),
@@ -204,8 +191,8 @@ export class EntityEventHelperService {
                 }
               },
               replace: {
-                condition: () => !UserModel.canListForFilters(this._authUser),
-                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
+                condition: () => !UserModel.canListForFilters(this.parent.authUser),
+                html: this.parent.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -287,7 +274,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'name',
         label: 'LNG_EVENT_FIELD_LABEL_NAME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'name'
@@ -298,7 +285,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
         label: 'LNG_EVENT_FIELD_LABEL_DATE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'date'
@@ -309,7 +296,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'eventCategory',
         label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'eventCategory'
@@ -321,7 +308,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'description',
         label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'description'
@@ -332,7 +319,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.ADDRESS,
         field: 'address',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'address'
@@ -343,7 +330,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfReporting',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateOfReporting'
@@ -354,7 +341,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'isDateOfReportingApproximate',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'isDateOfReportingApproximate'
@@ -365,7 +352,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'endDate',
         label: 'LNG_EVENT_FIELD_LABEL_END_DATE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'endDate'
@@ -376,7 +363,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
         label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'visualId'
@@ -387,7 +374,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        visibleMandatoryIf: () => true,
+        visibleMandatoryIf: () => data.eventInvestigationTemplate && data.eventInvestigationTemplate()?.length > 0,
         template: data.eventInvestigationTemplate
       },
       {
@@ -408,7 +395,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'address.typeId',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_TYPE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'address'
@@ -422,7 +409,7 @@ export class EntityEventHelperService {
         field: 'address.date',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_DATE',
         relationshipLabel: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'address'
@@ -433,7 +420,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.emailAddress',
         label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'address'
@@ -444,7 +431,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
         field: 'address',
         label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'address'
@@ -456,7 +443,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.city',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_CITY',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'address'
@@ -469,7 +456,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.postalCode',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_POSTAL_CODE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'address'
@@ -482,7 +469,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'address.geoLocationAccurate',
         label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'address'
@@ -523,12 +510,12 @@ export class EntityEventHelperService {
     ];
 
     // allowed to filter by user ?
-    if (UserModel.canListForFilters(this._authUser)) {
+    if (UserModel.canListForFilters(this.parent.authUser)) {
       advancedFilters.push({
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'responsibleUserId',
         label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'responsibleUserId'
@@ -553,7 +540,7 @@ export class EntityEventHelperService {
     }
 
     // finished
-    return this.createViewModifyHelperService.filterVisibleMandatoryAdvancedFilters(advancedFilters);
+    return this.parent.list.filterVisibleMandatoryAdvancedFilters(advancedFilters);
   }
 
   /**
@@ -573,7 +560,7 @@ export class EntityEventHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: this.parent.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     } else {
       forms.push({

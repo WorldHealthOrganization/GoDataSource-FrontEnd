@@ -15,24 +15,20 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-individual-contact-follow-ups-list',
@@ -73,13 +69,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    */
   constructor(
     protected listHelperService: ListHelperService,
-    protected followUpsDataService: FollowUpsDataService,
-    protected i18nService: I18nService,
     protected outbreakDataService: OutbreakDataService,
-    private toastV2Service: ToastV2Service,
     private route: ActivatedRoute,
-    private dialogV2Service: DialogV2Service,
-    private entityFollowUpHelperService: EntityFollowUpHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
@@ -133,7 +125,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Table column - actions
    */
   protected initializeTableColumnActions(): void {
-    this.tableColumnActions = this.entityFollowUpHelperService.retrieveTableColumnActions({
+    this.tableColumnActions = this.personAndRelatedHelperService.followUp.retrieveTableColumnActions({
       entityData: this.entityData,
       selectedOutbreak: () => this.selectedOutbreak,
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -149,7 +141,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
-    this.tableColumns = this.entityFollowUpHelperService.retrieveTableColumns({
+    this.tableColumns = this.personAndRelatedHelperService.followUp.retrieveTableColumns({
       team: this.route.snapshot.data.team,
       user: this.route.snapshot.data.user,
       dailyFollowUpStatus: this.route.snapshot.data.dailyFollowUpStatus,
@@ -233,7 +225,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityFollowUpHelperService.generateAdvancedFilters({
+    this.advancedFilters = this.personAndRelatedHelperService.followUp.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       options: {
         team: (this.route.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
@@ -265,7 +257,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
           },
           action: {
             click: () => {
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showExportData({
                   title: {
                     get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_TITLE'
@@ -274,7 +266,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                     url: `outbreaks/${this.selectedOutbreak.id}/contacts/daily-followup-form/export`,
                     async: false,
                     method: ExportDataMethod.GET,
-                    fileName: this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
+                    fileName: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
                     queryBuilder: this.queryBuilder,
                     allow: {
                       types: [ExportDataExtension.PDF]
@@ -456,7 +448,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
               });
 
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -475,14 +467,14 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                   // delete follow-ups
-                  this.followUpsDataService
+                  this.personAndRelatedHelperService.followUp.followUpsDataService
                     .deleteBulkFollowUps(this.selectedOutbreak.id, qb)
                     .pipe(
                       catchError((err) => {
-                        this.toastV2Service.error(err);
+                        this.personAndRelatedHelperService.toastV2Service.error(err);
 
                         // hide loading
                         loading.close();
@@ -491,7 +483,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                       })
                     )
                     .subscribe(() => {
-                      this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                       // hide loading
                       loading.close();
@@ -528,7 +520,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
               });
 
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -547,14 +539,14 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                   // restore follow-ups
-                  this.followUpsDataService
+                  this.personAndRelatedHelperService.followUp.followUpsDataService
                     .restoreBulkFollowUps(this.selectedOutbreak.id, qb)
                     .pipe(
                       catchError((err) => {
-                        this.toastV2Service.error(err);
+                        this.personAndRelatedHelperService.toastV2Service.error(err);
 
                         // hide loading
                         loading.close();
@@ -563,7 +555,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                       })
                     )
                     .subscribe(() => {
-                      this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                       // hide loading
                       loading.close();
@@ -692,7 +684,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return this.entityFollowUpHelperService.refreshListFields();
+    return this.personAndRelatedHelperService.followUp.refreshListFields();
   }
 
   /**
@@ -715,7 +707,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
     }
 
     // retrieve the list of Follow Ups
-    this.records$ = this.entityFollowUpHelperService
+    this.records$ = this.personAndRelatedHelperService.followUp
       .retrieveRecords(
         this.selectedOutbreak,
         this.queryBuilder
@@ -760,7 +752,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
     }
 
     // count
-    this.entityFollowUpHelperService
+    this.personAndRelatedHelperService.followUp
       .retrieveRecordsCount(
         this.selectedOutbreak.id,
         countQueryBuilder
@@ -778,7 +770,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Export follow-ups
    */
   private exportFollowUps(qb: RequestQueryBuilder): void {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showExportDataAfterLoadingData({
         title: {
           get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE'
@@ -791,7 +783,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
               // handle errors
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // send error further
                 return throwError(err);
@@ -819,7 +811,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                   url: `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE')} - ${moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE')} - ${moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}`,
                   queryBuilder: qb,
                   allow: {
                     types: [

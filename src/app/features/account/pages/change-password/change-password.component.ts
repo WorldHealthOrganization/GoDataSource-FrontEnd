@@ -11,9 +11,10 @@ import { PasswordChangeModel } from '../../../../core/models/password-change.mod
 import { catchError } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-change-password',
@@ -30,7 +31,8 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected userDataService: UserDataService,
     protected dialogV2Service: DialogV2Service,
@@ -41,13 +43,14 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
     // display you must change password ?
     if (this.authUser.passwordChange) {
-      this.createViewModifyHelperService.toastV2Service.notice(
+      this.toastV2Service.notice(
         'LNG_PAGE_CHANGE_PASSWORD_DESCRIPTION',
         undefined,
         AppMessages.APP_MESSAGE_MUST_CHANGE_PASSWORD
@@ -63,7 +66,7 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
     super.onDestroy();
 
     // remove global notifications
-    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_MUST_CHANGE_PASSWORD);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_MUST_CHANGE_PASSWORD);
   }
 
   /**
@@ -272,7 +275,7 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
               .reloadAndPersistAuthUser()
               .subscribe((_authenticatedUser) => {
                 // display message
-                this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
+                this.toastV2Service.success('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
 
                 // redirect
                 if (!askForSecurityQuestions) {

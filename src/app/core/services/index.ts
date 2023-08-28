@@ -43,7 +43,6 @@ import { DeviceDataService } from './data/device.data.service';
 import { SavedFiltersService } from './data/saved-filters.data.service';
 import { SavedImportMappingService } from './data/saved-import-mapping.data.service';
 import { RedirectService } from './helper/redirect.service';
-import { EntityHelperService } from './helper/entity-helper.service';
 import { ContactsOfContactsDataService } from './data/contacts-of-contacts.data.service';
 import { CaptchaDataService } from './data/captcha.data.service';
 import { ListHelperService } from './helper/list-helper.service';
@@ -99,7 +98,6 @@ import { LanguageUserResolver } from './resolvers/language-user.resolver';
 import { LanguageDataResolver } from './resolvers/data/language.resolver';
 import { PersonDataResolver } from './resolvers/data/person.resolver';
 import { NotAuthRedirectGuard } from './guards/not-auth-redirect-guard.service';
-import { EntityFollowUpHelperService } from './helper/entity-follow-up-helper.service';
 import { SecurityQuestionDataResolver } from './resolvers/data/security-question.resolver';
 import { MapVectorTypeDataResolver } from './resolvers/data/map-vector-type.resolver';
 import { OutbreakTemplateDataResolver } from './resolvers/data/outbreak-template.resolver';
@@ -148,13 +146,8 @@ import { RestoreLogDataService } from './data/restore-log.data.service';
 import {
   SyncPackageStatusStepBackupRestoreResolver
 } from './resolvers/data/sync-package-status-step-backup-restore.resolver';
-import { EntityCaseHelperService } from './helper/entity-case-helper.service';
-import { EntityContactHelperService } from './helper/entity-contact-helper.service';
-import { EntityEventHelperService } from './helper/entity-event-helper.service';
-import { EntityContactOfContactHelperService } from './helper/entity-contact-of-contact-helper.service';
-import { EntityLabResultHelperService } from './helper/entity-lab-result-helper.service';
-import { CreateViewModifyHelperService } from './helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from './helper/outbreak-and-outbreak-template-helper.service';
+import { PersonAndRelatedHelperService } from './helper/person-and-related-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -300,22 +293,15 @@ export const services: any[] = [
 
   // helper services
   CacheService,
-  CreateViewModifyHelperService,
   DialogV2Service,
   DomService,
-  EntityCaseHelperService,
-  EntityContactHelperService,
-  EntityContactOfContactHelperService,
-  EntityEventHelperService,
-  EntityFollowUpHelperService,
-  EntityLabResultHelperService,
-  EntityHelperService,
   FormHelperService,
   I18nService,
   ListHelperService,
   LoggerService,
   ModelHelperService,
   OutbreakAndOutbreakTemplateHelperService,
+  PersonAndRelatedHelperService,
   RedirectService,
   ReferenceDataHelperService,
   StorageService,

@@ -12,9 +12,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { SelectedNodes } from '../../classes/selected-nodes';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import * as _ from 'lodash';
@@ -23,14 +21,10 @@ import { throwError } from 'rxjs';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TransmissionChainsDashletComponent } from '../../components/transmission-chains-dashlet/transmission-chains-dashlet.component';
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 enum NodeAction {
   MODIFY_PERSON = 'modify-person',
@@ -97,17 +91,11 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
    */
   constructor(
     private authDataService: AuthDataService,
-    protected toastV2Service: ToastV2Service,
     protected route: ActivatedRoute,
     private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService,
     private formHelper: FormHelperService,
-    private relationshipDataService: RelationshipDataService,
-    private contactDataService: ContactDataService,
-    private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private dialogV2Service: DialogV2Service,
-    private entityHelperService: EntityHelperService,
-    private i18nService: I18nService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService,
     private domService: DomService
   ) {}
 
@@ -213,12 +201,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     }
 
     // retrieve entity info
-    const loadingDialog = this.dialogV2Service.showLoadingDialog();
+    const loadingDialog = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
     this.entityDataService
       .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
       .pipe(
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           loadingDialog.close();
           return throwError(err);
         })
@@ -233,7 +221,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             )
             .pipe(
               catchError((err) => {
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
                 loadingDialog.close();
                 return throwError(err);
               })
@@ -268,11 +256,11 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                 });
               } else {
                 // show node information
-                this.entityHelperService.showEntityDetailsDialog(
-                  this.i18nService.instant(
+                this.personAndRelatedHelperService.relationship.showEntityDetailsDialog(
+                  this.personAndRelatedHelperService.i18nService.instant(
                     'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_TITLE',
                     {
-                      type: this.i18nService.instant(entityData.type)
+                      type: this.personAndRelatedHelperService.i18nService.instant(entityData.type)
                     }
                   ),
                   entityData,
@@ -312,11 +300,11 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             });
           } else {
             // show node information
-            this.entityHelperService.showEntityDetailsDialog(
-              this.i18nService.instant(
+            this.personAndRelatedHelperService.relationship.showEntityDetailsDialog(
+              this.personAndRelatedHelperService.i18nService.instant(
                 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_TITLE',
                 {
-                  type: this.i18nService.instant(entityData.type)
+                  type: this.personAndRelatedHelperService.i18nService.instant(entityData.type)
                 }
               ),
               entityData,
@@ -342,8 +330,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
    */
   onEdgeTap(relationship: GraphEdgeModel) {
     // retrieve relationship info
-    const loadingDialog = this.dialogV2Service.showLoadingDialog();
-    this.relationshipDataService
+    const loadingDialog = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+    this.personAndRelatedHelperService.relationship.relationshipDataService
       .getEntityRelationship(
         this.selectedOutbreak.id,
         relationship.sourceType,
@@ -351,7 +339,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         relationship.id)
       .pipe(
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           loadingDialog.close();
           return throwError(err);
         })
@@ -380,8 +368,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           });
         } else {
           // show edge information
-          this.entityHelperService.showEntityDetailsDialog(
-            this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_TITLE'),
+          this.personAndRelatedHelperService.relationship.showEntityDetailsDialog(
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_TITLE'),
             relationshipData,
             this.selectedOutbreak, {
               showResourceViewPageLink: true
@@ -452,7 +440,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
    * Delete selected person
    */
   deleteSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showConfirmDialog({
         config: {
           title: {
@@ -474,7 +462,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         }
 
         // delete person
-        const loadingDialog = this.dialogV2Service.showLoadingDialog();
+        const loadingDialog = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
         this.entityDataService
           .deleteEntity(
             person.type,
@@ -483,13 +471,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           )
           .pipe(
             catchError((err) => {
-              this.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
               loadingDialog.close();
               return throwError(err);
             })
           )
           .subscribe(() => {
-            this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
+            this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
             loadingDialog.close();
 
             // reset form
@@ -519,7 +507,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     // validate
     if (!form.valid) {
       // show message
-      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+      this.personAndRelatedHelperService.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
 
       // finished
       return;
@@ -533,14 +521,14 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const targetPerson = this.selectedNodes.targetNode;
 
     // show loading
-    const loading = this.dialogV2Service.showLoadingDialog();
+    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
     // prepare relationship data
     const relationshipData = fields.relationship;
     relationshipData.persons = [{
       id: targetPerson.id
     }];
-    this.relationshipDataService
+    this.personAndRelatedHelperService.relationship.relationshipDataService
       .createRelationship(
         this.selectedOutbreak.id,
         sourcePerson.type,
@@ -549,14 +537,14 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       )
       .pipe(
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           loading.close();
           return throwError(err);
         })
       )
       .subscribe(() => {
         loading.close();
-        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
+        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -579,7 +567,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     // validate
     if (!form.valid) {
       // show message
-      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+      this.personAndRelatedHelperService.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
 
       // finished
       return;
@@ -596,10 +584,10 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const sourcePerson = this.selectedNodes.sourceNode;
 
     // show loading
-    const loading = this.dialogV2Service.showLoadingDialog();
+    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
     // add the new Contact
-    this.contactDataService
+    this.personAndRelatedHelperService.contact.contactDataService
       .createContact(this.selectedOutbreak.id, contactFields)
       .pipe(
         switchMap((contactData: ContactModel) => {
@@ -608,7 +596,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           }];
 
           // create the relationship between the source person and the new contact
-          return this.relationshipDataService
+          return this.personAndRelatedHelperService.relationship.relationshipDataService
             .createRelationship(
               this.selectedOutbreak.id,
               sourcePerson.type,
@@ -619,10 +607,10 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
               catchError((err) => {
                 // display error message
                 loading.close();
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // rollback - remove contact
-                this.contactDataService
+                this.personAndRelatedHelperService.contact.contactDataService
                   .deleteContact(this.selectedOutbreak.id, contactData.id)
                   .subscribe();
 
@@ -633,13 +621,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         }),
         catchError((err) => {
           loading.close();
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
         loading.close();
-        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -662,7 +650,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     // validate
     if (!form.valid) {
       // show message
-      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+      this.personAndRelatedHelperService.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
 
       // finished
       return;
@@ -679,10 +667,10 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const sourcePerson = this.selectedNodes.sourceNode;
 
     // show loading
-    const loading = this.dialogV2Service.showLoadingDialog();
+    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
     // add the new Contact of Contact
-    this.contactsOfContactsDataService
+    this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
       .createContactOfContact(this.selectedOutbreak.id, contactOfContactFields)
       .pipe(
         switchMap((contactOfContactData: ContactOfContactModel) => {
@@ -691,7 +679,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           }];
 
           // create the relationship between the source person and the new contact of contact
-          return this.relationshipDataService
+          return this.personAndRelatedHelperService.relationship.relationshipDataService
             .createRelationship(
               this.selectedOutbreak.id,
               sourcePerson.type,
@@ -702,10 +690,10 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
               catchError((err) => {
                 // display error message
                 loading.close();
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // rollback - remove contact
-                this.contactsOfContactsDataService
+                this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
                   .deleteContactOfContact(this.selectedOutbreak.id, contactOfContactData.id)
                   .subscribe();
 
@@ -716,13 +704,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         }),
         catchError((err) => {
           loading.close();
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
         loading.close();
-        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
+        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -745,7 +733,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     // validate
     if (!form.valid) {
       // show message
-      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+      this.personAndRelatedHelperService.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
 
       // finished
       return;
@@ -755,7 +743,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const dirtyFields: any = this.formHelper.getDirtyFields(form);
     if (_.isEmpty(dirtyFields)) {
       // show message
-      this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
+      this.personAndRelatedHelperService.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
 
       // finished
       return;
@@ -765,7 +753,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const person: (CaseModel | ContactModel | EventModel | ContactOfContactModel) = this.selectedNodes.nodes[0];
 
     // show loading
-    const loading = this.dialogV2Service.showLoadingDialog();
+    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
     // modify person
     this.entityDataService
@@ -773,13 +761,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .pipe(
         catchError((err) => {
           loading.close();
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
         loading.close();
-        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
+        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -802,7 +790,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     // validate
     if (!form.valid) {
       // show message
-      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+      this.personAndRelatedHelperService.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
 
       // finished
       return;
@@ -812,18 +800,18 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const dirtyFields: any = this.formHelper.getDirtyFields(form);
     if (_.isEmpty(dirtyFields)) {
       // show message
-      this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
+      this.personAndRelatedHelperService.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
 
       // finished
       return;
     }
 
     // show loading
-    const loading = this.dialogV2Service.showLoadingDialog();
+    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
     // create source person
     const sourcePerson = _.find(this.selectedRelationship.persons, (person) => person.source === true);
-    this.relationshipDataService
+    this.personAndRelatedHelperService.relationship.relationshipDataService
       .modifyRelationship(
         this.selectedOutbreak.id,
         sourcePerson.type,
@@ -834,13 +822,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .pipe(
         catchError((err) => {
           loading.close();
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
         loading.close();
-        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
+        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // reset selected relationship
         this.selectedRelationship = undefined;
@@ -860,7 +848,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      * Delete selected relationship
      */
   deleteSelectedRelationship() {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showConfirmDialog({
         config: {
           title: {
@@ -879,9 +867,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         }
 
         // delete relationship
-        const loadingDialog = this.dialogV2Service.showLoadingDialog();
+        const loadingDialog = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
         const sourcePerson = _.find(this.selectedRelationship.persons, (person) => person.source === true);
-        this.relationshipDataService
+        this.personAndRelatedHelperService.relationship.relationshipDataService
           .deleteRelationship(
             this.selectedOutbreak.id,
             sourcePerson.type,
@@ -890,13 +878,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           )
           .pipe(
             catchError((err) => {
-              this.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
               loadingDialog.close();
               return throwError(err);
             })
           )
           .subscribe(() => {
-            this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+            this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
             loadingDialog.close();
 
             // reset selected relationship

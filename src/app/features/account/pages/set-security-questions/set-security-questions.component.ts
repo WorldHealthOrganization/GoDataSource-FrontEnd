@@ -9,9 +9,10 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { catchError } from 'rxjs/operators';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-set-security-questions',
@@ -32,7 +33,8 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected userDataService: UserDataService,
     protected router: Router
@@ -42,7 +44,8 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
   }
@@ -315,7 +318,7 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
             .reloadAndPersistAuthUser()
             .subscribe((_authenticatedUser) => {
               // display message
-              this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_SET_SECURITY_QUESTIONS_ACTION_SAVE_SUCCESS_MESSAGE');
+              this.toastV2Service.success('LNG_PAGE_SET_SECURITY_QUESTIONS_ACTION_SAVE_SUCCESS_MESSAGE');
 
               // hide loading & redirect
               finished(undefined, null);

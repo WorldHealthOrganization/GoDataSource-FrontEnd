@@ -25,8 +25,10 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Location } from '@angular/common';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 /**
  * Component
@@ -46,8 +48,10 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected teamDataService: TeamDataService,
@@ -57,7 +61,8 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
   }
@@ -70,7 +75,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     super.onDestroy();
 
     // remove global notifications
-    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_USER_IN_MULTIPLE_TEAMS);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_USER_IN_MULTIPLE_TEAMS);
   }
 
   /**
@@ -156,7 +161,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_TEAM_TITLE', {
             name: this.itemData.name
           }
@@ -166,7 +171,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_TEAM_TITLE', {
             name: this.itemData.name
           }
@@ -195,8 +200,8 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -423,7 +428,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
               })
             ).subscribe((outbreak) => {
               // display message
-              this.createViewModifyHelperService.toastV2Service.success(
+              this.toastV2Service.success(
                 type === CreateViewModifyV2ActionType.CREATE ?
                   'LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_SUCCESS_MESSAGE' :
                   'LNG_PAGE_MODIFY_TEAM_ACTION_MODIFY_TEAM_SUCCESS_MESSAGE'
@@ -535,7 +540,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     }
 
     // remove global notifications
-    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_USER_IN_MULTIPLE_TEAMS);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_USER_IN_MULTIPLE_TEAMS);
 
     // nothing to check ?
     if (!this.itemData.userIds?.length) {
@@ -610,7 +615,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
         });
 
         // display alert
-        this.createViewModifyHelperService.toastV2Service.notice(
+        this.toastV2Service.notice(
           'LNG_DIALOG_CONFIRM_ADD_USER_TEAM',
           {
             assigned

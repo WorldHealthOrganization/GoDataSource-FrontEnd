@@ -15,7 +15,7 @@ import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../core/services/helper/reference-data-helper.service';
-import { EntityContactOfContactHelperService } from '../../../core/services/helper/entity-contact-of-contact-helper.service';
+import { PersonAndRelatedHelperService } from '../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-form-contact-of-contact-quick',
@@ -74,7 +74,7 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
       }
 
       // generate
-      this.contactOfContact.visualId = this.entityContactOfContactHelperService.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask);
+      this.contactOfContact.visualId = this.personAndRelatedHelperService.contactOfContact.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask);
       this.groupForm.controls.visualId.markAsDirty();
       this.onChange();
 
@@ -94,7 +94,7 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
     private activatedRoute: ActivatedRoute,
     private i18nService: I18nService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private entityContactOfContactHelperService: EntityContactOfContactHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(controlContainer, validators, asyncValidators);
   }
@@ -127,7 +127,7 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
         // set visual ID translate data
         this.visualIDTooltip = this.i18nService.instant(
           'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION', {
-            mask: this.entityContactOfContactHelperService.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask)
+            mask: this.personAndRelatedHelperService.contactOfContact.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask)
           }
         );
       });
