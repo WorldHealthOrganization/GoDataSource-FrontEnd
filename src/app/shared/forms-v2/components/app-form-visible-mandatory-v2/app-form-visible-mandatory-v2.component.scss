@@ -128,22 +128,38 @@
 
         .gd-form-checkbox-v2 {
           .mat-checkbox {
-            &.mat-checkbox-indeterminate,
-            &.mat-checkbox-checked {
-              &.mat-checkbox-disabled {
-                opacity: 0.5;
+            &.mat-checkbox-disabled {
+              opacity: 0.5;
 
-                .mat-checkbox-frame {
-                  border-color: var(--gd-primary);
-                }
+              .mat-checkbox-frame {
+                border-color: var(--gd-secondary);
+              }
 
-                .mat-checkbox-background {
-                  background-color: var(--gd-primary);
-                }
+              .mat-checkbox-label {
+                color: var(--gd-secondary);
+              }
+            }
+          }
+        }
 
-                .mat-checkbox-label {
-                  color: var(--gd-primary);
-                  font-weight: 700;
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-default,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-required-default {
+          .gd-form-checkbox-v2 {
+            .mat-checkbox {
+              &.mat-checkbox-indeterminate,
+              &.mat-checkbox-checked {
+                &.mat-checkbox-disabled {
+                  .mat-checkbox-frame {
+                    border-color: var(--gd-primary);
+                  }
+  
+                  .mat-checkbox-background {
+                    background-color: var(--gd-primary);
+                  }
+  
+                  .mat-checkbox-label {
+                    color: var(--gd-primary);
+                  }
                 }
               }
             }
@@ -302,5 +318,12 @@
         font-size: 1.4rem;
       }
     }
+  }
+}
+
+/* Exclude legend on view */
+.gd-create-view-modify-view {
+  .gd-form-visible-mandatory-v2-list {
+    height: calc(100% - 7.3rem);
   }
 }
