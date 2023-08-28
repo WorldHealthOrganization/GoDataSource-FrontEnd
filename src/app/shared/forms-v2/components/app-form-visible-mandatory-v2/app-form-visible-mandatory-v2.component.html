@@ -196,7 +196,8 @@
 
           <!-- Visible Checkbox + label -->
           <div
-            class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible">
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible"
+            [class.gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-with-needs]="!viewOnly && !!item.needs?.length">
             <!-- Checkbox -->
             <app-form-checkbox-v2
               [ngModel]="item.data.visibleMandatoryConf?.visible || (value && value[item.parent.parent.parent.data.id] && value[item.parent.parent.parent.data.id][item.data.id] && value[item.parent.parent.parent.data.id][item.data.id].visible)"

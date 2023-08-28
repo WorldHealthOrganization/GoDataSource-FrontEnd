@@ -78,6 +78,14 @@
           }
         }
 
+        .gd-form-visible-mandatory-v2-list-item-group {
+          padding: 0 1.6rem 0 0;
+
+          @include breakpoint('xs') {
+            padding-right: 0.8rem;
+          }
+        }
+
         .gd-form-visible-mandatory-v2-list-item-group-tab {
           padding: 0 1.6rem 0 3.2rem;
 
@@ -150,6 +158,27 @@
           white-space: nowrap;
         }
 
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-with-needs {
+          .mat-checkbox-label {
+            position: relative;
+            top: -0.5rem;
+          }
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs {
+          color: var(--gd-secondary);
+          font-size: 1.2rem;
+          line-height: 1rem;
+          padding-left: 2.8rem;
+          position: relative;
+          top: -0.8rem;
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs-invalid {
+          color: var(--gd-danger);
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-buttons,
         .gd-form-visible-mandatory-v2-list-item-group-tab-buttons,
         .gd-form-visible-mandatory-v2-list-item-group-tab-section-buttons {
           @include flex_align_items(center);
@@ -242,6 +271,35 @@
             white-space: nowrap;
           }
         }
+      }
+    }
+  }
+
+  /* Empty */
+  .gd-form-visible-mandatory-v2-list-empty {
+    height: 100%;
+
+    .gd-form-visible-mandatory-v2-list-empty-image {
+      background-image: url(../../../../../assets/images/nothing-found.svg);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 25rem;
+      width: 25rem;
+
+      @include breakpoint('xs') {
+        height: 15rem;
+        width: 15rem;
+      }
+    }
+
+    .gd-form-visible-mandatory-v2-list-empty-text {
+      color: var(--gd-secondary);
+      font-size: 1.6rem;
+      margin-top: 2rem;
+
+      @include breakpoint('xs') {
+        font-size: 1.4rem;
       }
     }
   }
