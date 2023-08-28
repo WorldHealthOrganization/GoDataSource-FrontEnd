@@ -4,7 +4,6 @@ import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
@@ -34,12 +33,9 @@ import { Constants } from '../../../../core/models/constants';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { EntityEventHelperService } from '../../../../core/services/helper/entity-event-helper.service';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import {
@@ -49,6 +45,7 @@ import {
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -73,21 +70,19 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
-    protected eventDataService: EventDataService,
     protected dialogV2Service: DialogV2Service,
-    protected entityHelperService: EntityHelperService,
     protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    private entityEventHelperService: EntityEventHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
@@ -141,7 +136,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     }
 
     // retrieve data
-    this.expandListRecords$ = this.eventDataService
+    this.expandListRecords$ = this.personAndRelatedHelperService.event.eventDataService
       .getEventsList(
         this.selectedOutbreak.id,
         data.queryBuilder
@@ -176,7 +171,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Retrieve item
    */
   protected retrieveItem(record?: EventModel): Observable<EventModel> {
-    return this.eventDataService
+    return this.personAndRelatedHelperService.event.eventDataService
       .getEvent(
         this.selectedOutbreak.id,
         record ?
@@ -191,7 +186,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   protected initializedData(): void {
     // initialize visual ID mask
     this._eventVisualIDMask = {
-      mask: this.entityEventHelperService.generateEventIDMask(this.selectedOutbreak.eventIdMask)
+      mask: this.personAndRelatedHelperService.event.generateEventIDMask(this.selectedOutbreak.eventIdMask)
     };
 
     // set visual id for event
@@ -256,7 +251,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_EVENT_TITLE', {
             name: this.itemData.name
           }
@@ -266,7 +261,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_EVENT_TITLE', {
             name: this.itemData.name
           }
@@ -336,8 +331,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON'),
+          message: () => this.personAndRelatedHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -383,7 +378,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
           if (!item.uiStatusForms) {
             // determine forms
-            const forms: V2ColumnStatusForm[] = this.entityEventHelperService.getStatusForms({
+            const forms: V2ColumnStatusForm[] = this.personAndRelatedHelperService.event.getStatusForms({
               item
             });
 
@@ -424,7 +419,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = this.entityEventHelperService.generateAdvancedFilters(this.selectedOutbreak, {
+    this.expandListAdvancedFilters = this.personAndRelatedHelperService.event.generateAdvancedFilters(this.selectedOutbreak, {
       eventInvestigationTemplate: () => this.selectedOutbreak.eventInvestigationTemplate,
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
@@ -440,7 +435,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Initialize tab details
    */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
-    return this.entityEventHelperService.generateTabsDetails(this.selectedOutbreak, {
+    return this.personAndRelatedHelperService.event.generateTabsDetails(this.selectedOutbreak, {
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,
@@ -468,7 +463,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
-        tableColumnActions: this.entityHelperService.retrieveTableColumnActions({
+        tableColumnActions: this.personAndRelatedHelperService.relationship.retrieveTableColumnActions({
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
@@ -479,7 +474,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.entityHelperService.retrieveTableColumns({
+        tableColumns: this.personAndRelatedHelperService.relationship.retrieveTableColumns({
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
@@ -507,7 +502,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
             user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
           }
         }),
-        advancedFilters: this.entityHelperService.generateAdvancedFilters({
+        advancedFilters: this.personAndRelatedHelperService.relationship.generateAdvancedFilters({
           options: {
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -539,7 +534,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         refresh: (tab) => {
           // refresh data
           const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          localTab.records$ = this.entityHelperService
+          localTab.records$ = this.personAndRelatedHelperService.relationship
             .retrieveRecords(
               RelationshipType.CONTACT,
               this.selectedOutbreak,
@@ -585,7 +580,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           }
 
           // count
-          this.entityHelperService
+          this.personAndRelatedHelperService.relationship
             .retrieveRecordsCount(
               RelationshipType.CONTACT,
               this.selectedOutbreak,
@@ -621,7 +616,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
-        tableColumnActions: this.entityHelperService.retrieveTableColumnActions({
+        tableColumnActions: this.personAndRelatedHelperService.relationship.retrieveTableColumnActions({
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
@@ -632,7 +627,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.entityHelperService.retrieveTableColumns({
+        tableColumns: this.personAndRelatedHelperService.relationship.retrieveTableColumns({
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
@@ -660,7 +655,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
             user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
           }
         }),
-        advancedFilters: this.entityHelperService.generateAdvancedFilters({
+        advancedFilters: this.personAndRelatedHelperService.relationship.generateAdvancedFilters({
           options: {
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -692,7 +687,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         refresh: (tab) => {
           // refresh data
           const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          localTab.records$ = this.entityHelperService
+          localTab.records$ = this.personAndRelatedHelperService.relationship
             .retrieveRecords(
               RelationshipType.EXPOSURE,
               this.selectedOutbreak,
@@ -738,7 +733,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           }
 
           // count
-          this.entityHelperService
+          this.personAndRelatedHelperService.relationship
             .retrieveRecordsCount(
               RelationshipType.EXPOSURE,
               this.selectedOutbreak,
@@ -903,11 +898,11 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     ) => {
       // finished
       (type === CreateViewModifyV2ActionType.CREATE ?
-        this.eventDataService.createEvent(
+        this.personAndRelatedHelperService.event.eventDataService.createEvent(
           this.selectedOutbreak.id,
           data
         ) :
-        this.eventDataService.modifyEvent(
+        this.personAndRelatedHelperService.event.eventDataService.modifyEvent(
           this.selectedOutbreak.id,
           this.itemData.id,
           data
@@ -926,7 +921,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         takeUntil(this.destroyed$)
       ).subscribe((item: EventModel) => {
         // success creating / updating event
-        this.createViewModifyHelperService.toastV2Service.success(
+        this.personAndRelatedHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE'

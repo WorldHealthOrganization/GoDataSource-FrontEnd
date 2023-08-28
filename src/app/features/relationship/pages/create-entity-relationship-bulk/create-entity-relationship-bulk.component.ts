@@ -20,8 +20,10 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-create-entity-relationship-bulk',
@@ -72,8 +74,10 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     private router: Router,
     private entityDataService: EntityDataService,
     private relationshipDataService: RelationshipDataService,
@@ -86,7 +90,8 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
@@ -138,7 +143,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
         .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
         .pipe(
           catchError((err) => {
-            this.createViewModifyHelperService.toastV2Service.error(err);
+            this.toastV2Service.error(err);
 
             // Entity not found; navigate back to Entities list
             this.router.navigate([this.entityMap[this.entityType].link]);
@@ -204,7 +209,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
             .pipe(
               catchError((err) => {
                 // show error
-                this.createViewModifyHelperService.toastV2Service.error(err);
+                this.toastV2Service.error(err);
 
                 // hide loading
                 loading.close();
@@ -215,7 +220,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
             )
             .subscribe(() => {
               // success
-              this.createViewModifyHelperService.toastV2Service.success(this.entityType === EntityType.CONTACT_OF_CONTACT ?
+              this.toastV2Service.success(this.entityType === EntityType.CONTACT_OF_CONTACT ?
                 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE' :
                 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_OF_CONTACT_SUCCESS_MESSAGE'
               );
@@ -266,7 +271,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
       // something went wrong ?
       if (this.selectedSourceIds.length < 1 || this.selectedTargetIds.length < 1) {
         // show error
-        this.createViewModifyHelperService.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
+        this.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
 
         // don't do anything
         return;
@@ -305,7 +310,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
           takeUntil(this.destroyed$)
         )
         .subscribe(() => {
-          this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, null);

@@ -6,11 +6,14 @@ import { StorageService } from './storage.service';
 import { AuthDataService } from '../data/auth.data.service';
 import { OutbreakDataService } from '../data/outbreak.data.service';
 import { ToastV2Service } from './toast-v2.service';
-import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from './outbreak-and-outbreak-template-helper.service';
+import { ListHelperModel } from './models/list-helper.model';
 
 @Injectable()
 export class ListHelperService {
+  // helper
+  public readonly model: ListHelperModel = new ListHelperModel();
+
   /**
    * Constructor
    * Used to easily inject services to list-component that is used to extend all list page compoenents
@@ -24,7 +27,6 @@ export class ListHelperService {
     public storageService: StorageService,
     public authDataService: AuthDataService,
     public outbreakDataService: OutbreakDataService,
-    public createViewModifyHelperService: CreateViewModifyHelperService,
     public outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService
   ) {}
 

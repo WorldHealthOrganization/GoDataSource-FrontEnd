@@ -8,7 +8,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ActivatedRoute } from '@angular/router';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import * as _ from 'lodash';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -24,9 +23,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-available-entities-list',
@@ -48,12 +46,10 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
   constructor(
     protected listHelperService: ListHelperService,
     protected activatedRoute: ActivatedRoute,
-    protected relationshipDataService: RelationshipDataService,
     protected genericDataService: GenericDataService,
-    protected i18nService: I18nService,
     protected locationDataService: LocationDataService,
-    protected entityHelperService: EntityHelperService,
-    protected referenceDataHelperService: ReferenceDataHelperService
+    protected referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
@@ -177,7 +173,7 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
-              tooltip: this.i18nService.instant(data.type)
+              tooltip: this.personAndRelatedHelperService.i18nService.instant(data.type)
             });
           } else {
             forms.push({
@@ -237,7 +233,7 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
         label: 'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION',
         format: {
           type: (item) => item.classification ?
-            this.i18nService.instant(item.classification) :
+            this.personAndRelatedHelperService.i18nService.instant(item.classification) :
             ''
         },
         sortable: true,
@@ -373,15 +369,15 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
             ['/account/my-profile']
         }
       }, {
-        label: this.entityHelperService.entityMap[this._entity.type].label,
+        label: this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].label,
         action: {
-          link: [this.entityHelperService.entityMap[this._entity.type].link]
+          link: [this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link]
         }
       }, {
         label: this._entity.name,
         action: {
           link: [
-            this.entityHelperService.entityMap[this._entity.type].link,
+            this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link,
             this._entity.id,
             'view'
           ]
@@ -453,7 +449,7 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
    */
   refreshList(): void {
     // request data
-    this.records$ = this.relationshipDataService
+    this.records$ = this.personAndRelatedHelperService.relationship.relationshipDataService
       .getEntityAvailablePeople(
         this.selectedOutbreak.id,
         this._entity.type,
@@ -568,7 +564,7 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
     }
 
     // count
-    this.relationshipDataService
+    this.personAndRelatedHelperService.relationship.relationshipDataService
       .getEntityAvailablePeopleCount(
         this.selectedOutbreak.id,
         this._entity.type,

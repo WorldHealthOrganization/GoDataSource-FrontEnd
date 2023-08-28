@@ -1,63 +1,45 @@
-import { Injectable } from '@angular/core';
-import { Moment, moment } from '../../helperClasses/x-moment';
-import { AuthDataService } from '../data/auth.data.service';
-import { UserModel } from '../../models/user.model';
-import { OutbreakModel } from '../../models/outbreak.model';
-import { CaseModel } from '../../models/case.model';
-import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { Constants } from '../../models/constants';
-import { AgeModel } from '../../models/age.model';
+import { OutbreakModel } from '../../../models/outbreak.model';
+import { PersonAndRelatedHelperService } from '../person-and-related-helper.service';
+import { ContactModel } from '../../../models/contact.model';
+import { CaseModel } from '../../../models/case.model';
+import { EventModel } from '../../../models/event.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { Constants } from '../../../models/constants';
+import { AgeModel } from '../../../models/age.model';
+import { moment, Moment } from '../../../helperClasses/x-moment';
 import { Observable } from 'rxjs';
-import { TimerCache } from '../../helperClasses/timer-cache';
-import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
-import { DocumentModel } from '../../models/document.model';
-import { AddressModel } from '../../models/address.model';
-import { VaccineModel } from '../../models/vaccine.model';
-import { QuestionModel } from '../../models/question.model';
-import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { ReferenceDataEntryModel } from '../../models/reference-data.model';
-import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { TimerCache } from '../../../helperClasses/timer-cache';
+import { ContactDataService } from '../../data/contact.data.service';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { UserModel } from '../../../models/user.model';
+import { DocumentModel } from '../../../models/document.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { AddressModel } from '../../../models/address.model';
+import { TeamModel } from '../../../models/team.model';
+import { VaccineModel } from '../../../models/vaccine.model';
+import { QuestionModel } from '../../../models/question.model';
+import { IResolverV2ResponseModel } from '../../resolvers/data/models/resolver-response.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { FollowUpModel } from '../../../models/follow-up.model';
+import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
+import { EntityType } from '../../../models/entity-type';
+import { ReferenceDataEntryModel } from '../../../models/reference-data.model';
+import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
-import { DialogV2Service } from './dialog-v2.service';
-import { ContactDataService } from '../data/contact.data.service';
-import { ContactModel } from '../../models/contact.model';
-import { EventModel } from '../../models/event.model';
-import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { TeamModel } from '../../models/team.model';
-import { FollowUpModel } from '../../models/follow-up.model';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { EntityType } from '../../models/entity-type';
-import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
-import { V2AdvancedFilterToVisibleMandatoryConf } from '../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
-import { EntityHelperService } from './entity-helper.service';
-import { EntityFollowUpHelperService } from './entity-follow-up-helper.service';
-import { EntityCaseHelperService } from './entity-case-helper.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class EntityContactHelperService {
+export class ContactHelperModel {
   // data
   public readonly visibleMandatoryKey: string = 'contacts';
-  private _authUser: UserModel;
 
   /**
    * Constructor
    */
   constructor(
-    private authDataService: AuthDataService,
-    private dialogV2Service: DialogV2Service,
-    private contactDataService: ContactDataService,
-    private createViewModifyHelperService: CreateViewModifyHelperService,
-    private entityHelperService: EntityHelperService,
-    private entityFollowUpHelperService: EntityFollowUpHelperService,
-    private entityCaseHelperService: EntityCaseHelperService
-  ) {
-    // get the authenticated user
-    this._authUser = this.authDataService.getAuthenticatedUser();
-  }
+    private parent: PersonAndRelatedHelperService,
+    public contactDataService: ContactDataService
+  ) {}
 
   /**
    * Generate tab - Personal
@@ -85,7 +67,7 @@ export class EntityContactHelperService {
     }
   ): ICreateViewModifyV2Tab {
     // create tab
-    const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
+    const tab: ICreateViewModifyV2Tab = this.parent.createViewModify.tabFilter(
       {
         type: CreateViewModifyV2TabInputType.TAB,
         name: 'personal',
@@ -275,7 +257,7 @@ export class EntityContactHelperService {
                 type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
                 name: 'visualId',
                 placeholder: () => 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-                description: () => this.createViewModifyHelperService.i18nService.instant(
+                description: () => this.parent.i18nService.instant(
                   'LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                   data.contactVisualIDMask
                 ),
@@ -345,8 +327,8 @@ export class EntityContactHelperService {
                   }
                 },
                 replace: {
-                  condition: () => !UserModel.canListForFilters(this._authUser),
-                  html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
+                  condition: () => !UserModel.canListForFilters(this.parent.authUser),
+                  html: this.parent.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
                 }
               }
             ]
@@ -407,7 +389,7 @@ export class EntityContactHelperService {
                     _input,
                     addressIndex: number
                   ) => {
-                    this.dialogV2Service.showConfirmDialog({
+                    this.parent.dialogV2Service.showConfirmDialog({
                       config: {
                         title: {
                           get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
@@ -494,7 +476,7 @@ export class EntityContactHelperService {
     const today: Moment = moment();
 
     // finished
-    const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
+    const tab: ICreateViewModifyV2Tab = this.parent.createViewModify.tabFilter(
       {
         type: CreateViewModifyV2TabInputType.TAB,
         name: 'infection',
@@ -617,8 +599,8 @@ export class EntityContactHelperService {
                 }
               },
               replace: {
-                condition: () => !TeamModel.canList(this._authUser),
-                html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
+                condition: () => !TeamModel.canList(this.parent.authUser),
+                html: this.parent.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
               }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -730,7 +712,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'firstName'
@@ -741,7 +723,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'middleName',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'middleName'
@@ -752,7 +734,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
         label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'lastName'
@@ -763,7 +745,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'occupation',
         label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'occupation'
@@ -775,7 +757,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'riskLevel',
         label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'riskLevel'
@@ -787,7 +769,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'outcomeId',
         label: 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'outcomeId'
@@ -799,7 +781,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfOutcome',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateOfOutcome'
@@ -810,7 +792,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'transferRefused',
         label: 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'transferRefused'
@@ -822,7 +804,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'riskReason',
         label: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'riskReason'
@@ -832,7 +814,7 @@ export class EntityContactHelperService {
       {
         field: 'gender',
         label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'gender'
@@ -845,7 +827,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.RANGE_AGE,
         field: 'age',
         label: 'LNG_CONTACT_FIELD_LABEL_AGE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'ageDob'
@@ -856,7 +838,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfReporting',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateOfReporting'
@@ -867,7 +849,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'isDateOfReportingApproximate',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'isDateOfReportingApproximate'
@@ -879,7 +861,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dob',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'ageDob'
@@ -890,7 +872,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'visualId'
@@ -901,7 +883,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateBecomeContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateBecomeContact'
@@ -912,7 +894,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.ADDRESS,
         field: 'addresses',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'addresses'
@@ -923,7 +905,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
         field: 'addresses',
         label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'addresses'
@@ -971,7 +953,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'pregnancyStatus',
         label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'pregnancyStatus'
@@ -983,7 +965,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'vaccinesReceived.vaccine',
         label: 'LNG_CONTACT_FIELD_LABEL_VACCINE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'vaccinesReceived'
@@ -995,7 +977,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'vaccinesReceived.status',
         label: 'LNG_CONTACT_FIELD_LABEL_VACCINE_STATUS',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'vaccinesReceived'
@@ -1007,7 +989,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'vaccinesReceived.date',
         label: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'vaccinesReceived'
@@ -1018,7 +1000,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'documents.type',
         label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENT_TYPE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'documents'
@@ -1030,7 +1012,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'documents.number',
         label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENT_NUMBER',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'documents'
@@ -1042,7 +1024,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.emailAddress',
         label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'addresses'
@@ -1054,7 +1036,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'addresses'
@@ -1067,7 +1049,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'addresses.typeId',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_TYPE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'addresses'
@@ -1080,7 +1062,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'addresses.date',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_DATE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'addresses'
@@ -1092,7 +1074,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.city',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_CITY',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'addresses'
@@ -1105,7 +1087,7 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.postalCode',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_POSTAL_CODE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'addresses'
@@ -1177,17 +1159,17 @@ export class EntityContactHelperService {
 
     // relationship
     if (
-      ContactModel.canListRelationshipExposures(this._authUser) ||
-      ContactModel.canListRelationshipContacts(this._authUser)
+      ContactModel.canListRelationshipExposures(this.parent.authUser) ||
+      ContactModel.canListRelationshipContacts(this.parent.authUser)
     ) {
       advancedFilters.push(
         {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'clusterId',
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityHelperService.visibleMandatoryKey,
+            this.parent.relationship.visibleMandatoryKey,
             'clusterId'
           ),
           relationshipPath: ['relationships'],
@@ -1198,9 +1180,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'contactDate',
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityHelperService.visibleMandatoryKey,
+            this.parent.relationship.visibleMandatoryKey,
             'contactDate'
           ),
           relationshipPath: ['relationships'],
@@ -1210,9 +1192,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.SELECT,
           field: 'contactDateEstimated',
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityHelperService.visibleMandatoryKey,
+            this.parent.relationship.visibleMandatoryKey,
             'contactDateEstimated'
           ),
           options: data.options.yesNo,
@@ -1223,9 +1205,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'certaintyLevelId',
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityHelperService.visibleMandatoryKey,
+            this.parent.relationship.visibleMandatoryKey,
             'certaintyLevelId'
           ),
           options: data.options.certaintyLevel,
@@ -1236,9 +1218,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'exposureTypeId',
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityHelperService.visibleMandatoryKey,
+            this.parent.relationship.visibleMandatoryKey,
             'exposureTypeId'
           ),
           options: data.options.exposureType,
@@ -1249,9 +1231,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'exposureFrequencyId',
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityHelperService.visibleMandatoryKey,
+            this.parent.relationship.visibleMandatoryKey,
             'exposureFrequencyId'
           ),
           options: data.options.exposureFrequency,
@@ -1262,9 +1244,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'exposureDurationId',
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityHelperService.visibleMandatoryKey,
+            this.parent.relationship.visibleMandatoryKey,
             'exposureDurationId'
           ),
           options: data.options.exposureDuration,
@@ -1275,9 +1257,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'socialRelationshipTypeId',
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityHelperService.visibleMandatoryKey,
+            this.parent.relationship.visibleMandatoryKey,
             'socialRelationshipTypeId'
           ),
           options: data.options.contextOfTransmission,
@@ -1288,9 +1270,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'socialRelationshipDetail',
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityHelperService.visibleMandatoryKey,
+            this.parent.relationship.visibleMandatoryKey,
             'socialRelationshipDetail'
           ),
           relationshipPath: ['relationships'],
@@ -1300,9 +1282,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'comment',
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityHelperService.visibleMandatoryKey,
+            this.parent.relationship.visibleMandatoryKey,
             'comment'
           ),
           relationshipPath: ['relationships'],
@@ -1344,7 +1326,7 @@ export class EntityContactHelperService {
       );
 
       // allowed to filter by user ?
-      if (UserModel.canListForFilters(this._authUser)) {
+      if (UserModel.canListForFilters(this.parent.authUser)) {
         advancedFilters.push({
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'createdBy',
@@ -1366,12 +1348,12 @@ export class EntityContactHelperService {
     }
 
     // allowed to filter by follow-up team ?
-    if (TeamModel.canList(this._authUser)) {
+    if (TeamModel.canList(this.parent.authUser)) {
       advancedFilters.push({
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'followUpTeamId',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'followUpTeamId'
@@ -1382,12 +1364,12 @@ export class EntityContactHelperService {
     }
 
     // allowed to filter by follow-up user ?
-    if (UserModel.canListForFilters(this._authUser)) {
+    if (UserModel.canListForFilters(this.parent.authUser)) {
       advancedFilters.push({
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'responsibleUserId'
@@ -1412,15 +1394,15 @@ export class EntityContactHelperService {
     }
 
     // Relation - Follow-up
-    if (FollowUpModel.canList(this._authUser)) {
+    if (FollowUpModel.canList(this.parent.authUser)) {
       advancedFilters.push(
         {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'date',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'date'
           ),
           relationshipPath: ['followUps'],
@@ -1438,9 +1420,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.SELECT,
           field: 'targeted',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'targeted'
           ),
           options: data.options.yesNo,
@@ -1451,9 +1433,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'statusId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'statusId'
           ),
           options: data.options.dailyFollowUpStatus,
@@ -1473,9 +1455,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.ADDRESS,
           field: 'address',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'address'
           ),
           isArray: false,
@@ -1519,9 +1501,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'address.typeId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_TYPE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'address'
           ),
           options: data.options.addressType,
@@ -1532,9 +1514,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'address.date',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_DATE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'address'
           ),
           relationshipPath: ['followUps'],
@@ -1544,9 +1526,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'address.emailAddress',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'address'
           ),
           relationshipPath: ['followUps'],
@@ -1556,9 +1538,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
           field: 'address',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'address'
           ),
           isArray: false,
@@ -1569,9 +1551,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.LOCATION_MULTIPLE,
           field: 'address',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_LOCATION',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'address'
           ),
           relationshipPath: ['followUps'],
@@ -1581,9 +1563,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'address.city',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_CITY',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'address'
           ),
           relationshipPath: ['followUps'],
@@ -1593,9 +1575,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'address.postalCode',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_POSTAL_CODE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'address'
           ),
           relationshipPath: ['followUps'],
@@ -1605,9 +1587,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.SELECT,
           field: 'address.geoLocationAccurate',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'address'
           ),
           options: data.options.yesNo,
@@ -1617,14 +1599,14 @@ export class EntityContactHelperService {
       );
 
       // allowed to filter by user ?
-      if (UserModel.canListForFilters(this._authUser)) {
+      if (UserModel.canListForFilters(this.parent.authUser)) {
         advancedFilters.push({
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'responsibleUserId',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityFollowUpHelperService.visibleMandatoryKey,
+            this.parent.followUp.visibleMandatoryKey,
             'responsibleUserId'
           ),
           options: data.options.user,
@@ -1658,15 +1640,15 @@ export class EntityContactHelperService {
     );
 
     // Relation - Cases
-    if (CaseModel.canList(this._authUser)) {
+    if (CaseModel.canList(this.parent.authUser)) {
       advancedFilters.push(
         {
           type: V2AdvancedFilterType.TEXT,
           field: 'firstName',
           label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'firstName'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1677,9 +1659,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'middleName',
           label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'middleName'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1690,9 +1672,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'lastName',
           label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'lastName'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1703,9 +1685,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'gender',
           label: 'LNG_CASE_FIELD_LABEL_GENDER',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'gender'
           ),
           options: data.options.gender,
@@ -1717,9 +1699,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_AGE,
           field: 'age',
           label: 'LNG_CASE_FIELD_LABEL_AGE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'ageDob'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1740,9 +1722,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.ADDRESS,
           field: 'addresses',
           label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'addresses'
           ),
           isArray: true,
@@ -1754,9 +1736,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'visualId',
           label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'visualId'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1767,9 +1749,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'investigationStatus',
           label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'investigationStatus'
           ),
           options: data.options.investigationStatus,
@@ -1781,9 +1763,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'classification',
           label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'classification'
           ),
           options: data.options.classification,
@@ -1795,9 +1777,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateBecomeCase',
           label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateBecomeCase'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1808,9 +1790,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dob',
           label: 'LNG_CASE_FIELD_LABEL_DOB',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'ageDob'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1821,9 +1803,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateOfInfection',
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateOfInfection'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1834,9 +1816,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateInvestigationCompleted',
           label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateInvestigationCompleted'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1847,9 +1829,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateOfOnset',
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateOfOnset'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1860,9 +1842,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.SELECT,
           field: 'isDateOfOnsetApproximate',
           label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'isDateOfOnsetApproximate'
           ),
           options: data.options.yesNo,
@@ -1874,9 +1856,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateOfOutcome',
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateOfOutcome'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1887,9 +1869,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateOfReporting',
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateOfReporting'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -1900,9 +1882,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.SELECT,
           field: 'isDateOfReportingApproximate',
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'isDateOfReportingApproximate'
           ),
           options: data.options.yesNo,
@@ -1932,9 +1914,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'occupation',
           label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'occupation'
           ),
           options: data.options.occupation,
@@ -1946,9 +1928,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'outcomeId',
           label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'outcomeId'
           ),
           options: data.options.outcome,
@@ -1960,9 +1942,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
           field: 'addresses',
           label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'addresses'
           ),
           isArray: true,
@@ -1974,9 +1956,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'pregnancyStatus',
           label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'pregnancyStatus'
           ),
           options: data.options.pregnancy,
@@ -1988,9 +1970,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.SELECT,
           field: 'transferRefused',
           label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'transferRefused'
           ),
           options: data.options.yesNo,
@@ -2002,9 +1984,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'riskLevel',
           label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'riskLevel'
           ),
           options: data.options.risk,
@@ -2016,9 +1998,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'riskReason',
           label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'riskReason'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -2029,9 +2011,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'vaccinesReceived.vaccine',
           label: 'LNG_CASE_FIELD_LABEL_VACCINE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'vaccinesReceived'
           ),
           options: data.options.vaccine,
@@ -2043,9 +2025,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'vaccinesReceived.status',
           label: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'vaccinesReceived'
           ),
           options: data.options.vaccineStatus,
@@ -2057,9 +2039,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'vaccinesReceived.date',
           label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'vaccinesReceived'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -2090,9 +2072,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.SELECT,
           field: 'safeBurial',
           label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'safeBurial'
           ),
           options: data.options.yesNo,
@@ -2104,9 +2086,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'documents.type',
           label: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'documents'
           ),
           options: data.options.documentType,
@@ -2118,9 +2100,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'documents.number',
           label: 'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'documents'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -2131,9 +2113,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.TEXT,
           field: 'addresses.emailAddress',
           label: 'LNG_CASE_FIELD_LABEL_EMAIL',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'addresses'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -2144,9 +2126,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.LOCATION_MULTIPLE,
           field: 'deathLocationId',
           label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'deathLocationId'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -2157,9 +2139,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateOfBurial',
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateOfBurial'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -2170,9 +2152,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.LOCATION_MULTIPLE,
           field: 'burialLocationId',
           label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'burialLocationId'
           ),
           relationshipPath: ['relationships', 'people'],
@@ -2183,9 +2165,9 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'dateRanges.typeId',
           label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateRanges'
           ),
           options: data.options.dateRangeType,
@@ -2197,40 +2179,40 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateRanges.startDate',
           label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_START_DATE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateRanges'
           ),
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          relationshipLabel: `${this.parent.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.parent.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         },
         {
           type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dateRanges.endDate',
           label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_END_DATE',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateRanges'
           ),
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          relationshipLabel: `${this.parent.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.parent.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         },
         {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'dateRanges.centerName',
           label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateRanges'
           ),
           options: data.options.dateRangeCenter,
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          relationshipLabel: `${this.parent.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.parent.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         },
         {
@@ -2238,26 +2220,26 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.LOCATION_MULTIPLE,
           field: 'dateRanges',
           label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateRanges'
           ),
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          relationshipLabel: `${this.parent.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.parent.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         },
         {
           type: V2AdvancedFilterType.TEXT,
           field: 'dateRanges.comments',
           label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'dateRanges'
           ),
           relationshipPath: ['relationships', 'people'],
-          relationshipLabel: `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.createViewModifyHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
+          relationshipLabel: `${this.parent.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.parent.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
           extraConditions: caseCondition
         },
         {
@@ -2300,14 +2282,14 @@ export class EntityContactHelperService {
       );
 
       // allowed to filter by user ?
-      if (UserModel.canListForFilters(this._authUser)) {
+      if (UserModel.canListForFilters(this.parent.authUser)) {
         advancedFilters.push({
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'responsibleUserId',
           label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-          visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
-            this.entityCaseHelperService.visibleMandatoryKey,
+            this.parent.case.visibleMandatoryKey,
             'responsibleUserId'
           ),
           options: data.options.user,
@@ -2337,7 +2319,7 @@ export class EntityContactHelperService {
     }
 
     // finished
-    return this.createViewModifyHelperService.filterVisibleMandatoryAdvancedFilters(advancedFilters);
+    return this.parent.list.filterVisibleMandatoryAdvancedFilters(advancedFilters);
   }
 
   /**
@@ -2362,7 +2344,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.HEXAGON,
         color: info.outcome.map[info.item.outcomeId].getColorCode(),
-        tooltip: this.createViewModifyHelperService.i18nService.instant(info.item.outcomeId)
+        tooltip: this.parent.i18nService.instant(info.item.outcomeId)
       });
     } else {
       forms.push({
@@ -2378,7 +2360,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.TRIANGLE,
         color: info.risk.map[info.item.riskLevel].getColorCode(),
-        tooltip: this.createViewModifyHelperService.i18nService.instant(info.item.riskLevel)
+        tooltip: this.parent.i18nService.instant(info.item.riskLevel)
       });
     } else {
       forms.push({
@@ -2394,7 +2376,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
         color: 'var(--gd-status-follow-up-not-started)',
-        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED')
+        tooltip: this.parent.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED')
       });
     } else if (
       info.item.followUp?.startDate &&
@@ -2409,7 +2391,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
         color: 'var(--gd-status-under-follow-up)',
-        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP')
+        tooltip: this.parent.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP')
       });
     } else if (
       info.item.followUp?.endDate &&
@@ -2418,7 +2400,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
         color: 'var(--gd-status-follow-up-ended)',
-        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP')
+        tooltip: this.parent.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP')
       });
     } else {
       forms.push({
@@ -2431,7 +2413,7 @@ export class EntityContactHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: this.parent.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     } else {
       forms.push({

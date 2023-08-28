@@ -19,7 +19,6 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
@@ -34,14 +33,13 @@ import {
 import { catchError, map, takeUntil } from 'rxjs/operators';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 /**
  * Component
@@ -74,20 +72,19 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
-    protected followUpsDataService: FollowUpsDataService,
-    protected entityFollowUpHelperService: EntityFollowUpHelperService,
-    protected domSanitizer: DomSanitizer
+    protected domSanitizer: DomSanitizer,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
@@ -101,13 +98,13 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       this._entityData?.type === EntityType.CASE ||
       this._entityData?.type === EntityType.CONTACT_OF_CONTACT
     ) {
-      this.createViewModifyHelperService.toastV2Service.notice(
+      this.personAndRelatedHelperService.toastV2Service.notice(
         this.isHistory ?
           'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE' :
           'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO',
         {
           personName: this._entityData.name,
-          personType: this.createViewModifyHelperService.i18nService.instant(this._entityData.type).toLowerCase()
+          personType: this.personAndRelatedHelperService.i18nService.instant(this._entityData.type).toLowerCase()
         },
         AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS
       );
@@ -137,7 +134,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     super.onDestroy();
 
     // remove global notifications
-    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS);
+    this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS);
   }
 
   /**
@@ -151,7 +148,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Retrieve item
    */
   protected retrieveItem(record?: FollowUpModel): Observable<FollowUpModel> {
-    return this.followUpsDataService
+    return this.personAndRelatedHelperService.followUp.followUpsDataService
       .getFollowUp(
         this.selectedOutbreak.id,
         record ?
@@ -352,7 +349,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE', {
             dateFormatted: moment(this.itemData.date).format('YYYY-MM-DD')
           }
@@ -362,7 +359,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_FOLLOW_UP_TITLE', {
             dateFormatted: moment(this.itemData.date).format('YYYY-MM-DD')
           }
@@ -428,8 +425,8 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON'),
+          message: () => this.personAndRelatedHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL', {
               name: moment(this.itemData.date).format('YYYY-MM-DD')
             }
@@ -466,7 +463,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Details
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return this.entityFollowUpHelperService.generateTabsPersonal(this.selectedOutbreak, {
+    return this.personAndRelatedHelperService.followUp.generateTabsPersonal(this.selectedOutbreak, {
       isCreate: this.isCreate,
       isModify: this.isModify,
       itemData: this.itemData,
@@ -601,12 +598,12 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     ) => {
       // finished
       (type === CreateViewModifyV2ActionType.CREATE ?
-        this.followUpsDataService.createFollowUp(
+        this.personAndRelatedHelperService.followUp.followUpsDataService.createFollowUp(
           this.selectedOutbreak.id,
           this._entityData.id,
           data
         ) :
-        this.followUpsDataService
+        this.personAndRelatedHelperService.followUp.followUpsDataService
           .modifyFollowUp(
             this.selectedOutbreak.id,
             this._entityData.id,
@@ -627,7 +624,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         takeUntil(this.destroyed$)
       ).subscribe((item: FollowUpModel) => {
         // success creating / updating event
-        this.createViewModifyHelperService.toastV2Service.success(
+        this.personAndRelatedHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_FOLLOW_UP_ACTION_MODIFY_FOLLOW_UP_SUCCESS_MESSAGE'
@@ -655,7 +652,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
           if (!item.uiStatusForms) {
             // determine forms
-            const forms: V2ColumnStatusForm[] = this.entityFollowUpHelperService.getStatusForms({
+            const forms: V2ColumnStatusForm[] = this.personAndRelatedHelperService.followUp.getStatusForms({
               item,
               dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
             });
@@ -700,7 +697,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = this.entityFollowUpHelperService.generateAdvancedFiltersPerson(this.selectedOutbreak, {
+    this.expandListAdvancedFilters = this.personAndRelatedHelperService.followUp.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       options: {
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
@@ -723,7 +720,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     // }
 
     // retrieve data
-    this.expandListRecords$ = this.followUpsDataService
+    this.expandListRecords$ = this.personAndRelatedHelperService.followUp.followUpsDataService
       .getFollowUpsList(
         this.selectedOutbreak.id,
         data.queryBuilder
@@ -731,7 +728,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       .pipe(
         // determine alertness
         map((followUps: FollowUpModel[]) => {
-          return this.entityFollowUpHelperService.determineAlertness(
+          return this.personAndRelatedHelperService.followUp.determineAlertness(
             this.selectedOutbreak.contactFollowUpTemplate,
             followUps
           );

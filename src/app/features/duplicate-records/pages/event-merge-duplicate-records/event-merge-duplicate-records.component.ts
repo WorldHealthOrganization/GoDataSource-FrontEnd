@@ -22,8 +22,10 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
@@ -55,8 +57,10 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     private outbreakDataService: OutbreakDataService,
     private locationDataService: LocationDataService
   ) {
@@ -64,7 +68,8 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
@@ -160,7 +165,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
               questionnaireAnswers: mergeRecords
                 .filter((item) => (item.model as EventModel).questionnaireAnswers && Object.keys((item.model as EventModel).questionnaireAnswers).length > 0)
                 .map((item, index) => ({
-                  label: `${ this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
+                  label: `${ this.i18nService.instant('LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
                   value: index,
                   data: (item.model as EventModel).questionnaireAnswers
                 }))
@@ -369,7 +374,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       createOrUpdate: this.initializeProcessData(),
       redirectAfterCreateUpdate: () => {
         // redirect to view
-        this.createViewModifyHelperService.redirectService.to(['/duplicated-records']);
+        this.redirectService.to(['/duplicated-records']);
       }
     };
   }
@@ -494,7 +499,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
         )
         .subscribe((item) => {
           // success creating / updating event
-          this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, item);
@@ -601,7 +606,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'visualId',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
-            description: () => this.createViewModifyHelperService.i18nService.instant(
+            description: () => this.i18nService.instant(
               'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
               this.selectedOutbreak.eventIdMask
             ),
@@ -626,7 +631,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             },
             replace: {
               condition: () => !UserModel.canListForFilters(this.authUser),
-              html: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
+              html: this.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,

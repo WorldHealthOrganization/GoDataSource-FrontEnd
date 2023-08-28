@@ -12,20 +12,18 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import * as _ from 'lodash';
 import { takeUntil } from 'rxjs/operators';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-entity-relationships-list-assign',
@@ -53,11 +51,9 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
     protected activatedRoute: ActivatedRoute,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
-    protected entityHelperService: EntityHelperService,
-    protected i18nService: I18nService,
-    private toastV2Service: ToastV2Service,
     private genericDataService: GenericDataService,
-    private referenceDataHelperService: ReferenceDataHelperService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       listHelperService, {
@@ -75,7 +71,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
 
     // get selected records ids
     if (_.isEmpty(this.activatedRoute.snapshot.queryParams.selectedTargetIds)) {
-      this.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
+      this.personAndRelatedHelperService.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
       this.router.navigate(['..']);
     } else {
       this.selectedTargetIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
@@ -185,7 +181,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
-              tooltip: this.i18nService.instant(data.type)
+              tooltip: this.personAndRelatedHelperService.i18nService.instant(data.type)
             });
           } else {
             forms.push({
@@ -446,15 +442,15 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
           }
         },
         {
-          label: this.entityHelperService.entityMap[this._entity.type].label,
+          label: this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].label,
           action: {
-            link: [this.entityHelperService.entityMap[this._entity.type].link]
+            link: [this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link]
           }
         },
         {
           label: this._entity.name,
           action: {
-            link: [`${ this.entityHelperService.entityMap[this._entity.type].link }/${ this._entity.id }/view`]
+            link: [`${ this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link }/${ this._entity.id }/view`]
           }
         },
         {

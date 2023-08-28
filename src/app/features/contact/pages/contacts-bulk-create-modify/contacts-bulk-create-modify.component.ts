@@ -12,9 +12,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2SpreadsheetEditorChange, V2SpreadsheetEditorChangeType } from '../../../../shared/components-v2/app-spreadsheet-editor-v2/models/change.model';
 import { IV2SpreadsheetEditorExtendedColDefEditorColumnMap } from '../../../../shared/components-v2/app-spreadsheet-editor-v2/models/extended-column.model';
@@ -23,7 +21,6 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { TeamModel } from '../../../../core/models/team.model';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, map } from 'rxjs/operators';
@@ -31,7 +28,7 @@ import { throwError } from 'rxjs';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
-import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-contacts-bulk-create-modify',
@@ -85,13 +82,10 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     protected authDataService: AuthDataService,
     protected outbreakDataService: OutbreakDataService,
     protected activatedRoute: ActivatedRoute,
-    protected contactDataService: ContactDataService,
-    protected dialogV2Service: DialogV2Service,
-    protected toastV2Service: ToastV2Service,
     protected router: Router,
     protected bulkCacheHelperService: BulkCacheHelperService,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    private entityContactHelperService: EntityContactHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
@@ -117,7 +111,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     this.stopDisplayOnceGeoLocationChange();
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
     // clear bulk cache
     this.clearBulkCache();
@@ -327,10 +321,10 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         validators: {
           async: (rowData: EntityModel) => {
             // set visual ID validator
-            return this.contactDataService
+            return this.personAndRelatedHelperService.contact.contactDataService
               .checkContactVisualIDValidity(
                 this.selectedOutbreak.id,
-                this.entityContactHelperService.generateContactIDMask(this.selectedOutbreak.contactIdMask),
+                this.personAndRelatedHelperService.contact.generateContactIDMask(this.selectedOutbreak.contactIdMask),
                 (rowData.model as ContactModel).visualId
               );
           }
@@ -575,12 +569,12 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
 
           // hide previous message if the warning message was updated
           if (refreshWarning) {
-            this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+            this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
           }
 
           // show the warning message
           if (Object.keys(this._warnings.rows).length) {
-            this.toastV2Service.notice(
+            this.personAndRelatedHelperService.toastV2Service.notice(
               'LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_WARNING_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET',
               {
                 dateOfOnset: this._warnings.dateOfOnset,
@@ -712,7 +706,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     if (!contactIds?.length) {
       // invalid data provide
       // - show warning and redirect back to list page
-      this.toastV2Service.notice('LNG_GENERIC_WARNING_BULK_CACHE_EXPIRED');
+      this.personAndRelatedHelperService.toastV2Service.notice('LNG_GENERIC_WARNING_BULK_CACHE_EXPIRED');
 
       // redirect
       this.disableDirtyConfirm();
@@ -734,7 +728,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
 
     // retrieve contacts
     // - throwError is handled by spreadsheet editor
-    this.records$ = this.contactDataService
+    this.records$ = this.personAndRelatedHelperService.contact.contactDataService
       .getContactsList(
         this.selectedOutbreak.id,
         qb,
@@ -874,7 +868,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     }
 
     // ask for confirmation if we should copy location lat & lng
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showConfirmDialog({
         config: {
           title: {
@@ -1034,7 +1028,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
       });
 
       // create
-      request$ = this.contactDataService
+      request$ = this.personAndRelatedHelperService.contact.contactDataService
         .bulkAddContacts(
           this.selectedOutbreak.id,
           this._entity.type,
@@ -1066,7 +1060,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
       );
 
       // modify
-      request$ = this.contactDataService.bulkModifyContacts(
+      request$ = this.personAndRelatedHelperService.contact.contactDataService.bulkModifyContacts(
         this.selectedOutbreak.id,
         data
       );
@@ -1078,7 +1072,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         catchError((err) => {
           // display partial success message
           if (!_.isEmpty(_.get(err, 'details.success'))) {
-            this.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG');
+            this.personAndRelatedHelperService.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG');
           }
 
           // remove success records
@@ -1125,7 +1119,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
           });
 
           // try to parse into more clear errors
-          this.toastV2Service.translateErrors(errors)
+          this.personAndRelatedHelperService.toastV2Service.translateErrors(errors)
             .subscribe((translatedErrors) => {
               // transform errors
               (translatedErrors || []).forEach((translatedError) => {
@@ -1136,7 +1130,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
                 }
 
                 // add to error list
-                this.toastV2Service.error(
+                this.personAndRelatedHelperService.toastV2Service.error(
                   'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG', {
                     row: row + '',
                     err: translatedError.message
@@ -1155,9 +1149,9 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
       .subscribe(() => {
         // message
         if (this.isCreate) {
-          this.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
         } else {
-          this.toastV2Service.success('LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
+          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
         }
 
         // finished

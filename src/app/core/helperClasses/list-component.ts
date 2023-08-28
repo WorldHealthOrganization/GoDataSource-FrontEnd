@@ -1387,7 +1387,7 @@ export abstract class ListComponent<T, U extends IV2Column> extends ListAppliedF
     visibleMandatoryKey: string,
     prop: string
   ): boolean {
-    return this.listHelperService.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+    return this.listHelperService.model.shouldVisibleMandatoryTableColumnBeVisible(
       this.selectedOutbreak,
       visibleMandatoryKey,
       prop

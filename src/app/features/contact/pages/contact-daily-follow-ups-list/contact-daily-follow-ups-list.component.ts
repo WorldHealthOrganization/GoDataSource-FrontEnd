@@ -16,12 +16,9 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
@@ -49,13 +46,11 @@ import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-da
 import { EntityType } from '../../../../core/models/entity-type';
 import { AppFormSelectMultipleV2Component } from '../../../../shared/forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
 import { LocationModel } from '../../../../core/models/location.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
-import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -121,15 +116,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
    */
   constructor(
     protected listHelperService: ListHelperService,
-    protected followUpsDataService: FollowUpsDataService,
-    protected i18nService: I18nService,
     protected outbreakDataService: OutbreakDataService,
-    protected toastV2Service: ToastV2Service,
     protected activatedRoute: ActivatedRoute,
-    protected dialogV2Service: DialogV2Service,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    private entityFollowUpHelperService: EntityFollowUpHelperService,
-    private entityContactHelperService: EntityContactHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       listHelperService, {
@@ -251,7 +241,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               action: {
                 click: (item: FollowUpModel): void => {
                   // determine what we need to delete
-                  this.dialogV2Service.showConfirmDialog({
+                  this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
@@ -278,15 +268,15 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                     // delete follow up
-                    this.followUpsDataService
+                    this.personAndRelatedHelperService.followUp.followUpsDataService
                       .deleteFollowUp(this.selectedOutbreak.id, item.personId, item.id)
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -297,7 +287,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
+                        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -324,7 +314,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               action: {
                 click: (item: FollowUpModel) => {
                   // show confirm dialog to confirm the action
-                  this.dialogV2Service.showConfirmDialog({
+                  this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
@@ -351,10 +341,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                     // delete follow up
-                    this.followUpsDataService
+                    this.personAndRelatedHelperService.followUp.followUpsDataService
                       .restoreFollowUp(
                         this.selectedOutbreak.id,
                         item.personId,
@@ -363,7 +353,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -374,7 +364,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
+                        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -412,7 +402,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               },
               action: {
                 click: (item: FollowUpModel) => {
-                  this.dialogV2Service
+                  this.personAndRelatedHelperService.dialogV2Service
                     .showSideDialog({
                       // title
                       title: {
@@ -469,7 +459,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       }
 
                       // change entity targeted
-                      this.followUpsDataService
+                      this.personAndRelatedHelperService.followUp.followUpsDataService
                         .modifyFollowUp(
                           this.selectedOutbreak.id,
                           item.personId,
@@ -480,7 +470,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         )
                         .pipe(
                           catchError((err) => {
-                            this.toastV2Service.error(err);
+                            this.personAndRelatedHelperService.toastV2Service.error(err);
                             return throwError(err);
                           })
                         )
@@ -489,7 +479,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                           item.targeted = ((response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
 
                           // success message
-                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
+                          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
 
                           // close popup
                           response.handler.hide();
@@ -516,7 +506,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               },
               action: {
                 click: (item: FollowUpModel) => {
-                  this.dialogV2Service
+                  this.personAndRelatedHelperService.dialogV2Service
                     .showSideDialog({
                       // title
                       title: {
@@ -563,7 +553,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       }
 
                       // change entity targeted
-                      this.followUpsDataService
+                      this.personAndRelatedHelperService.followUp.followUpsDataService
                         .modifyFollowUp(
                           this.selectedOutbreak.id,
                           item.personId,
@@ -574,13 +564,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         )
                         .pipe(
                           catchError((err) => {
-                            this.toastV2Service.error(err);
+                            this.personAndRelatedHelperService.toastV2Service.error(err);
                             return throwError(err);
                           })
                         )
                         .subscribe(() => {
                           // success message
-                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_SUCCESS_MESSAGE');
+                          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_SUCCESS_MESSAGE');
 
                           // close popup
                           response.handler.hide();
@@ -613,7 +603,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             // View follow-ups
             {
               label: {
-                get: (item: FollowUpModel) => this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
+                get: (item: FollowUpModel) => this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
               },
               action: {
                 link: (item: FollowUpModel): string[] => {
@@ -646,7 +636,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.lastName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'lastName'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -680,7 +670,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.firstName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'firstName'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -714,7 +704,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'visualId'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -732,13 +722,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.gender',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'gender'
         ),
         sortable: true,
         format: {
           type: (item) => item.person?.gender && (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender] ?
-            this.i18nService.instant((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender].value) :
+            this.personAndRelatedHelperService.i18nService.instant((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender].value) :
             '—'
         },
         filter: {
@@ -752,13 +742,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.occupation',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'occupation'
         ),
         sortable: true,
         format: {
           type: (item) => item.person?.occupation && (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation] ?
-            this.i18nService.instant((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation].value) :
+            this.personAndRelatedHelperService.i18nService.instant((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation].value) :
             '—'
         },
         filter: {
@@ -776,7 +766,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'date',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'date'
         ),
         sortable: true,
@@ -887,7 +877,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             }]
           }
         ],
-        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => this.entityFollowUpHelperService.getStatusForms({
+        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => this.personAndRelatedHelperService.followUp.getStatusForms({
           item: data,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
         })
@@ -896,7 +886,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'teamId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'teamId'
         ),
         format: {
@@ -937,7 +927,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'statusId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'statusId'
         ),
         sortable: true,
@@ -956,7 +946,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'targeted',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'targeted'
         ),
         sortable: true,
@@ -973,7 +963,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'area',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'address'
         ),
         format: {
@@ -995,7 +985,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'phoneNumber',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'address'
         ),
         format: {
@@ -1012,7 +1002,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.emailAddress',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'address'
         ),
         notVisible: true,
@@ -1062,7 +1052,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.age',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'ageDob'
         ),
         format: {
@@ -1079,7 +1069,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.dob',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'ageDob'
         ),
         sortable: true,
@@ -1095,14 +1085,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.riskLevel',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'riskLevel'
         ),
         sortable: true,
         notVisible: true,
         format: {
           type: (item) => item.person?.riskLevel && (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel] ?
-            this.i18nService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
+            this.personAndRelatedHelperService.i18nService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
             '—'
         },
         filter: {
@@ -1130,7 +1120,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'address'
         ),
         notVisible: true,
@@ -1149,7 +1139,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'address'
         ),
         notVisible: true,
@@ -1169,7 +1159,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'address'
         ),
         notVisible: true,
@@ -1181,7 +1171,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'address'
         ),
         notVisible: true,
@@ -1193,7 +1183,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'address'
         ),
         notVisible: true,
@@ -1213,7 +1203,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'address'
         ),
         notVisible: true,
@@ -1235,7 +1225,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'responsibleUserId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityFollowUpHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'responsibleUserId'
         ),
         notVisible: true,
@@ -1451,7 +1441,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityFollowUpHelperService.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
+    this.advancedFilters = this.personAndRelatedHelperService.followUp.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
       options: {
         team: this.activatedRoute.snapshot.data.team.options,
         yesNoAll: this.activatedRoute.snapshot.data.yesNoAll.options,
@@ -1537,7 +1527,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               qb.filter.removeDeep('date');
 
               // print daily follow-up form
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showExportData({
                   title: {
                     get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_TITLE'
@@ -1546,7 +1536,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     url: `outbreaks/${ this.selectedOutbreak.id }/contacts/daily-followup-form/export`,
                     async: false,
                     method: ExportDataMethod.GET,
-                    fileName: this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
+                    fileName: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
                     queryBuilder: qb,
                     allow: {
                       types: [ExportDataExtension.PDF]
@@ -1627,7 +1617,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           },
           action: {
             click: () => {
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showSideDialog({
                   // title
                   title: {
@@ -1853,7 +1843,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               });
 
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -1872,14 +1862,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                   // delete follow-ups
-                  this.followUpsDataService
+                  this.personAndRelatedHelperService.followUp.followUpsDataService
                     .deleteBulkFollowUps(this.selectedOutbreak.id, qb)
                     .pipe(
                       catchError((err) => {
-                        this.toastV2Service.error(err);
+                        this.personAndRelatedHelperService.toastV2Service.error(err);
 
                         // hide loading
                         loading.close();
@@ -1888,7 +1878,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       })
                     )
                     .subscribe(() => {
-                      this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                       // hide loading
                       loading.close();
@@ -1925,7 +1915,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               });
 
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -1944,14 +1934,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                   // restore follow-ups
-                  this.followUpsDataService
+                  this.personAndRelatedHelperService.followUp.followUpsDataService
                     .restoreBulkFollowUps(this.selectedOutbreak.id, qb)
                     .pipe(
                       catchError((err) => {
-                        this.toastV2Service.error(err);
+                        this.personAndRelatedHelperService.toastV2Service.error(err);
 
                         // hide loading
                         loading.close();
@@ -1960,7 +1950,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       })
                     )
                     .subscribe(() => {
-                      this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                       // hide loading
                       loading.close();
@@ -2049,7 +2039,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           clonedQueryBuilder.filter.removePathCondition('or.teamId');
 
           // load data
-          return this.followUpsDataService
+          return this.personAndRelatedHelperService.followUp.followUpsDataService
             .getCountedFollowUpsGroupedByTeams(
               this.selectedOutbreak.id,
               clonedQueryBuilder
@@ -2245,11 +2235,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     }
 
     // retrieve the list of Follow Ups
-    this.records$ = this.followUpsDataService
+    this.records$ = this.personAndRelatedHelperService.followUp.followUpsDataService
       .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         map((followUps: FollowUpModel[]) => {
-          return this.entityFollowUpHelperService.determineAlertness(
+          return this.personAndRelatedHelperService.followUp.determineAlertness(
             this.selectedOutbreak.contactFollowUpTemplate,
             followUps
           );
@@ -2297,11 +2287,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     }
 
     // count
-    this.followUpsDataService
+    this.personAndRelatedHelperService.followUp.followUpsDataService
       .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         }),
 
@@ -2317,7 +2307,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
    * Generate Follow Ups
    */
   generateFollowUps() {
-    this.dialogV2Service.showSideDialog({
+    this.personAndRelatedHelperService.dialogV2Service.showSideDialog({
       // title
       title: {
         get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE'
@@ -2415,7 +2405,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       response.handler.loading.show();
 
       // generate follow-ups
-      this.followUpsDataService
+      this.personAndRelatedHelperService.followUp.followUpsDataService
         .generateFollowUps(
           this.selectedOutbreak.id,
           (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.startDate,
@@ -2427,13 +2417,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         )
         .pipe(
           catchError((err) => {
-            this.toastV2Service.error(err);
+            this.personAndRelatedHelperService.toastV2Service.error(err);
             return throwError(err);
           })
         )
         .subscribe(() => {
           // success message
-          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
           // close popup
           response.handler.hide();
@@ -2448,7 +2438,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   * Export follow-ups
   */
   private exportFollowUps(qb: RequestQueryBuilder) {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showExportDataAfterLoadingData({
         title: {
           get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE'
@@ -2461,7 +2451,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               // handle errors
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // send error further
                 return throwError(err);
@@ -2489,7 +2479,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   url: `outbreaks/${ this.selectedOutbreak.id }/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
+                  fileName: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
                   queryBuilder: qb,
                   allow: {
                     types: [

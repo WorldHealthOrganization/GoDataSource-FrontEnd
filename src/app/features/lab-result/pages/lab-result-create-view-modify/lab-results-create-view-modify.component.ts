@@ -4,7 +4,6 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { Observable, throwError } from 'rxjs';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, takeUntil } from 'rxjs/operators';
@@ -38,9 +37,8 @@ import {
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 /**
  * Component
@@ -70,21 +68,20 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
-    private labResultDataService: LabResultDataService,
     private dialogV2Service: DialogV2Service,
     private domSanitizer: DomSanitizer,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private entityLabResultHelperService: EntityLabResultHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
@@ -127,7 +124,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Retrieve item
    */
   protected retrieveItem(record?: LabResultModel): Observable<LabResultModel> {
-    return this.labResultDataService
+    return this.personAndRelatedHelperService.labResult.labResultDataService
       .getOutbreakLabResult(
         this.selectedOutbreak.id,
         record ?
@@ -258,7 +255,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       ) {
         this.breadcrumbs.push(
           {
-            label: `${this.createViewModifyHelperService.i18nService.instant(this.entityData.name)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
+            label: `${this.personAndRelatedHelperService.i18nService.instant(this.entityData.name)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
             action: this.entityData.deleted ? null : {
               link: [`/lab-results/contacts/${this.entityData.id}`]
             }
@@ -270,7 +267,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       ) {
         this.breadcrumbs.push(
           {
-            label: `${this.createViewModifyHelperService.i18nService.instant(this.entityData.name)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
+            label: `${this.personAndRelatedHelperService.i18nService.instant(this.entityData.name)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
             action: this.entityData.deleted ? null : {
               link: [`/lab-results/cases/${this.entityData.id}`]
             }
@@ -290,7 +287,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     } else if (this.isModify) {
       this.breadcrumbs.push(
         {
-          label: this.createViewModifyHelperService.i18nService.instant(
+          label: this.personAndRelatedHelperService.i18nService.instant(
             'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
             {
               sampleIdentifier: this.itemData.sampleIdentifier ?
@@ -305,7 +302,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       // view
       this.breadcrumbs.push(
         {
-          label: this.createViewModifyHelperService.i18nService.instant(
+          label: this.personAndRelatedHelperService.i18nService.instant(
             'LNG_PAGE_VIEW_LAB_RESULT_TITLE',
             {
               sampleIdentifier: this.itemData.sampleIdentifier ?
@@ -375,8 +372,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON'),
+          message: () => this.personAndRelatedHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.entityData
           )
@@ -408,7 +405,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Initialize tabs - Details
    */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
-    return this.entityLabResultHelperService.generateTabsDetails(this.selectedOutbreak, {
+    return this.personAndRelatedHelperService.labResult.generateTabsDetails(this.selectedOutbreak, {
       isCreate: this.isCreate,
       itemData: this.itemData,
       options: {
@@ -601,13 +598,13 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
       // finished
       (type === CreateViewModifyV2ActionType.CREATE ?
-        this.labResultDataService.createLabResult(
+        this.personAndRelatedHelperService.labResult.labResultDataService.createLabResult(
           this.selectedOutbreak.id,
           EntityModel.getLinkForEntityType(this._personType),
           this.entityData.id,
           data
         ) :
-        this.labResultDataService
+        this.personAndRelatedHelperService.labResult.labResultDataService
           .modifyLabResult(
             this.selectedOutbreak.id,
             this.itemData.id,
@@ -628,7 +625,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         takeUntil(this.destroyed$)
       ).subscribe((item: LabResultModel) => {
         // success creating / updating event
-        this.createViewModifyHelperService.toastV2Service.success(
+        this.personAndRelatedHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_LAB_RESULT_ACTION_MODIFY_LAB_RESULT_SUCCESS_MESSAGE'
@@ -662,7 +659,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
           if (!item.uiStatusForms) {
             // determine forms
-            const forms: V2ColumnStatusForm[] = this.entityLabResultHelperService.getStatusForms({
+            const forms: V2ColumnStatusForm[] = this.personAndRelatedHelperService.labResult.getStatusForms({
               item
             });
 
@@ -706,7 +703,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = this.entityLabResultHelperService.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
+    this.expandListAdvancedFilters = this.personAndRelatedHelperService.labResult.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -768,7 +765,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     data.queryBuilder.clearRelationships();
 
     // retrieve data
-    this.expandListRecords$ = this.labResultDataService
+    this.expandListRecords$ = this.personAndRelatedHelperService.labResult.labResultDataService
       .getEntityLabResults(
         this.selectedOutbreak.id,
         EntityModel.getLinkForEntityType(this._personType),
@@ -778,7 +775,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       .pipe(
         // determine alertness
         map((labResults: LabResultModel[]) => {
-          return this.entityLabResultHelperService.determineAlertness(
+          return this.personAndRelatedHelperService.labResult.determineAlertness(
             this.selectedOutbreak.labResultsTemplate,
             labResults
           );

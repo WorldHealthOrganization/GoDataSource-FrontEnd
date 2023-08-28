@@ -7,8 +7,8 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-person-summary',
@@ -44,13 +44,13 @@ export class PersonSummaryComponent implements OnInit {
    */
   constructor(
     private authDataService: AuthDataService,
-    private entityHelperService: EntityHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {}
 
   ngOnInit() {
     this.authUser = this.authDataService.getAuthenticatedUser();
 
-    this.personData = this.entityHelperService.lightEntity(this.person);
+    this.personData = this.personAndRelatedHelperService.relationship.lightEntity(this.person);
 
     this.personLink = this.getPersonLink();
     this.personChainLink = this.getPersonChainLink();

@@ -15,7 +15,7 @@ import { FormHelperService } from '../../../core/services/helper/form-helper.ser
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../core/services/helper/reference-data-helper.service';
-import { EntityContactHelperService } from '../../../core/services/helper/entity-contact-helper.service';
+import { PersonAndRelatedHelperService } from '../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-form-contact-quick',
@@ -75,7 +75,7 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
       }
 
       // generate
-      this.contact.visualId = this.entityContactHelperService.generateContactIDMask(this.selectedOutbreak.contactIdMask);
+      this.contact.visualId = this.personAndRelatedHelperService.contact.generateContactIDMask(this.selectedOutbreak.contactIdMask);
       this.groupForm.controls.visualId.markAsDirty();
       this.onChange();
 
@@ -91,7 +91,7 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
     private i18nService: I18nService,
     private outbreakDataService: OutbreakDataService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private entityContactHelperService: EntityContactHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(controlContainer, validators, asyncValidators);
   }
@@ -125,7 +125,7 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
         // set visual ID translate data
         this.visualIDTooltip = this.i18nService.instant(
           'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION', {
-            mask: this.entityContactHelperService.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+            mask: this.personAndRelatedHelperService.contact.generateContactIDMask(this.selectedOutbreak.contactIdMask)
           }
         );
       });

@@ -15,7 +15,7 @@ import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../core/services/helper/reference-data-helper.service';
-import { EntityCaseHelperService } from '../../../core/services/helper/entity-case-helper.service';
+import { PersonAndRelatedHelperService } from '../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-form-case-quick',
@@ -79,7 +79,7 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
       }
 
       // generate
-      this.case.visualId = this.entityCaseHelperService.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
+      this.case.visualId = this.personAndRelatedHelperService.case.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
       this.groupForm.controls.visualId.markAsDirty();
       this.onChange();
 
@@ -96,7 +96,7 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
     private i18nService: I18nService,
     private outbreakDataService: OutbreakDataService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private entityCaseHelperService: EntityCaseHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(controlContainer, validators, asyncValidators);
   }
@@ -129,7 +129,7 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
         // set visual ID translate data
         this.visualIDTooltip = this.i18nService.instant(
           'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION', {
-            mask: this.entityCaseHelperService.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+            mask: this.personAndRelatedHelperService.case.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
           }
         );
       });

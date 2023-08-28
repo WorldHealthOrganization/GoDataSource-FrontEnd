@@ -15,18 +15,16 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-entity-relationships-list-add',
@@ -53,10 +51,8 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
     protected activatedRoute: ActivatedRoute,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
-    protected entityHelperService: EntityHelperService,
-    protected toastV2Service: ToastV2Service,
-    private i18nService: I18nService,
-    private referenceDataHelperService: ReferenceDataHelperService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       listHelperService, {
@@ -91,7 +87,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
     }
 
     // show the warning messages
-    this.toastV2Service.notice(
+    this.personAndRelatedHelperService.toastV2Service.notice(
       warningToken,
       undefined,
       AppMessages.APP_MESSAGE_CONVERT_RELATIONSHIP_WARNING
@@ -112,7 +108,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_CONVERT_RELATIONSHIP_WARNING);
+    this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_CONVERT_RELATIONSHIP_WARNING);
   }
 
   /**
@@ -204,7 +200,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
-              tooltip: this.i18nService.instant(data.type)
+              tooltip: this.personAndRelatedHelperService.i18nService.instant(data.type)
             });
           } else {
             forms.push({
@@ -458,15 +454,15 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
           }
         },
         {
-          label: this.entityHelperService.entityMap[this._entity.type].label,
+          label: this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].label,
           action: {
-            link: [this.entityHelperService.entityMap[this._entity.type].link]
+            link: [this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link]
           }
         },
         {
           label: this._entity.name,
           action: {
-            link: [`${ this.entityHelperService.entityMap[this._entity.type].link }/${ this._entity.id }/view`]
+            link: [`${ this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link }/${ this._entity.id }/view`]
           }
         },
         {
