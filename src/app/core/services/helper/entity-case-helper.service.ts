@@ -1236,7 +1236,7 @@ export class EntityCaseHelperService {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        visibleMandatoryIf: () => true,
+        visibleMandatoryIf: () => data.caseInvestigationTemplate && data.caseInvestigationTemplate()?.length > 0,
         template: data.caseInvestigationTemplate
       },
       {

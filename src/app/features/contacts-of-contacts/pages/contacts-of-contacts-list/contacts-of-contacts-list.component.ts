@@ -990,10 +990,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
       {
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityContactOfContactHelperService.visibleMandatoryKey,
-          'dateOfLastContact'
-        ),
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.DATE
         },

@@ -387,7 +387,7 @@ export class EntityEventHelperService {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        visibleMandatoryIf: () => true,
+        visibleMandatoryIf: () => data.eventInvestigationTemplate && data.eventInvestigationTemplate()?.length > 0,
         template: data.eventInvestigationTemplate
       },
       {

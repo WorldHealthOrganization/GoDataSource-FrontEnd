@@ -13,7 +13,6 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { QuestionModel } from '../../../../core/models/question.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
@@ -26,8 +25,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2FilterDate, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
@@ -56,12 +54,14 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { EntityContactHelperService } from '../../../../core/services/helper/entity-contact-helper.service';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
   templateUrl: './contact-daily-follow-ups-list.component.html'
 })
-export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpModel, IV2Column> implements OnDestroy {
+export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
   // constants
   private static readonly CREATED_BY_USER: string = 'createdByUser';
   private static readonly UPDATED_BY_USER: string = 'updatedByUser';
@@ -128,7 +128,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     protected activatedRoute: ActivatedRoute,
     protected dialogV2Service: DialogV2Service,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    private entityFollowUpHelperService: EntityFollowUpHelperService
+    private entityFollowUpHelperService: EntityFollowUpHelperService,
+    private entityContactHelperService: EntityContactHelperService
   ) {
     super(
       listHelperService, {
@@ -644,6 +645,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.lastName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'lastName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         format: {
@@ -674,6 +679,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.firstName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'firstName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         format: {
@@ -704,6 +713,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'visualId'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         format: {
@@ -718,6 +731,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.gender',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'gender'
+        ),
         sortable: true,
         format: {
           type: (item) => item.person?.gender && (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender] ?
@@ -734,6 +751,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.occupation',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'occupation'
+        ),
         sortable: true,
         format: {
           type: (item) => item.person?.occupation && (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation] ?
@@ -754,6 +775,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'date',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'date'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -776,7 +801,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               startDate: moment().startOf('day'),
               endDate: moment().endOf('day')
             },
-          search: (column: IV2Column) => {
+          search: (column) => {
             const startDate = (column.filter as IV2FilterDate).value.startDate;
             const endDate = (column.filter as IV2FilterDate).value.endDate;
 
@@ -827,6 +852,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
@@ -869,6 +895,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'teamId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'teamId'
+        ),
         format: {
           type: (item: FollowUpModel) => {
             return item.teamId && this.activatedRoute.snapshot.data.team.map[item.teamId] ?
@@ -906,6 +936,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'statusId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'statusId'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -921,6 +955,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'targeted',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'targeted'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -934,6 +972,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'area',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'address'
+        ),
         format: {
           type: 'address.location.name'
         },
@@ -952,6 +994,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'phoneNumber',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'address'
+        ),
         format: {
           type: 'address.phoneNumber'
         },
@@ -965,6 +1011,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'address.emailAddress',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -981,6 +1031,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        visibleMandatoryIf: () => true,
         sortable: true,
         format: {
           type: (item) => item.person?.dateOfLastContact ?
@@ -995,6 +1046,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.followUp.endDate',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP',
+        visibleMandatoryIf: () => true,
         sortable: true,
         format: {
           type: (item) => item.person?.followUp?.endDate ?
@@ -1009,6 +1061,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.age',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'ageDob'
+        ),
         format: {
           type: V2ColumnFormat.AGE,
           value: (item) => item.person?.age
@@ -1022,6 +1078,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.dob',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'ageDob'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE,
@@ -1034,6 +1094,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'contact.riskLevel',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityContactHelperService.visibleMandatoryKey,
+          'riskLevel'
+        ),
         sortable: true,
         notVisible: true,
         format: {
@@ -1055,6 +1119,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'index',
         label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
+        visibleMandatoryIf: () => true,
         sortable: true,
         filter: {
           type: V2FilterType.NUMBER_RANGE,
@@ -1064,6 +1129,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'address.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'address.addressLine1'
@@ -1079,6 +1148,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'address.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -1095,6 +1168,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'address.geoLocation.lat'
@@ -1103,6 +1180,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'address.geoLocation.lng'
@@ -1111,6 +1192,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'address.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -1127,6 +1212,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'address.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -1145,6 +1234,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'responsibleUserId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.entityFollowUpHelperService.visibleMandatoryKey,
+          'responsibleUserId'
+        ),
         notVisible: true,
         format: {
           type: (item) => item.responsibleUserId && this.activatedRoute.snapshot.data.user.map[item.responsibleUserId] ?
@@ -1182,6 +1275,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'deleted',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -1196,6 +1290,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'deletedAt',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1208,6 +1303,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'createdBy',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
@@ -1231,6 +1327,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'createdAt',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -1243,6 +1340,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'updatedBy',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
@@ -1266,6 +1364,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'updatedAt',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -1352,469 +1451,37 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = [
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'address',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
-        isArray: false
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'date',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'index',
-        label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'teamId',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-        options: this.activatedRoute.snapshot.data.team.options
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'targeted',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-        options: this.activatedRoute.snapshot.data.yesNo.options
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'statusId',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-        options: this.activatedRoute.snapshot.data.dailyFollowUpStatus.options
-      },
-      {
-        type: V2AdvancedFilterType.NUMBER,
-        field: 'weekNumber',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER',
-        allowedComparators: [
-          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.NUMBER], { value: V2AdvancedFilterComparatorType.IS })
-        ],
-        flagIt: true
-      },
-      {
-        type: V2AdvancedFilterType.DATE,
-        field: 'timeLastSeen',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER',
-        allowedComparators: [
-          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.DATE], { value: V2AdvancedFilterComparatorType.DATE })
-        ],
-        flagIt: true
-      },
-      {
-        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-        field: 'questionnaireAnswers',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        template: (): QuestionModel[] => this.selectedOutbreak.contactFollowUpTemplate
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'address.emailAddress',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
-        sortable: true,
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'address.geoLocationAccurate',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
-        options: this.activatedRoute.snapshot.data.yesNo.options,
-        sortable: true,
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'address.typeId',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_TYPE',
-        options: this.activatedRoute.snapshot.data.addressType.options,
-        sortable: true,
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'address.date',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_DATE',
-        sortable: true,
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'address.city',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_CITY',
-        sortable: true,
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'address.postalCode',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_POSTAL_CODE',
-        sortable: true,
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
-        field: 'address',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
-        isArray: false,
-        sortable: 'address.phoneNumber'
-      },
-      {
-        type: V2AdvancedFilterType.DELETED,
-        field: 'deleted',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
-        yesNoAllOptions: this.activatedRoute.snapshot.data.yesNoAll.options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'createdAt',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'updatedAt',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.DELETED_AT,
-        field: 'deletedAt',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT',
-        sortable: true
-      }
-    ];
-
-    // allowed to filter by user ?
-    if (UserModel.canListForFilters(this.authUser)) {
-      this.advancedFilters.push(
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'responsibleUserId',
-          label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
-          options: this.activatedRoute.snapshot.data.user.options,
-          sortable: true
-        }, {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'createdBy',
-          label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
-          options: this.activatedRoute.snapshot.data.user.options,
-          sortable: true
-        }, {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'updatedBy',
-          label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
-          options: this.activatedRoute.snapshot.data.user.options,
-          sortable: true
-        }
-      );
-    }
-
-    // Follow-up person
-    this.advancedFilters.push(
-      {
-        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
-        type: V2AdvancedFilterType.TEXT,
-        field: 'contact.firstName',
-        label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-        sortable: 'contact.firstName'
-      },
-      {
-        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
-        type: V2AdvancedFilterType.TEXT,
-        field: 'contact.lastName',
-        label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-        sortable: 'contact.lastName'
-      },
-      {
-        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'contact.addresses',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-        isArray: false,
-        allowedComparators: [
-          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.ADDRESS], { value: V2AdvancedFilterComparatorType.CONTAINS }),
-          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.ADDRESS], { value: V2AdvancedFilterComparatorType.LOCATION })
-        ]
-      },
-      {
-        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'contact.gender',
-        label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
-        options: this.activatedRoute.snapshot.data.gender.options,
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-      },
-      {
-        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'contact.riskLevel',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
-        options: this.referenceDataHelperService.filterPerOutbreakOptions(
+    this.advancedFilters = this.entityFollowUpHelperService.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
+      options: {
+        team: this.activatedRoute.snapshot.data.team.options,
+        yesNoAll: this.activatedRoute.snapshot.data.yesNoAll.options,
+        yesNo: this.activatedRoute.snapshot.data.yesNo.options,
+        dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus.options,
+        user: this.activatedRoute.snapshot.data.user.options,
+        addressType: this.activatedRoute.snapshot.data.addressType.options,
+        gender: this.activatedRoute.snapshot.data.gender.options,
+        risk: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           this.activatedRoute.snapshot.data.risk.options,
           undefined
         ),
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-      },
-      {
-        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
-        type: V2AdvancedFilterType.RANGE_AGE,
-        field: 'contact.age',
-        label: 'LNG_CONTACT_FIELD_LABEL_AGE',
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-      },
-      {
-        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'contact.dob',
-        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-      },
-      {
-        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
-        type: V2AdvancedFilterType.TEXT,
-        field: 'contact.visualId',
-        label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-        sortable: 'contact.visualId'
-      },
-      {
-        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
-        type: V2AdvancedFilterType.TEXT,
-        field: 'contact.addresses.phoneNumber',
-        label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-      },
-      {
-        // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'contact.occupation',
-        label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-        options: this.referenceDataHelperService.filterPerOutbreakOptions(
+        occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           this.activatedRoute.snapshot.data.occupation.options,
           undefined
         ),
-        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          this.activatedRoute.snapshot.data.classification.options,
+          undefined
+        ),
+        outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          this.activatedRoute.snapshot.data.outcome.options,
+          undefined
+        )
       }
-    );
-
-    // Contacts exposed to cases that match the criteria bellow
-    if (CaseModel.canList(this.authUser)) {
-      this.advancedFilters.push(
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'firstName',
-          label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'middleName',
-          label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'lastName',
-          label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'gender',
-          label: 'LNG_CASE_FIELD_LABEL_GENDER',
-          options: this.activatedRoute.snapshot.data.gender.options,
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'addresses.phoneNumber',
-          label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'riskLevel',
-          label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-          options: this.referenceDataHelperService.filterPerOutbreakOptions(
-            this.selectedOutbreak,
-            this.activatedRoute.snapshot.data.risk.options,
-            undefined
-          ),
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'riskReason',
-          label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'classification',
-          label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-          options: this.referenceDataHelperService.filterPerOutbreakOptions(
-            this.selectedOutbreak,
-            this.activatedRoute.snapshot.data.classification.options,
-            undefined
-          ),
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'occupation',
-          label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-          options: this.referenceDataHelperService.filterPerOutbreakOptions(
-            this.selectedOutbreak,
-            this.activatedRoute.snapshot.data.occupation.options,
-            undefined
-          ),
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_AGE,
-          field: 'age',
-          label: 'LNG_CASE_FIELD_LABEL_AGE',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_DATE,
-          field: 'dob',
-          label: 'LNG_CASE_FIELD_LABEL_DOB',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'visualId',
-          label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_DATE,
-          field: 'dateOfInfection',
-          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_DATE,
-          field: 'dateOfOnset',
-          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_DATE,
-          field: 'dateOfOutcome',
-          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_DATE,
-          field: 'dateBecomeCase',
-          label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.SELECT,
-          field: 'safeBurial',
-          label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-          options: this.activatedRoute.snapshot.data.yesNo.options,
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.SELECT,
-          field: 'isDateOfOnsetApproximate',
-          label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-          options: this.activatedRoute.snapshot.data.yesNo.options,
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_DATE,
-          field: 'dateOfReporting',
-          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.SELECT,
-          field: 'isDateOfReportingApproximate',
-          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-          options: this.activatedRoute.snapshot.data.yesNo.options,
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.SELECT,
-          field: 'transferRefused',
-          label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-          options: this.activatedRoute.snapshot.data.yesNo.options,
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'outcomeId',
-          label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-          options: this.referenceDataHelperService.filterPerOutbreakOptions(
-            this.selectedOutbreak,
-            this.activatedRoute.snapshot.data.outcome.options,
-            undefined
-          ),
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.SELECT,
-          field: 'wasContact',
-          label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-          options: this.activatedRoute.snapshot.data.yesNo.options,
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        },
-        {
-          type: V2AdvancedFilterType.ADDRESS,
-          field: 'addresses',
-          label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case',
-          isArray: false
-        },
-        {
-          type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-          field: 'questionnaireAnswers',
-          label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-          template: (): QuestionModel[] => this.selectedOutbreak.caseInvestigationTemplate,
-          relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
-          childQueryBuilderKey: 'case'
-        }
-      );
-    }
+    });
   }
 
   /**

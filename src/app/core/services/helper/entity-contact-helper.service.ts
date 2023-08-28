@@ -956,18 +956,14 @@ export class EntityContactHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
-          selectedOutbreak,
-          this.visibleMandatoryKey,
-          'dateOfLastContact'
-        ),
+        visibleMandatoryIf: () => true,
         sortable: true
       },
       {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        visibleMandatoryIf: () => true,
+        visibleMandatoryIf: () => data.contactInvestigationTemplate && data.contactInvestigationTemplate()?.length > 0,
         template: data.contactInvestigationTemplate,
         useLike: true
       },
@@ -1468,7 +1464,7 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
           field: 'questionnaireAnswers',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-          visibleMandatoryIf: () => true,
+          visibleMandatoryIf: () => data.contactFollowUpTemplate && data.contactFollowUpTemplate()?.length > 0,
           template: data.contactFollowUpTemplate,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
@@ -1734,7 +1730,7 @@ export class EntityContactHelperService {
           type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
           field: 'questionnaireAnswers',
           label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-          visibleMandatoryIf: () => true,
+          visibleMandatoryIf: () => data.caseInvestigationTemplate && data.caseInvestigationTemplate()?.length > 0,
           template: data.caseInvestigationTemplate,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',

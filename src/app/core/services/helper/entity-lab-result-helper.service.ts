@@ -601,7 +601,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        visibleMandatoryIf: () => true,
+        visibleMandatoryIf: () => selectedOutbreak.labResultsTemplate?.length > 0,
         template: () => selectedOutbreak.labResultsTemplate,
         useLike: true
       },
@@ -1818,7 +1818,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        visibleMandatoryIf: () => true,
+        visibleMandatoryIf: () => data.labResultsTemplate && data.labResultsTemplate()?.length > 0,
         template: data.labResultsTemplate,
         useLike: true
       },

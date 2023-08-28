@@ -1149,7 +1149,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
           }
         }),
-        advancedFilters: this.entityFollowUpHelperService.generateAdvancedFilters({
+        advancedFilters: this.entityFollowUpHelperService.generateAdvancedFiltersPerson(this.selectedOutbreak, {
           contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
           options: {
             team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,

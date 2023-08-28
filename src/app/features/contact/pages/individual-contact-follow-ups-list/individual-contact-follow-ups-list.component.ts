@@ -233,7 +233,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityFollowUpHelperService.generateAdvancedFilters({
+    this.advancedFilters = this.entityFollowUpHelperService.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       options: {
         team: (this.route.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
