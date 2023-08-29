@@ -49,6 +49,7 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 /**
  * Component
@@ -369,6 +370,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         // contacts and exposures ...
         this.initializeTabsContacts(),
         this.initializeTabsExposures(),
+        this.initializeTabsLabResults(),
         this.initializeTabsViewFollowUps()
       ],
 
@@ -885,6 +887,186 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
   }
 
   /**
+   * Initialize tabs - Lab results
+   */
+  private initializeTabsLabResults(): ICreateViewModifyV2TabTable {
+    // create tab
+    const newTab: ICreateViewModifyV2TabTable = {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'lab_results',
+      label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_SEE_LAB_RESULTS',
+      visible: () => this.isView &&
+        LabResultModel.canList(this.authUser) &&
+        ContactOfContactModel.canListLabResult(this.authUser),
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
+        pageSettingsKey: UserSettings.CONTACT_OF_CONTACT_LAB_FIELDS,
+        advancedFilterType: Constants.APP_PAGE.CONTACT_OF_CONTACT_LAB_RESULTS.value,
+        tableColumnActions: this.personAndRelatedHelperService.labResult.retrieveTableColumnActions({
+          personType: this.itemData.type,
+          selectedOutbreak: () => this.selectedOutbreak,
+          selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+          refreshList: () => {
+            // reload data
+            const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+            localTab.refresh(newTab);
+          }
+        }),
+        tableColumns: this.personAndRelatedHelperService.labResult.retrieveTableColumns(this.selectedOutbreak, {
+          user: this.activatedRoute.snapshot.data.user,
+          options: {
+            labName: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            )
+          }
+        }),
+        advancedFilters: this.personAndRelatedHelperService.labResult.generateAdvancedFiltersPerson(this.selectedOutbreak, {
+          labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
+          options: {
+            labName: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+            yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+            user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          }
+        }),
+        queryBuilder: new RequestQueryBuilder(),
+        pageIndex: 0,
+        refresh: (tab) => {
+          // attach fields restrictions
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          const fields: string[] = this.personAndRelatedHelperService.labResult.refreshListFields();
+          if (fields.length > 0) {
+            localTab.queryBuilder.clearFields();
+            localTab.queryBuilder.fields(...fields);
+          }
+
+          // refresh data
+          localTab.records$ = this.personAndRelatedHelperService.labResult
+            .retrieveRecords(
+              this.selectedOutbreak,
+              EntityModel.getLinkForEntityType(this.itemData.type),
+              this.itemData.id,
+              localTab.queryBuilder
+            )
+            .pipe(
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            );
+
+          // count
+          localTab.refreshCount(tab);
+
+          // update ui
+          localTab.updateUI();
+        },
+        refreshCount: (
+          tab,
+          applyHasMoreLimit?: boolean
+        ) => {
+          // reset
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.pageCount = undefined;
+
+          // set apply value
+          if (applyHasMoreLimit !== undefined) {
+            localTab.applyHasMoreLimit = applyHasMoreLimit;
+          }
+
+          // remove paginator from query builder
+          const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
+          countQueryBuilder.paginator.clear();
+          countQueryBuilder.sort.clear();
+          countQueryBuilder.clearFields();
+
+          // apply has more limit
+          if (localTab.applyHasMoreLimit) {
+            countQueryBuilder.flag(
+              'applyHasMoreLimit',
+              true
+            );
+          }
+
+          // count
+          this.personAndRelatedHelperService.labResult
+            .retrieveRecordsCount(
+              this.selectedOutbreak.id,
+              this.itemData.type,
+              this.itemData.id,
+              countQueryBuilder
+            )
+            .pipe(
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            ).subscribe((response) => {
+              localTab.pageCount = response;
+            });
+        }
+      }
+    };
+
+    // finished
+    return newTab;
+  }
+
+  /**
    * Initialize tabs - Follow-ups
    */
   private initializeTabsViewFollowUps(): ICreateViewModifyV2TabTable {
@@ -1127,6 +1309,16 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
               link: () => ['/relationships', EntityType.CONTACT_OF_CONTACT, this.itemData.id, 'exposures']
             },
             visible: () => ContactOfContactModel.canListRelationshipExposures(this.authUser)
+          },
+
+          // lab results
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_SEE_LAB_RESULTS',
+            action: {
+              link: () => ['/lab-results', 'contacts-of-contacts', this.itemData.id]
+            },
+            visible: () => ContactOfContactModel.canListLabResult(this.authUser)
           },
 
           // follow-ups

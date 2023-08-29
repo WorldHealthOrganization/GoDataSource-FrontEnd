@@ -38,6 +38,7 @@ import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -465,6 +466,24 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               },
               visible: (item: ContactOfContactModel): boolean => {
                 return !item.deleted;
+              }
+            },
+
+            // See contact lab results
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_SEE_LAB_RESULTS'
+              },
+              action: {
+                link: (item: ContactOfContactModel): string[] => {
+                  return ['/lab-results', 'contacts-of-contacts', item.id];
+                }
+              },
+              visible: (item: ContactOfContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  LabResultModel.canList(this.authUser) &&
+                  ContactOfContactModel.canListLabResult(this.authUser);
               }
             },
 
