@@ -30,6 +30,7 @@ import { Moment } from 'moment';
 import * as momentOriginal from 'moment';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
   selector: 'app-lab-results',
@@ -137,6 +138,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                 ) || (
                   item.personType === EntityType.CONTACT &&
                   ContactModel.canViewLabResult(this.authUser)
+                ) || (
+                  item.personType === EntityType.CONTACT_OF_CONTACT &&
+                  ContactOfContactModel.canViewLabResult(this.authUser)
                 )
               );
           }
@@ -168,6 +172,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                 ) || (
                   item.personType === EntityType.CONTACT &&
                   ContactModel.canModifyLabResult(this.authUser)
+                ) || (
+                  item.personType === EntityType.CONTACT_OF_CONTACT &&
+                  ContactOfContactModel.canModifyLabResult(this.authUser)
                 )
               );
           }
@@ -248,6 +255,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                     ) || (
                       item.personType === EntityType.CONTACT &&
                       ContactModel.canDeleteLabResult(this.authUser)
+                    ) || (
+                      item.personType === EntityType.CONTACT_OF_CONTACT &&
+                      ContactOfContactModel.canDeleteLabResult(this.authUser)
                     )
                   );
               }
@@ -328,6 +338,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                     ) || (
                       item.personType === EntityType.CONTACT &&
                       ContactModel.canRestoreLabResult(this.authUser)
+                    ) || (
+                      item.personType === EntityType.CONTACT_OF_CONTACT &&
+                      ContactOfContactModel.canRestoreLabResult(this.authUser)
                     )
                   );
               }
@@ -356,6 +369,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'visualId'
         ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -365,16 +381,23 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
           relationshipKey: 'person'
         },
         link: (data) => {
-          return data.person.type === EntityType.CASE ?
-            (
-              CaseModel.canView(this.authUser) && !data.person.deleted ?
-                `/cases/${data.person.id}/view` :
-                undefined
-            ) : (
-              data.person.type === EntityType.CONTACT && ContactModel.canView(this.authUser) && !data.person.deleted ?
-                `/contacts/${data.person.id}/view` :
-                undefined
-            );
+          return (
+            data.person && (
+              (
+                data.person.type === EntityType.CASE &&
+                CaseModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT &&
+                ContactModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT_OF_CONTACT &&
+                ContactOfContactModel.canView(this.authUser)
+              )
+            ) &&
+            !data.person.deleted
+          ) ?
+            EntityModel.getPersonLink(data.person) :
+            undefined;
         }
       },
       {
@@ -389,6 +412,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'lastName'
         ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -398,16 +424,23 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
           relationshipKey: 'person'
         },
         link: (data) => {
-          return data.person.type === EntityType.CASE ?
-            (
-              CaseModel.canView(this.authUser) && !data.person.deleted ?
-                `/cases/${data.person.id}/view` :
-                undefined
-            ) : (
-              data.person.type === EntityType.CONTACT && ContactModel.canView(this.authUser) && !data.person.deleted ?
-                `/contacts/${data.person.id}/view` :
-                undefined
-            );
+          return (
+            data.person && (
+              (
+                data.person.type === EntityType.CASE &&
+                CaseModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT &&
+                ContactModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT_OF_CONTACT &&
+                ContactOfContactModel.canView(this.authUser)
+              )
+            ) &&
+            !data.person.deleted
+          ) ?
+            EntityModel.getPersonLink(data.person) :
+            undefined;
         }
       },
       {
@@ -422,6 +455,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'firstName'
         ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -431,16 +467,23 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
           relationshipKey: 'person'
         },
         link: (data) => {
-          return data.person.type === EntityType.CASE ?
-            (
-              CaseModel.canView(this.authUser) && !data.person.deleted ?
-                `/cases/${data.person.id}/view` :
-                undefined
-            ) : (
-              data.person.type === EntityType.CONTACT && ContactModel.canView(this.authUser) && !data.person.deleted ?
-                `/contacts/${data.person.id}/view` :
-                undefined
-            );
+          return (
+            data.person && (
+              (
+                data.person.type === EntityType.CASE &&
+                CaseModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT &&
+                ContactModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT_OF_CONTACT &&
+                ContactOfContactModel.canView(this.authUser)
+              )
+            ) &&
+            !data.person.deleted
+          ) ?
+            EntityModel.getPersonLink(data.person) :
+            undefined;
         }
       },
       {
@@ -1048,7 +1091,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
         ) || (
           LabResultModel.canExport(this.authUser) && (
             CaseModel.canExportLabResult(this.authUser) ||
-            ContactModel.canExportLabResult(this.authUser)
+            ContactModel.canExportLabResult(this.authUser) ||
+            ContactOfContactModel.canExportLabResult(this.authUser)
           )
         );
       },
@@ -1065,7 +1109,11 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
             }
           },
           visible: (): boolean => {
-            return LabResultModel.canExport(this.authUser) && (CaseModel.canExportLabResult(this.authUser) || ContactModel.canExportLabResult(this.authUser));
+            return LabResultModel.canExport(this.authUser) && (
+              CaseModel.canExportLabResult(this.authUser) ||
+              ContactModel.canExportLabResult(this.authUser) ||
+              ContactOfContactModel.canExportLabResult(this.authUser)
+            );
           }
         },
 
@@ -1114,7 +1162,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       ) || (
         LabResultModel.canExport(this.authUser) && (
           CaseModel.canExportLabResult(this.authUser) ||
-          ContactModel.canExportLabResult(this.authUser)
+          ContactModel.canExportLabResult(this.authUser) ||
+          ContactOfContactModel.canExportLabResult(this.authUser)
         )
       ) || (
         LabResultModel.canBulkDelete(this.authUser) &&
@@ -1177,7 +1226,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
           visible: (): boolean => {
             return LabResultModel.canExport(this.authUser) && (
               CaseModel.canExportLabResult(this.authUser) ||
-              ContactModel.canExportLabResult(this.authUser)
+              ContactModel.canExportLabResult(this.authUser) ||
+              ContactOfContactModel.canExportLabResult(this.authUser)
             );
           },
           disable: (selected: string[]): boolean => {
@@ -1194,7 +1244,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
             ) || (
               LabResultModel.canExport(this.authUser) && (
                 CaseModel.canExportLabResult(this.authUser) ||
-                ContactModel.canExportLabResult(this.authUser)
+                ContactModel.canExportLabResult(this.authUser) ||
+                ContactOfContactModel.canExportLabResult(this.authUser)
               )
             )
           ) && (
@@ -1523,44 +1574,16 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
    * Re(load) the Lab Results list
    */
   refreshList(): void {
-    // retrieve only case lab results ?
-    if (
-      CaseModel.canListLabResult(this.authUser) && (
-        !this.selectedOutbreak.isContactLabResultsActive ||
-        !ContactModel.canListLabResult(this.authUser)
-      )
-    ) {
-      // force filter by cases
-      this.queryBuilder.filter.byEquality(
-        'personType',
-        EntityType.CASE
-      );
-    } else if (
-      ContactModel.canListLabResult(this.authUser) &&
-      !CaseModel.canListLabResult(this.authUser)
-    ) {
-      // outbreak allows this case ?
-      if (this.selectedOutbreak.isContactLabResultsActive) {
-        // force filter by cases
-        this.queryBuilder.filter.byEquality(
-          'personType',
-          EntityType.CONTACT
-        );
-      } else {
-        // can't see any labs :)
-        // force filter by cases
-        this.queryBuilder.filter.byEquality(
-          'personType',
-          '—'
-        );
-      }
-    } else {
-      // NOT POSSIBLE TO ACCESS THIS PAGE WITHOUT HAVING AT LEAST ONE OF THE TWO PERMISSIONS ( case / contact list lab results )
-    }
+    // add person type conditions
+    const queryBuilder = _.cloneDeep(this.queryBuilder);
+    this.addPersonTypeConditions(queryBuilder);
 
     // retrieve the list of lab results
     this.records$ = this.personAndRelatedHelperService.labResult.labResultDataService
-      .getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
+      .getOutbreakLabResults(
+        this.selectedOutbreak.id,
+        queryBuilder
+      )
       .pipe(
         // determine alertness
         map((data: LabResultModel[]) => {
@@ -1592,6 +1615,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
     countQueryBuilder.clearFields();
+
+    // add person type conditions
+    this.addPersonTypeConditions(countQueryBuilder);
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
@@ -1694,5 +1720,42 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
           });
       }
     });
+  }
+
+  /**
+   * Person type conditions
+   */
+  private addPersonTypeConditions(qb: RequestQueryBuilder) {
+    // check person types permissions
+    const personTypes: string[] = [];
+    if (CaseModel.canListLabResult(this.authUser)) {
+      personTypes.push(EntityType.CASE);
+    }
+    if (
+      ContactModel.canListLabResult(this.authUser) &&
+      this.selectedOutbreak.isContactLabResultsActive
+    ) {
+      personTypes.push(EntityType.CONTACT);
+    }
+    if (ContactOfContactModel.canListLabResult(this.authUser)) {
+      personTypes.push(EntityType.CONTACT_OF_CONTACT);
+    }
+
+    // force filtering ?
+    if (personTypes.length < 1) {
+      // can't see any labs :)
+      qb.filter.byEquality(
+        'personType',
+        '-'
+      );
+    } else {
+      // force filter by specific person types
+      qb.filter.bySelect(
+        'personType',
+        personTypes,
+        false,
+        null
+      );
+    }
   }
 }

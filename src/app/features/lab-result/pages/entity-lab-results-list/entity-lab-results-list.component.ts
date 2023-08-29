@@ -34,6 +34,7 @@ import { Constants } from '../../../../core/models/constants';
 import { UserModel } from '../../../../core/models/user.model';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 @Component({
   selector: 'app-entity-lab-results-list',
@@ -42,7 +43,7 @@ import { PersonAndRelatedHelperService } from '../../../../core/services/helper/
 export class EntityLabResultsListComponent extends ListComponent<LabResultModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
   // entity
   personType: EntityType;
-  entityData: CaseModel | ContactModel;
+  entityData: CaseModel | ContactModel | ContactOfContactModel;
 
   // constants
   EntityType = EntityType;
@@ -308,6 +309,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
         return LabResultModel.canExport(this.authUser) && (
           (this.personType === EntityType.CASE && CaseModel.canExportLabResult(this.authUser)) ||
           (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser)) ||
+          (this.personType === EntityType.CONTACT_OF_CONTACT && ContactOfContactModel.canExportLabResult(this.authUser)) ||
           (
             this.personType === EntityType.CASE &&
             CaseModel.canModify(this.authUser) &&
@@ -353,7 +355,8 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
           visible: (): boolean => {
             return LabResultModel.canExport(this.authUser) && (
               (this.personType === EntityType.CASE && CaseModel.canExportLabResult(this.authUser)) ||
-              (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser))
+              (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser)) ||
+              (this.personType === EntityType.CONTACT_OF_CONTACT && ContactOfContactModel.canExportLabResult(this.authUser))
             );
           }
         }
@@ -373,7 +376,8 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
       ) || (
         LabResultModel.canExport(this.authUser) && (
           CaseModel.canExportLabResult(this.authUser) ||
-          ContactModel.canExportLabResult(this.authUser)
+          ContactModel.canExportLabResult(this.authUser) ||
+          ContactOfContactModel.canExportLabResult(this.authUser)
         )
       ) || (
         LabResultModel.canBulkDelete(this.authUser) &&
@@ -432,7 +436,8 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
           visible: (): boolean => {
             return LabResultModel.canExport(this.authUser) && (
               CaseModel.canExportLabResult(this.authUser) ||
-              ContactModel.canExportLabResult(this.authUser)
+              ContactModel.canExportLabResult(this.authUser) ||
+              ContactOfContactModel.canExportLabResult(this.authUser)
             );
           },
           disable: (selected: string[]): boolean => {
@@ -449,7 +454,8 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
             ) || (
               LabResultModel.canExport(this.authUser) && (
                 CaseModel.canExportLabResult(this.authUser) ||
-                ContactModel.canExportLabResult(this.authUser)
+                ContactModel.canExportLabResult(this.authUser) ||
+                ContactOfContactModel.canExportLabResult(this.authUser)
               )
             )
           ) && (
@@ -758,6 +764,18 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
 
     // entity list
     if (
+      this.personType === EntityType.CONTACT_OF_CONTACT &&
+      ContactOfContactModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+          action: {
+            link: ['/contacts-of-contacts']
+          }
+        }
+      );
+    } else if (
       this.personType === EntityType.CONTACT &&
       ContactModel.canList(this.authUser)
     ) {
@@ -787,6 +805,18 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
     if (this.entityData) {
       // entity view
       if (
+        this.personType === EntityType.CONTACT_OF_CONTACT &&
+        ContactOfContactModel.canView(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          {
+            label: this.entityData.name,
+            action: {
+              link: [`/contacts-of-contacts/${ this.entityData.id }/view`]
+            }
+          }
+        );
+      } else if (
         this.personType === EntityType.CONTACT &&
         ContactModel.canView(this.authUser)
       ) {
@@ -1025,15 +1055,25 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
             const labResultsFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
 
             // show export
+            // EntityType.CASE
+            let personId = this.activatedRoute.snapshot.params.caseId;
+            let pageTitle = 'LNG_PAGE_LIST_CASES_TITLE';
+            if (this.personType === EntityType.CONTACT_OF_CONTACT) {
+              personId = this.activatedRoute.snapshot.params.contactOfContactId;
+              pageTitle = 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE';
+            } else if (this.personType === EntityType.CONTACT) {
+              personId = this.activatedRoute.snapshot.params.contactId;
+              pageTitle = 'LNG_PAGE_LIST_CONTACTS_TITLE';
+            }
             finished({
               title: {
                 get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_TITLE'
               },
               export: {
-                url: `/outbreaks/${ this.selectedOutbreak.id }/${ EntityModel.getLinkForEntityType(this.personType) }/${ this.personType === EntityType.CONTACT ? this.activatedRoute.snapshot.params.contactId : this.activatedRoute.snapshot.params.caseId }/lab-results/export`,
+                url: `/outbreaks/${ this.selectedOutbreak.id }/${ EntityModel.getLinkForEntityType(this.personType) }/${ personId }/lab-results/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${ this.personAndRelatedHelperService.i18nService.instant(this.personType === EntityType.CONTACT ? 'LNG_PAGE_LIST_CONTACTS_TITLE' : 'LNG_PAGE_LIST_CASES_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
+                fileName: `${ this.personAndRelatedHelperService.i18nService.instant(pageTitle) } - ${ moment().format('YYYY-MM-DD') }`,
                 queryBuilder: qb,
                 allow: {
                   types: [

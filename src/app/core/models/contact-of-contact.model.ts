@@ -176,6 +176,16 @@ export class ContactOfContactModel
   static canConvertToContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT) : false); }
 
   /**
+   * Static Permissions - IPermissionRelatedLabResult
+   */
+  static canViewLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_LAB_RESULT) : false); }
+  static canListLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_LAB_RESULT) : false); }
+  static canModifyLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_MODIFY_LAB_RESULT) : false); }
+  static canDeleteLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE_LAB_RESULT) : false); }
+  static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_RESTORE_LAB_RESULT) : false); }
+  static canExportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_LAB_RESULT) : false); }
+
+  /**
    * Constructor
    */
   constructor(data = null) {
@@ -338,6 +348,16 @@ export class ContactOfContactModel
   canGenerateVisualId(user: UserModel): boolean { return ContactOfContactModel.canGenerateVisualId(user); }
   canExportDossier(user: UserModel): boolean { return ContactOfContactModel.canExportDossier(user); }
   canConvertToContact(user: UserModel): boolean { return ContactOfContactModel.canConvertToContact(user); }
+
+  /**
+   * Permissions - IPermissionRelatedLabResult
+   */
+  canViewLabResult(user: UserModel): boolean { return ContactOfContactModel.canViewLabResult(user); }
+  canListLabResult(user: UserModel): boolean { return ContactOfContactModel.canListLabResult(user); }
+  canModifyLabResult(user: UserModel): boolean { return ContactOfContactModel.canModifyLabResult(user); }
+  canDeleteLabResult(user: UserModel): boolean { return ContactOfContactModel.canDeleteLabResult(user); }
+  canRestoreLabResult(user: UserModel): boolean { return ContactOfContactModel.canRestoreLabResult(user); }
+  canExportLabResult(user: UserModel): boolean { return ContactOfContactModel.canExportLabResult(user); }
 
   /**
    * Contact Of Contact Name

@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { BaseModel } from './base.model';
 import { CaseModel } from './case.model';
 import { ContactModel } from './contact.model';
+import { ContactOfContactModel } from './contact-of-contact.model';
 import { EntityType } from './entity-type';
 import { LabResultSequenceModel } from './lab-result-sequence.model';
 import { OutbreakModel } from './outbreak.model';
@@ -45,7 +46,7 @@ export class LabResultModel
   };
   personId: string;
   personType: EntityType;
-  person: CaseModel | ContactModel;
+  person: CaseModel | ContactModel | ContactOfContactModel;
   testedFor: string;
   sequence: LabResultSequenceModel;
 
@@ -93,9 +94,18 @@ export class LabResultModel
 
     this.person = _.get(data, 'person');
     if (!_.isEmpty(this.person)) {
-      this.person = this.person.type === EntityType.CONTACT ?
-        new ContactModel(this.person) :
-        new CaseModel(this.person);
+      switch (this.person.type) {
+        case EntityType.CONTACT:
+          this.person = new ContactModel(this.person);
+          break;
+        case EntityType.CONTACT_OF_CONTACT:
+          this.person = new ContactOfContactModel(this.person);
+          break;
+        // case EntityType.CASE:
+        default:
+          this.person = new CaseModel(this.person);
+          break;
+      }
     }
 
     this.id = _.get(data, 'id');

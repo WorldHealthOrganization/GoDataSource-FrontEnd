@@ -77,7 +77,8 @@ const routes: Routes = [
         new PermissionExpression({
           or: [
             PERMISSION.CASE_LIST_LAB_RESULT,
-            PERMISSION.CONTACT_LIST_LAB_RESULT
+            PERMISSION.CONTACT_LIST_LAB_RESULT,
+            PERMISSION.CONTACT_OF_CONTACT_LIST_LAB_RESULT
           ]
         })
       ]
@@ -216,6 +217,44 @@ const routes: Routes = [
         PERMISSION.CONTACT_MODIFY_LAB_RESULT
       ],
       personType: EntityType.CONTACT,
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
+  // Contact of contact Lab results
+  {
+    path: 'contacts-of-contacts/:contactOfContactId',
+    ...entityLabResultsFoundation,
+    data: {
+      permissions: [
+        PERMISSION.CONTACT_OF_CONTACT_LIST_LAB_RESULT
+      ],
+      personType: EntityType.CONTACT_OF_CONTACT
+    }
+  },
+  // View Contact Lab Result
+  {
+    path: 'contacts-of-contacts/:contactOfContactId/:labResultId/view',
+    ...createViewModifyFoundation,
+    data: {
+      permissions: [
+        PERMISSION.CONTACT_OF_CONTACT_VIEW_LAB_RESULT
+      ],
+      personType: EntityType.CONTACT_OF_CONTACT,
+      action: CreateViewModifyV2Action.VIEW
+    }
+  },
+  // Modify Contact Lab Result
+  {
+    path: 'contacts-of-contacts/:contactOfContactId/:labResultId/modify',
+    ...createViewModifyFoundation,
+    data: {
+      permissions: [
+        PERMISSION.CONTACT_OF_CONTACT_MODIFY_LAB_RESULT
+      ],
+      personType: EntityType.CONTACT_OF_CONTACT,
       action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
