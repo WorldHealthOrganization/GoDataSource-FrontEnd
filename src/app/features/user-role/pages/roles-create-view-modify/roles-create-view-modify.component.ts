@@ -21,8 +21,10 @@ import { UserRoleDataService } from '../../../../core/services/data/user-role.da
 import { PERMISSION, PermissionModel } from '../../../../core/models/permission.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -42,8 +44,10 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected userRoleDataService: UserRoleDataService
@@ -53,7 +57,8 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
@@ -165,7 +170,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_USER_ROLES_TITLE', {
             name: this.itemData.name
           }
@@ -175,7 +180,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_USER_ROLES_TITLE', {
             name: this.itemData.name
           }
@@ -204,8 +209,8 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -328,14 +333,14 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
               groupSelectionChanged: (data) => {
                 UserRoleHelper.groupSelectionChanged(
                   data,
-                  this.createViewModifyHelperService.i18nService,
+                  this.i18nService,
                   this.dialogV2Service
                 );
               },
               groupOptionCheckStateChanged: (data) => {
                 UserRoleHelper.groupOptionCheckStateChanged(
                   data,
-                  this.createViewModifyHelperService.i18nService,
+                  this.i18nService,
                   this.dialogV2Service
                 );
               },
@@ -433,7 +438,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
         })
       ).subscribe((outbreak) => {
         // display message
-        this.createViewModifyHelperService.toastV2Service.success(
+        this.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_USER_ROLE_ACTION_CREATE_USER_ROLE_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_USER_ROLES_ACTION_MODIFY_USER_ROLES_SUCCESS_MESSAGE'

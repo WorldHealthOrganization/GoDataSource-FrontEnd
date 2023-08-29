@@ -26,10 +26,8 @@ import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/component
 import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
@@ -48,13 +46,9 @@ import { Location } from '@angular/common';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { TeamModel } from '../../../../core/models/team.model';
-import { EntityContactOfContactHelperService } from '../../../../core/services/helper/entity-contact-of-contact-helper.service';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
-import { EntityLabResultHelperService } from '../../../../core/services/helper/entity-lab-result-helper.service';
-import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 /**
  * Component
@@ -102,28 +96,24 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
-    protected contactsOfContactsDataService: ContactsOfContactsDataService,
     protected dialogV2Service: DialogV2Service,
-    protected entityHelperService: EntityHelperService,
     protected systemSettingsDataService: SystemSettingsDataService,
     protected entityDataService: EntityDataService,
-    protected entityLabResultHelperService: EntityLabResultHelperService,
     protected relationshipDataService: RelationshipDataService,
     protected domSanitizer: DomSanitizer,
     protected location: Location,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    private entityContactOfContactHelperService: EntityContactOfContactHelperService,
-    private entityFollowUpHelperService: EntityFollowUpHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
@@ -164,7 +154,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     }
 
     // remove global notifications
-    this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+    this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
   }
 
   /**
@@ -183,7 +173,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Retrieve item
    */
   protected retrieveItem(record?: ContactOfContactModel): Observable<ContactOfContactModel> {
-    return this.contactsOfContactsDataService
+    return this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
       .getContactOfContact(
         this.selectedOutbreak.id,
         record ?
@@ -198,7 +188,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
   protected initializedData(): void {
     // initialize visual ID mask
     this._cocVisualIDMask = {
-      mask: this.entityContactOfContactHelperService.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask)
+      mask: this.personAndRelatedHelperService.contactOfContact.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask)
     };
 
     // set visual id
@@ -217,7 +207,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       this.isModify
     ) {
       // remove global notifications
-      this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+      this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
       // show global notifications
       this.checkForPersonExistence();
@@ -303,7 +293,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE', {
             name: this.itemData.name
           }
@@ -313,7 +303,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE', {
             name: this.itemData.name
           }
@@ -340,7 +330,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       this.breadcrumbInfos.push({
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE',
         tooltip: this.itemData.dateBecomeContactOfContact ?
-          `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${moment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${moment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -350,7 +340,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       this.breadcrumbInfos.push({
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT',
         tooltip: this.itemData.dateBecomeContactOfContact ?
-          `${this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${moment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${moment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -379,15 +369,14 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         // contacts and exposures ...
         this.initializeTabsContacts(),
         this.initializeTabsExposures(),
-        this.initializeTabsLabResults(),
         this.initializeTabsViewFollowUps()
       ],
 
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_BUTTON'),
+          message: () => this.personAndRelatedHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -421,7 +410,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Initialize tabs - Personal
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return this.entityContactOfContactHelperService.generateTabsPersonal(this.selectedOutbreak, {
+    return this.personAndRelatedHelperService.contactOfContact.generateTabsPersonal(this.selectedOutbreak, {
       selectedOutbreak: this.selectedOutbreak,
       isCreate: this.isCreate,
       itemData: this.itemData,
@@ -454,7 +443,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Initialize tabs - Epidemiology
    */
   private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
-    return this.entityContactOfContactHelperService.generateTabsEpidemiology(this.selectedOutbreak, {
+    return this.personAndRelatedHelperService.contactOfContact.generateTabsEpidemiology(this.selectedOutbreak, {
       isCreate: this.isCreate,
       itemData: this.itemData,
       options: {
@@ -481,7 +470,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Initialize tabs - Relationship
    */
   private initializeTabsRelationship(): ICreateViewModifyV2Tab {
-    return this.entityHelperService.generateTabsDetails(this.selectedOutbreak, {
+    return this.personAndRelatedHelperService.relationship.generateTabsDetails(this.selectedOutbreak, {
       entityId: 'LNG_COMMON_MODEL_FIELD_LABEL_ID',
       tabName: 'details',
       tabLabel: 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_RELATIONSHIP_TITLE',
@@ -527,7 +516,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: ContactsOfContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CASE,
-      label: `${this.createViewModifyHelperService.i18nService.instant(EntityType.CASE)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.personAndRelatedHelperService.i18nService.instant(EntityType.CASE)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersCase',
@@ -562,7 +551,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: ContactsOfContactsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
-      label: `${this.createViewModifyHelperService.i18nService.instant(EntityType.CONTACT)} ${this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersContact',
@@ -604,7 +593,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
-        tableColumnActions: this.entityHelperService.retrieveTableColumnActions({
+        tableColumnActions: this.personAndRelatedHelperService.relationship.retrieveTableColumnActions({
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
@@ -615,7 +604,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.entityHelperService.retrieveTableColumns({
+        tableColumns: this.personAndRelatedHelperService.relationship.retrieveTableColumns({
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
@@ -643,7 +632,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
           }
         }),
-        advancedFilters: this.entityHelperService.generateAdvancedFilters({
+        advancedFilters: this.personAndRelatedHelperService.relationship.generateAdvancedFilters({
           options: {
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -675,7 +664,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         refresh: (tab) => {
           // refresh data
           const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          localTab.records$ = this.entityHelperService
+          localTab.records$ = this.personAndRelatedHelperService.relationship
             .retrieveRecords(
               RelationshipType.CONTACT,
               this.selectedOutbreak,
@@ -721,7 +710,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           }
 
           // count
-          this.entityHelperService
+          this.personAndRelatedHelperService.relationship
             .retrieveRecordsCount(
               RelationshipType.CONTACT,
               this.selectedOutbreak,
@@ -757,7 +746,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
-        tableColumnActions: this.entityHelperService.retrieveTableColumnActions({
+        tableColumnActions: this.personAndRelatedHelperService.relationship.retrieveTableColumnActions({
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
@@ -768,7 +757,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.entityHelperService.retrieveTableColumns({
+        tableColumns: this.personAndRelatedHelperService.relationship.retrieveTableColumns({
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
@@ -796,7 +785,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
           }
         }),
-        advancedFilters: this.entityHelperService.generateAdvancedFilters({
+        advancedFilters: this.personAndRelatedHelperService.relationship.generateAdvancedFilters({
           options: {
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
@@ -828,7 +817,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         refresh: (tab) => {
           // refresh data
           const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          localTab.records$ = this.entityHelperService
+          localTab.records$ = this.personAndRelatedHelperService.relationship
             .retrieveRecords(
               RelationshipType.EXPOSURE,
               this.selectedOutbreak,
@@ -874,191 +863,11 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           }
 
           // count
-          this.entityHelperService
+          this.personAndRelatedHelperService.relationship
             .retrieveRecordsCount(
               RelationshipType.EXPOSURE,
               this.selectedOutbreak,
               this.itemData,
-              countQueryBuilder
-            )
-            .pipe(
-              // should be the last pipe
-              takeUntil(this.destroyed$)
-            ).subscribe((response) => {
-              localTab.pageCount = response;
-            });
-        }
-      }
-    };
-
-    // finished
-    return newTab;
-  }
-
-  /**
-   * Initialize tabs - Lab results
-   */
-  private initializeTabsLabResults(): ICreateViewModifyV2TabTable {
-    // create tab
-    const newTab: ICreateViewModifyV2TabTable = {
-      type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'lab_results',
-      label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_SEE_LAB_RESULTS',
-      visible: () => this.isView &&
-        LabResultModel.canList(this.authUser) &&
-        ContactOfContactModel.canListLabResult(this.authUser),
-      definition: {
-        type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
-        pageSettingsKey: UserSettings.CONTACT_OF_CONTACT_LAB_FIELDS,
-        advancedFilterType: Constants.APP_PAGE.CONTACT_OF_CONTACT_LAB_RESULTS.value,
-        tableColumnActions: this.entityLabResultHelperService.retrieveTableColumnActions({
-          personType: this.itemData.type,
-          selectedOutbreak: () => this.selectedOutbreak,
-          selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
-          refreshList: () => {
-            // reload data
-            const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
-            localTab.refresh(newTab);
-          }
-        }),
-        tableColumns: this.entityLabResultHelperService.retrieveTableColumns(this.selectedOutbreak, {
-          user: this.activatedRoute.snapshot.data.user,
-          options: {
-            labName: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            )
-          }
-        }),
-        advancedFilters: this.entityLabResultHelperService.generateAdvancedFiltersPerson(this.selectedOutbreak, {
-          labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
-          options: {
-            labName: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
-              this.selectedOutbreak,
-              (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              undefined
-            ),
-            yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-            yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-            user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
-          }
-        }),
-        queryBuilder: new RequestQueryBuilder(),
-        pageIndex: 0,
-        refresh: (tab) => {
-          // attach fields restrictions
-          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          const fields: string[] = this.entityLabResultHelperService.refreshListFields();
-          if (fields.length > 0) {
-            localTab.queryBuilder.clearFields();
-            localTab.queryBuilder.fields(...fields);
-          }
-
-          // refresh data
-          localTab.records$ = this.entityLabResultHelperService
-            .retrieveRecords(
-              this.selectedOutbreak,
-              EntityModel.getLinkForEntityType(this.itemData.type),
-              this.itemData.id,
-              localTab.queryBuilder
-            )
-            .pipe(
-              // should be the last pipe
-              takeUntil(this.destroyed$)
-            );
-
-          // count
-          localTab.refreshCount(tab);
-
-          // update ui
-          localTab.updateUI();
-        },
-        refreshCount: (
-          tab,
-          applyHasMoreLimit?: boolean
-        ) => {
-          // reset
-          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          localTab.pageCount = undefined;
-
-          // set apply value
-          if (applyHasMoreLimit !== undefined) {
-            localTab.applyHasMoreLimit = applyHasMoreLimit;
-          }
-
-          // remove paginator from query builder
-          const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
-          countQueryBuilder.paginator.clear();
-          countQueryBuilder.sort.clear();
-          countQueryBuilder.clearFields();
-
-          // apply has more limit
-          if (localTab.applyHasMoreLimit) {
-            countQueryBuilder.flag(
-              'applyHasMoreLimit',
-              true
-            );
-          }
-
-          // count
-          this.entityLabResultHelperService
-            .retrieveRecordsCount(
-              this.selectedOutbreak.id,
-              this.itemData.type,
-              this.itemData.id,
               countQueryBuilder
             )
             .pipe(
@@ -1091,7 +900,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value,
-        tableColumnActions: this.entityFollowUpHelperService.retrieveTableColumnActions({
+        tableColumnActions: this.personAndRelatedHelperService.followUp.retrieveTableColumnActions({
           entityData: this.itemData,
           selectedOutbreak: () => this.selectedOutbreak,
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -1102,7 +911,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.entityFollowUpHelperService.retrieveTableColumns({
+        tableColumns: this.personAndRelatedHelperService.followUp.retrieveTableColumns({
           team: this.activatedRoute.snapshot.data.team,
           user: this.activatedRoute.snapshot.data.user,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,
@@ -1110,7 +919,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
           }
         }),
-        advancedFilters: this.entityFollowUpHelperService.generateAdvancedFilters({
+        advancedFilters: this.personAndRelatedHelperService.followUp.generateAdvancedFiltersPerson(this.selectedOutbreak, {
           contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
           options: {
             team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
@@ -1126,7 +935,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         refresh: (tab) => {
           // attach fields restrictions
           const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          const fields: string[] = this.entityFollowUpHelperService.refreshListFields();
+          const fields: string[] = this.personAndRelatedHelperService.followUp.refreshListFields();
           if (fields.length > 0) {
             localTab.queryBuilder.clearFields();
             localTab.queryBuilder.fields(...fields);
@@ -1148,7 +957,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           }
 
           // refresh data
-          localTab.records$ = this.entityFollowUpHelperService
+          localTab.records$ = this.personAndRelatedHelperService.followUp
             .retrieveRecords(
               this.selectedOutbreak,
               localTab.queryBuilder
@@ -1191,7 +1000,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           }
 
           // count
-          this.entityFollowUpHelperService
+          this.personAndRelatedHelperService.followUp
             .retrieveRecordsCount(
               this.selectedOutbreak.id,
               countQueryBuilder
@@ -1320,16 +1129,6 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             visible: () => ContactOfContactModel.canListRelationshipExposures(this.authUser)
           },
 
-          // lab results
-          {
-            type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_SEE_LAB_RESULTS',
-            action: {
-              link: () => ['/lab-results', 'contacts-of-contacts', this.itemData.id]
-            },
-            visible: () => ContactOfContactModel.canListLabResult(this.authUser)
-          },
-
           // follow-ups
           {
             type: CreateViewModifyV2MenuType.OPTION,
@@ -1404,12 +1203,12 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
 
         // create / update
         (type === CreateViewModifyV2ActionType.CREATE ?
-          this.contactsOfContactsDataService
+          this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
             .createContactOfContact(
               this.selectedOutbreak.id,
               data
             ) :
-          this.contactsOfContactsDataService
+          this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
             .modifyContactOfContact(
               this.selectedOutbreak.id,
               this.itemData.id,
@@ -1449,7 +1248,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           // finished
           const finishedProcessingData = () => {
             // success creating / updating case
-            this.createViewModifyHelperService.toastV2Service.success(
+            this.personAndRelatedHelperService.toastV2Service.success(
               type === CreateViewModifyV2ActionType.CREATE ?
                 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE' :
                 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_MODIFY_CONTACT_OF_CONTACT_SUCCESS_MESSAGE'
@@ -1585,9 +1384,9 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
                   name: `actionsLink[${item.model.id}]`,
                   placeholder: (index + 1) + '. ' + EntityModel.getDuplicatePersonDetails(
                     item,
-                    this.createViewModifyHelperService.i18nService.instant(item.model.type),
-                    this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                    this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                    this.personAndRelatedHelperService.i18nService.instant(item.model.type),
+                    this.personAndRelatedHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                    this.personAndRelatedHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
                   link: () => ['/contacts-of-contacts', item.model.id, 'view'],
                   actions: {
@@ -1724,7 +1523,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
           if (!item.uiStatusForms) {
             // determine forms
-            const forms: V2ColumnStatusForm[] = this.entityContactOfContactHelperService.getStatusForms({
+            const forms: V2ColumnStatusForm[] = this.personAndRelatedHelperService.contactOfContact.getStatusForms({
               item,
               risk: this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>
             });
@@ -1769,7 +1568,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = this.entityContactOfContactHelperService.generateAdvancedFilters(this.selectedOutbreak, {
+    this.expandListAdvancedFilters = this.personAndRelatedHelperService.contactOfContact.generateAdvancedFilters(this.selectedOutbreak, {
       options: {
         occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -1832,7 +1631,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     }
 
     // retrieve data
-    this.expandListRecords$ = this.contactsOfContactsDataService
+    this.expandListRecords$ = this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService
       .getContactsOfContactsList(
         this.selectedOutbreak.id,
         data.queryBuilder
@@ -1858,8 +1657,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
 
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
-    this.createViewModifyHelperService.toastV2Service.notice(
-      this.createViewModifyHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DUPLICATE_PERSONS') +
+    this.personAndRelatedHelperService.toastV2Service.notice(
+      this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DUPLICATE_PERSONS') +
       ' ' +
       this._personDuplicates
         .map((item) => {
@@ -1876,7 +1675,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
               !ContactOfContactModel.canView(this.authUser)
             )
           ) {
-            return `${item.model.name} (${this.createViewModifyHelperService.i18nService.instant(item.type)})`;
+            return `${item.model.name} (${this.personAndRelatedHelperService.i18nService.instant(item.type)})`;
           }
 
           // create url
@@ -1895,7 +1694,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           const url =  `${entityPath}/${item.model.id}/view`;
 
           // finished
-          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.createViewModifyHelperService.i18nService.instant(item.model.type)})</span></a>`;
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.personAndRelatedHelperService.i18nService.instant(item.model.type)})</span></a>`;
         })
         .join(', '),
       undefined,
@@ -1936,7 +1735,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         const updateAlert = () => {
           // must update message ?
           // - hide alert
-          this.createViewModifyHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
+          this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
           // show duplicates alert
           this.showDuplicatesAlert();
@@ -2002,7 +1801,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             // handle error
             catchError((err) => {
               // show error
-              this.createViewModifyHelperService.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
 
               // finished
               return throwError(err);

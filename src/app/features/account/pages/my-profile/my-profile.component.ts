@@ -8,10 +8,12 @@ import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateView
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-my-profile',
@@ -25,8 +27,10 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected userDataService: UserDataService,
     protected dialogV2Service: DialogV2Service
   ) {
@@ -34,7 +38,8 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
   }
@@ -199,7 +204,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
               },
               noValueLabel: () => this.itemData.outbreakIds?.length > 0 ?
                 undefined :
-                this.createViewModifyHelperService.i18nService.instant('LNG_USER_FIELD_LABEL_ALL_OUTBREAKS')
+                this.i18nService.instant('LNG_USER_FIELD_LABEL_ALL_OUTBREAKS')
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'activeOutbreakId',

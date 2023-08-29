@@ -19,8 +19,10 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -37,8 +39,10 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected languageDataService: LanguageDataService
@@ -47,7 +51,8 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
   }
@@ -140,7 +145,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_LANGUAGE_TITLE', {
             name: this.itemData.name
           }
@@ -150,7 +155,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_LANGUAGE_TITLE', {
             name: this.itemData.name
           }
@@ -179,8 +184,8 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -337,7 +342,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
         takeUntil(this.destroyed$)
       ).subscribe((item: ClusterModel) => {
         // success creating / updating cluster
-        this.createViewModifyHelperService.toastV2Service.success(
+        this.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE'

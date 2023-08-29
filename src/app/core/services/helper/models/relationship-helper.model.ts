@@ -1,37 +1,34 @@
-import { Injectable } from '@angular/core';
-import { CaseModel } from '../../models/case.model';
-import { ContactModel } from '../../models/contact.model';
-import { EventModel } from '../../models/event.model';
-import { EntityModel, RelationshipModel } from '../../models/entity-and-relationship.model';
-import { ContactOfContactModel } from '../../models/contact-of-contact.model';
+import { UserModel } from '../../../models/user.model';
+import { EntityType } from '../../../models/entity-type';
+import { CaseModel } from '../../../models/case.model';
+import { ContactModel } from '../../../models/contact.model';
+import { ContactOfContactModel } from '../../../models/contact-of-contact.model';
+import { EventModel } from '../../../models/event.model';
+import { OutbreakModel } from '../../../models/outbreak.model';
+import { EntityModel, RelationshipModel } from '../../../models/entity-and-relationship.model';
+import { IAppFormIconButtonV2 } from '../../../../shared/forms-v2/core/app-form-icon-button-v2';
+import { moment, Moment } from '../../../helperClasses/x-moment';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { Observable, throwError } from 'rxjs';
-import { DialogV2Service } from './dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputAccordion, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { EntityType } from '../../models/entity-type';
-import { OutbreakModel } from '../../models/outbreak.model';
-import { RelationshipDataService } from '../data/relationship.data.service';
-import * as _ from 'lodash';
-import { Moment, moment } from '../../helperClasses/x-moment';
-import { Constants } from '../../models/constants';
-import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
-import { IV2Column, IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { RelationshipType } from '../../enums/relationship-type.enum';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { V2FilterTextType, V2FilterType } from '../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
-import { ReferenceDataEntryModel } from '../../models/reference-data.model';
-import { ClusterModel } from '../../models/cluster.model';
-import { UserModel } from '../../models/user.model';
-import { V2ActionType } from '../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { IBasicCount } from '../../models/basic-count.interface';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { v4 as uuid } from 'uuid';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputAccordion, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { catchError } from 'rxjs/operators';
-import { AuthDataService } from '../data/auth.data.service';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { IAppFormIconButtonV2 } from '../../../shared/forms-v2/core/app-form-icon-button-v2';
-import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
+import { v4 as uuid } from 'uuid';
+import * as _ from 'lodash';
+import { Constants } from '../../../models/constants';
+import { RelationshipType } from '../../../enums/relationship-type.enum';
+import { IV2Column, IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { IResolverV2ResponseModel } from '../../resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../models/reference-data.model';
+import { ClusterModel } from '../../../models/cluster.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
+import { IBasicCount } from '../../../models/basic-count.interface';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { PersonAndRelatedHelperService } from '../person-and-related-helper.service';
+import { RelationshipDataService } from '../../data/relationship.data.service';
 
 /**
  * From ?
@@ -41,11 +38,9 @@ enum SentFromColumn {
   EXPOSURES = 'fromExposures'
 }
 
-@Injectable()
-export class EntityHelperService {
+export class RelationshipHelperModel {
   // data
   public readonly visibleMandatoryKey: string = 'relationships';
-  private _authUser: UserModel;
 
   // entities map
   readonly entityMap: {
@@ -167,14 +162,9 @@ export class EntityHelperService {
    * Constructor
    */
   constructor(
-    private authDataService: AuthDataService,
-    private dialogV2Service: DialogV2Service,
-    private relationshipDataService: RelationshipDataService,
-    private createViewModifyHelperService: CreateViewModifyHelperService
-  ) {
-    // get the authenticated user
-    this._authUser = this.authDataService.getAuthenticatedUser();
-  }
+    private parent: PersonAndRelatedHelperService,
+    public relationshipDataService: RelationshipDataService
+  ) {}
 
   /**
    * Generate tab - Details
@@ -209,7 +199,7 @@ export class EntityHelperService {
     const today: Moment = moment();
 
     // create tab
-    const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
+    const tab: ICreateViewModifyV2Tab = this.parent.createViewModify.tabFilter(
       {
         type: CreateViewModifyV2TabInputType.TAB,
         name: data.tabName,
@@ -437,7 +427,7 @@ export class EntityHelperService {
     endpoint$: Observable<EntityModel[]>,
     entity: CaseModel | ContactModel | EventModel | ContactOfContactModel
   ): void  {
-    this.dialogV2Service
+    this.parent.dialogV2Service
       .showSideDialog({
         title: {
           get: () => from === SentFromColumn.CONTACTS ?
@@ -460,7 +450,7 @@ export class EntityHelperService {
             .pipe(
               catchError((err) => {
                 // show error
-                this.createViewModifyHelperService.toastV2Service.error(err);
+                this.parent.toastV2Service.error(err);
 
                 // hide
                 handler.hide();
@@ -504,8 +494,8 @@ export class EntityHelperService {
                     relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
                     selectedOutbreak?.isContactsOfContactsActive
                   ) &&
-                    relationshipData.model.canView(this._authUser) &&
-                    !relationshipData.model.deleted
+                  relationshipData.model.canView(this.parent.authUser) &&
+                  !relationshipData.model.deleted
                 }, {
                   type: V2SideDialogConfigInputType.DIVIDER
                 });
@@ -544,12 +534,12 @@ export class EntityHelperService {
                   link: () => [
                     `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${relationshipData.relationship.id}/view`
                   ],
-                  visible: () => RelationshipModel.canView(this._authUser) &&
+                  visible: () => RelationshipModel.canView(this.parent.authUser) &&
                     (
                       relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
                       selectedOutbreak?.isContactsOfContactsActive
                     ) &&
-                    relationshipData.model.canView(this._authUser) &&
+                    relationshipData.model.canView(this.parent.authUser) &&
                     !relationshipData.model.deleted
                 }, {
                   type: V2SideDialogConfigInputType.DIVIDER
@@ -712,7 +702,7 @@ export class EntityHelperService {
     }
 
     // display dialog
-    this.dialogV2Service
+    this.parent.dialogV2Service
       .showSideDialog({
         title: {
           get: () => title
@@ -755,12 +745,12 @@ export class EntityHelperService {
       );
 
       // display age. decide between years and months
-      let ageUnit: string = this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
+      let ageUnit: string = this.parent.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
       let ageValue: number = _.get(entity, 'age.years', 0);
       const ageMonths = _.get(entity, 'age.months', 0);
       if (ageMonths > 0) {
         // show age in months
-        ageUnit = this.createViewModifyHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+        ageUnit = this.parent.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
         ageValue = ageMonths;
       }
 
@@ -981,8 +971,8 @@ export class EntityHelperService {
           },
           visible: (item: EntityModel): boolean => {
             return !item.relationship.deleted &&
-              RelationshipModel.canView(this._authUser) &&
-              this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].view(this._authUser);
+              RelationshipModel.canView(this.parent.authUser) &&
+              this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].view(this.parent.authUser);
           }
         },
 
@@ -999,8 +989,8 @@ export class EntityHelperService {
           visible: (item: EntityModel): boolean => {
             return !item.relationship.deleted &&
               definitions.selectedOutbreakIsActive() &&
-              RelationshipModel.canModify(this._authUser) &&
-              this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].modify(this._authUser);
+              RelationshipModel.canModify(this.parent.authUser) &&
+              this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].modify(this.parent.authUser);
           }
         },
 
@@ -1018,7 +1008,7 @@ export class EntityHelperService {
               action: {
                 click: (item: EntityModel): void => {
                   // confirm
-                  this.dialogV2Service.showConfirmDialog({
+                  this.parent.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
@@ -1041,7 +1031,7 @@ export class EntityHelperService {
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.parent.dialogV2Service.showLoadingDialog();
 
                     // delete
                     this.relationshipDataService
@@ -1054,7 +1044,7 @@ export class EntityHelperService {
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.createViewModifyHelperService.toastV2Service.error(err);
+                          this.parent.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -1065,7 +1055,7 @@ export class EntityHelperService {
                       )
                       .subscribe(() => {
                         // success
-                        this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+                        this.parent.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -1079,7 +1069,7 @@ export class EntityHelperService {
               visible: (item: CaseModel): boolean => {
                 return !item.deleted &&
                   definitions.selectedOutbreakIsActive() &&
-                  CaseModel.canDelete(this._authUser);
+                  CaseModel.canDelete(this.parent.authUser);
               }
             }
           ]
@@ -1118,7 +1108,7 @@ export class EntityHelperService {
           textType: V2FilterTextType.STARTS_WITH
         },
         link: (data) => {
-          return data.model && data.model.canView(this._authUser) && !data.model.deleted ?
+          return data.model && data.model.canView(this.parent.authUser) && !data.model.deleted ?
             `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
             undefined;
         }
@@ -1136,7 +1126,7 @@ export class EntityHelperService {
           textType: V2FilterTextType.STARTS_WITH
         },
         link: (data) => {
-          return data.model && data.model.canView(this._authUser) && !data.model.deleted ?
+          return data.model && data.model.canView(this.parent.authUser) && !data.model.deleted ?
             `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
             undefined;
         }
@@ -1154,7 +1144,7 @@ export class EntityHelperService {
           textType: V2FilterTextType.STARTS_WITH
         },
         link: (data) => {
-          return data.model && data.model.canView(this._authUser) && !data.model.deleted ?
+          return data.model && data.model.canView(this.parent.authUser) && !data.model.deleted ?
             `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
             undefined;
         }
@@ -1195,7 +1185,7 @@ export class EntityHelperService {
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: definitions.personType.map[data.type].getColorCode(),
-              tooltip: this.createViewModifyHelperService.i18nService.instant(data.type)
+              tooltip: this.parent.i18nService.instant(data.type)
             });
           } else {
             forms.push({
@@ -1251,7 +1241,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
         format: {
           type: (item) => item.relationship?.certaintyLevelId ?
-            this.createViewModifyHelperService.i18nService.instant(item.relationship?.certaintyLevelId) :
+            this.parent.i18nService.instant(item.relationship?.certaintyLevelId) :
             item.relationship?.certaintyLevelId
         },
         filter: {
@@ -1266,7 +1256,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
         format: {
           type: (item) => item.relationship?.exposureTypeId ?
-            this.createViewModifyHelperService.i18nService.instant(item.relationship?.exposureTypeId) :
+            this.parent.i18nService.instant(item.relationship?.exposureTypeId) :
             item.relationship?.exposureTypeId
         },
         filter: {
@@ -1281,7 +1271,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
         format: {
           type: (item) => item.relationship?.exposureFrequencyId ?
-            this.createViewModifyHelperService.i18nService.instant(item.relationship?.exposureFrequencyId) :
+            this.parent.i18nService.instant(item.relationship?.exposureFrequencyId) :
             item.relationship?.exposureFrequencyId
         },
         filter: {
@@ -1296,7 +1286,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
         format: {
           type: (item) => item.relationship?.exposureDurationId ?
-            this.createViewModifyHelperService.i18nService.instant(item.relationship?.exposureDurationId) :
+            this.parent.i18nService.instant(item.relationship?.exposureDurationId) :
             item.relationship?.exposureDurationId
         },
         filter: {
@@ -1311,7 +1301,7 @@ export class EntityHelperService {
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
         format: {
           type: (item) => item.relationship?.socialRelationshipTypeId ?
-            this.createViewModifyHelperService.i18nService.instant(item.relationship?.socialRelationshipTypeId) :
+            this.parent.i18nService.instant(item.relationship?.socialRelationshipTypeId) :
             item.relationship?.socialRelationshipTypeId
         },
         filter: {
@@ -1349,7 +1339,7 @@ export class EntityHelperService {
     ];
 
     // by cluster
-    if (ClusterModel.canList(this._authUser)) {
+    if (ClusterModel.canList(this.parent.authUser)) {
       tableColumns.push({
         field: 'clusterId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
@@ -1382,7 +1372,7 @@ export class EntityHelperService {
           childQueryBuilderKey: 'relationship'
         },
         exclude: (): boolean => {
-          return !UserModel.canView(this._authUser);
+          return !UserModel.canView(this.parent.authUser);
         },
         link: (data) => {
           return data.relationship?.createdBy ?
@@ -1415,7 +1405,7 @@ export class EntityHelperService {
           childQueryBuilderKey: 'relationship'
         },
         exclude: (): boolean => {
-          return !UserModel.canView(this._authUser);
+          return !UserModel.canView(this.parent.authUser);
         },
         link: (data) => {
           return data.relationship?.updatedBy ?
@@ -1491,7 +1481,7 @@ export class EntityHelperService {
         )
     ).pipe(
       catchError((err) => {
-        this.createViewModifyHelperService.toastV2Service.error(err);
+        this.parent.toastV2Service.error(err);
         return throwError(err);
       })
     );

@@ -6,7 +6,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import * as _ from 'lodash';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -14,23 +13,20 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { AddressModel } from '../../../../core/models/address.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-available-entities-for-switch-list',
@@ -57,13 +53,8 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
     protected activatedRoute: ActivatedRoute,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
-    protected entityHelperService: EntityHelperService,
-    protected i18nService: I18nService,
-    private toastV2Service: ToastV2Service,
-    private relationshipDataService: RelationshipDataService,
     private genericDataService: GenericDataService,
-    private dialogV2Service: DialogV2Service
-
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
@@ -82,7 +73,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
 
     // read route query params
     if (_.isEmpty(this.activatedRoute.snapshot.queryParams.selectedTargetIds)) {
-      this.toastV2Service.error('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
+      this.personAndRelatedHelperService.toastV2Service.error('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
       this.router.navigate(['/contacts/follow-ups']);
     } else {
       this.selectedTargetIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
@@ -195,7 +186,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
-              tooltip: this.i18nService.instant(data.type)
+              tooltip: this.personAndRelatedHelperService.i18nService.instant(data.type)
             });
           } else {
             forms.push({
@@ -338,7 +329,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
           });
 
           // display confirm dialog
-          this.dialogV2Service.showConfirmDialog({
+          this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
             config: {
               title: {
                 get: () => 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_CHANGE_SOURCE_TITLE'
@@ -355,9 +346,9 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
             }
 
             // show loading
-            const loading = this.dialogV2Service.showLoadingDialog();
+            const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
-            this.relationshipDataService
+            this.personAndRelatedHelperService.relationship.relationshipDataService
               .bulkChangeSource(
                 this.selectedOutbreak.id,
                 selectedRecordId,
@@ -366,7 +357,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
               .pipe(
                 catchError((err) => {
                   // show error
-                  this.toastV2Service.error(err);
+                  this.personAndRelatedHelperService.toastV2Service.error(err);
 
                   // hide loading
                   loading.close();
@@ -377,7 +368,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
               )
               .subscribe(() => {
                 // success
-                this.toastV2Service.success('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
+                this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
 
                 // hide loading
                 loading.close();
@@ -433,15 +424,15 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
         }
       },
       {
-        label: this.entityHelperService.entityMap[this._entity.type].label,
+        label: this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].label,
         action: {
-          link: [this.entityHelperService.entityMap[this._entity.type].link]
+          link: [this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link]
         }
       },
       {
         label: this._entity.name,
         action: {
-          link: [`${ this.entityHelperService.entityMap[this._entity.type].link }/${ this._entity.id }/view`]
+          link: [`${ this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link }/${ this._entity.id }/view`]
         }
       },
       {
@@ -489,7 +480,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
       qb.include('locations', true);
 
       // retrieve the list of Relationships
-      this.records$ = this.relationshipDataService
+      this.records$ = this.personAndRelatedHelperService.relationship.relationshipDataService
         .getEntityAvailablePeople(
           this.selectedOutbreak.id,
           this._entity.type,
@@ -539,7 +530,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
       }
 
       // count
-      this.relationshipDataService
+      this.personAndRelatedHelperService.relationship.relationshipDataService
         .getEntityAvailablePeopleCount(
           this.selectedOutbreak.id,
           this._entity.type,

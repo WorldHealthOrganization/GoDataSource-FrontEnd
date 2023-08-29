@@ -20,8 +20,9 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-contact-follow-ups-bulk-modify',
@@ -41,7 +42,8 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     private router: Router,
     private followUpsDataService: FollowUpsDataService
@@ -51,7 +53,8 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
   }
@@ -386,7 +389,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
       // something went wrong ?
       if (selectedFollowUpIds.length < 1) {
         // show error
-        this.createViewModifyHelperService.toastV2Service.error('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
+        this.toastV2Service.error('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
 
         // don't do anything
         return;
@@ -422,7 +425,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
         )
         .subscribe((items) => {
           // success updating event
-          this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, items);

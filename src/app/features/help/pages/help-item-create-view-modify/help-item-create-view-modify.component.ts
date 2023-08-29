@@ -20,8 +20,10 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { CreateViewModifyHelperService } from '../../../../core/services/helper/create-view-modify-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-help-item-create-view-modify',
@@ -38,8 +40,10 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected createViewModifyHelperService: CreateViewModifyHelperService,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected helpDataService: HelpDataService,
     protected dialogV2Service: DialogV2Service
@@ -48,7 +52,8 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       authDataService,
       activatedRoute,
       renderer2,
-      createViewModifyHelperService,
+      redirectService,
+      toastV2Service,
       outbreakAndOutbreakTemplateHelperService,
       true
     );
@@ -130,7 +135,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
 
     // add info accordingly to page type
     this.breadcrumbs.push({
-      label: this.createViewModifyHelperService.i18nService.instant(this.selectedCategory.name),
+      label: this.i18nService.instant(this.selectedCategory.name),
       action: {
         link: [`/help/categories/${this.selectedCategory.id}/view`]
       }
@@ -154,7 +159,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_HELP_ITEM_TITLE', {
             name: this.itemData.title
           }
@@ -164,7 +169,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.createViewModifyHelperService.i18nService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_HELP_ITEM_TITLE', {
             name: this.itemData.title
           }
@@ -193,8 +198,8 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.createViewModifyHelperService.i18nService.instant('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_ITEM_BUTTON'),
-          message: () => this.createViewModifyHelperService.i18nService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_ITEM_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             { name: this.itemData.title }
           )
@@ -246,7 +251,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
               description: () => 'LNG_HELP_ITEM_FIELD_LABEL_TITLE_DESCRIPTION',
               value: {
                 get: () => this.itemData.title ?
-                  this.createViewModifyHelperService.i18nService.instant(this.itemData.title) :
+                  this.i18nService.instant(this.itemData.title) :
                   this.itemData.title,
                 set: (value) => {
                   this.itemData.title = value;
@@ -279,7 +284,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
               name: 'content',
               value: {
                 get: () => this.itemData.content ?
-                  this.createViewModifyHelperService.i18nService.instant(this.itemData.content) :
+                  this.i18nService.instant(this.itemData.content) :
                   this.itemData.content,
                 set: (value) => {
                   this.itemData.content = value;
@@ -293,7 +298,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
               description: () => 'LNG_HELP_ITEM_FIELD_LABEL_COMMENT_DESCRIPTION',
               value: {
                 get: () => this.itemData.comment ?
-                  this.createViewModifyHelperService.i18nService.instant(this.itemData.comment) :
+                  this.i18nService.instant(this.itemData.comment) :
                   this.itemData.comment,
                 set: (value) => {
                   this.itemData.comment = value;
@@ -307,7 +312,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
               description: () => 'LNG_HELP_ITEM_FIELD_LABEL_PAGE_DESCRIPTION',
               value: {
                 get: () => this.itemData.page ?
-                  this.createViewModifyHelperService.i18nService.instant(this.itemData.page) :
+                  this.i18nService.instant(this.itemData.page) :
                   this.itemData.page,
                 set: (value) => {
                   this.itemData.page = value;
@@ -417,11 +422,11 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
           return throwError(err);
         })
       ).subscribe((helpItem: HelpItemModel) => {
-        this.createViewModifyHelperService.i18nService.loadUserLanguage()
+        this.i18nService.loadUserLanguage()
           .pipe(
             catchError((err) => {
               // show err
-              this.createViewModifyHelperService.toastV2Service.error(err);
+              this.toastV2Service.error(err);
 
               // finished
               finished(err, undefined);
@@ -431,7 +436,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
             })
           ).subscribe(() => {
           // success creating / updating help item
-            this.createViewModifyHelperService.toastV2Service.success(
+            this.toastV2Service.success(
               type === CreateViewModifyV2ActionType.CREATE ?
                 'LNG_PAGE_CREATE_HELP_ITEM_ACTION_CREATE_HELP_ITEM_SUCCESS_MESSAGE' :
                 'LNG_PAGE_MODIFY_HELP_ITEM_ACTION_MODIFY_HELP_ITEM_SUCCESS_MESSAGE'
@@ -454,7 +459,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       link: (item: HelpItemModel) => [`/help/categories/${this.selectedCategory.id}/items/${item.id}/view`],
       get: {
         text: (item: HelpItemModel) => item.title ?
-          this.createViewModifyHelperService.i18nService.instant(item.title) :
+          this.i18nService.instant(item.title) :
           item.title
       }
     };

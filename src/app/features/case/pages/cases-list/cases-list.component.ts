@@ -2,7 +2,6 @@ import { Component, OnDestroy } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -14,11 +13,9 @@ import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactModel, IContactIsolated } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
@@ -27,27 +24,23 @@ import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ExportButtonKey, ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import * as moment from 'moment';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { Location } from '@angular/common';
 import { Moment } from 'moment';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
-import { EntityCaseHelperService } from '../../../../core/services/helper/entity-case-helper.service';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-cases-list',
@@ -140,18 +133,11 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
   constructor(
     protected listHelperService: ListHelperService,
     private activatedRoute: ActivatedRoute,
-    private caseDataService: CaseDataService,
-    private locationDataService: LocationDataService,
-    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private dialogV2Service: DialogV2Service,
-    private i18nService: I18nService,
-    private entityHelperService: EntityHelperService,
-    private redirectService: RedirectService,
     private clusterDataService: ClusterDataService,
     private referenceDataHelperService: ReferenceDataHelperService,
     private location: Location,
-    private entityCaseHelperService: EntityCaseHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       listHelperService, {
@@ -247,7 +233,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                   };
 
                   // determine what we need to delete
-                  this.dialogV2Service.showConfirmDialog({
+                  this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
@@ -266,12 +252,12 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                       handler.loading.show();
 
                       // determine if case has exposed contacts
-                      this.caseDataService
+                      this.personAndRelatedHelperService.case.caseDataService
                         .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
                         .pipe(
                           catchError((err) => {
                             // show error
-                            this.toastV2Service.error(err);
+                            this.personAndRelatedHelperService.toastV2Service.error(err);
 
                             // hide loading
                             handler.loading.hide();
@@ -304,10 +290,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                     // delete
-                    this.caseDataService
+                    this.personAndRelatedHelperService.case.caseDataService
                       .deleteCase(
                         this.selectedOutbreak.id,
                         item.id
@@ -315,7 +301,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -326,7 +312,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
+                        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -363,15 +349,15 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               action: {
                 click: (item: CaseModel): void => {
                   // show loading
-                  let loading = this.dialogV2Service.showLoadingDialog();
+                  let loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                   // determine if case has isolated contacts
-                  this.caseDataService
+                  this.personAndRelatedHelperService.case.caseDataService
                     .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
                     .pipe(
                       catchError((err) => {
                         // show error
-                        this.toastV2Service.error(err);
+                        this.personAndRelatedHelperService.toastV2Service.error(err);
 
                         // hide loading
                         loading.close();
@@ -388,7 +374,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                       let isolatedContactLinks: string = '';
                       if (isolatedContacts?.count) {
                         // get the isolated contacts
-                        isolatedContactLinks = this.i18nService.instant('LNG_PAGE_LIST_CASES_ACTION_ISOLATED_CONTACTS') +
+                        isolatedContactLinks = this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_ACTION_ISOLATED_CONTACTS') +
                           isolatedContacts.contacts
                             .map((entity) => {
                               // create contact full name
@@ -398,7 +384,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
 
                               // check rights
                               if (!ContactModel.canView(this.authUser)) {
-                                return `${fullName} (${this.i18nService.instant(EntityType.CONTACT)})`;
+                                return `${fullName} (${this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)})`;
                               }
 
                               // create url
@@ -411,13 +397,13 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                       }
 
                       // show confirm dialog to confirm the action
-                      this.dialogV2Service.showConfirmDialog({
+                      this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                         config: {
                           title: {
                             get: () => 'LNG_COMMON_LABEL_CONVERT',
                             data: () => ({
                               name: item.name,
-                              type: this.i18nService.instant(EntityType.CONTACT)
+                              type: this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)
                             })
                           },
                           message: {
@@ -436,10 +422,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                         }
 
                         // show loading
-                        loading = this.dialogV2Service.showLoadingDialog();
+                        loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                         // convert
-                        this.caseDataService
+                        this.personAndRelatedHelperService.case.caseDataService
                           .convertToContact(
                             this.selectedOutbreak.id,
                             item.id
@@ -447,7 +433,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                           .pipe(
                             catchError((err) => {
                               // show error
-                              this.toastV2Service.error(err);
+                              this.personAndRelatedHelperService.toastV2Service.error(err);
 
                               // hide loading
                               loading.close();
@@ -458,7 +444,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                           )
                           .subscribe(() => {
                             // success
-                            this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+                            this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();
@@ -710,7 +696,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               action: {
                 click: (item: CaseModel) => {
                   // export
-                  this.dialogV2Service.showExportData({
+                  this.personAndRelatedHelperService.dialogV2Service.showExportData({
                     title: {
                       get: () => 'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE'
                     },
@@ -721,7 +707,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                       url: `outbreaks/${this.selectedOutbreak.id}/cases/${item.id}/export-empty-case-investigation`,
                       async: false,
                       method: ExportDataMethod.GET,
-                      fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                      fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
                       allow: {
                         types: [
                           ExportDataExtension.ZIP
@@ -746,7 +732,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               action: {
                 click: (item: CaseModel) => {
                   // show confirm dialog to confirm the action
-                  this.dialogV2Service.showConfirmDialog({
+                  this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
@@ -766,10 +752,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                     // convert
-                    this.caseDataService
+                    this.personAndRelatedHelperService.case.caseDataService
                       .restoreCase(
                         this.selectedOutbreak.id,
                         item.id
@@ -777,7 +763,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -788,7 +774,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
+                        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -826,7 +812,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'lastName'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -840,7 +826,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'firstName'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -854,7 +840,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'middleName'
         ),
         notVisible: true,
@@ -869,7 +855,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'visualId',
         label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'visualId'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -938,7 +924,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
             }]
           }
         ],
-        forms: (_column, data: CaseModel): V2ColumnStatusForm[] => this.entityCaseHelperService.getStatusForms({
+        forms: (_column, data: CaseModel): V2ColumnStatusForm[] => this.personAndRelatedHelperService.case.getStatusForms({
           item: data,
           classification: this.activatedRoute.snapshot.data.classification,
           outcome: this.activatedRoute.snapshot.data.outcome
@@ -948,7 +934,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'classification',
         label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'classification'
         ),
         sortable: true,
@@ -991,7 +977,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'pregnancyStatus',
         label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'pregnancyStatus'
         ),
         notVisible: true,
@@ -1006,7 +992,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'investigationStatus',
         label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'investigationStatus'
         ),
         sortable: true,
@@ -1020,7 +1006,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'dateInvestigationCompleted',
         label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'dateInvestigationCompleted'
         ),
         format: {
@@ -1036,7 +1022,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'outcomeId',
         label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'outcomeId'
         ),
         sortable: true,
@@ -1054,7 +1040,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'dateOfOutcome',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'dateOfOutcome'
         ),
         format: {
@@ -1070,7 +1056,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'dateBecomeCase',
         label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'dateBecomeCase'
         ),
         format: {
@@ -1086,7 +1072,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'dateOfInfection',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'dateOfInfection'
         ),
         format: {
@@ -1102,7 +1088,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'deathLocationId',
         label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'deathLocationId'
         ),
         format: {
@@ -1123,7 +1109,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'dob',
         label: 'LNG_CASE_FIELD_LABEL_DOB',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'ageDob'
         ),
         format: {
@@ -1139,7 +1125,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'age',
         label: 'LNG_CASE_FIELD_LABEL_AGE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'ageDob'
         ),
         format: {
@@ -1156,7 +1142,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'gender'
         ),
         sortable: true,
@@ -1169,7 +1155,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'riskLevel',
         label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'riskLevel'
         ),
         sortable: true,
@@ -1186,7 +1172,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'riskReason',
         label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'riskReason'
         ),
         sortable: true,
@@ -1199,7 +1185,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'occupation',
         label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'occupation'
         ),
         sortable: true,
@@ -1216,7 +1202,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'phoneNumber',
         label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses'
         ),
         format: {
@@ -1234,7 +1220,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'location',
         label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses'
         ),
         format: {
@@ -1256,7 +1242,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'addresses.emailAddress',
         label: 'LNG_CASE_FIELD_LABEL_EMAIL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -1276,7 +1262,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'addresses.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -1296,7 +1282,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -1316,7 +1302,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'addresses.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -1328,7 +1314,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'addresses.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -1340,7 +1326,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -1360,7 +1346,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses'
         ),
         notVisible: true,
@@ -1382,7 +1368,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'dateOfOnset',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'dateOfOnset'
         ),
         format: {
@@ -1397,7 +1383,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'isDateOfOnsetApproximate',
         label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'isDateOfOnsetApproximate'
         ),
         notVisible: true,
@@ -1415,7 +1401,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'transferRefused',
         label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'transferRefused'
         ),
         notVisible: true,
@@ -1433,7 +1419,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'dateOfReporting',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'dateOfReporting'
         ),
         notVisible: true,
@@ -1449,7 +1435,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'isDateOfReportingApproximate',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'isDateOfReportingApproximate'
         ),
         notVisible: true,
@@ -1467,7 +1453,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'dateOfBurial',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'dateOfBurial'
         ),
         notVisible: true,
@@ -1483,7 +1469,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'burialLocationId',
         label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'burialLocationId'
         ),
         format: {
@@ -1504,7 +1490,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'burialPlaceName',
         label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'burialPlaceName'
         ),
         sortable: true,
@@ -1517,7 +1503,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'safeBurial',
         label: 'LNG_CASE_FIELD_LABEL_SAFE_BURIAL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'safeBurial'
         ),
         notVisible: true,
@@ -1589,7 +1575,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'responsibleUserId',
         label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'responsibleUserId'
         ),
         notVisible: true,
@@ -1614,7 +1600,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'documents',
         label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'documents'
         ),
         format: {
@@ -1622,7 +1608,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
             // must format ?
             if (!item.uiDocuments) {
               item.uiDocuments = DocumentModel.arrayToString(
-                this.i18nService,
+                this.personAndRelatedHelperService.i18nService,
                 item.documents
               );
             }
@@ -1637,7 +1623,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'vaccinesReceived',
         label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'vaccinesReceived'
         ),
         format: {
@@ -1645,7 +1631,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
             // must format ?
             if (!item.uiVaccines) {
               item.uiVaccines = VaccineModel.arrayToString(
-                this.i18nService,
+                this.personAndRelatedHelperService.i18nService,
                 item.vaccinesReceived
               );
             }
@@ -1660,7 +1646,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         field: 'dateRanges',
         label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'dateRanges'
         ),
         format: {
@@ -1668,7 +1654,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
             // must format ?
             if (!item.uiDateRanges) {
               item.uiDateRanges = CaseCenterDateRangeModel.arrayToString(
-                this.i18nService,
+                this.personAndRelatedHelperService.i18nService,
                 item.dateRanges
               );
             }
@@ -1709,7 +1695,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
             }
 
             // display dialog
-            this.entityHelperService.contacts(
+            this.personAndRelatedHelperService.relationship.contacts(
               this.selectedOutbreak,
               item
             );
@@ -1740,7 +1726,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
             }
 
             // display dialog
-            this.entityHelperService.exposures(
+            this.personAndRelatedHelperService.relationship.exposures(
               this.selectedOutbreak,
               item
             );
@@ -1932,7 +1918,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityCaseHelperService.generateAdvancedFilters(this.selectedOutbreak, {
+    this.advancedFilters = this.personAndRelatedHelperService.case.generateAdvancedFilters(this.selectedOutbreak, {
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
         gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1967,7 +1953,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               // handle error
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // not found
                 finished(null);
@@ -2034,7 +2020,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           label: {
             get: () => 'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON'
           },
-          action: this.redirectService.linkAndQueryParams(
+          action: this.personAndRelatedHelperService.redirectService.linkAndQueryParams(
             ['/cases'],
             {
               applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS
@@ -2132,7 +2118,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           },
           action: {
             click: () => {
-              this.dialogV2Service.showExportData({
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
                 title: {
                   get: () => 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_TITLE'
                 },
@@ -2140,7 +2126,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                   url: `outbreaks/${this.selectedOutbreak.id}/cases/export-investigation-template`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
                   allow: {
                     types: [
                       ExportDataExtension.ZIP
@@ -2296,7 +2282,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               });
 
               // export dossier
-              this.dialogV2Service.showExportData({
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
                 title: {
                   get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE'
                 },
@@ -2304,7 +2290,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                   url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
                   async: false,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                   extraFormData: {
                     append: {
                       cases: selected
@@ -2393,12 +2379,12 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
           tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
-            this.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_DELETE_SELECTED_CASES_DESCRIPTION') :
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_DELETE_SELECTED_CASES_DESCRIPTION') :
             undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -2417,7 +2403,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
                   loading.message({
                     message: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_SELECTED_CASES_WAIT_MESSAGE',
                     messageData: {
@@ -2433,14 +2419,14 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                   const nextDelete = () => {
                     // finished ?
                     if (selectedShallowClone.length < 1) {
-                      this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SELECTED_CASES_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SELECTED_CASES_SUCCESS_MESSAGE');
                       loading.close();
                       this.needsRefreshList(true);
                       return;
                     }
 
                     // delete
-                    this.caseDataService
+                    this.personAndRelatedHelperService.case.caseDataService
                       .deleteCase(
                         this.selectedOutbreak.id,
                         selectedShallowClone.shift()
@@ -2451,7 +2437,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                           loading.close();
 
                           // error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
                           return throwError(err);
                         })
                       )
@@ -2511,12 +2497,12 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
           tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allDeleted ?
-            this.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_RESTORE_SELECTED_CASES_DESCRIPTION') :
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_RESTORE_SELECTED_CASES_DESCRIPTION') :
             undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -2535,7 +2521,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
                   loading.message({
                     message: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_SELECTED_CASES_WAIT_MESSAGE',
                     messageData: {
@@ -2551,14 +2537,14 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                   const nextRestore = () => {
                     // finished ?
                     if (selectedShallowClone.length < 1) {
-                      this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SELECTED_CASES_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SELECTED_CASES_SUCCESS_MESSAGE');
                       loading.close();
                       this.needsRefreshList(true);
                       return;
                     }
 
                     // restore
-                    this.caseDataService
+                    this.personAndRelatedHelperService.case.caseDataService
                       .restoreCase(
                         this.selectedOutbreak.id,
                         selectedShallowClone.shift()
@@ -2569,7 +2555,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                           loading.close();
 
                           // error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
                           return throwError(err);
                         })
                       )
@@ -2704,7 +2690,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           clonedQueryBuilder.filter.removePathCondition('or.classification');
 
           // load data
-          return this.caseDataService
+          return this.personAndRelatedHelperService.case.caseDataService
             .getCasesGroupedByClassification(
               this.selectedOutbreak.id,
               clonedQueryBuilder
@@ -2737,7 +2723,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               values = values.sort((item1, item2) => {
                 // if same order, compare labels
                 if (item1.order === item2.order) {
-                  return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
+                  return this.personAndRelatedHelperService.i18nService.instant(item1.label).localeCompare(this.personAndRelatedHelperService.i18nService.instant(item2.label));
                 }
 
                 // format order
@@ -2781,7 +2767,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
    * Export case data
    */
   private exportCases(qb: RequestQueryBuilder): void {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showExportDataAfterLoadingData({
         title: {
           get: () => 'LNG_PAGE_LIST_CASES_EXPORT_TITLE'
@@ -2794,7 +2780,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               // handle errors
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // send error further
                 return throwError(err);
@@ -2822,7 +2808,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                   url: `/outbreaks/${this.selectedOutbreak.id}/cases/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -2878,7 +2864,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
    * Export case relationships
    */
   private exportCaseRelationships(qb: RequestQueryBuilder): void {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showExportDataAfterLoadingData({
         title: {
           get: () => 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE'
@@ -2891,7 +2877,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               // handle errors
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // send error further
                 return throwError(err);
@@ -2919,7 +2905,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
                   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -2995,7 +2981,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
     // if we have an applied filter then we need to add breadcrumb
     if (this.appliedListFilter === ApplyListFilter.CASES_WITHOUT_RELATIONSHIPS) {
       // since we need to send user to the same page we need to do some hacks...
-      const redirect = this.redirectService.linkAndQueryParams(
+      const redirect = this.personAndRelatedHelperService.redirectService.linkAndQueryParams(
         ['/cases']
       );
       casesAction = {
@@ -3101,7 +3087,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
     }
 
     // retrieve the list of Cases
-    this.records$ = this.caseDataService
+    this.records$ = this.personAndRelatedHelperService.case.caseDataService
       .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         switchMap((data) => {
@@ -3150,7 +3136,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           );
 
           // retrieve locations
-          return this.locationDataService
+          return this.personAndRelatedHelperService.locationDataService
             .getLocationsList(qb)
             .pipe(
               map((locations) => {
@@ -3232,12 +3218,12 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
     }
 
     // count
-    this.caseDataService
+    this.personAndRelatedHelperService.case.caseDataService
       .getCasesCount(this.selectedOutbreak.id, countQueryBuilder)
       .pipe(
         // error
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         }),
 

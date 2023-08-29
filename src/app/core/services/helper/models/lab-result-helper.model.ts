@@ -1,56 +1,39 @@
-import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { OutbreakModel } from '../../../models/outbreak.model';
+import { PersonAndRelatedHelperService } from '../person-and-related-helper.service';
+import { LabResultModel } from '../../../models/lab-result.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { Constants } from '../../../models/constants';
+import { IV2ColumnToVisibleMandatoryConf, V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { UserModel } from '../../../models/user.model';
+import { IAnswerData, QuestionModel } from '../../../models/question.model';
+import { IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { EntityType } from '../../../models/entity-type';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { EntityModel } from '../../../models/entity-and-relationship.model';
+import { CaseModel } from '../../../models/case.model';
+import { ContactModel } from '../../../models/contact.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { LabResultDataService } from '../../data/lab-result.data.service';
 import { catchError, map } from 'rxjs/operators';
-import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { V2ActionType } from '../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { V2FilterTextType, V2FilterType } from '../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { CaseModel } from '../../models/case.model';
-import { ContactModel } from '../../models/contact.model';
-import { ContactOfContactModel } from '../../models/contact-of-contact.model';
-import { EntityModel } from '../../models/entity-and-relationship.model';
-import { EntityType } from '../../models/entity-type';
-import { LabResultModel } from '../../models/lab-result.model';
-import { OutbreakModel } from '../../models/outbreak.model';
-import { IAnswerData, QuestionModel } from '../../models/question.model';
-import { UserModel } from '../../models/user.model';
-import { LabResultDataService } from '../data/lab-result.data.service';
-import { DialogV2Service } from './dialog-v2.service';
-import { IBasicCount } from '../../models/basic-count.interface';
-import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
-import { AuthDataService } from '../data/auth.data.service';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { Constants } from '../../models/constants';
-import { CreateViewModifyHelperService } from './create-view-modify-helper.service';
-import { IV2ColumnToVisibleMandatoryConf, V2AdvancedFilterToVisibleMandatoryConf } from '../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
-import { EntityCaseHelperService } from './entity-case-helper.service';
-import { EntityContactHelperService } from './entity-contact-helper.service';
+import { Observable, throwError } from 'rxjs';
+import { IResolverV2ResponseModel } from '../../resolvers/data/models/resolver-response.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
+import { IBasicCount } from '../../../models/basic-count.interface';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class EntityLabResultHelperService {
+export class LabResultHelperModel {
   // data
   public readonly visibleMandatoryKey: string = 'lab-results';
-  private _authUser: UserModel;
 
   /**
    * Constructor
    */
   constructor(
-    private authDataService: AuthDataService,
-    private dialogV2Service: DialogV2Service,
-    private labResultDataService: LabResultDataService,
-    private createViewModifyHelperService: CreateViewModifyHelperService,
-    private entityCaseHelperService: EntityCaseHelperService,
-    private entityContactHelperService: EntityContactHelperService
-  ) {
-    // get the authenticated user
-    this._authUser = this.authDataService.getAuthenticatedUser();
-  }
+    private parent: PersonAndRelatedHelperService,
+    public labResultDataService: LabResultDataService
+  ) {}
 
   /**
    * Generate tab - Details
@@ -72,7 +55,7 @@ export class EntityLabResultHelperService {
     }
   ): ICreateViewModifyV2Tab {
     // create tab
-    const tab: ICreateViewModifyV2Tab = this.createViewModifyHelperService.tabsFilter(
+    const tab: ICreateViewModifyV2Tab = this.parent.createViewModify.tabFilter(
       {
         type: CreateViewModifyV2TabInputType.TAB,
         name: 'details',
@@ -438,13 +421,13 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.parent.case.visibleMandatoryKey,
           'visualId'
-        ) || this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.parent.contact.visibleMandatoryKey,
           'visualId'
         ),
         relationshipPath: ['person'],
@@ -454,13 +437,13 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_LAST_NAME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.parent.case.visibleMandatoryKey,
           'lastName'
-        ) || this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.parent.contact.visibleMandatoryKey,
           'lastName'
         ),
         relationshipPath: ['person'],
@@ -470,13 +453,13 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_FIRST_NAME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.parent.case.visibleMandatoryKey,
           'firstName'
-        ) || this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
-          this.entityContactHelperService.visibleMandatoryKey,
+          this.parent.contact.visibleMandatoryKey,
           'firstName'
         ),
         relationshipPath: ['person'],
@@ -486,9 +469,9 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'classification',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
-          this.entityCaseHelperService.visibleMandatoryKey,
+          this.parent.case.visibleMandatoryKey,
           'classification'
         ),
         options: data.options.classification,
@@ -499,7 +482,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'sampleIdentifier',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sampleIdentifier'
@@ -510,7 +493,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateSampleTaken',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateSampleTaken'
@@ -521,7 +504,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateSampleDelivered',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateSampleDelivered'
@@ -532,7 +515,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateOfResult'
@@ -543,7 +526,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'labName',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'labName'
@@ -555,7 +538,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'sampleType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sampleType'
@@ -567,7 +550,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'testType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'testType'
@@ -579,7 +562,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'result',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'result'
@@ -591,7 +574,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'testedFor',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'testedFor'
@@ -602,7 +585,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        visibleMandatoryIf: () => true,
+        visibleMandatoryIf: () => selectedOutbreak.labResultsTemplate?.length > 0,
         template: () => selectedOutbreak.labResultsTemplate,
         useLike: true
       },
@@ -610,7 +593,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateTesting',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateTesting'
@@ -621,7 +604,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'status',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'status'
@@ -633,7 +616,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'quantitativeResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'quantitativeResult'
@@ -644,7 +627,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'notes',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'notes'
@@ -655,7 +638,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'sequence.hasSequence',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[hasSequence]'
@@ -668,7 +651,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'sequence.dateSampleSent',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[dateSampleSent]'
@@ -680,7 +663,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'sequence.labId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[labId]'
@@ -693,7 +676,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'sequence.dateResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[dateResult]'
@@ -705,7 +688,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'sequence.resultId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[resultId]'
@@ -718,7 +701,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'sequence.noSequenceReason',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[noSequenceReason]'
@@ -758,7 +741,7 @@ export class EntityLabResultHelperService {
     ];
 
     // allowed to filter by user ?
-    if (UserModel.canListForFilters(this._authUser)) {
+    if (UserModel.canListForFilters(this.parent.authUser)) {
       advancedFilters.push({
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'createdBy',
@@ -777,7 +760,7 @@ export class EntityLabResultHelperService {
     }
 
     // finished
-    return this.createViewModifyHelperService.filterVisibleMandatoryAdvancedFilters(advancedFilters);
+    return this.parent.list.filterVisibleMandatoryAdvancedFilters(advancedFilters);
   }
 
   /**
@@ -876,7 +859,7 @@ export class EntityLabResultHelperService {
       forms.push({
         type: IV2ColumnStatusFormType.STAR,
         color: 'var(--gd-danger)',
-        tooltip: this.createViewModifyHelperService.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+        tooltip: this.parent.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
       });
     } else {
       forms.push({
@@ -914,17 +897,14 @@ export class EntityLabResultHelperService {
           },
           visible: (item: LabResultModel): boolean => {
             return !item.deleted &&
-              LabResultModel.canView(this._authUser) &&
+              LabResultModel.canView(this.parent.authUser) &&
               (
                 (
                   definitions.personType === EntityType.CASE &&
-                  CaseModel.canViewLabResult(this._authUser)
+                  CaseModel.canViewLabResult(this.parent.authUser)
                 ) || (
                   definitions.personType === EntityType.CONTACT &&
-                  ContactModel.canViewLabResult(this._authUser)
-                ) || (
-                  definitions.personType === EntityType.CONTACT_OF_CONTACT &&
-                  ContactOfContactModel.canViewLabResult(this._authUser)
+                  ContactModel.canViewLabResult(this.parent.authUser)
                 )
               );
           }
@@ -943,17 +923,14 @@ export class EntityLabResultHelperService {
           visible: (item: LabResultModel): boolean => {
             return !item.deleted &&
               definitions.selectedOutbreakIsActive() &&
-              LabResultModel.canModify(this._authUser) &&
+              LabResultModel.canModify(this.parent.authUser) &&
               (
                 (
                   definitions.personType === EntityType.CASE &&
-                  CaseModel.canModifyLabResult(this._authUser)
+                  CaseModel.canModifyLabResult(this.parent.authUser)
                 ) || (
                   definitions.personType === EntityType.CONTACT &&
-                  ContactModel.canModifyLabResult(this._authUser)
-                ) || (
-                  definitions.personType === EntityType.CONTACT_OF_CONTACT &&
-                  ContactOfContactModel.canModifyLabResult(this._authUser)
+                  ContactModel.canModifyLabResult(this.parent.authUser)
                 )
               );
           }
@@ -973,7 +950,7 @@ export class EntityLabResultHelperService {
               action: {
                 click: (item: LabResultModel): void => {
                   // confirm
-                  this.dialogV2Service.showConfirmDialog({
+                  this.parent.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
@@ -993,7 +970,7 @@ export class EntityLabResultHelperService {
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.parent.dialogV2Service.showLoadingDialog();
 
                     // delete lab result
                     this.labResultDataService
@@ -1001,7 +978,7 @@ export class EntityLabResultHelperService {
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.createViewModifyHelperService.toastV2Service.error(err);
+                          this.parent.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -1012,7 +989,7 @@ export class EntityLabResultHelperService {
                       )
                       .subscribe(() => {
                         // success
-                        this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
+                        this.parent.toastV2Service.success('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -1026,17 +1003,14 @@ export class EntityLabResultHelperService {
               visible: (item: LabResultModel): boolean => {
                 return !item.deleted &&
                   definitions.selectedOutbreakIsActive() &&
-                  LabResultModel.canDelete(this._authUser) &&
+                  LabResultModel.canDelete(this.parent.authUser) &&
                   (
                     (
                       definitions.personType === EntityType.CASE &&
-                      CaseModel.canDeleteLabResult(this._authUser)
+                      CaseModel.canDeleteLabResult(this.parent.authUser)
                     ) || (
                       definitions.personType === EntityType.CONTACT &&
-                      ContactModel.canDeleteLabResult(this._authUser)
-                    ) || (
-                      definitions.personType === EntityType.CONTACT_OF_CONTACT &&
-                      ContactOfContactModel.canDeleteLabResult(this._authUser)
+                      ContactModel.canDeleteLabResult(this.parent.authUser)
                     )
                   );
               }
@@ -1048,17 +1022,14 @@ export class EntityLabResultHelperService {
                 // visible only if at least one of the first two items is visible
                 return !item.deleted &&
                   definitions.selectedOutbreakIsActive() &&
-                  LabResultModel.canDelete(this._authUser) &&
+                  LabResultModel.canDelete(this.parent.authUser) &&
                   (
                     (
                       definitions.personType === EntityType.CASE &&
-                      CaseModel.canDeleteLabResult(this._authUser)
+                      CaseModel.canDeleteLabResult(this.parent.authUser)
                     ) || (
                       definitions.personType === EntityType.CONTACT &&
-                      ContactModel.canDeleteLabResult(this._authUser)
-                    ) || (
-                      definitions.personType === EntityType.CONTACT_OF_CONTACT &&
-                      ContactOfContactModel.canDeleteLabResult(this._authUser)
+                      ContactModel.canDeleteLabResult(this.parent.authUser)
                     )
                   );
               }
@@ -1073,7 +1044,7 @@ export class EntityLabResultHelperService {
               action: {
                 click: (item: LabResultModel) => {
                   // show confirm dialog to confirm the action
-                  this.dialogV2Service.showConfirmDialog({
+                  this.parent.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
@@ -1093,7 +1064,7 @@ export class EntityLabResultHelperService {
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.parent.dialogV2Service.showLoadingDialog();
 
                     // restore lab result
                     this.labResultDataService
@@ -1106,7 +1077,7 @@ export class EntityLabResultHelperService {
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.createViewModifyHelperService.toastV2Service.error(err);
+                          this.parent.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -1117,7 +1088,7 @@ export class EntityLabResultHelperService {
                       )
                       .subscribe(() => {
                         // success
-                        this.createViewModifyHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
+                        this.parent.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -1131,17 +1102,14 @@ export class EntityLabResultHelperService {
               visible: (item: LabResultModel): boolean => {
                 return item.deleted &&
                   definitions.selectedOutbreakIsActive() &&
-                  LabResultModel.canRestore(this._authUser) &&
+                  LabResultModel.canRestore(this.parent.authUser) &&
                   (
                     (
                       definitions.personType === EntityType.CASE &&
-                      CaseModel.canRestoreLabResult(this._authUser)
+                      CaseModel.canRestoreLabResult(this.parent.authUser)
                     ) || (
                       definitions.personType === EntityType.CONTACT &&
-                      ContactModel.canRestoreLabResult(this._authUser)
-                    ) || (
-                      definitions.personType === EntityType.CONTACT_OF_CONTACT &&
-                      ContactOfContactModel.canRestoreLabResult(this._authUser)
+                      ContactModel.canRestoreLabResult(this.parent.authUser)
                     )
                   );
               }
@@ -1175,7 +1143,7 @@ export class EntityLabResultHelperService {
       {
         field: 'sampleIdentifier',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sampleIdentifier'
@@ -1217,7 +1185,7 @@ export class EntityLabResultHelperService {
       {
         field: 'dateSampleTaken',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateSampleTaken'
@@ -1233,7 +1201,7 @@ export class EntityLabResultHelperService {
       {
         field: 'dateSampleDelivered',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateSampleDelivered'
@@ -1249,7 +1217,7 @@ export class EntityLabResultHelperService {
       {
         field: 'dateOfResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateOfResult'
@@ -1265,7 +1233,7 @@ export class EntityLabResultHelperService {
       {
         field: 'notes',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'notes'
@@ -1279,7 +1247,7 @@ export class EntityLabResultHelperService {
       {
         field: 'dateTesting',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateTesting'
@@ -1295,7 +1263,7 @@ export class EntityLabResultHelperService {
       {
         field: 'labName',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'labName'
@@ -1309,7 +1277,7 @@ export class EntityLabResultHelperService {
       {
         field: 'sampleType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sampleType'
@@ -1323,7 +1291,7 @@ export class EntityLabResultHelperService {
       {
         field: 'testType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'testType'
@@ -1337,7 +1305,7 @@ export class EntityLabResultHelperService {
       {
         field: 'result',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'result'
@@ -1351,7 +1319,7 @@ export class EntityLabResultHelperService {
       {
         field: 'status',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'status'
@@ -1365,7 +1333,7 @@ export class EntityLabResultHelperService {
       {
         field: 'testedFor',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'testedFor'
@@ -1379,7 +1347,7 @@ export class EntityLabResultHelperService {
       {
         field: 'quantitativeResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'quantitativeResult'
@@ -1393,7 +1361,7 @@ export class EntityLabResultHelperService {
       {
         field: 'sequence.hasSequence',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[hasSequence]'
@@ -1413,7 +1381,7 @@ export class EntityLabResultHelperService {
       {
         field: 'sequence.dateSampleSent',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[dateSampleSent]'
@@ -1431,7 +1399,7 @@ export class EntityLabResultHelperService {
       {
         field: 'sequence.labId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[labId]'
@@ -1446,7 +1414,7 @@ export class EntityLabResultHelperService {
       {
         field: 'sequence.dateResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[dateResult]'
@@ -1464,7 +1432,7 @@ export class EntityLabResultHelperService {
       {
         field: 'sequence.resultId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[resultId]'
@@ -1479,7 +1447,7 @@ export class EntityLabResultHelperService {
       {
         field: 'sequence.noSequenceReason',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[noSequenceReason]'
@@ -1523,7 +1491,7 @@ export class EntityLabResultHelperService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canView(this._authUser);
+          return !UserModel.canView(this.parent.authUser);
         },
         link: (data) => {
           return data.createdBy ?
@@ -1560,7 +1528,7 @@ export class EntityLabResultHelperService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canView(this._authUser);
+          return !UserModel.canView(this.parent.authUser);
         },
         link: (data) => {
           return data.updatedBy ?
@@ -1597,7 +1565,7 @@ export class EntityLabResultHelperService {
     ];
 
     // finished
-    return this.createViewModifyHelperService.filterVisibleMandatoryTableColumns(tableColumns);
+    return this.parent.list.filterVisibleMandatoryTableColumns(tableColumns);
   }
 
   /**
@@ -1627,7 +1595,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'sampleIdentifier',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sampleIdentifier'
@@ -1638,7 +1606,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateSampleTaken',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateSampleTaken'
@@ -1649,7 +1617,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateSampleDelivered',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateSampleDelivered'
@@ -1660,7 +1628,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateOfResult'
@@ -1671,7 +1639,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'labName',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'labName'
@@ -1683,7 +1651,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'sampleType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sampleType'
@@ -1695,7 +1663,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'testType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'testType'
@@ -1707,7 +1675,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'result',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'result'
@@ -1719,7 +1687,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'status',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'status'
@@ -1731,7 +1699,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'testedFor',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'testedFor'
@@ -1742,7 +1710,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'sequence.hasSequence',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[hasSequence]'
@@ -1754,7 +1722,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'sequence.dateSampleSent',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[dateSampleSent]'
@@ -1765,7 +1733,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'sequence.labId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[labId]'
@@ -1777,7 +1745,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'sequence.dateResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[dateResult]'
@@ -1788,7 +1756,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'sequence.resultId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[resultId]'
@@ -1800,7 +1768,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'sequence.noSequenceReason',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'sequence[noSequenceReason]'
@@ -1812,7 +1780,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateTesting',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'dateTesting'
@@ -1823,7 +1791,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'notes',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'notes'
@@ -1834,7 +1802,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        visibleMandatoryIf: () => true,
+        visibleMandatoryIf: () => data.labResultsTemplate && data.labResultsTemplate()?.length > 0,
         template: data.labResultsTemplate,
         useLike: true
       },
@@ -1842,7 +1810,7 @@ export class EntityLabResultHelperService {
         type: V2AdvancedFilterType.TEXT,
         field: 'quantitativeResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
-        visibleMandatoryIf: () => this.createViewModifyHelperService.shouldVisibleMandatoryTableColumnBeVisible(
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
           'quantitativeResult'
@@ -1881,7 +1849,7 @@ export class EntityLabResultHelperService {
     ];
 
     // allowed to filter by user ?
-    if (UserModel.canListForFilters(this._authUser)) {
+    if (UserModel.canListForFilters(this.parent.authUser)) {
       advancedFilters.push({
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'createdBy',
@@ -1900,7 +1868,7 @@ export class EntityLabResultHelperService {
     }
 
     // finished
-    return this.createViewModifyHelperService.filterVisibleMandatoryAdvancedFilters(advancedFilters);
+    return this.parent.list.filterVisibleMandatoryAdvancedFilters(advancedFilters);
   }
 
   /**
@@ -1948,7 +1916,7 @@ export class EntityLabResultHelperService {
       )
       .pipe(
         catchError((err) => {
-          this.createViewModifyHelperService.toastV2Service.error(err);
+          this.parent.toastV2Service.error(err);
           return throwError(err);
         })
       );
