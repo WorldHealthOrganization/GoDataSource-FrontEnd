@@ -430,6 +430,10 @@ export class LabResultHelperModel {
           selectedOutbreak,
           this.parent.contact.visibleMandatoryKey,
           'visualId'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.parent.contactOfContact.visibleMandatoryKey,
+          'visualId'
         ),
         relationshipPath: ['person'],
         sortable: 'person.visualId'
@@ -446,6 +450,10 @@ export class LabResultHelperModel {
           selectedOutbreak,
           this.parent.contact.visibleMandatoryKey,
           'lastName'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.parent.contactOfContact.visibleMandatoryKey,
+          'lastName'
         ),
         relationshipPath: ['person'],
         sortable: 'person.lastName'
@@ -461,6 +469,10 @@ export class LabResultHelperModel {
         ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.parent.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.parent.contactOfContact.visibleMandatoryKey,
           'firstName'
         ),
         relationshipPath: ['person'],

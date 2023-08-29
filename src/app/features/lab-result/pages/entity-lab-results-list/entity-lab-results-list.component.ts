@@ -1055,18 +1055,15 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
             const labResultsFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
 
             // show export
-            let personId = '';
-            let pageTitle = '';
+            // EntityType.CASE
+            let personId = this.activatedRoute.snapshot.params.caseId;
+            let pageTitle = 'LNG_PAGE_LIST_CASES_TITLE';
             if (this.personType === EntityType.CONTACT_OF_CONTACT) {
               personId = this.activatedRoute.snapshot.params.contactOfContactId;
               pageTitle = 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE';
             } else if (this.personType === EntityType.CONTACT) {
               personId = this.activatedRoute.snapshot.params.contactId;
               pageTitle = 'LNG_PAGE_LIST_CONTACTS_TITLE';
-            } else {
-              // EntityType.CASE
-              personId = this.activatedRoute.snapshot.params.caseId;
-              pageTitle = 'LNG_PAGE_LIST_CASES_TITLE';
             }
             finished({
               title: {
