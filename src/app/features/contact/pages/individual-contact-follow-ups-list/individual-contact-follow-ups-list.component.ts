@@ -76,7 +76,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
     // parent
     super(
       listHelperService, {
-        disableFilterCaching: true
+        disableFilterCaching: true,
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
       }
     );
 
@@ -141,7 +143,6 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
-    console.log(1, this.selectedOutbreak);
     this.tableColumns = this.personAndRelatedHelperService.followUp.retrieveTableColumns(this.selectedOutbreak, {
       team: this.route.snapshot.data.team,
       user: this.route.snapshot.data.user,
@@ -226,7 +227,6 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    console.log(2, this.selectedOutbreak);
     this.advancedFilters = this.personAndRelatedHelperService.followUp.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       options: {
