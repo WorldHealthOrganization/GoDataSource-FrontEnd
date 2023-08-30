@@ -20,7 +20,6 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
@@ -86,7 +85,6 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
-    protected dialogV2Service: DialogV2Service,
     protected router: Router,
     protected location: Location,
     protected referenceDataHelperService: ReferenceDataHelperService,
@@ -122,7 +120,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
       // something went wrong, we should have at least one relationship model on create
       if (this._createRelationships.length < 1) {
-        const loading = this.dialogV2Service.showLoadingDialog();
+        const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
         loading.message({
           message: 'Something went wrong...'
         });
@@ -518,7 +516,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             action: {
               click: () => {
                 // show record details dialog
-                this.dialogV2Service.showRecordDetailsDialog(
+                this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
                   'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user
@@ -749,7 +747,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
         icon: 'content_copy',
         tooltip: 'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_COPY_BUTTON_TITLE',
         clickAction: (item) => {
-          this.dialogV2Service.showConfirmDialog({
+          this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
             config: {
               title: {
                 get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'

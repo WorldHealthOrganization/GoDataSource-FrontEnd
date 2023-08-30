@@ -2,7 +2,6 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
@@ -71,7 +70,6 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     protected renderer2: Renderer2,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
-    private dialogV2Service: DialogV2Service,
     private domSanitizer: DomSanitizer,
     private referenceDataHelperService: ReferenceDataHelperService,
     private personAndRelatedHelperService: PersonAndRelatedHelperService
@@ -652,7 +650,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
             action: {
               click: () => {
                 // show record details dialog
-                this.dialogV2Service.showRecordDetailsDialog(
+                this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
                   'LNG_PAGE_MODIFY_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user
