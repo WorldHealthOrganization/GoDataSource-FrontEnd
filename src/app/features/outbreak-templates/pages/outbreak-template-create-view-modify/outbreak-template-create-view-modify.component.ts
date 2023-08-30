@@ -539,6 +539,17 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                   this.itemData.generateFollowUpsDateOfLastContact = value;
                 }
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'generateFollowUpsWhenCreatingContacts',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CONTACTS',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CONTACTS_DESCRIPTION',
+              value: {
+                get: () => this.itemData.generateFollowUpsWhenCreatingContacts,
+                set: (value) => {
+                  this.itemData.generateFollowUpsWhenCreatingContacts = value;
+                }
+              }
             }
           ]
         },

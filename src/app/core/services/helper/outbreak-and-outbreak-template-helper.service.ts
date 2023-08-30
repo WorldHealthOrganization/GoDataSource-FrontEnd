@@ -418,6 +418,13 @@ export class OutbreakAndOutbreakTemplateHelperService {
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsWhenCreatingContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CONTACTS',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.LOCATION_MULTIPLE,
         field: 'locationIds',
         label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATIONS'
@@ -639,6 +646,13 @@ export class OutbreakAndOutbreakTemplateHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'generateFollowUpsDateOfLastContact',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsWhenCreatingContacts',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CONTACTS',
         options: data.options.yesNo,
         sortable: true
       },
