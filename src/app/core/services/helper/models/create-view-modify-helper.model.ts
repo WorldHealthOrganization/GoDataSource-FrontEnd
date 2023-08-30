@@ -168,7 +168,7 @@ export class CreateViewModifyHelperModel {
 
         // field type not handled ?
         if (!fieldDef?.id) {
-          throw new Error(`tabsFilter: couldn't determine field id for type '${input.type}'`);
+          throw new Error(`tabFilter: couldn't determine field id for type '${input.type}'`);
         }
 
         // always required ?
