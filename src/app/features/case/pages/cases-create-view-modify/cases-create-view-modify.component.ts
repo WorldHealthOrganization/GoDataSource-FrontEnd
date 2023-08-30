@@ -1130,7 +1130,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.personAndRelatedHelperService.followUp.retrieveTableColumns({
+        tableColumns: this.personAndRelatedHelperService.followUp.retrieveTableColumns(this.selectedOutbreak, {
           team: this.activatedRoute.snapshot.data.team,
           user: this.activatedRoute.snapshot.data.user,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,

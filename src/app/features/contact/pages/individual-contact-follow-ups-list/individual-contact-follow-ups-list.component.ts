@@ -27,14 +27,14 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 @Component({
   selector: 'app-individual-contact-follow-ups-list',
   templateUrl: './individual-contact-follow-ups-list.component.html'
 })
-export class IndividualContactFollowUpsListComponent extends ListComponent<FollowUpModel, IV2Column> implements OnDestroy {
+export class IndividualContactFollowUpsListComponent extends ListComponent<FollowUpModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
   // data
   entityData: ContactOfContactModel | ContactModel | CaseModel;
 
@@ -141,7 +141,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
-    this.tableColumns = this.personAndRelatedHelperService.followUp.retrieveTableColumns({
+    console.log(1, this.selectedOutbreak);
+    this.tableColumns = this.personAndRelatedHelperService.followUp.retrieveTableColumns(this.selectedOutbreak, {
       team: this.route.snapshot.data.team,
       user: this.route.snapshot.data.user,
       dailyFollowUpStatus: this.route.snapshot.data.dailyFollowUpStatus,
@@ -225,6 +226,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
+    console.log(2, this.selectedOutbreak);
     this.advancedFilters = this.personAndRelatedHelperService.followUp.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       options: {

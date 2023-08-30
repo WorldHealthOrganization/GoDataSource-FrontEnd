@@ -11,7 +11,7 @@ import { UserModel } from '../../../models/user.model';
 import { IAnswerData, QuestionModel } from '../../../models/question.model';
 import { IResolverV2ResponseModel } from '../../resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../models/reference-data.model';
-import { IV2Column, IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { TeamModel } from '../../../models/team.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { EntityType } from '../../../models/entity-type';
@@ -24,7 +24,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, 
 import { AddressModel } from '../../../models/address.model';
 import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { IV2ColumnToVisibleMandatoryConf, V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
 import { LocationModel } from '../../../models/location.model';
@@ -735,24 +735,32 @@ export class FollowUpHelperModel {
   /**
    * Retrieve table columns
    */
-  retrieveTableColumns(definitions: {
-    team: IResolverV2ResponseModel<TeamModel>,
-    user: IResolverV2ResponseModel<UserModel>,
-    dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>,
-    options: {
-      yesNoAll: ILabelValuePairModel[]
+  retrieveTableColumns(
+    selectedOutbreak: OutbreakModel,
+    definitions: {
+      team: IResolverV2ResponseModel<TeamModel>,
+      user: IResolverV2ResponseModel<UserModel>,
+      dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>,
+      options: {
+        yesNoAll: ILabelValuePairModel[]
+      }
     }
-  }): IV2Column[] {
+  ): IV2ColumnToVisibleMandatoryConf[] {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
       geoLocationAccurate: ''
     });
 
     // default table columns
-    const tableColumns: IV2Column[] = [
+    const tableColumns: IV2ColumnToVisibleMandatoryConf[] = [
       {
         field: 'date',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'date'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         format: {
@@ -765,6 +773,11 @@ export class FollowUpHelperModel {
       {
         field: 'teamId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'teamId'
+        ),
         notVisible: true,
         format: {
           type: (item: FollowUpModel) => {
@@ -788,6 +801,11 @@ export class FollowUpHelperModel {
       {
         field: 'statusId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'statusId'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -797,6 +815,7 @@ export class FollowUpHelperModel {
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
@@ -839,6 +858,11 @@ export class FollowUpHelperModel {
       {
         field: 'targeted',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'targeted'
+        ),
         sortable: true,
         format: {
           type: (item: FollowUpModel) => {
@@ -856,6 +880,7 @@ export class FollowUpHelperModel {
       {
         field: 'index',
         label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
+        visibleMandatoryIf: () => true,
         sortable: true,
         filter: {
           type: V2FilterType.NUMBER_RANGE,
@@ -865,6 +890,11 @@ export class FollowUpHelperModel {
       {
         field: 'location',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         format: {
           type: 'address.location.name'
         },
@@ -883,6 +913,11 @@ export class FollowUpHelperModel {
       {
         field: 'phoneNumber',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         sortable: true,
         format: {
           type: 'address.phoneNumber'
@@ -897,6 +932,11 @@ export class FollowUpHelperModel {
       {
         field: 'address.emailAddress',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -913,6 +953,11 @@ export class FollowUpHelperModel {
       {
         field: 'address.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'address.addressLine1'
@@ -928,6 +973,11 @@ export class FollowUpHelperModel {
       {
         field: 'address.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -944,6 +994,11 @@ export class FollowUpHelperModel {
       {
         field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'address.geoLocation.lat'
@@ -952,6 +1007,11 @@ export class FollowUpHelperModel {
       {
         field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         format: {
           type: 'address.geoLocation.lng'
@@ -960,6 +1020,11 @@ export class FollowUpHelperModel {
       {
         field: 'address.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -976,6 +1041,11 @@ export class FollowUpHelperModel {
       {
         field: 'address.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'address'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -994,6 +1064,11 @@ export class FollowUpHelperModel {
       {
         field: 'responsibleUserId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'responsibleUserId'
+        ),
         notVisible: true,
         format: {
           type: (item) => item.responsibleUserId && definitions.user.map[item.responsibleUserId] ?
@@ -1017,6 +1092,7 @@ export class FollowUpHelperModel {
       {
         field: 'deleted',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -1031,6 +1107,7 @@ export class FollowUpHelperModel {
       {
         field: 'deletedAt',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1043,6 +1120,7 @@ export class FollowUpHelperModel {
       {
         field: 'createdBy',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: (item) => item.createdBy && definitions.user.map[item.createdBy] ?
@@ -1066,6 +1144,7 @@ export class FollowUpHelperModel {
       {
         field: 'createdAt',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -1078,6 +1157,7 @@ export class FollowUpHelperModel {
       {
         field: 'updatedBy',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: (item) => item.updatedBy && definitions.user.map[item.updatedBy] ?
@@ -1101,6 +1181,7 @@ export class FollowUpHelperModel {
       {
         field: 'updatedAt',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -1113,7 +1194,7 @@ export class FollowUpHelperModel {
     ];
 
     // finished
-    return tableColumns;
+    return this.parent.list.filterVisibleMandatoryTableColumns(tableColumns);
   }
 
   /**

@@ -636,7 +636,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.lastName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'lastName'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -670,7 +676,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.firstName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'firstName'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -704,7 +716,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'visualId'
         ),
         pinned: IV2ColumnPinned.LEFT,
@@ -722,7 +740,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.gender',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'gender'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'gender'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'gender'
         ),
         sortable: true,
@@ -742,7 +766,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.occupation',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'occupation'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'occupation'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'occupation'
         ),
         sortable: true,
@@ -1069,7 +1099,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.dob',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'ageDob'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'ageDob'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'ageDob'
         ),
         sortable: true,
@@ -1085,7 +1121,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.riskLevel',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'riskLevel'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'riskLevel'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'riskLevel'
         ),
         sortable: true,
