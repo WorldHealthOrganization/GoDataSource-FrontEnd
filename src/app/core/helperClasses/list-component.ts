@@ -32,12 +32,13 @@ import { AppListTableV2Component } from '../../shared/components-v2/app-list-tab
 import { SavedFilterData } from '../models/saved-filters.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { IV2ProcessSelectedData } from '../../shared/components-v2/app-list-table-v2/models/process-data.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 /**
  * List component
  */
 @Directive()
-export abstract class ListComponent<T, U extends IV2Column> extends ListAppliedFiltersComponent<U> {
+export abstract class ListComponent<T, U extends (IV2Column | IV2ColumnToVisibleMandatoryConf)> extends ListAppliedFiltersComponent<U> {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
 

@@ -17,7 +17,6 @@ import { Constants } from '../../../../core/models/constants';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -74,7 +73,6 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     protected renderer2: Renderer2,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
-    protected dialogV2Service: DialogV2Service,
     protected domSanitizer: DomSanitizer,
     private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
@@ -550,7 +548,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
             action: {
               click: () => {
                 // show record details dialog
-                this.dialogV2Service.showRecordDetailsDialog(
+                this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
                   'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user,

@@ -7,7 +7,7 @@ import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/component
 /**
  * Applied filters
  */
-export abstract class ListQueryComponent<T extends IV2Column> {
+export abstract class ListQueryComponent<T extends (IV2Column | IV2ColumnToVisibleMandatoryConf)> {
   // table columns
   private _tableColumns: T[] = [];
   get tableColumns(): T[] {
@@ -15,12 +15,12 @@ export abstract class ListQueryComponent<T extends IV2Column> {
   }
   set tableColumns(tableColumns: T[]) {
     // set value
-    this._tableColumns = this.listHelperService.model.filterVisibleMandatoryTableColumns(tableColumns as unknown as IV2ColumnToVisibleMandatoryConf[]);
+    this._tableColumns = this.listHelperService.model.filterVisibleMandatoryTableColumns<T>(tableColumns as IV2ColumnToVisibleMandatoryConf[]);
 
     // overwrite push items, otherwise we might push items that shouldn't be visible
     const self = this;
     this._tableColumns.push = function(...args) {
-      return Array.prototype.push.apply(this, self.listHelperService.model.filterVisibleMandatoryTableColumns(args as unknown as IV2ColumnToVisibleMandatoryConf[]));
+      return Array.prototype.push.apply(this, self.listHelperService.model.filterVisibleMandatoryTableColumns(args as IV2ColumnToVisibleMandatoryConf[]));
     };
   }
 

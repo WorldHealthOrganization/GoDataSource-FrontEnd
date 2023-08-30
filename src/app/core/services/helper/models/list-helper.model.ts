@@ -39,10 +39,10 @@ export class ListHelperModel {
   /**
    * Filter table columns depending on outbreak visible/mandatory settings
    */
-  filterVisibleMandatoryTableColumns<T extends IV2Column>(items: IV2ColumnToVisibleMandatoryConf[]): T[] {
+  filterVisibleMandatoryTableColumns<T extends (IV2Column | IV2ColumnToVisibleMandatoryConf)>(items: IV2ColumnToVisibleMandatoryConf[]): T[] {
     return (items || []).filter((column) => column.visibleMandatoryIf ?
       column.visibleMandatoryIf() :
       true
-    ) as unknown as T[];
+    ) as T[];
   }
 }

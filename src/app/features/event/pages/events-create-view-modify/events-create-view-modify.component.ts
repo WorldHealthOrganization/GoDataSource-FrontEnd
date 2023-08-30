@@ -27,7 +27,6 @@ import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Constants } from '../../../../core/models/constants';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
@@ -72,7 +71,6 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     protected renderer2: Renderer2,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
-    protected dialogV2Service: DialogV2Service,
     protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
     private personAndRelatedHelperService: PersonAndRelatedHelperService
@@ -827,7 +825,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
             action: {
               click: () => {
                 // show record details dialog
-                this.dialogV2Service.showRecordDetailsDialog(
+                this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
                   'LNG_PAGE_MODIFY_EVENT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user

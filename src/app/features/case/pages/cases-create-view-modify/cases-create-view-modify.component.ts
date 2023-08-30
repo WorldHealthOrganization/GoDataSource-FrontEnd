@@ -35,7 +35,6 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Location } from '@angular/common';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputLinkWithAction,
@@ -103,7 +102,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected router: Router,
     protected systemSettingsDataService: SystemSettingsDataService,
     protected location: Location,
-    protected dialogV2Service: DialogV2Service,
     protected entityDataService: EntityDataService,
     protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
@@ -1132,7 +1130,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.personAndRelatedHelperService.followUp.retrieveTableColumns({
+        tableColumns: this.personAndRelatedHelperService.followUp.retrieveTableColumns(this.selectedOutbreak, {
           team: this.activatedRoute.snapshot.data.team,
           user: this.activatedRoute.snapshot.data.user,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,
@@ -1281,7 +1279,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             action: {
               click: () => {
                 // show record details dialog
-                this.dialogV2Service.showRecordDetailsDialog(
+                this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
                   'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user,
@@ -1670,7 +1668,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               });
 
               // construct & display duplicates dialog
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showSideDialog({
                   title: {
                     get: () => 'LNG_COMMON_LABEL_HAS_DUPLICATES_TITLE'
