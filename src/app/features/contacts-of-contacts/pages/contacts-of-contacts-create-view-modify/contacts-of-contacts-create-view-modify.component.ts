@@ -24,7 +24,6 @@ import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
@@ -33,7 +32,6 @@ import { EntityModel, RelationshipModel } from '../../../../core/models/entity-a
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -99,10 +97,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     protected renderer2: Renderer2,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
-    protected dialogV2Service: DialogV2Service,
     protected systemSettingsDataService: SystemSettingsDataService,
     protected entityDataService: EntityDataService,
-    protected relationshipDataService: RelationshipDataService,
     protected domSanitizer: DomSanitizer,
     protected location: Location,
     protected referenceDataHelperService: ReferenceDataHelperService,
@@ -1241,7 +1237,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             action: {
               click: () => {
                 // show record details dialog
-                this.dialogV2Service.showRecordDetailsDialog(
+                this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
                   'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user,
@@ -1415,7 +1411,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             }
 
             // create relationship
-            return this.relationshipDataService
+            return this.personAndRelatedHelperService.relationship.relationshipDataService
               .createRelationship(
                 this.selectedOutbreak.id,
                 EntityType.CONTACT_OF_CONTACT,
@@ -1606,7 +1602,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
               });
 
               // construct & display duplicates dialog
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showSideDialog({
                   title: {
                     get: () => 'LNG_COMMON_LABEL_HAS_DUPLICATES_TITLE'
