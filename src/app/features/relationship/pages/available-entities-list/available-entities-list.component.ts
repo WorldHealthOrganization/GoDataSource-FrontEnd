@@ -21,7 +21,6 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { of } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LocationModel } from '../../../../core/models/location.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
@@ -47,7 +46,6 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
     protected listHelperService: ListHelperService,
     protected activatedRoute: ActivatedRoute,
     protected genericDataService: GenericDataService,
-    protected locationDataService: LocationDataService,
     protected referenceDataHelperService: ReferenceDataHelperService,
     private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
@@ -497,7 +495,7 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
           );
 
           // retrieve locations
-          return this.locationDataService
+          return this.personAndRelatedHelperService.locationDataService
             .getLocationsList(qb)
             .pipe(
               map((locations) => {

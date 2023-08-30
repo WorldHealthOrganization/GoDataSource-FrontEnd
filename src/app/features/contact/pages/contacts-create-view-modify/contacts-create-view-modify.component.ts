@@ -30,7 +30,6 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Location } from '@angular/common';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
@@ -46,7 +45,6 @@ import {
   IV2SideDialogConfigInputToggleCheckbox,
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -106,10 +104,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
     protected location: Location,
-    protected dialogV2Service: DialogV2Service,
     protected entityDataService: EntityDataService,
     protected systemSettingsDataService: SystemSettingsDataService,
-    protected relationshipDataService: RelationshipDataService,
     protected domSanitizer: DomSanitizer,
     protected referenceDataHelperService: ReferenceDataHelperService,
     private clusterDataService: ClusterDataService,
@@ -1177,7 +1173,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.personAndRelatedHelperService.followUp.retrieveTableColumns({
+        tableColumns: this.personAndRelatedHelperService.followUp.retrieveTableColumns(this.selectedOutbreak, {
           team: this.activatedRoute.snapshot.data.team,
           user: this.activatedRoute.snapshot.data.user,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,
@@ -1326,7 +1322,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             action: {
               click: () => {
                 // show record details dialog
-                this.dialogV2Service.showRecordDetailsDialog(
+                this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
                   'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user,
@@ -1525,7 +1521,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             }
 
             // create relationship
-            return this.relationshipDataService
+            return this.personAndRelatedHelperService.relationship.relationshipDataService
               .createRelationship(
                 this.selectedOutbreak.id,
                 EntityType.CONTACT,
@@ -1719,7 +1715,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               });
 
               // construct & display duplicates dialog
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showSideDialog({
                   title: {
                     get: () => 'LNG_COMMON_LABEL_HAS_DUPLICATES_TITLE'

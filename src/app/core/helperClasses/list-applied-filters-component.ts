@@ -8,11 +8,12 @@ import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { ListQueryComponent } from './list-query-component';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 /**
  * Applied filters
  */
-export abstract class ListAppliedFiltersComponent<T extends IV2Column> extends ListQueryComponent<T> {
+export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2ColumnToVisibleMandatoryConf)> extends ListQueryComponent<T> {
   // Applied list filter on this list page
   appliedListFilter: ApplyListFilter;
 

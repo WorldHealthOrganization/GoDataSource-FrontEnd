@@ -13,7 +13,6 @@ import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { LocationModel } from '../../../../core/models/location.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { ActivatedRoute } from '@angular/router';
@@ -533,7 +532,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private entityDataService: EntityDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private genericDataService: GenericDataService,
-    private locationDataService: LocationDataService,
     private clusterDataService: ClusterDataService,
     private activatedRoute: ActivatedRoute,
     private authDataService: AuthDataService,
@@ -2810,7 +2808,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             false,
             null
           );
-          this.locationDataService
+          this.personAndRelatedHelperService.locationDataService
             .getLocationsList(locationQueryBuilder)
             .pipe(
               catchError((err) => {
