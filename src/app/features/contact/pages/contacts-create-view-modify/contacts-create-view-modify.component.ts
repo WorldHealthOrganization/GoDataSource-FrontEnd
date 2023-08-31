@@ -1533,7 +1533,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                 switchMap(() => {
                   // do not generate follow-ups if the feature is not enabled
                   if (!this.selectedOutbreak.generateFollowUpsWhenCreatingContacts) {
-                    return;
+                    return of(contact);
                   }
 
                   // generate follow-ups
