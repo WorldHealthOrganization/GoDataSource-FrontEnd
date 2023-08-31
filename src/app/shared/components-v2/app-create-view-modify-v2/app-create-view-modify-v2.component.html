@@ -1033,6 +1033,7 @@
 
                     <!-- Type -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('type')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('type'))"
                       fxFlex
                       [(ngModel)]="input.value.get(parentItemIndex).type"
                       name="type"
@@ -1041,11 +1042,12 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.typeOptions"
-                      required="true"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('type')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('type')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                     <!-- Date -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('number')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('number'))"
                       fxFlex
                       [(ngModel)]="input.value.get(parentItemIndex).number"
                       name="number"
@@ -1053,7 +1055,7 @@
                       tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
-                      required="true"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('number')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('number')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                   </div>
@@ -1067,6 +1069,7 @@
 
                     <!-- Type -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('typeId')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('typeId'))"
                       [(ngModel)]="input.value.get(parentItemIndex).typeId"
                       name="typeId"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_TYPE"
@@ -1074,42 +1077,49 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
                       [options]="input.typeOptions"
-                      [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('typeId')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('typeId')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                     <!-- Date -->
                     <app-form-date-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('date')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('date'))"
                       [(ngModel)]="input.value.get(parentItemIndex).date"
                       name="date"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_DATE"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('date')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('date')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-date-v2>
 
                     <!-- Email address -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('emailAddress')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('emailAddress'))"
                       [(ngModel)]="input.value.get(parentItemIndex).emailAddress"
                       name="emailAddress"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('emailAddress')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('emailAddress')))"
                       app-email-validator
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Phone number -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('phoneNumber')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('phoneNumber'))"
                       [(ngModel)]="input.value.get(parentItemIndex).phoneNumber"
                       name="phoneNumber"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('phoneNumber')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('phoneNumber')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Location -->
                     <app-form-select-location-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('locationId')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('locationId'))"
                       [(ngModel)]="input.value.get(parentItemIndex).locationId"
                       name="locationId"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
@@ -1117,42 +1127,49 @@
                       [disabled]="parentInput?.readonly || input.readonly"
                       useOutbreakLocations="true"
                       clearable="true"
-                      [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('locationId')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('locationId')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                       (selectedLocationChanged)="addressLocationChanged(input.value.get(parentItemIndex), $event)"></app-form-select-location-single-v2>
 
                     <!-- City -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('city')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('city'))"
                       [(ngModel)]="input.value.get(parentItemIndex).city"
                       name="city"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_CITY"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('city')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('city')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Postal code -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('postalCode')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('postalCode'))"
                       [(ngModel)]="input.value.get(parentItemIndex).postalCode"
                       name="postalCode"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('postalCode')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('postalCode')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Address line 1 -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('addressLine1')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('addressLine1'))"
                       [(ngModel)]="input.value.get(parentItemIndex).addressLine1"
                       name="addressLine1"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('addressLine1')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('addressLine1')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Lat & Lng -->
                     <div
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('geoLocation')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('geoLocation'))"
                       fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="1.6rem" fxLayoutGap.xs="0"
                       ngModelGroup="geoLocation"
                       class="gd-create-view-modify-bottom-section-content-input-coordinates">
@@ -1195,6 +1212,7 @@
 
                     <!-- Geo location accurate -->
                     <app-form-toggle-checkbox-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('geoLocationAccurate')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('geoLocationAccurate'))"
                       [(ngModel)]="input.value.get(parentItemIndex).geoLocationAccurate"
                       name="geoLocationAccurate"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES"

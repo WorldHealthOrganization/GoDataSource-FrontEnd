@@ -1,4 +1,3 @@
-import { CreateViewModifyV2TabInput } from '../../../../components-v2/app-create-view-modify-v2/models/tab.model';
 import { IV2Column } from '../../../../components-v2/app-list-table-v2/models/column.model';
 import { V2AdvancedFilter } from '../../../../components-v2/app-list-table-v2/models/advanced-filter.model';
 
@@ -61,7 +60,7 @@ export interface IVisibleMandatoryDataGroupTabSectionField {
   label: string;
   supportsRequired: boolean;
   visibleMandatoryConf: ICreateViewModifyV2TabInputToVisibleMandatoryConf;
-  definition: CreateViewModifyV2TabInput;
+  inputHasRequiredValidator: boolean;
 }
 
 /**
