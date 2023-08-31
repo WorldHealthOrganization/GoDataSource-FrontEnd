@@ -1,7 +1,6 @@
 import {
   CreateViewModifyV2TabInput,
   CreateViewModifyV2TabInputType,
-  ICreateViewModifyV2Section,
   ICreateViewModifyV2Tab,
   ICreateViewModifyV2TabInputValidatorRequired
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
@@ -152,10 +151,115 @@ export class CreateViewModifyHelperModel {
   }
 
   /**
+   * Determine visible / mandatory definition - vaccine
+   */
+  private retrieveFieldVisibleMandatoryDefVaccine(
+    name: string
+  ): IVisibleMandatoryDataGroupTabSectionField[] {
+    return [
+      {
+        id: `${name}.vaccine`,
+        label: 'LNG_ENTITY_FIELD_LABEL_VACCINE',
+        supportsRequired: true,
+        visibleMandatoryConf: undefined,
+        inputHasRequiredValidator: true
+      }, {
+        id: `${name}.date`,
+        label: 'LNG_ENTITY_FIELD_LABEL_VACCINE_DATE',
+        supportsRequired: true,
+        visibleMandatoryConf: {
+          needs: [{
+            field: `${name}.vaccine`
+          }]
+        },
+        inputHasRequiredValidator: false
+      }, {
+        id: `${name}.status`,
+        label: 'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS',
+        supportsRequired: true,
+        visibleMandatoryConf: {
+          needs: [{
+            field: `${name}.vaccine`
+          }]
+        },
+        inputHasRequiredValidator: true
+      }
+    ];
+  }
+
+  /**
+   * Determine visible / mandatory definition - date range
+   */
+  private retrieveFieldVisibleMandatoryDefDateRange(
+    name: string
+  ): IVisibleMandatoryDataGroupTabSectionField[] {
+    return [
+      {
+        id: `${name}.typeId`,
+        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID',
+        supportsRequired: true,
+        visibleMandatoryConf: {
+          required: true
+        },
+        inputHasRequiredValidator: true
+      }, {
+        id: `${name}.startDate`,
+        label: 'LNG_FORM_RANGE_FIELD_LABEL_FROM',
+        supportsRequired: true,
+        visibleMandatoryConf: {
+          needs: [{
+            field: `${name}.typeId`
+          }]
+        },
+        inputHasRequiredValidator: false
+      }, {
+        id: `${name}.endDate`,
+        label: 'LNG_FORM_RANGE_FIELD_LABEL_TO',
+        supportsRequired: true,
+        visibleMandatoryConf: {
+          needs: [{
+            field: `${name}.typeId`
+          }]
+        },
+        inputHasRequiredValidator: false
+      }, {
+        id: `${name}.centerName`,
+        label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+        supportsRequired: true,
+        visibleMandatoryConf: {
+          needs: [{
+            field: `${name}.typeId`
+          }]
+        },
+        inputHasRequiredValidator: false
+      }, {
+        id: `${name}.locationId`,
+        label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION',
+        supportsRequired: true,
+        visibleMandatoryConf: {
+          needs: [{
+            field: `${name}.typeId`
+          }]
+        },
+        inputHasRequiredValidator: false
+      }, {
+        id: `${name}.comments`,
+        label: 'LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS',
+        supportsRequired: true,
+        visibleMandatoryConf: {
+          needs: [{
+            field: `${name}.typeId`
+          }]
+        },
+        inputHasRequiredValidator: false
+      }
+    ];
+  }
+
+  /**
    * Determine visible / mandatory definition
    */
   private retrieveFieldVisibleMandatoryDef(
-    section: ICreateViewModifyV2Section,
     input: CreateViewModifyV2TabInput
   ): IVisibleMandatoryDataGroupTabSectionField[] {
     switch (input.type) {
@@ -213,14 +317,14 @@ export class CreateViewModifyHelperModel {
             );
 
           case CreateViewModifyV2TabInputType.VACCINE:
+            return this.retrieveFieldVisibleMandatoryDefVaccine(
+              input.name
+            );
+
           case CreateViewModifyV2TabInputType.CENTER_DATE_RANGE:
-            return [{
-              id: input.name,
-              label: section.label,
-              supportsRequired: false,
-              visibleMandatoryConf: undefined,
-              inputHasRequiredValidator: false
-            }];
+            return this.retrieveFieldVisibleMandatoryDefDateRange(
+              input.name
+            );
 
           default:
             throw new Error(`retrieveFieldVisibleMandatoryDef - list: unhandled type '${input.definition.input.type}'`);
@@ -245,7 +349,6 @@ export class CreateViewModifyHelperModel {
           const children: IVisibleMandatoryDataGroupTabSectionField[] = [];
           section.inputs.forEach((input) => {
             children.push(...this.retrieveFieldVisibleMandatoryDef(
-              section,
               input
             ));
           });
@@ -315,7 +418,6 @@ export class CreateViewModifyHelperModel {
 
         // determine field id
         const fieldDefs: IVisibleMandatoryDataGroupTabSectionField[] = this.retrieveFieldVisibleMandatoryDef(
-          section,
           input
         );
 

@@ -1230,6 +1230,7 @@
 
                     <!-- Vaccine -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('vaccine')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('vaccine'))"
                       fxFlex
                       [(ngModel)]="input.value.get(parentItemIndex).vaccine"
                       name="vaccine"
@@ -1238,20 +1239,23 @@
                       [disabled]="parentInput?.readonly"
                       [options]="input.vaccineOptions"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
-                      required="true"></app-form-select-single-v2>
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('vaccine')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('vaccine')))"></app-form-select-single-v2>
 
                     <!-- Date -->
                     <app-form-date-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('date')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('date'))"
                       fxFlex
                       [(ngModel)]="input.value.get(parentItemIndex).date"
                       name="date"
                       placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_DATE"
                       [viewOnly]="isView"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
-                      [disabled]="parentInput?.readonly"></app-form-date-v2>
+                      [disabled]="parentInput?.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('date')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('date')))"></app-form-date-v2>
 
                     <!-- Vaccine status -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('status')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('status'))"
                       fxFlex
                       [(ngModel)]="input.value.get(parentItemIndex).status"
                       name="status"
@@ -1260,7 +1264,7 @@
                       [disabled]="parentInput?.readonly"
                       [options]="input.vaccineStatusOptions"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
-                      required="true"></app-form-select-single-v2>
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('status')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('status')))"></app-form-select-single-v2>
 
                   </div>
 
@@ -1273,21 +1277,25 @@
 
                     <!-- Type -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('typeId')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('typeId'))"
                       [(ngModel)]="input.value.get(parentItemIndex).typeId"
                       name="typeId"
                       placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.typeOptions"
-                      required="true"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('typeId')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('typeId')))"
                       (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-select-single-v2>
 
                     <!-- From & To -->
                     <div
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('startDate')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('startDate')) ||
+                             (input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('endDate')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('endDate'))"
                       fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="1.6rem" fxLayoutGap.xs="0">
 
                       <!-- Date range - start -->
                       <app-form-date-v2
+                        *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('startDate')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('startDate'))"
                         fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
                         [(ngModel)]="input.value.get(parentItemIndex).startDate"
                         name="startDate"
@@ -1297,10 +1305,12 @@
                         app-date-validator
                         dateSameOrBefore="endDate"
                         [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"
+                        [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('startDate')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('startDate')))"
                         (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-date-v2>
 
                       <!-- Date range - end -->
                       <app-form-date-v2
+                        *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('endDate')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('endDate'))"
                         fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
                         [(ngModel)]="input.value.get(parentItemIndex).endDate"
                         name="endDate"
@@ -1309,22 +1319,26 @@
                         [disabled]="parentInput?.readonly"
                         app-date-validator
                         dateSameOrAfter="startDate"
+                        [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('endDate')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('endDate')))"
                         (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-date-v2>
 
                     </div>
 
                     <!-- Center name -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('centerName')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('centerName'))"
                       [(ngModel)]="input.value.get(parentItemIndex).centerName"
                       name="centerName"
                       placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.centerOptions"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('centerName')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('centerName')))"
                       (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-select-single-v2>
 
                     <!-- Location -->
                     <app-form-select-location-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('locationId')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('locationId'))"
                       [(ngModel)]="input.value.get(parentItemIndex).locationId"
                       name="locationId"
                       placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION"
@@ -1332,15 +1346,18 @@
                       [disabled]="parentInput?.readonly"
                       useOutbreakLocations="true"
                       clearable="true"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('locationId')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('locationId')))"
                       (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-select-location-single-v2>
 
                     <!-- Comments -->
                     <app-form-textarea-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('comments')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('comments'))"
                       [(ngModel)]="input.value.get(parentItemIndex).comments"
                       name="comments"
                       placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('comments')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('comments')))"
                       (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-textarea-v2>
 
                   </div>
