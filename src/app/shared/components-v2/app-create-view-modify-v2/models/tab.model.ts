@@ -486,6 +486,12 @@ export interface ICreateViewModifyV2TabInputList {
   readonly?: boolean;
   cssClasses?: string;
   actionIconButtons?: ICreateViewModifyV2TabInputActionButton[];
+
+  // used by ui
+  visibleMandatoryChild?: {
+    visible: (prop: string) => boolean,
+    mandatory: (prop: string) => boolean
+  };
 }
 
 /**
@@ -558,6 +564,12 @@ interface ICreateViewModifyV2TabInputAddress extends ICreateViewModifyV2TabInput
   };
   visible?: () => boolean;
   readonly?: boolean;
+
+  // used by ui
+  visibleMandatoryChild?: {
+    visible: (prop: string) => boolean,
+    mandatory: (prop: string) => boolean
+  };
 }
 
 /**

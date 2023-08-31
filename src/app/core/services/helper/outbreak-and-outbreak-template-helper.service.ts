@@ -9,7 +9,6 @@ import { LabResultModel } from '../../models/lab-result.model';
 import { RelationshipModel } from '../../models/entity-and-relationship.model';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
-import { ICreateViewModifyV2TabInputValidatorRequired } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { UserModel } from '../../models/user.model';
 import { AuthDataService } from '../data/auth.data.service';
@@ -276,7 +275,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
               item.visibleAndMandatoryFields[group.id][field.id] = {
                 visible: true,
                 // if method exists is enough, no need to execute, otherwise some might not return required because we sent an empty model when we generate groups, and some required might depend on db data
-                mandatory: !!(field.definition as ICreateViewModifyV2TabInputValidatorRequired).validators?.required || !!field.visibleMandatoryConf?.required
+                mandatory: !!field.inputHasRequiredValidator || !!field.visibleMandatoryConf?.required
               };
             });
           });
@@ -296,7 +295,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
             item.visibleAndMandatoryFields[group.id][field.id] = {
               visible: true,
               // if method exists is enough, no need to execute, otherwise some might not return required because we sent an empty model when we generate groups, and some required might depend on db data
-              mandatory: !!(field.definition as ICreateViewModifyV2TabInputValidatorRequired).validators?.required || !!field.visibleMandatoryConf?.required
+              mandatory: !!field.inputHasRequiredValidator || !!field.visibleMandatoryConf?.required
             };
           });
         });
