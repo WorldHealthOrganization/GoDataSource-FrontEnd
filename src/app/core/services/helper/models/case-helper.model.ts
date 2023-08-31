@@ -954,7 +954,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.typeId'
         ),
         isArray: true
       },
@@ -965,7 +965,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ),
         isArray: true,
         sortable: 'addresses.phoneNumber'
@@ -1246,7 +1246,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.vaccine'
         ),
         options: data.options.vaccine,
         sortable: true
@@ -1258,7 +1258,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.status'
         ),
         options: data.options.vaccineStatus,
         sortable: true
@@ -1270,7 +1270,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.date'
         ),
         sortable: true
       },
@@ -1281,7 +1281,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'documents'
+          'documents.type'
         ),
         options: data.options.documentType,
         sortable: true
@@ -1293,7 +1293,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'documents'
+          'documents.number'
         ),
         sortable: true
       },
@@ -1304,7 +1304,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ),
         sortable: true
       },
@@ -1315,7 +1315,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.geoLocationAccurate'
         ),
         options: data.options.yesNo,
         sortable: true,
@@ -1328,7 +1328,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.typeId'
         ),
         options: data.options.addressType,
         sortable: true,
@@ -1341,7 +1341,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.date'
         ),
         sortable: true,
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
@@ -1353,7 +1353,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ),
         sortable: true,
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
@@ -1365,7 +1365,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.postalCode'
         ),
         sortable: true,
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_ADDRESSES'
@@ -1420,7 +1420,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'dateRanges'
+          'dateRanges.typeId'
         ),
         options: data.options.dateRangeType,
         sortable: true
@@ -1432,7 +1432,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'dateRanges'
+          'dateRanges.startDate'
         ),
         sortable: true,
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
@@ -1444,7 +1444,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'dateRanges'
+          'dateRanges.endDate'
         ),
         sortable: true,
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
@@ -1456,7 +1456,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'dateRanges'
+          'dateRanges.centerName'
         ),
         options: data.options.dateRangeCenter,
         sortable: true,
@@ -1470,7 +1470,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'dateRanges'
+          'dateRanges.locationId'
         ),
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
       },
@@ -1481,7 +1481,7 @@ export class CaseHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'dateRanges'
+          'dateRanges.comments'
         ),
         sortable: true,
         relationshipLabel: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS'
