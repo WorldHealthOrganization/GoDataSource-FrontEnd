@@ -1528,6 +1528,21 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                 contact.id,
                 relationship
               )
+              .pipe(
+                // generate follow-ups if create
+                switchMap(() => {
+                  // do not generate follow-ups if the feature is not enabled
+                  if (!this.selectedOutbreak.generateFollowUpsWhenCreatingContacts) {
+                    return;
+                  }
+
+                  // generate follow-ups
+                  return this.personAndRelatedHelperService.followUp.followUpsDataService
+                    .generateFollowUps(
+                      this.selectedOutbreak.id,
+                      contact.id
+                    );
+                }))
               .pipe(map(() => contact));
           }),
 

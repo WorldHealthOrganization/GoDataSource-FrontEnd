@@ -2450,6 +2450,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       this.personAndRelatedHelperService.followUp.followUpsDataService
         .generateFollowUps(
           this.selectedOutbreak.id,
+          undefined,
           (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.startDate,
           (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.endDate,
           (response.data.map.targeted as IV2SideDialogConfigInputToggleCheckbox).value as unknown as boolean,

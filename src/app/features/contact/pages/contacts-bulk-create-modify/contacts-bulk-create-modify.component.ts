@@ -30,6 +30,12 @@ import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-ca
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
+interface IBulkContact {
+  recordNo: number,
+  contact: ContactModel,
+  relationship?: RelationshipModel
+}
+
 @Component({
   selector: 'app-contacts-bulk-create-modify',
   templateUrl: './contacts-bulk-create-modify.component.html'
@@ -1075,15 +1081,67 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             this.personAndRelatedHelperService.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG');
           }
 
+          // show error action
+          const showErrors = (rowsToDelete) => {
+            // remove success rows
+            if (rowsToDelete.length > 0) {
+              event.removeRows(rowsToDelete);
+            }
+
+            // prepare errors to parse later into more readable errors
+            const errors = [];
+            (_.get(err, 'details.failed') || []).forEach((childError) => {
+              if (!_.isEmpty(childError.error)) {
+                errors.push({
+                  err: childError.error,
+                  echo: childError
+                });
+              }
+            });
+
+            // try to parse into more clear errors
+            this.personAndRelatedHelperService.toastV2Service.translateErrors(errors)
+              .subscribe((translatedErrors) => {
+                // transform errors
+                (translatedErrors || []).forEach((translatedError) => {
+                  // determine row number
+                  let row: number = _.get(translatedError, 'echo.recordNo', null);
+                  if (typeof row === 'number') {
+                    row++;
+                  }
+
+                  // add to error list
+                  this.personAndRelatedHelperService.toastV2Service.error(
+                    'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG', {
+                      row: row + '',
+                      err: translatedError.message
+                    }
+                  );
+                });
+              });
+
+            // close dialog
+            event.finished();
+          };
+
           // remove success records
           // items should be ordered by recordNo
           //  - so in this case if we reverse we can remove records from sheet without having to take in account that we removed other rows as well
           const rowsToDelete: number[] = [];
+          const contactIds: string[] = [];
           (_.get(err, 'details.success') || []).reverse().forEach((successRecord) => {
             // remove record that was added
             if (typeof successRecord.recordNo === 'number') {
               // remove row
               rowsToDelete.push(successRecord.recordNo);
+
+              // get the created contacts
+              if (
+                this.isCreate &&
+                successRecord.contact
+              ) {
+                contactIds.push(successRecord.contact.id);
+              }
 
               // subtract row numbers
               _.each(
@@ -1102,67 +1160,91 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             }
           });
 
-          // remove success rows
-          if (rowsToDelete.length > 0) {
-            event.removeRows(rowsToDelete);
+          // generate follow-ups ?
+          if (
+            this.selectedOutbreak.generateFollowUpsWhenCreatingContacts &&
+            contactIds.length
+          ) {
+            this.personAndRelatedHelperService.followUp.followUpsDataService
+              .generateFollowUps(
+                this.selectedOutbreak.id,
+                contactIds
+              )
+              .pipe(
+                catchError((error) => {
+                  // show error
+                  this.personAndRelatedHelperService.toastV2Service.error(error);
+
+                  // send error
+                  return throwError(err);
+                })
+              )
+              .subscribe(() => {
+                // continue to show errors
+                showErrors(rowsToDelete);
+
+                // finished
+                return throwError(err);
+              });
+          } else {
+            // continue to show errors
+            showErrors(rowsToDelete);
+
+            // finished
+            return throwError(err);
           }
-
-          // prepare errors to parse later into more readable errors
-          const errors = [];
-          (_.get(err, 'details.failed') || []).forEach((childError) => {
-            if (!_.isEmpty(childError.error)) {
-              errors.push({
-                err: childError.error,
-                echo: childError
-              });
-            }
-          });
-
-          // try to parse into more clear errors
-          this.personAndRelatedHelperService.toastV2Service.translateErrors(errors)
-            .subscribe((translatedErrors) => {
-              // transform errors
-              (translatedErrors || []).forEach((translatedError) => {
-                // determine row number
-                let row: number = _.get(translatedError, 'echo.recordNo', null);
-                if (typeof row === 'number') {
-                  row++;
-                }
-
-                // add to error list
-                this.personAndRelatedHelperService.toastV2Service.error(
-                  'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG', {
-                    row: row + '',
-                    err: translatedError.message
-                  }
-                );
-              });
-            });
-
-          // close dialog
-          event.finished();
-
-          // finished
-          return throwError(err);
         })
       )
-      .subscribe(() => {
+      .subscribe((result: IBulkContact[]) => {
+        // redirect action
+        const redirect = () => {
+          // finished
+          event.finished();
+
+          // navigate to listing page
+          this.disableDirtyConfirm();
+          if (ContactModel.canList(this.authUser)) {
+            this.router.navigate(['/contacts']);
+          } else {
+            this.router.navigate(['/']);
+          }
+        };
+
         // message
         if (this.isCreate) {
-          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+          // get the created contacts
+          const contactIds: string[] = result.map((item) => item.contact?.id || null);
+
+          // generate follow-ups ?
+          if (
+            this.selectedOutbreak.generateFollowUpsWhenCreatingContacts &&
+            contactIds.length
+          ) {
+            this.personAndRelatedHelperService.followUp.followUpsDataService
+              .generateFollowUps(
+                this.selectedOutbreak.id,
+                contactIds
+              )
+              .pipe(
+                catchError((err) => {
+                  // show error
+                  this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                  // send error
+                  return throwError(err);
+                })
+              )
+              .subscribe(() => {
+                this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+                redirect();
+              });
+          } else {
+            this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+            redirect();
+          }
         } else {
           this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
-        }
-
-        // finished
-        event.finished();
-
-        // navigate to listing page
-        this.disableDirtyConfirm();
-        if (ContactModel.canList(this.authUser)) {
-          this.router.navigate(['/contacts']);
-        } else {
-          this.router.navigate(['/']);
+          redirect();
         }
       });
   }

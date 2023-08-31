@@ -33,22 +33,26 @@ export class FollowUpsDataService {
      */
   generateFollowUps(
     outbreakId: string,
-    startDate: any,
-    endDate: any,
-    targeted: boolean,
-    overwriteExistingFollowUps: boolean,
-    keepTeamAssignment: boolean,
-    intervalOfFollowUp: string
+    contactIds?: string | string[] | undefined,
+    startDate?: any,
+    endDate?: any,
+    targeted?: boolean,
+    overwriteExistingFollowUps?: boolean,
+    keepTeamAssignment?: boolean,
+    intervalOfFollowUp?: string
+
   ): Observable<ContactFollowUpsModel> {
     // construct generate options
     const options: {
-      startDate: any,
-      endDate: any,
-      targeted: boolean,
-      overwriteExistingFollowUps: boolean,
+      contactIds?: string | string[] | undefined,
+      startDate?: any,
+      endDate?: any,
+      targeted?: boolean,
+      overwriteExistingFollowUps?: boolean,
       keepTeamAssignment?: boolean,
       intervalOfFollowUp?: string
     } = {
+      contactIds: contactIds,
       startDate: startDate,
       endDate: endDate,
       targeted: targeted,
