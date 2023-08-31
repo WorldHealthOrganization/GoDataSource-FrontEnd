@@ -893,7 +893,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.locationId'
         ),
         format: {
           type: 'address.location.name'
@@ -916,7 +916,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.phoneNumber'
         ),
         sortable: true,
         format: {
@@ -935,7 +935,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.emailAddress'
         ),
         notVisible: true,
         sortable: true,
@@ -956,7 +956,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.addressLine1'
         ),
         notVisible: true,
         format: {
@@ -976,7 +976,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.city'
         ),
         notVisible: true,
         sortable: true,
@@ -997,7 +997,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.geoLocation'
         ),
         notVisible: true,
         format: {
@@ -1010,7 +1010,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.geoLocation'
         ),
         notVisible: true,
         format: {
@@ -1023,7 +1023,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.postalCode'
         ),
         notVisible: true,
         sortable: true,
@@ -1044,7 +1044,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.geoLocationAccurate'
         ),
         notVisible: true,
         sortable: true,
@@ -1223,7 +1223,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.typeId'
         ),
         isArray: false
       },
@@ -1234,7 +1234,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.emailAddress'
         ),
         sortable: true,
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
@@ -1246,7 +1246,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.geoLocationAccurate'
         ),
         options: data.options.yesNo,
         sortable: true,
@@ -1259,7 +1259,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.typeId'
         ),
         options: data.options.addressType,
         sortable: true,
@@ -1272,7 +1272,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.date'
         ),
         sortable: true,
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
@@ -1284,7 +1284,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.city'
         ),
         sortable: true,
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
@@ -1296,7 +1296,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.postalCode'
         ),
         sortable: true,
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
@@ -1308,7 +1308,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.phoneNumber'
         ),
         isArray: false,
         sortable: 'address.phoneNumber'
@@ -1491,7 +1491,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.typeId'
         ),
         isArray: false
       },
@@ -1578,7 +1578,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.emailAddress'
         ),
         sortable: true,
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
@@ -1590,7 +1590,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.geoLocationAccurate'
         ),
         options: data.options.yesNo,
         sortable: true,
@@ -1603,7 +1603,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.typeId'
         ),
         options: data.options.addressType,
         sortable: true,
@@ -1616,7 +1616,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.date'
         ),
         sortable: true,
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
@@ -1628,7 +1628,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.city'
         ),
         sortable: true,
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
@@ -1640,7 +1640,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.postalCode'
         ),
         sortable: true,
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS'
@@ -1652,7 +1652,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.phoneNumber'
         ),
         isArray: false,
         sortable: 'address.phoneNumber'
@@ -1764,7 +1764,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.parent.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.typeId'
         ),
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
         isArray: false,
@@ -1844,7 +1844,7 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.parent.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ),
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
       },
@@ -1922,7 +1922,7 @@ export class FollowUpHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'addresses'
+            'addresses.phoneNumber'
           ),
           relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
           childQueryBuilderKey: 'case'
@@ -2155,7 +2155,7 @@ export class FollowUpHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'addresses'
+            'addresses.typeId'
           ),
           relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
           childQueryBuilderKey: 'case',
