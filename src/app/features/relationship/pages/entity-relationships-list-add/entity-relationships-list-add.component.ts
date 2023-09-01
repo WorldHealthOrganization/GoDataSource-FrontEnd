@@ -137,16 +137,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         field: 'lastName',
         label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'lastName'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'lastName'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'lastName'
         ),
@@ -160,16 +157,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         field: 'firstName',
         label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'firstName'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'firstName'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'firstName'
         ),
@@ -186,20 +180,16 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         field: 'visualId',
         label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'visualId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'visualId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'visualId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
           'visualId'
         ),
@@ -260,16 +250,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         field: 'age',
         label: 'LNG_ENTITY_FIELD_LABEL_AGE',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'ageDob'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'ageDob'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'ageDob'
         ),
@@ -286,16 +273,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         field: 'gender',
         label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'gender'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'gender'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'gender'
         ),
@@ -308,16 +292,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         field: 'riskLevel',
         label: 'LNG_ENTITY_FIELD_LABEL_RISK',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'riskLevel'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'riskLevel'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'riskLevel'
         ),
@@ -334,8 +315,7 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         field: 'classification',
         label: 'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'classification'
         ),
@@ -352,12 +332,10 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         field: 'dateOfOnset',
         label: 'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'dateOfOnset'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'dateOfOnset'
         ),
@@ -372,20 +350,16 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         field: 'place',
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses.locationId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'addresses.locationId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses.locationId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
           'address.locationId'
         ),
@@ -401,20 +375,16 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         field: 'address',
         label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses.typeId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'addresses.typeId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses.typeId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
           'address.typeId'
         ),
@@ -468,16 +438,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'firstName'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'firstName'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'firstName'
         ),
@@ -486,16 +453,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'lastName'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'lastName'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'lastName'
         ),
@@ -506,16 +470,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'gender',
         label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'gender'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'gender'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'gender'
         ),
@@ -526,16 +487,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         type: V2AdvancedFilterType.RANGE_AGE,
         field: 'age',
         label: 'LNG_ENTITY_FIELD_LABEL_AGE',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'ageDob'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'ageDob'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'ageDob'
         ),
@@ -545,20 +503,16 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         type: V2AdvancedFilterType.ADDRESS,
         field: 'addresses',
         label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses.typeId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'addresses.typeId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'addresses.typeId'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
           'address.typeId'
         ),
@@ -568,16 +522,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dob',
         label: 'LNG_ENTITY_FIELD_LABEL_DOB',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'ageDob'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'ageDob'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'ageDob'
         ),
@@ -587,16 +538,13 @@ export class EntityRelationshipsListAddComponent extends ListComponent<CaseModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'riskLevel',
         label: 'LNG_ENTITY_FIELD_LABEL_RISK',
-        visibleMandatoryIf: () => this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'riskLevel'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'riskLevel'
-        ) || this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
-          this.selectedOutbreak,
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           'riskLevel'
         ),

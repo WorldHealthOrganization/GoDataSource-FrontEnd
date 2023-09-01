@@ -35,6 +35,14 @@ export interface ICreateViewModifyV2TabInputToVisibleMandatoryConf {
 }
 
 /**
+ * Used by create/view/modify input to configure specific things for visible/mandatory
+ */
+export interface ICreateViewModifyV2TabInputToVisibleMandatorySectionConf {
+  // optional
+  dontFilter: boolean;
+}
+
+/**
  * Visible / Mandatory accepted value format - field
  */
 export interface IVisibleMandatoryDataValueField {

@@ -395,6 +395,15 @@ export class CreateViewModifyHelperModel {
     const previousSections = tab.sections;
     tab.sections = [];
     previousSections.forEach((section) => {
+      // filter disabled ?
+      if (section.visibleMandatoryConf?.dontFilter) {
+        // add section
+        tab.sections.push(section);
+
+        // finished
+        return;
+      }
+
       // filter fields
       const previousInputs = section.inputs;
       section.inputs = [];
