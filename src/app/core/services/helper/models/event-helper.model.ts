@@ -322,7 +322,7 @@ export class EventHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.typeId'
         ),
         isArray: false
       },
@@ -398,7 +398,7 @@ export class EventHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.typeId'
         ),
         options: data.options.addressType,
         sortable: true,
@@ -412,7 +412,7 @@ export class EventHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.date'
         ),
         sortable: true
       },
@@ -423,7 +423,7 @@ export class EventHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.emailAddress'
         ),
         sortable: true
       },
@@ -434,7 +434,7 @@ export class EventHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.phoneNumber'
         ),
         isArray: false,
         sortable: 'address.phoneNumber'
@@ -446,7 +446,7 @@ export class EventHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.city'
         ),
         sortable: true,
         useLike: true,
@@ -459,7 +459,7 @@ export class EventHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.postalCode'
         ),
         sortable: true,
         useLike: true,
@@ -472,7 +472,7 @@ export class EventHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'address'
+          'address.geoLocationAccurate'
         ),
         options: data.options.yesNo,
         sortable: true,
