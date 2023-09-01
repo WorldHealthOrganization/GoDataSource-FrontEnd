@@ -28,7 +28,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import {
-  ICreateViewModifyV2TabInputToVisibleMandatoryConf,
+  ICreateViewModifyV2TabInputToVisibleMandatoryConf, ICreateViewModifyV2TabInputToVisibleMandatorySectionConf,
   IVisibleMandatoryDataGroup,
   IVisibleMandatoryDataValue
 } from '../../../forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
@@ -687,6 +687,9 @@ export interface ICreateViewModifyV2Section {
 
   // optional
   visible?: () => boolean;
+
+  // used by visible / mandatory component
+  visibleMandatoryConf?: ICreateViewModifyV2TabInputToVisibleMandatorySectionConf;
 }
 
 /**
