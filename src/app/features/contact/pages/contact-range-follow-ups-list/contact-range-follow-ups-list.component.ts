@@ -223,13 +223,13 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
-          'addresses'
+          'addresses.locationId'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.locationId'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.locationId'
         ),
         format: {
           type: 'person.mainAddress.location.name'
@@ -251,13 +251,13 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ),
         notVisible: true,
         format: {
@@ -276,13 +276,13 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ),
         notVisible: true,
         format: {
@@ -302,13 +302,13 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
-          'addresses'
+          'addresses.addressLine1'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.addressLine1'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.addressLine1'
         ),
         notVisible: true,
         format: {
@@ -328,13 +328,13 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ),
         notVisible: true,
         format: {
@@ -596,13 +596,13 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
-          'addresses'
+          'addresses.locationId'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.locationId'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.locationId'
         ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
@@ -613,13 +613,13 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
@@ -630,13 +630,13 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
@@ -647,13 +647,13 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
-          'addresses'
+          'addresses.addressLine1'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.addressLine1'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.addressLine1'
         ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
@@ -664,13 +664,13 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ) || this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
@@ -794,7 +794,7 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.locationId'
         ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       },
@@ -804,7 +804,7 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.phoneNumber'
         ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       },
@@ -814,7 +814,7 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.emailAddress'
         ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       },
@@ -824,7 +824,7 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.addressLine1'
         ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       },
@@ -834,7 +834,7 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.city'
         ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }
