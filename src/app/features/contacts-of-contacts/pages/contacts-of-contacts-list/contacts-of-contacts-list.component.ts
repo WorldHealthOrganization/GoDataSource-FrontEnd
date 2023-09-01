@@ -755,7 +755,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.locationId'
         ),
         format: {
           type: 'mainAddress.location.name'
@@ -777,7 +777,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.addressLine1'
         ),
         notVisible: true,
         format: {
@@ -796,7 +796,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ),
         notVisible: true,
         format: {
@@ -816,7 +816,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ),
         notVisible: true,
         format: {
@@ -836,7 +836,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.geoLocation'
         ),
         notVisible: true,
         format: {
@@ -848,7 +848,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.geoLocation'
         ),
         notVisible: true,
         format: {
@@ -860,7 +860,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.postalCode'
         ),
         notVisible: true,
         format: {
@@ -880,7 +880,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.geoLocationAccurate'
         ),
         notVisible: true,
         format: {
@@ -948,7 +948,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ),
         format: {
           type: 'mainAddress.phoneNumber'
@@ -1160,7 +1160,10 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'documents'
+          'documents.type'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'documents.number'
         ),
         format: {
           type: (item: ContactOfContactModel): string => {
@@ -1183,7 +1186,13 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.vaccine'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'vaccinesReceived.date'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'vaccinesReceived.status'
         ),
         format: {
           type: (item: ContactOfContactModel): string => {

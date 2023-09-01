@@ -702,7 +702,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = this.personAndRelatedHelperService.relationship.generateAdvancedFilters({
+    this.expandListAdvancedFilters = this.personAndRelatedHelperService.relationship.generateAdvancedFilters(this.selectedOutbreak, {
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(

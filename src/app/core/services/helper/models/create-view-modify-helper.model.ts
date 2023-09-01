@@ -438,7 +438,10 @@ export class CreateViewModifyHelperModel {
             const requiredInput: ICreateViewModifyV2TabInputValidatorRequired = input as ICreateViewModifyV2TabInputValidatorRequired;
             if (
               fieldDef.visibleMandatoryConf?.required ||
-              visibleAndMandatoryConf[fieldDef.id]?.mandatory
+              visibleAndMandatoryConf[fieldDef.id]?.mandatory || (
+                fieldDef.visibleMandatoryConf?.originalName &&
+                visibleAndMandatoryConf[fieldDef.visibleMandatoryConf?.originalName]?.mandatory
+              )
             ) {
               // check if we don't have a default required validator
               if (requiredInput.validators?.required) {

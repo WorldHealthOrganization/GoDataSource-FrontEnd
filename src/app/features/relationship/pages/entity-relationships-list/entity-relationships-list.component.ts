@@ -22,8 +22,8 @@ import { UserModel } from '../../../../core/models/user.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-entity-relationships-list',
@@ -113,7 +113,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
-    this.tableColumns = this.personAndRelatedHelperService.relationship.retrieveTableColumns({
+    this.tableColumns = this.personAndRelatedHelperService.relationship.retrieveTableColumns(this.selectedOutbreak, {
       personType: this.activatedRoute.snapshot.data.personType,
       cluster: this.activatedRoute.snapshot.data.cluster,
       options: {
@@ -157,7 +157,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.personAndRelatedHelperService.relationship.generateAdvancedFilters({
+    this.advancedFilters = this.personAndRelatedHelperService.relationship.generateAdvancedFilters(this.selectedOutbreak, {
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(

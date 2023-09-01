@@ -29,6 +29,7 @@ import { IBasicCount } from '../../../models/basic-count.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { PersonAndRelatedHelperService } from '../person-and-related-helper.service';
 import { RelationshipDataService } from '../../data/relationship.data.service';
+import { IV2ColumnToVisibleMandatoryConf, V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 /**
  * From ?
@@ -1081,23 +1082,39 @@ export class RelationshipHelperModel {
   /**
    * Retrieve table columns
    */
-  retrieveTableColumns(definitions: {
-    personType: IResolverV2ResponseModel<ReferenceDataEntryModel>,
-    cluster: IResolverV2ResponseModel<ClusterModel>,
-    options: {
-      certaintyLevel: ILabelValuePairModel[],
-      exposureType: ILabelValuePairModel[],
-      exposureFrequency: ILabelValuePairModel[],
-      exposureDuration: ILabelValuePairModel[],
-      contextOfTransmission: ILabelValuePairModel[],
-      user: ILabelValuePairModel[]
+  retrieveTableColumns(
+    useToFilterOutbreak: OutbreakModel,
+    definitions: {
+      personType: IResolverV2ResponseModel<ReferenceDataEntryModel>,
+      cluster: IResolverV2ResponseModel<ClusterModel>,
+      options: {
+        certaintyLevel: ILabelValuePairModel[],
+        exposureType: ILabelValuePairModel[],
+        exposureFrequency: ILabelValuePairModel[],
+        exposureDuration: ILabelValuePairModel[],
+        contextOfTransmission: ILabelValuePairModel[],
+        user: ILabelValuePairModel[]
+      }
     }
-  }): IV2Column[] {
+  ): IV2Column[] {
     // default table columns
-    const tableColumns: IV2Column[] = [
+    const tableColumns: IV2ColumnToVisibleMandatoryConf[] = [
       {
         field: 'lastName',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.case.visibleMandatoryKey,
+          'lastName'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contact.visibleMandatoryKey,
+          'lastName'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contactOfContact.visibleMandatoryKey,
+          'lastName'
+        ),
         format: {
           type: 'model.lastName'
         },
@@ -1116,6 +1133,19 @@ export class RelationshipHelperModel {
       {
         field: 'firstName',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.case.visibleMandatoryKey,
+          'firstName'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contactOfContact.visibleMandatoryKey,
+          'firstName'
+        ),
         format: {
           type: 'model.firstName'
         },
@@ -1134,6 +1164,23 @@ export class RelationshipHelperModel {
       {
         field: 'visualId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.case.visibleMandatoryKey,
+          'visualId'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contact.visibleMandatoryKey,
+          'visualId'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contactOfContact.visibleMandatoryKey,
+          'visualId'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.event.visibleMandatoryKey,
+          'visualId'
+        ),
         format: {
           type: 'model.visualId'
         },
@@ -1152,6 +1199,7 @@ export class RelationshipHelperModel {
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
@@ -1200,6 +1248,11 @@ export class RelationshipHelperModel {
       {
         field: 'contactDate',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'contactDate'
+        ),
         format: {
           type: V2ColumnFormat.DATE,
           value: (item) => item.relationship?.contactDate
@@ -1212,6 +1265,11 @@ export class RelationshipHelperModel {
       {
         field: 'dateOfFirstContact',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'dateOfFirstContact'
+        ),
         format: {
           type: V2ColumnFormat.DATE,
           value: (item) => item.relationship?.dateOfFirstContact
@@ -1224,6 +1282,11 @@ export class RelationshipHelperModel {
       {
         field: 'contactDateEstimated',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'contactDateEstimated'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -1239,6 +1302,11 @@ export class RelationshipHelperModel {
       {
         field: 'certaintyLevelId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'certaintyLevelId'
+        ),
         format: {
           type: (item) => item.relationship?.certaintyLevelId ?
             this.parent.i18nService.instant(item.relationship?.certaintyLevelId) :
@@ -1254,6 +1322,11 @@ export class RelationshipHelperModel {
       {
         field: 'exposureTypeId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'exposureTypeId'
+        ),
         format: {
           type: (item) => item.relationship?.exposureTypeId ?
             this.parent.i18nService.instant(item.relationship?.exposureTypeId) :
@@ -1269,6 +1342,11 @@ export class RelationshipHelperModel {
       {
         field: 'exposureFrequencyId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'exposureFrequencyId'
+        ),
         format: {
           type: (item) => item.relationship?.exposureFrequencyId ?
             this.parent.i18nService.instant(item.relationship?.exposureFrequencyId) :
@@ -1284,6 +1362,11 @@ export class RelationshipHelperModel {
       {
         field: 'exposureDurationId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'exposureDurationId'
+        ),
         format: {
           type: (item) => item.relationship?.exposureDurationId ?
             this.parent.i18nService.instant(item.relationship?.exposureDurationId) :
@@ -1299,6 +1382,11 @@ export class RelationshipHelperModel {
       {
         field: 'socialRelationshipTypeId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'socialRelationshipTypeId'
+        ),
         format: {
           type: (item) => item.relationship?.socialRelationshipTypeId ?
             this.parent.i18nService.instant(item.relationship?.socialRelationshipTypeId) :
@@ -1314,6 +1402,11 @@ export class RelationshipHelperModel {
       {
         field: 'socialRelationshipDetail',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'socialRelationshipDetail'
+        ),
         format: {
           type: 'relationship.socialRelationshipDetail'
         },
@@ -1326,6 +1419,11 @@ export class RelationshipHelperModel {
       {
         field: 'comment',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'comment'
+        ),
         notVisible: true,
         format: {
           type: 'relationship.comment'
@@ -1343,6 +1441,11 @@ export class RelationshipHelperModel {
       tableColumns.push({
         field: 'clusterId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'clusterId'
+        ),
         format: {
           type: (item) => item.relationship?.clusterId && definitions.cluster.map[item.relationship?.clusterId] ?
             definitions.cluster.map[item.relationship?.clusterId].name :
@@ -1362,6 +1465,7 @@ export class RelationshipHelperModel {
       {
         field: 'createdBy',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         format: {
           type: 'relationship.createdByUser.nameAndEmail'
         },
@@ -1383,6 +1487,7 @@ export class RelationshipHelperModel {
       {
         field: 'createdAt',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.DATE,
           value: (item) => item.relationship?.createdAt
@@ -1395,6 +1500,7 @@ export class RelationshipHelperModel {
       {
         field: 'updatedBy',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         format: {
           type: 'relationship.updatedByUser.nameAndEmail'
         },
@@ -1416,6 +1522,7 @@ export class RelationshipHelperModel {
       {
         field: 'updatedAt',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.DATE,
           value: (item) => item.relationship?.updatedAt
@@ -1428,7 +1535,7 @@ export class RelationshipHelperModel {
     );
 
     // finished
-    return tableColumns;
+    return this.parent.list.filterVisibleMandatoryTableColumns(tableColumns);
   }
 
   /**
@@ -1490,53 +1597,114 @@ export class RelationshipHelperModel {
   /**
    * Advanced filters
    */
-  generateAdvancedFilters(data: {
-    options: {
-      certaintyLevel: ILabelValuePairModel[],
-      exposureType: ILabelValuePairModel[],
-      exposureFrequency: ILabelValuePairModel[],
-      exposureDuration: ILabelValuePairModel[],
-      contextOfTransmission: ILabelValuePairModel[],
-      cluster: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[]
+  generateAdvancedFilters(
+    useToFilterOutbreak: OutbreakModel,
+    data: {
+      options: {
+        certaintyLevel: ILabelValuePairModel[],
+        exposureType: ILabelValuePairModel[],
+        exposureFrequency: ILabelValuePairModel[],
+        exposureDuration: ILabelValuePairModel[],
+        contextOfTransmission: ILabelValuePairModel[],
+        cluster: ILabelValuePairModel[],
+        yesNo: ILabelValuePairModel[]
+      }
     }
-  }): V2AdvancedFilter[] {
+  ): V2AdvancedFilter[] {
     // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
+    const advancedFilters: V2AdvancedFilterToVisibleMandatoryConf[] = [
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.case.visibleMandatoryKey,
+          'lastName'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contact.visibleMandatoryKey,
+          'lastName'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contactOfContact.visibleMandatoryKey,
+          'lastName'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.case.visibleMandatoryKey,
+          'firstName'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contactOfContact.visibleMandatoryKey,
+          'firstName'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.case.visibleMandatoryKey,
+          'visualId'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contact.visibleMandatoryKey,
+          'visualId'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.contactOfContact.visibleMandatoryKey,
+          'visualId'
+        ) || this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.parent.event.visibleMandatoryKey,
+          'visualId'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'contactDate',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'contactDate'
+        ),
         childQueryBuilderKey: 'relationship'
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfFirstContact',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'dateOfFirstContact'
+        ),
         childQueryBuilderKey: 'relationship'
       },
       {
         type: V2AdvancedFilterType.SELECT,
         field: 'contactDateEstimated',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'contactDateEstimated'
+        ),
         options: data.options.yesNo,
         childQueryBuilderKey: 'relationship'
       },
@@ -1544,6 +1712,11 @@ export class RelationshipHelperModel {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'certaintyLevelId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'certaintyLevelId'
+        ),
         options: data.options.certaintyLevel,
         childQueryBuilderKey: 'relationship'
       },
@@ -1551,6 +1724,11 @@ export class RelationshipHelperModel {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'exposureTypeId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'exposureTypeId'
+        ),
         options: data.options.exposureType,
         childQueryBuilderKey: 'relationship'
       },
@@ -1558,6 +1736,11 @@ export class RelationshipHelperModel {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'exposureFrequencyId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'exposureFrequencyId'
+        ),
         options: data.options.exposureFrequency,
         childQueryBuilderKey: 'relationship'
       },
@@ -1565,6 +1748,11 @@ export class RelationshipHelperModel {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'exposureDurationId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'exposureDurationId'
+        ),
         options: data.options.exposureDuration,
         childQueryBuilderKey: 'relationship'
       },
@@ -1572,6 +1760,11 @@ export class RelationshipHelperModel {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'socialRelationshipTypeId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'socialRelationshipTypeId'
+        ),
         options: data.options.contextOfTransmission,
         childQueryBuilderKey: 'relationship'
       },
@@ -1579,12 +1772,22 @@ export class RelationshipHelperModel {
         type: V2AdvancedFilterType.TEXT,
         field: 'socialRelationshipDetail',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'socialRelationshipDetail'
+        ),
         childQueryBuilderKey: 'relationship'
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'clusterId',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'clusterId'
+        ),
         options: data.options.cluster,
         childQueryBuilderKey: 'relationship'
       },
@@ -1592,11 +1795,16 @@ export class RelationshipHelperModel {
         type: V2AdvancedFilterType.TEXT,
         field: 'comment',
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          useToFilterOutbreak,
+          this.visibleMandatoryKey,
+          'comment'
+        ),
         childQueryBuilderKey: 'relationship'
       }
     ];
 
     // finished
-    return advancedFilters;
+    return this.parent.list.filterVisibleMandatoryAdvancedFilters(advancedFilters);
   }
 }

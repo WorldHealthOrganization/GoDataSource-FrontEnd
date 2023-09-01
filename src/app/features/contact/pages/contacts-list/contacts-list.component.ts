@@ -987,7 +987,7 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.locationId'
         ),
         format: {
           type: 'mainAddress.location.name'
@@ -1009,7 +1009,7 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ),
         notVisible: true,
         format: {
@@ -1029,7 +1029,7 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.addressLine1'
         ),
         notVisible: true,
         format: {
@@ -1049,7 +1049,7 @@ export class ContactsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ),
         notVisible: true,
         format: {
@@ -1069,7 +1069,7 @@ export class ContactsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.geoLocation'
         ),
         notVisible: true,
         format: {
@@ -1081,7 +1081,7 @@ export class ContactsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.geoLocation'
         ),
         notVisible: true,
         format: {
@@ -1093,7 +1093,7 @@ export class ContactsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.postalCode'
         ),
         notVisible: true,
         format: {
@@ -1113,7 +1113,7 @@ export class ContactsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.geoLocationAccurate'
         ),
         notVisible: true,
         format: {
@@ -1181,7 +1181,7 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ),
         format: {
           type: 'mainAddress.phoneNumber'
@@ -1489,7 +1489,10 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'documents'
+          'documents.type'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'documents.number'
         ),
         format: {
           type: (item: ContactModel): string => {
@@ -1512,7 +1515,13 @@ export class ContactsListComponent
         label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.vaccine'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'vaccinesReceived.date'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'vaccinesReceived.status'
         ),
         format: {
           type: (item: ContactModel): string => {
