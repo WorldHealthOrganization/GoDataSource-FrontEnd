@@ -251,7 +251,7 @@ export class RelationshipHelperModel {
               },
               visibleMandatoryConf: {
                 visible: true,
-                required: false,
+                required: true,
                 originalName: 'contactDate'
               },
               maxDate: today,
