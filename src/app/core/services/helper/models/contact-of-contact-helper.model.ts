@@ -707,7 +707,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.typeId'
         ),
         isArray: true
       },
@@ -718,7 +718,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ),
         isArray: true,
         sortable: 'addresses.phoneNumber'
@@ -791,7 +791,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'documents'
+          'documents.type'
         ),
         options: data.options.documentType,
         sortable: true
@@ -803,7 +803,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'documents'
+          'documents.number'
         ),
         sortable: true,
         useLike: true
@@ -815,7 +815,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ),
         sortable: true,
         useLike: true
@@ -827,7 +827,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.geoLocationAccurate'
         ),
         options: data.options.yesNo,
         sortable: true,
@@ -840,7 +840,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.typeId'
         ),
         options: data.options.addressType,
         sortable: true,
@@ -853,7 +853,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.date'
         ),
         sortable: true,
         relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES'
@@ -865,7 +865,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ),
         sortable: true,
         relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
@@ -878,7 +878,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.postalCode'
         ),
         sortable: true,
         relationshipLabel: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
@@ -914,7 +914,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.vaccine'
         ),
         options: data.options.vaccine,
         sortable: true
@@ -926,7 +926,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.status'
         ),
         options: data.options.vaccineStatus,
         sortable: true
@@ -938,7 +938,7 @@ export class ContactOfContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.date'
         ),
         sortable: true
       },
