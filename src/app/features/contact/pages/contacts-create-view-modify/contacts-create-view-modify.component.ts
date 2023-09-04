@@ -1540,7 +1540,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                   return this.personAndRelatedHelperService.followUp.followUpsDataService
                     .generateFollowUps(
                       this.selectedOutbreak.id,
-                      contact.id
+                      {
+                        contactIds: [contact.id]
+                      }
                     );
                 }))
               .pipe(map(() => contact));

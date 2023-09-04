@@ -30,12 +30,6 @@ import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-ca
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
-interface IBulkContact {
-  recordNo: number,
-  contact: ContactModel,
-  relationship?: RelationshipModel
-}
-
 @Component({
   selector: 'app-contacts-bulk-create-modify',
   templateUrl: './contacts-bulk-create-modify.component.html'
@@ -1081,8 +1075,44 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             this.personAndRelatedHelperService.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG');
           }
 
+          // remove success records
+          // items should be ordered by recordNo
+          //  - so in this case if we reverse we can remove records from sheet without having to take in account that we removed other rows as well
+          const rowsToDelete: number[] = [];
+          const contactIds: string[] = [];
+          (_.get(err, 'details.success') || []).reverse().forEach((successRecord) => {
+            // remove record that was added
+            if (typeof successRecord.recordNo === 'number') {
+              // remove row
+              rowsToDelete.push(successRecord.recordNo);
+
+              // get the created contacts
+              if (
+                this.isCreate &&
+                successRecord.contact
+              ) {
+                contactIds.push(successRecord.contact.id);
+              }
+
+              // subtract row numbers
+              _.each(
+                _.get(err, 'details.failed'),
+                (item) => {
+                  if (typeof item.recordNo !== 'number') {
+                    return;
+                  }
+
+                  // if record is after the one that we removed then we need to substract 1 value
+                  if (item.recordNo > successRecord.recordNo) {
+                    item.recordNo = item.recordNo - 1;
+                  }
+                }
+              );
+            }
+          });
+
           // show error action
-          const showErrors = (rowsToDelete) => {
+          const showErrors = () => {
             // remove success rows
             if (rowsToDelete.length > 0) {
               event.removeRows(rowsToDelete);
@@ -1124,42 +1154,6 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             event.finished();
           };
 
-          // remove success records
-          // items should be ordered by recordNo
-          //  - so in this case if we reverse we can remove records from sheet without having to take in account that we removed other rows as well
-          const rowsToDelete: number[] = [];
-          const contactIds: string[] = [];
-          (_.get(err, 'details.success') || []).reverse().forEach((successRecord) => {
-            // remove record that was added
-            if (typeof successRecord.recordNo === 'number') {
-              // remove row
-              rowsToDelete.push(successRecord.recordNo);
-
-              // get the created contacts
-              if (
-                this.isCreate &&
-                successRecord.contact
-              ) {
-                contactIds.push(successRecord.contact.id);
-              }
-
-              // subtract row numbers
-              _.each(
-                _.get(err, 'details.failed'),
-                (item) => {
-                  if (typeof item.recordNo !== 'number') {
-                    return;
-                  }
-
-                  // if record is after the one that we removed then we need to substract 1 value
-                  if (item.recordNo > successRecord.recordNo) {
-                    item.recordNo = item.recordNo - 1;
-                  }
-                }
-              );
-            }
-          });
-
           // generate follow-ups ?
           if (
             this.selectedOutbreak.generateFollowUpsWhenCreatingContacts &&
@@ -1168,7 +1162,9 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             this.personAndRelatedHelperService.followUp.followUpsDataService
               .generateFollowUps(
                 this.selectedOutbreak.id,
-                contactIds
+                {
+                  contactIds: contactIds
+                }
               )
               .pipe(
                 catchError((error) => {
@@ -1181,21 +1177,25 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
               )
               .subscribe(() => {
                 // continue to show errors
-                showErrors(rowsToDelete);
+                showErrors();
 
                 // finished
                 return throwError(err);
               });
           } else {
             // continue to show errors
-            showErrors(rowsToDelete);
+            showErrors();
 
             // finished
             return throwError(err);
           }
         })
       )
-      .subscribe((result: IBulkContact[]) => {
+      .subscribe((result: {
+        recordNo: number,
+        contact: ContactModel,
+        relationship?: RelationshipModel
+      }[]) => {
         // redirect action
         const redirect = () => {
           // finished
@@ -1213,7 +1213,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         // message
         if (this.isCreate) {
           // get the created contacts
-          const contactIds: string[] = result.map((item) => item.contact?.id || null);
+          const contactIds: string[] = result.map((item) => item.contact?.id);
 
           // generate follow-ups ?
           if (
@@ -1223,7 +1223,9 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             this.personAndRelatedHelperService.followUp.followUpsDataService
               .generateFollowUps(
                 this.selectedOutbreak.id,
-                contactIds
+                {
+                  contactIds: contactIds
+                }
               )
               .pipe(
                 catchError((err) => {

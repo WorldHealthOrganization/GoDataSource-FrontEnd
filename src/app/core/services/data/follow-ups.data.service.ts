@@ -15,6 +15,7 @@ import { UserFollowupsPerDayModel } from '../../models/user-followups-per-day.mo
 import { RangeFollowUpsModel } from '../../models/range-follow-ups.model';
 import { map, mergeMap } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { Moment } from '../../helperClasses/x-moment';
 
 @Injectable()
 export class FollowUpsDataService {
@@ -33,36 +34,25 @@ export class FollowUpsDataService {
      */
   generateFollowUps(
     outbreakId: string,
-    contactIds?: string | string[] | undefined,
-    startDate?: any,
-    endDate?: any,
-    targeted?: boolean,
-    overwriteExistingFollowUps?: boolean,
-    keepTeamAssignment?: boolean,
-    intervalOfFollowUp?: string
-
+    data: {
+      startDate: string | Moment | Date,
+      endDate: string | Moment | Date,
+      targeted: boolean,
+      overwriteExistingFollowUps: boolean,
+      keepTeamAssignment: boolean,
+      intervalOfFollowUp: string
+    } | {
+      contactIds: string[]
+    }
   ): Observable<ContactFollowUpsModel> {
-    // construct generate options
+    // keepTeamAssignment is relevant only if overwriteExistingFollowUps is disabled
     const options: {
-      contactIds?: string | string[] | undefined,
-      startDate?: any,
-      endDate?: any,
-      targeted?: boolean,
       overwriteExistingFollowUps?: boolean,
       keepTeamAssignment?: boolean,
-      intervalOfFollowUp?: string
-    } = {
-      contactIds: contactIds,
-      startDate: startDate,
-      endDate: endDate,
-      targeted: targeted,
-      overwriteExistingFollowUps: overwriteExistingFollowUps,
-      intervalOfFollowUp
-    };
-
-    // keepTeamAssignment is relevant only if overwriteExistingFollowUps is disabled
-    if (!overwriteExistingFollowUps) {
-      options.keepTeamAssignment = keepTeamAssignment;
+      contactIds?: string[]
+    } = data;
+    if (options.overwriteExistingFollowUps) {
+      delete options.keepTeamAssignment;
     }
 
     // generate follow-ups
