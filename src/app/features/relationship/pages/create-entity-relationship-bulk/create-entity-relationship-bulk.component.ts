@@ -1,7 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
@@ -17,13 +16,8 @@ import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateView
 import * as moment from 'moment';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
-import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-create-entity-relationship-bulk',
@@ -74,24 +68,18 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected redirectService: RedirectService,
-    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
-    protected i18nService: I18nService,
     private router: Router,
     private entityDataService: EntityDataService,
-    private relationshipDataService: RelationshipDataService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private contactDataService: ContactDataService,
-    private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private dialogV2Service: DialogV2Service
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       authDataService,
       activatedRoute,
       renderer2,
-      redirectService,
-      toastV2Service,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
 
@@ -199,12 +187,12 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
       redirectAfterCreateUpdate: () => {
         if (this.isAddAndConvert) {
           // show loading
-          const loading = this.dialogV2Service.showLoadingDialog();
+          const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
           // convert the entity
           const convertSubscriber = this.entityType === EntityType.CONTACT_OF_CONTACT ?
-            this.contactsOfContactsDataService.convertContactOfContactToContact(this.selectedOutbreak.id, this.entityId) :
-            this.contactDataService.convertContactToContactOfContact(this.selectedOutbreak.id, this.entityId);
+            this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService.convertContactOfContactToContact(this.selectedOutbreak.id, this.entityId) :
+            this.personAndRelatedHelperService.contact.contactDataService.convertContactToContactOfContact(this.selectedOutbreak.id, this.entityId);
           convertSubscriber
             .pipe(
               catchError((err) => {
@@ -294,7 +282,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
         targets: relationshipTargets,
         relationship: this._relationship
       };
-      this.relationshipDataService
+      this.personAndRelatedHelperService.relationship.relationshipDataService
         .createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
         .pipe(
           // handle error
