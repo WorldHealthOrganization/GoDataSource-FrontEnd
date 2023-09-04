@@ -988,6 +988,26 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
    * Save handler
    */
   save(event) {
+    // generate follow-ups callback
+    const generateFollowUps = ((contactIds: string[]) => {
+      return this.personAndRelatedHelperService.followUp.followUpsDataService
+        .generateFollowUps(
+          this.selectedOutbreak.id,
+          {
+            contactIds: contactIds
+          }
+        )
+        .pipe(
+          catchError((err) => {
+            // show error
+            this.personAndRelatedHelperService.toastV2Service.error(err);
+
+            // send error
+            return throwError(err);
+          })
+        );
+    });
+
     // configure save request
     let request$;
     if (this.isCreate) {
@@ -1159,22 +1179,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             this.selectedOutbreak.generateFollowUpsWhenCreatingContacts &&
             contactIds.length
           ) {
-            this.personAndRelatedHelperService.followUp.followUpsDataService
-              .generateFollowUps(
-                this.selectedOutbreak.id,
-                {
-                  contactIds: contactIds
-                }
-              )
-              .pipe(
-                catchError((error) => {
-                  // show error
-                  this.personAndRelatedHelperService.toastV2Service.error(error);
-
-                  // send error
-                  return throwError(err);
-                })
-              )
+            generateFollowUps(contactIds)
               .subscribe(() => {
                 // continue to show errors
                 showErrors();
@@ -1220,22 +1225,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             this.selectedOutbreak.generateFollowUpsWhenCreatingContacts &&
             contactIds.length
           ) {
-            this.personAndRelatedHelperService.followUp.followUpsDataService
-              .generateFollowUps(
-                this.selectedOutbreak.id,
-                {
-                  contactIds: contactIds
-                }
-              )
-              .pipe(
-                catchError((err) => {
-                  // show error
-                  this.personAndRelatedHelperService.toastV2Service.error(err);
-
-                  // send error
-                  return throwError(err);
-                })
-              )
+            generateFollowUps(contactIds)
               .subscribe(() => {
                 this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
                 redirect();
