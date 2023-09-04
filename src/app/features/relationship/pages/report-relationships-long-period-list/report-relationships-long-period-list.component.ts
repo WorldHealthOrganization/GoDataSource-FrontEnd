@@ -7,22 +7,23 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { RelationshipModel, ReportDifferenceOnsetRelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-report-relationships-long-period',
   templateUrl: './report-relationships-long-period-list.component.html'
 })
-export class ReportRelationshipsLongPeriodListComponent extends ListComponent<ReportDifferenceOnsetRelationshipModel, IV2Column> implements OnDestroy {
+export class ReportRelationshipsLongPeriodListComponent extends ListComponent<ReportDifferenceOnsetRelationshipModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
   /**
    * Constructor
    */
   constructor(
     protected listHelperService: ListHelperService,
-    private relationshipDataService: RelationshipDataService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       listHelperService, {
@@ -220,6 +221,16 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
       {
         field: 'people[0].model.firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'firstName'
+        ),
         format: {
           type: 'people[0].model.firstName'
         }
@@ -227,6 +238,16 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
       {
         field: 'people[0].model.lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'lastName'
+        ),
         format: {
           type: 'people[0].model.lastName'
         }
@@ -234,6 +255,13 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
       {
         field: 'people[0].model.dateOfOnset',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateOfOnset'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'dateOfOnset'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         }
@@ -241,6 +269,16 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
       {
         field: 'people[1].model.firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'firstName'
+        ),
         format: {
           type: 'people[1].model.firstName'
         }
@@ -248,6 +286,16 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
       {
         field: 'people[1].model.lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'lastName'
+        ),
         format: {
           type: 'people[1].model.lastName'
         }
@@ -255,13 +303,21 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
       {
         field: 'people[1].model.dateOfOnset',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateOfOnset'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'dateOfOnset'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         }
       },
       {
         field: 'differenceBetweenDatesOfOnset',
-        label: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_LABEL_DIFFERENCE_BETWEEN_DATES'
+        label: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_LABEL_DIFFERENCE_BETWEEN_DATES',
+        visibleMandatoryIf: () => true
       }
     ];
   }
@@ -347,7 +403,7 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
    */
   refreshList() {
     // retrieve the list
-    this.records$ = this.relationshipDataService
+    this.records$ = this.personAndRelatedHelperService.relationship.relationshipDataService
       .getLongPeriodBetweenDateOfOnset(this.selectedOutbreak.id)
       .pipe(
         // update page count

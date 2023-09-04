@@ -30,6 +30,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
   selector: 'app-outbreak-list',
@@ -462,6 +463,14 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
                       // translate questionnaire questions - Contact Follow-up
                       if (!_.isEmpty(outbreakToClone.contactFollowUpTemplate)) {
                         translateQuestionnaire(outbreakToClone.contactFollowUpTemplate);
+                      }
+
+                      // replace . from property names since it is a restricted mongodb character that shouldn't be used in property names
+                      if (
+                        outbreakToClone.visibleAndMandatoryFields &&
+                        Object.keys(outbreakToClone.visibleAndMandatoryFields).length > 0
+                      ) {
+                        outbreakToClone.visibleAndMandatoryFields = JSON.parse(JSON.stringify(outbreakToClone.visibleAndMandatoryFields).replace(/\./g, Constants.DEFAULT_DB_DOT_REPLACER));
                       }
 
                       // hide side dialog

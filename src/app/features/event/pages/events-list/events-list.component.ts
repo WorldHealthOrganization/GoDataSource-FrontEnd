@@ -558,7 +558,7 @@ export class EventsListComponent
         label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
-          'address'
+          'address.phoneNumber'
         ),
         notVisible: true,
         sortable: true,
@@ -577,7 +577,7 @@ export class EventsListComponent
         label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
-          'address'
+          'address.emailAddress'
         ),
         notVisible: true,
         format: {
@@ -849,7 +849,7 @@ export class EventsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
-          'address'
+          'address.locationId'
         ),
         notVisible: true,
         format: {
@@ -872,7 +872,7 @@ export class EventsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
-          'address'
+          'address.addressLine1'
         ),
         notVisible: true,
         format: {
@@ -893,7 +893,7 @@ export class EventsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
-          'address'
+          'address.city'
         ),
         notVisible: true,
         format: {
@@ -914,7 +914,7 @@ export class EventsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
-          'address'
+          'address.geoLocation'
         ),
         notVisible: true,
         format: {
@@ -926,7 +926,7 @@ export class EventsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
-          'address'
+          'address.geoLocation'
         ),
         notVisible: true,
         format: {
@@ -938,7 +938,7 @@ export class EventsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
-          'address'
+          'address.postalCode'
         ),
         notVisible: true,
         format: {
@@ -959,7 +959,7 @@ export class EventsListComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
-          'address'
+          'address.geoLocationAccurate'
         ),
         notVisible: true,
         format: {

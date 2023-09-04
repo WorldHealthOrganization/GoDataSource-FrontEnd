@@ -994,7 +994,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.locationId'
         ),
         format: {
           type: 'address.location.name'
@@ -1016,7 +1016,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.phoneNumber'
         ),
         format: {
           type: 'address.phoneNumber'
@@ -1033,7 +1033,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.emailAddress'
         ),
         notVisible: true,
         sortable: true,
@@ -1163,7 +1163,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.addressLine1'
         ),
         notVisible: true,
         format: {
@@ -1182,7 +1182,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.city'
         ),
         notVisible: true,
         sortable: true,
@@ -1202,7 +1202,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.geoLocation'
         ),
         notVisible: true,
         format: {
@@ -1214,7 +1214,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.geoLocation'
         ),
         notVisible: true,
         format: {
@@ -1226,7 +1226,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.postalCode'
         ),
         notVisible: true,
         sortable: true,
@@ -1246,7 +1246,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
-          'address'
+          'address.geoLocationAccurate'
         ),
         notVisible: true,
         sortable: true,

@@ -268,7 +268,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
    */
   private initializeDetailTab(): ICreateViewModifyV2Tab {
     // modify ?
-    return {
+    return this.personAndRelatedHelperService.createViewModify.tabFilter({
       // Details
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'details',
@@ -277,6 +277,9 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
         {
           type: CreateViewModifyV2TabInputType.SECTION,
           label: null,
+          visibleMandatoryConf: {
+            dontFilter: true
+          },
           inputs: [
             // warnings
             {
@@ -481,7 +484,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
           ]
         }
       ]
-    };
+    }, this.personAndRelatedHelperService.labResult.visibleMandatoryKey, this.selectedOutbreak);
   }
 
   /**

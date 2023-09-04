@@ -183,11 +183,12 @@
 
         .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs {
           color: var(--gd-secondary);
-          font-size: 1.2rem;
+          font-size: 1.1rem;
           line-height: 1rem;
           padding-left: 2.8rem;
           position: relative;
-          top: -0.8rem;
+          top: -0.7rem;
+          z-index: -1;
         }
 
         .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs-invalid {
