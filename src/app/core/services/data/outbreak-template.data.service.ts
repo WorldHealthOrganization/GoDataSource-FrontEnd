@@ -49,10 +49,8 @@ export class OutbreakTemplateDataService {
   }
 
   /**
-     * Create a new OutbreakTemplate
-     * @param {OutbreakTemplateModel} outbreakTemplate
-     * @returns {Observable<any>}
-     */
+   * Create a new Outbreak Template
+   */
   createOutbreakTemplate(outbreakTemplate: OutbreakTemplateModel, outbreakTemplateId?: string): Observable<any> {
     return this. http.post(`templates${outbreakTemplateId ? `?templateId=${outbreakTemplateId}` : ''}`, outbreakTemplate);
   }

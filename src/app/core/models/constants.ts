@@ -77,6 +77,9 @@ export class Constants {
   static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
   static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
 
+  // json property . replacer
+  static readonly DEFAULT_DB_DOT_REPLACER: string = '____';
+
   // pagination defaults and configuration
   static PAGE_SIZE_OPTIONS = [50, 100, 500, 1000];
   static DEFAULT_PAGE_SIZE = 50;
