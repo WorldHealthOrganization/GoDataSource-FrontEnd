@@ -23,6 +23,7 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
   selector: 'app-outbreak-templates-list',
@@ -306,6 +307,14 @@ export class OutbreakTemplatesListComponent
 
                       // set the name for the cloned outbreak template
                       outbreakTemplateToClone.name = (response.handler.data.map.cloneData as IV2SideDialogConfigInputText).value;
+
+                      // replace . from property names since it is a restricted mongodb character that shouldn't be used in property names
+                      if (
+                        outbreakTemplateToClone.visibleAndMandatoryFields &&
+                        Object.keys(outbreakTemplateToClone.visibleAndMandatoryFields).length > 0
+                      ) {
+                        outbreakTemplateToClone.visibleAndMandatoryFields = JSON.parse(JSON.stringify(outbreakTemplateToClone.visibleAndMandatoryFields).replace(/\./g, Constants.DEFAULT_DB_DOT_REPLACER));
+                      }
 
                       // close side dialog
                       response.handler.hide();

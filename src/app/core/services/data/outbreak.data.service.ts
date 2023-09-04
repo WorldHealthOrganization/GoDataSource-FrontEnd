@@ -152,10 +152,8 @@ export class OutbreakDataService {
   }
 
   /**
-     * Create a new Outbreak
-     * @param { OutbreakModel } outbreak
-     * @param { string } outbreakTemplateId
-     */
+   * Create a new Outbreak
+   */
   createOutbreak(outbreak: OutbreakModel): Observable<any> {
     return this.http.post('outbreaks', outbreak)
       .pipe(
