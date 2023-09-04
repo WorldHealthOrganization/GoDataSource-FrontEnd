@@ -897,7 +897,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.typeId'
         ),
         isArray: true
       },
@@ -908,7 +908,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.phoneNumber'
         ),
         isArray: true
       },
@@ -968,7 +968,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.vaccine'
         ),
         options: data.options.vaccine,
         sortable: true
@@ -980,7 +980,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.status'
         ),
         options: data.options.vaccineStatus,
         sortable: true
@@ -992,7 +992,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'vaccinesReceived'
+          'vaccinesReceived.date'
         ),
         sortable: true
       },
@@ -1003,7 +1003,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'documents'
+          'documents.type'
         ),
         options: data.options.documentType,
         sortable: true
@@ -1015,7 +1015,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'documents'
+          'documents.number'
         ),
         sortable: true,
         useLike: true
@@ -1027,7 +1027,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.emailAddress'
         ),
         sortable: true,
         useLike: true
@@ -1039,7 +1039,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.geoLocationAccurate'
         ),
         options: data.options.yesNo,
         sortable: true,
@@ -1052,7 +1052,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.typeId'
         ),
         options: data.options.addressType,
         sortable: true,
@@ -1065,7 +1065,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.date'
         ),
         sortable: true,
         relationshipLabel: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES'
@@ -1077,7 +1077,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.city'
         ),
         sortable: true,
         useLike: true,
@@ -1090,7 +1090,7 @@ export class ContactHelperModel {
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
-          'addresses'
+          'addresses.postalCode'
         ),
         sortable: true,
         useLike: true,
@@ -1458,7 +1458,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.followUp.visibleMandatoryKey,
-            'address'
+            'address.typeId'
           ),
           isArray: false,
           relationshipPath: ['followUps'],
@@ -1504,7 +1504,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.followUp.visibleMandatoryKey,
-            'address'
+            'address.typeId'
           ),
           options: data.options.addressType,
           relationshipPath: ['followUps'],
@@ -1517,7 +1517,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.followUp.visibleMandatoryKey,
-            'address'
+            'address.date'
           ),
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
@@ -1529,7 +1529,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.followUp.visibleMandatoryKey,
-            'address'
+            'address.emailAddress'
           ),
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
@@ -1541,7 +1541,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.followUp.visibleMandatoryKey,
-            'address'
+            'address.phoneNumber'
           ),
           isArray: false,
           relationshipPath: ['followUps'],
@@ -1554,7 +1554,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.followUp.visibleMandatoryKey,
-            'address'
+            'address.locationId'
           ),
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
@@ -1566,7 +1566,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.followUp.visibleMandatoryKey,
-            'address'
+            'address.city'
           ),
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
@@ -1578,7 +1578,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.followUp.visibleMandatoryKey,
-            'address'
+            'address.postalCode'
           ),
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
@@ -1590,7 +1590,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.followUp.visibleMandatoryKey,
-            'address'
+            'address.geoLocationAccurate'
           ),
           options: data.options.yesNo,
           relationshipPath: ['followUps'],
@@ -1725,7 +1725,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'addresses'
+            'addresses.typeId'
           ),
           isArray: true,
           relationshipPath: ['relationships', 'people'],
@@ -1945,7 +1945,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'addresses'
+            'addresses.phoneNumber'
           ),
           isArray: true,
           relationshipPath: ['relationships', 'people'],
@@ -2089,7 +2089,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'documents'
+            'documents.type'
           ),
           options: data.options.documentType,
           relationshipPath: ['relationships', 'people'],
@@ -2103,7 +2103,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'documents'
+            'documents.number'
           ),
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
@@ -2116,7 +2116,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'addresses'
+            'addresses.emailAddress'
           ),
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
@@ -2168,7 +2168,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'dateRanges'
+            'dateRanges.typeId'
           ),
           options: data.options.dateRangeType,
           relationshipPath: ['relationships', 'people'],
@@ -2182,7 +2182,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'dateRanges'
+            'dateRanges.startDate'
           ),
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: `${this.parent.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.parent.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
@@ -2195,7 +2195,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'dateRanges'
+            'dateRanges.endDate'
           ),
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: `${this.parent.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.parent.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
@@ -2208,7 +2208,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'dateRanges'
+            'dateRanges.centerName'
           ),
           options: data.options.dateRangeCenter,
           relationshipPath: ['relationships', 'people'],
@@ -2223,7 +2223,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'dateRanges'
+            'dateRanges.locationId'
           ),
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: `${this.parent.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.parent.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
@@ -2236,7 +2236,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'dateRanges'
+            'dateRanges.comments'
           ),
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: `${this.parent.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES')} ${this.parent.i18nService.instant('LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS')}`,
