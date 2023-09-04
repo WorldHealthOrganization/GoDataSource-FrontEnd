@@ -143,6 +143,14 @@ export class OutbreakTemplateModel
     // visible / mandatory fields
     // default values are configured later after initialization where necessary (create/modify outbreak, retrieve selected outbreak)
     this.visibleAndMandatoryFields = _.get(data, 'visibleAndMandatoryFields');
+
+    // reconstruct property names
+    if (
+      this.visibleAndMandatoryFields &&
+      Object.keys(this.visibleAndMandatoryFields).length > 0
+    ) {
+      this.visibleAndMandatoryFields = JSON.parse(JSON.stringify(this.visibleAndMandatoryFields).replace(new RegExp(Constants.DEFAULT_DB_DOT_REPLACER, 'g'), '.'));
+    }
   }
 
   /**

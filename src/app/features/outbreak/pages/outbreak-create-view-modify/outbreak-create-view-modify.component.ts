@@ -42,6 +42,7 @@ import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/servi
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { Constants } from '../../../../core/models/constants';
 
 /**
  * Component
@@ -1272,6 +1273,14 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       // - remove fields used by ui (e.g. collapsed...)
       if (data.labResultsTemplate) {
         data.labResultsTemplate = (data.labResultsTemplate || []).map((question) => new QuestionModel(question));
+      }
+
+      // replace . from property names since it is a restricted mongodb character that shouldn't be used in property names
+      if (
+        data.visibleAndMandatoryFields &&
+        Object.keys(data.visibleAndMandatoryFields).length > 0
+      ) {
+        data.visibleAndMandatoryFields = JSON.parse(JSON.stringify(data.visibleAndMandatoryFields).replace(/\./g, Constants.DEFAULT_DB_DOT_REPLACER));
       }
 
       // cleanup
