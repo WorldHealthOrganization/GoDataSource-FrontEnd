@@ -169,7 +169,7 @@ const relationshipTypeChildrenRoutes = [
     },
     resolve: {
       outbreak: SelectedOutbreakDataResolver,
-      certainty: CertaintyLevelDataResolver,
+      certaintyLevel: CertaintyLevelDataResolver,
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
@@ -214,7 +214,7 @@ const relationshipTypeChildrenRoutes = [
     },
     resolve: {
       outbreak: SelectedOutbreakDataResolver,
-      certainty: CertaintyLevelDataResolver,
+      certaintyLevel: CertaintyLevelDataResolver,
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
