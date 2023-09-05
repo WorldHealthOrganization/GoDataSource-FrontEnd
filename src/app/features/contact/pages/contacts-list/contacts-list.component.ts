@@ -1447,7 +1447,10 @@ export class ContactsListComponent
       {
         field: 'followUp.status',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-        visibleMandatoryIf: () => true,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'followUp[status]'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,

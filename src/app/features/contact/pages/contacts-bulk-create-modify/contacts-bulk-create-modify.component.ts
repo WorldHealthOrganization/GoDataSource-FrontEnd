@@ -627,7 +627,10 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-        visibleMandatory: undefined,
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          field: 'followUp[status]'
+        },
         field: 'model.followUp.status',
         visible: this.isModify,
         options: this.isModify ?

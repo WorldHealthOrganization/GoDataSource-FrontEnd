@@ -919,7 +919,11 @@ export class ContactHelperModel {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'followUp.status',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
-        visibleMandatoryIf: () => true,
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'followUp[status]'
+        ),
         options: data.options.followUpStatus,
         sortable: true
       },
