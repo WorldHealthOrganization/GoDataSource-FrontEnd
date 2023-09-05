@@ -1546,6 +1546,13 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                   contactIds: [contact.id]
                 }
               ).pipe(
+                catchError((err) => {
+                  // show error
+                  this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                  // send the contact
+                  return of(contact);
+                }),
                 map(() => contact)
               );
           }),
