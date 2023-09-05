@@ -1,6 +1,12 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { IV2SpreadsheetEditorEventData, IV2SpreadsheetEditorEventDataLocation, IV2SpreadsheetEditorHandler, V2SpreadsheetEditorColumnType } from '../../../../shared/components-v2/app-spreadsheet-editor-v2/models/column.model';
+import {
+  IV2SpreadsheetEditorEventData,
+  IV2SpreadsheetEditorEventDataLocation,
+  IV2SpreadsheetEditorHandler,
+  V2SpreadsheetEditorColumn,
+  V2SpreadsheetEditorColumnType
+} from '../../../../shared/components-v2/app-spreadsheet-editor-v2/models/column.model';
 import { BulkCreateModifyComponent } from '../../../../core/helperClasses/bulk-create-modify-component';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -34,7 +40,7 @@ import { PersonAndRelatedHelperService } from '../../../../core/services/helper/
   selector: 'app-contacts-bulk-create-modify',
   templateUrl: './contacts-bulk-create-modify.component.html'
 })
-export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent<EntityModel> implements OnDestroy {
+export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent<EntityModel, V2SpreadsheetEditorColumn> implements OnDestroy {
   // entity
   private _entity: EventModel | CaseModel;
 
@@ -85,13 +91,14 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     protected router: Router,
     protected bulkCacheHelperService: BulkCacheHelperService,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    private personAndRelatedHelperService: PersonAndRelatedHelperService
+    protected personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
       activatedRoute,
       authDataService,
-      outbreakDataService, {
+      outbreakDataService,
+      personAndRelatedHelperService, {
         initializeTableColumnsAfterRecordsInitialized: true
       }
     );

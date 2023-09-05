@@ -1,5 +1,6 @@
 import { IV2Column } from '../../../../components-v2/app-list-table-v2/models/column.model';
 import { V2AdvancedFilter } from '../../../../components-v2/app-list-table-v2/models/advanced-filter.model';
+import { V2SpreadsheetEditorColumn } from '../../../../components-v2/app-spreadsheet-editor-v2/models/column.model';
 
 /**
  * Used by lists to configure specific things for visible/mandatory columns
@@ -41,6 +42,14 @@ export interface ICreateViewModifyV2TabInputToVisibleMandatorySectionConf {
   // optional
   dontFilter: boolean;
 }
+
+/**
+ * Used by bulk create/modify input to configure specific things for visible/mandatory
+ */
+export type V2SpreadsheetEditorColumnToVisibleMandatoryConf = V2SpreadsheetEditorColumn & {
+  // required
+  visibleMandatoryIf: () => boolean;
+};
 
 /**
  * Visible / Mandatory accepted value format - field
