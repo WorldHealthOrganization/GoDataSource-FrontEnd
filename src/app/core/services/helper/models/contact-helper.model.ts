@@ -619,6 +619,9 @@ export class ContactHelperModel {
                   // set data
                   data.itemData.followUp.status = value;
                 }
+              },
+              visibleMandatoryConf: {
+                visible: true
               }
             }]
           },
