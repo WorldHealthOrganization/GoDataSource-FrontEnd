@@ -1,7 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { Observable, throwError } from 'rxjs';
@@ -21,8 +20,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-contact-follow-ups-bulk-modify',
@@ -42,19 +40,17 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
     protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
-    protected redirectService: RedirectService,
-    protected toastV2Service: ToastV2Service,
     protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     private router: Router,
-    private followUpsDataService: FollowUpsDataService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
       authDataService,
       activatedRoute,
       renderer2,
-      redirectService,
-      toastV2Service,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
       outbreakAndOutbreakTemplateHelperService
     );
   }
@@ -91,7 +87,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
       );
 
       // retrieve follow-ups and contact details
-      this.followUpsDataService
+      this.personAndRelatedHelperService.followUp.followUpsDataService
         .getFollowUpsList(
           this.selectedOutbreak.id,
           qb
@@ -250,7 +246,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
    */
   private initializeDetailTab(): ICreateViewModifyV2Tab {
     // modify ?
-    return {
+    return this.personAndRelatedHelperService.createViewModify.tabFilter({
       // Details
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'details',
@@ -259,6 +255,9 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
         {
           type: CreateViewModifyV2TabInputType.SECTION,
           label: null,
+          visibleMandatoryConf: {
+            dontFilter: true
+          },
           inputs: [
             // warnings
             {
@@ -302,8 +301,12 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
                 get: () => 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES'
               },
               labels: this.followUpDates
-            },
-
+            }
+          ]
+        }, {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE',
+          inputs: [
             // inputs
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -342,7 +345,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
           ]
         }
       ]
-    };
+    }, this.personAndRelatedHelperService.followUp.visibleMandatoryKey, this.selectedOutbreak);
   }
 
   /**
@@ -404,7 +407,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
       });
 
       // do request
-      this.followUpsDataService
+      this.personAndRelatedHelperService.followUp.followUpsDataService
         .bulkModifyFollowUps(
           this.selectedOutbreak.id,
           data,
