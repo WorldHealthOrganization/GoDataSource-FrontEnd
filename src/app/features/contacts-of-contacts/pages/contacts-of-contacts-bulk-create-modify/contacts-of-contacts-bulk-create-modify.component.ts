@@ -26,12 +26,13 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { V2SpreadsheetEditorColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 @Component({
   selector: 'app-contacts-of-contacts-bulk-create-modify',
   templateUrl: './contacts-of-contacts-bulk-create-modify.component.html'
 })
-export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModifyComponent<EntityModel> implements OnDestroy {
+export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModifyComponent<EntityModel, V2SpreadsheetEditorColumnToVisibleMandatoryConf> implements OnDestroy {
   // entity
   private _entity: ContactModel;
 
@@ -71,13 +72,14 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
     protected router: Router,
     protected bulkCacheHelperService: BulkCacheHelperService,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    private personAndRelatedHelperService: PersonAndRelatedHelperService
+    protected personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
       activatedRoute,
       authDataService,
-      outbreakDataService, {
+      outbreakDataService,
+      personAndRelatedHelperService, {
         initializeTableColumnsAfterRecordsInitialized: true
       }
     );
@@ -180,6 +182,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'firstName'
+        },
         field: 'model.firstName',
         validators: {
           required: () => true
@@ -187,14 +193,26 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'middleName'
+        },
         field: 'model.middleName'
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'lastName'
+        },
         field: 'model.lastName'
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'gender'
+        },
         field: 'model.gender',
         options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         change: (data) => {
@@ -208,7 +226,8 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
               const newValue = null;
               if (
                 data.change &&
-                data.change.type === V2SpreadsheetEditorChangeType.VALUES
+                data.change.type === V2SpreadsheetEditorChangeType.VALUES &&
+                data.columnsMap['model.pregnancyStatus']
               ) {
                 // initialize
                 if (!data.change.changes.rows[data.rowIndex]) {
@@ -238,6 +257,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'pregnancyStatus'
+        },
         field: 'model.pregnancyStatus',
         options: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         readonly: (rowData: EntityModel) => {
@@ -246,6 +269,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'occupation'
+        },
         field: 'model.occupation',
         options: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -255,6 +282,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_YEARS',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'ageDob'
+        },
         field: 'model.age.years',
         validators: {
           integer: () => ({
@@ -265,6 +296,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_MONTHS',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'ageDob'
+        },
         field: 'model.age.months',
         validators: {
           integer: () => ({
@@ -275,10 +310,18 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'ageDob'
+        },
         field: 'model.dob'
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'visualId'
+        },
         field: 'model.visualId',
         visible: this.isCreate,
         validators: {
@@ -298,6 +341,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'documents.type'
+        },
         field: 'model.documents[0].type',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -313,6 +360,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'documents.number'
+        },
         field: 'model.documents[0].number',
         visible: this.isCreate,
         validators: {
@@ -328,6 +379,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_ADDRESS_DATE',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.date'
+        },
         field: 'model.mainAddress.date',
         change: (data) => {
           this.setAddressDate(data);
@@ -335,6 +390,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.emailAddress'
+        },
         field: 'model.mainAddress.emailAddress',
         validators: {
           email: () => true
@@ -345,6 +404,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.phoneNumber'
+        },
         field: 'model.mainAddress.phoneNumber',
         change: (data) => {
           this.setAddressDate(data);
@@ -352,6 +415,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.LOCATION,
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.locationId'
+        },
         field: 'model.mainAddress.locationId',
         change: (data) => {
           // push it to changes that we need to handle
@@ -378,6 +445,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.city'
+        },
         field: 'model.mainAddress.city',
         change: (data) => {
           this.setAddressDate(data);
@@ -385,6 +456,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.postalCode'
+        },
         field: 'model.mainAddress.postalCode',
         change: (data) => {
           this.setAddressDate(data);
@@ -392,6 +467,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.addressLine1'
+        },
         field: 'model.mainAddress.addressLine1',
         change: (data) => {
           this.setAddressDate(data);
@@ -399,6 +478,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.geoLocation'
+        },
         field: 'model.mainAddress.geoLocation.lat',
         validators: {
           required: (rowData: EntityModel) => {
@@ -413,6 +496,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.geoLocation'
+        },
         field: 'model.mainAddress.geoLocation.lng',
         validators: {
           required: (rowData: EntityModel) => {
@@ -427,6 +514,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.geoLocationAccurate'
+        },
         field: 'model.mainAddress.geoLocationAccurate',
         options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         change: (data) => {
@@ -438,6 +529,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'dateOfReporting'
+        },
         field: 'model.dateOfReporting',
         validators: {
           required: () => true,
@@ -448,11 +543,19 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'isDateOfReportingApproximate'
+        },
         field: 'model.isDateOfReportingApproximate',
         options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'riskLevel'
+        },
         field: 'model.riskLevel',
         options: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -462,6 +565,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'riskReason'
+        },
         field: 'model.riskReason'
       },
 
@@ -469,6 +576,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'dateOfFirstContact'
+        },
         field: 'relationship.dateOfFirstContact',
         visible: this.isCreate,
         validators: {
@@ -479,6 +590,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'contactDate'
+        },
         field: 'relationship.contactDate',
         visible: this.isCreate,
         validators: {
@@ -490,6 +605,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'contactDateEstimated'
+        },
         field: 'relationship.contactDateEstimated',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -498,6 +617,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'certaintyLevelId'
+        },
         field: 'relationship.certaintyLevelId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -509,6 +632,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'exposureTypeId'
+        },
         field: 'relationship.exposureTypeId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -521,6 +648,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'exposureFrequencyId'
+        },
         field: 'relationship.exposureFrequencyId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -533,6 +664,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'exposureDurationId'
+        },
         field: 'relationship.exposureDurationId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -545,6 +680,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'socialRelationshipTypeId'
+        },
         field: 'relationship.socialRelationshipTypeId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -557,6 +696,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'clusterId'
+        },
         field: 'relationship.clusterId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -565,11 +708,19 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'socialRelationshipDetail'
+        },
         field: 'relationship.socialRelationshipDetail',
         visible: this.isCreate
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'comment'
+        },
         field: 'relationship.comment',
         visible: this.isCreate
       }
