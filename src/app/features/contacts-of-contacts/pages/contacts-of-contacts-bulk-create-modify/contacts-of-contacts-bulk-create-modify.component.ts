@@ -182,10 +182,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'firstName'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'firstName'
+        },
         field: 'model.firstName',
         validators: {
           required: () => true
@@ -193,26 +193,26 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'middleName'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'middleName'
+        },
         field: 'model.middleName'
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'lastName'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'lastName'
+        },
         field: 'model.lastName'
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'gender'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'gender'
+        },
         field: 'model.gender',
         options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         change: (data) => {
@@ -257,10 +257,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'pregnancyStatus'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'pregnancyStatus'
+        },
         field: 'model.pregnancyStatus',
         options: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         readonly: (rowData: EntityModel) => {
@@ -269,10 +269,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'occupation'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'occupation'
+        },
         field: 'model.occupation',
         options: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -282,10 +282,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_YEARS',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'ageDob'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'ageDob'
+        },
         field: 'model.age.years',
         validators: {
           integer: () => ({
@@ -296,10 +296,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_MONTHS',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'ageDob'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'ageDob'
+        },
         field: 'model.age.months',
         validators: {
           integer: () => ({
@@ -310,18 +310,18 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'ageDob'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'ageDob'
+        },
         field: 'model.dob'
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'visualId'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'visualId'
+        },
         field: 'model.visualId',
         visible: this.isCreate,
         validators: {
@@ -341,10 +341,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'documents.type'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'documents.type'
+        },
         field: 'model.documents[0].type',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -360,10 +360,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'documents.number'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'documents.number'
+        },
         field: 'model.documents[0].number',
         visible: this.isCreate,
         validators: {
@@ -379,10 +379,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_ADDRESS_DATE',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses.date'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.date'
+        },
         field: 'model.mainAddress.date',
         change: (data) => {
           this.setAddressDate(data);
@@ -390,10 +390,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses.emailAddress'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.emailAddress'
+        },
         field: 'model.mainAddress.emailAddress',
         validators: {
           email: () => true
@@ -404,10 +404,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses.phoneNumber'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.phoneNumber'
+        },
         field: 'model.mainAddress.phoneNumber',
         change: (data) => {
           this.setAddressDate(data);
@@ -415,10 +415,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.LOCATION,
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses.locationId'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.locationId'
+        },
         field: 'model.mainAddress.locationId',
         change: (data) => {
           // push it to changes that we need to handle
@@ -445,10 +445,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses.city'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.city'
+        },
         field: 'model.mainAddress.city',
         change: (data) => {
           this.setAddressDate(data);
@@ -456,10 +456,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses.postalCode'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.postalCode'
+        },
         field: 'model.mainAddress.postalCode',
         change: (data) => {
           this.setAddressDate(data);
@@ -467,10 +467,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses.addressLine1'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.addressLine1'
+        },
         field: 'model.mainAddress.addressLine1',
         change: (data) => {
           this.setAddressDate(data);
@@ -478,10 +478,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses.geoLocation'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.geoLocation'
+        },
         field: 'model.mainAddress.geoLocation.lat',
         validators: {
           required: (rowData: EntityModel) => {
@@ -496,10 +496,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses.geoLocation'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.geoLocation'
+        },
         field: 'model.mainAddress.geoLocation.lng',
         validators: {
           required: (rowData: EntityModel) => {
@@ -514,10 +514,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'addresses.geoLocationAccurate'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'addresses.geoLocationAccurate'
+        },
         field: 'model.mainAddress.geoLocationAccurate',
         options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         change: (data) => {
@@ -529,10 +529,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'dateOfReporting'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'dateOfReporting'
+        },
         field: 'model.dateOfReporting',
         validators: {
           required: () => true,
@@ -543,19 +543,19 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'isDateOfReportingApproximate'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'isDateOfReportingApproximate'
+        },
         field: 'model.isDateOfReportingApproximate',
         options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'riskLevel'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'riskLevel'
+        },
         field: 'model.riskLevel',
         options: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -565,10 +565,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
-          'riskReason'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          field: 'riskReason'
+        },
         field: 'model.riskReason'
       },
 
@@ -576,10 +576,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'dateOfFirstContact'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'dateOfFirstContact'
+        },
         field: 'relationship.dateOfFirstContact',
         visible: this.isCreate,
         validators: {
@@ -590,10 +590,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'contactDate'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'contactDate'
+        },
         field: 'relationship.contactDate',
         visible: this.isCreate,
         validators: {
@@ -605,10 +605,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'contactDateEstimated'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'contactDateEstimated'
+        },
         field: 'relationship.contactDateEstimated',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -617,10 +617,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'certaintyLevelId'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'certaintyLevelId'
+        },
         field: 'relationship.certaintyLevelId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -632,10 +632,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'exposureTypeId'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'exposureTypeId'
+        },
         field: 'relationship.exposureTypeId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -648,10 +648,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'exposureFrequencyId'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'exposureFrequencyId'
+        },
         field: 'relationship.exposureFrequencyId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -664,10 +664,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'exposureDurationId'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'exposureDurationId'
+        },
         field: 'relationship.exposureDurationId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -680,10 +680,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'socialRelationshipTypeId'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'socialRelationshipTypeId'
+        },
         field: 'relationship.socialRelationshipTypeId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -696,10 +696,10 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'clusterId'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'clusterId'
+        },
         field: 'relationship.clusterId',
         visible: this.isCreate,
         options: this.isCreate ?
@@ -708,19 +708,19 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'socialRelationshipDetail'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'socialRelationshipDetail'
+        },
         field: 'relationship.socialRelationshipDetail',
         visible: this.isCreate
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
-        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
-          this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
-          'comment'
-        ),
+        visibleMandatory: {
+          key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+          field: 'comment'
+        },
         field: 'relationship.comment',
         visible: this.isCreate
       }

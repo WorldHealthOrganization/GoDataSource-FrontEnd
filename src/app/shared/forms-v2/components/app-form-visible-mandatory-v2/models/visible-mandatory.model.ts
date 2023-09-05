@@ -48,7 +48,10 @@ export interface ICreateViewModifyV2TabInputToVisibleMandatorySectionConf {
  */
 export type V2SpreadsheetEditorColumnToVisibleMandatoryConf = V2SpreadsheetEditorColumn & {
   // required
-  visibleMandatoryIf: () => boolean;
+  visibleMandatory: {
+    key: string,
+    field: string
+  };
 };
 
 /**

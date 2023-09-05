@@ -5,7 +5,7 @@ import { Directive, ViewChild } from '@angular/core';
 import { OutbreakDataService } from '../services/data/outbreak.data.service';
 import { UserModel } from '../models/user.model';
 import { AuthDataService } from '../services/data/auth.data.service';
-import { V2SpreadsheetEditorColumn } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/column.model';
+import { IV2SpreadsheetEditorColumnValidatorRequired, V2SpreadsheetEditorColumn } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/column.model';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { IV2SpreadsheetEditorEventSave } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/event.model';
 import { ActivatedRoute } from '@angular/router';
@@ -37,20 +37,56 @@ export abstract class BulkCreateModifyComponent<T, U extends (V2SpreadsheetEdito
     return this._tableColumns;
   }
   set tableColumns(tableColumns: U[]) {
-    // filter bulk table columns
-    const filter = (items: V2SpreadsheetEditorColumnToVisibleMandatoryConf[]): U[] => {
-      return (items || []).filter((column) => column.visibleMandatoryIf ?
-        column.visibleMandatoryIf() :
-        true
-      ) as U[];
+    // apply required
+    const applyRequiredAndVisibility = (items: V2SpreadsheetEditorColumnToVisibleMandatoryConf[]): U[] => {
+      // filter
+      const filteredItems: V2SpreadsheetEditorColumnToVisibleMandatoryConf[] = [];
+      (items || []).forEach((column) => {
+        // visible / mandatory ?
+        if (!column.visibleMandatory) {
+          // add
+          filteredItems.push(column);
+
+          // finished
+          return;
+        }
+
+        // visible ?
+        if (this.shouldVisibleMandatoryTableColumnBeVisible(
+          column.visibleMandatory.key,
+          column.visibleMandatory.field
+        )) {
+          // must check for required ?
+          if (
+            this.selectedOutbreak?.visibleAndMandatoryFields &&
+            this.selectedOutbreak.visibleAndMandatoryFields[column.visibleMandatory.key] &&
+            this.selectedOutbreak.visibleAndMandatoryFields[column.visibleMandatory.key][column.visibleMandatory.field]?.mandatory &&
+            !(column.validators as IV2SpreadsheetEditorColumnValidatorRequired)?.required
+          ) {
+            // must initialize ?
+            if (!column.validators) {
+              column.validators = {};
+            }
+
+            // attach required
+            (column.validators as IV2SpreadsheetEditorColumnValidatorRequired).required = () => true;
+          }
+
+          // add
+          filteredItems.push(column);
+        }
+      });
+
+      // finished
+      return filteredItems as U[];
     };
 
     // set value
-    this._tableColumns = filter(tableColumns as V2SpreadsheetEditorColumnToVisibleMandatoryConf[]);
+    this._tableColumns = applyRequiredAndVisibility(tableColumns as V2SpreadsheetEditorColumnToVisibleMandatoryConf[]);
 
     // overwrite push items, otherwise we might push items that shouldn't be visible
     this._tableColumns.push = function(...args) {
-      return Array.prototype.push.apply(this, filter(args as V2SpreadsheetEditorColumnToVisibleMandatoryConf[]));
+      return Array.prototype.push.apply(this, applyRequiredAndVisibility(args as V2SpreadsheetEditorColumnToVisibleMandatoryConf[]));
     };
   }
 
@@ -270,7 +306,7 @@ export abstract class BulkCreateModifyComponent<T, U extends (V2SpreadsheetEdito
   /**
    * Check if a column should be visible depending on outbreak visible/mandatory settings
    */
-  protected shouldVisibleMandatoryTableColumnBeVisible(
+  private shouldVisibleMandatoryTableColumnBeVisible(
     visibleMandatoryKey: string,
     prop: string
   ): boolean {
