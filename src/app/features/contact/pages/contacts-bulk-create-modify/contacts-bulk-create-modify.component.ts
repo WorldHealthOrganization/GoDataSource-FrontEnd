@@ -33,10 +33,7 @@ import {
   map,
   switchMap
 } from 'rxjs/operators';
-import {
-  EMPTY,
-  throwError
-} from 'rxjs';
+import { throwError } from 'rxjs';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
@@ -1162,33 +1159,28 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     // generate follow-ups callback
     const generateFollowUps = ((
       contactIds: string[],
-      error?: any,
-      showErrors?: () => void
+      catchErrorsTriggered: () => void,
+      error?: any
     ) => {
       return this.personAndRelatedHelperService.followUp.followUpsDataService
         .generateFollowUps(
           this.selectedOutbreak.id,
           {
-            contactIds: contactIds
+            contactIds
           }
         )
         .pipe(
-          catchError((err) => {
+          catchError((generateFollowupsError) => {
             // show error
-            this.personAndRelatedHelperService.toastV2Service.error(err);
+            this.personAndRelatedHelperService.toastV2Service.error(generateFollowupsError);
 
             // continue to show errors
-            if (showErrors) {
-              showErrors();
-            }
+            catchErrorsTriggered();
 
-            // send error further down the road
-            // - DO NOT use of(..) because it goes into subscribe
-            // - EMPTY allows you to not call callback from subscribe and also not show the error in console
-            // return EMPTY;
+            // return error
             return error ?
               throwError(error) :
-              EMPTY;
+              throwError(generateFollowupsError);
           })
         );
     });
@@ -1294,6 +1286,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
               // get the created contacts
               if (
                 this.isCreate &&
+                this.selectedOutbreak.generateFollowUpsWhenCreatingContacts &&
                 successRecord.contact
               ) {
                 contactIds.push(successRecord.contact.id);
@@ -1360,24 +1353,20 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
           };
 
           // generate follow-ups ?
-          if (
-            this.selectedOutbreak.generateFollowUpsWhenCreatingContacts &&
-            contactIds.length > 0
-          ) {
+          if (contactIds.length > 0) {
             return generateFollowUps(
               contactIds,
-              err,
-              showErrors
-            )
-              .pipe(
-                switchMap(() => {
-                  // continue to show errors
-                  showErrors();
+              showErrors,
+              err
+            ).pipe(
+              switchMap(() => {
+                // continue to show errors
+                showErrors();
 
-                  // finished
-                  return throwError(err);
-                })
-              );
+                // finished
+                return throwError(err);
+              })
+            );
           } else {
             // continue to show errors
             showErrors();
@@ -1393,7 +1382,10 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         relationship?: RelationshipModel
       }[]) => {
         // redirect action
-        const redirect = () => {
+        const redirect = (successToken) => {
+          // show success message
+          this.personAndRelatedHelperService.toastV2Service.success(successToken);
+
           // finished
           event.finished();
 
@@ -1409,7 +1401,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         // message
         if (this.isCreate) {
           // get the created contacts
-          const contactIds: string[] = result.map((item) => item.contact?.id);
+          const contactIds: string[] = result.map((item) => item.contact.id);
 
           // generate follow-ups ?
           if (
@@ -1418,20 +1410,17 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
           ) {
             generateFollowUps(
               contactIds,
-              'LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE',
-              redirect
-            )
-              .subscribe(() => {
-                this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
-                redirect();
-              });
+              () => {
+                redirect('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+              }
+            ).subscribe(() => {
+              redirect('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+            });
           } else {
-            this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
-            redirect();
+            redirect('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
           }
         } else {
-          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
-          redirect();
+          redirect('LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
         }
       });
   }
