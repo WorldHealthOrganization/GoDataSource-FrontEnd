@@ -27,7 +27,8 @@ export enum QuickEditorV2InputType {
   TEXT,
   DATE,
   SELECT_SINGLE,
-  ASYNC_VALIDATOR_TEXT
+  ASYNC_VALIDATOR_TEXT,
+  TEXTAREA
 }
 
 /**
@@ -107,9 +108,21 @@ interface IQuickEditorV2InputAsyncValidatorText extends Omit<IQuickEditorV2Input
 }
 
 /**
+ * Input - textarea
+ */
+interface IQuickEditorV2InputTextArea extends Omit<IQuickEditorV2InputBase, 'value'> {
+  // required
+  type: QuickEditorV2InputType.TEXTAREA;
+  value: IQuickEditorV2InputValue<string>;
+
+  // optional
+  validators?: IQuickEditorV2InputValidatorRequired;
+}
+
+/**
  * Input
  */
-export type QuickEditorV2Input = IQuickEditorV2InputText | IQuickEditorV2InputDate | IQuickEditorV2InputSingleSelect | IQuickEditorV2InputAsyncValidatorText;
+export type QuickEditorV2Input = IQuickEditorV2InputText | IQuickEditorV2InputDate | IQuickEditorV2InputSingleSelect | IQuickEditorV2InputAsyncValidatorText | IQuickEditorV2InputTextArea;
 
 /**
  * Section
