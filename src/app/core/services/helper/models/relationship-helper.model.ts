@@ -502,15 +502,17 @@ export class RelationshipHelperModel {
                 });
 
                 // attach entity fields information
-                this.lightEntity(relationshipData.model)
-                  .forEach((labelValue) => {
-                    entityInputs.push({
-                      type: V2SideDialogConfigInputType.KEY_VALUE,
-                      name: `entities-list-key-value-${relationshipData.model.id}-${labelValue.label}`,
-                      placeholder: labelValue.label,
-                      value: labelValue.value
-                    });
+                this.lightEntity(
+                  selectedOutbreak,
+                  relationshipData.model
+                ).forEach((labelValue) => {
+                  entityInputs.push({
+                    type: V2SideDialogConfigInputType.KEY_VALUE,
+                    name: `entities-list-key-value-${relationshipData.model.id}-${labelValue.label}`,
+                    placeholder: labelValue.label,
+                    value: labelValue.value
                   });
+                });
 
                 // add entities to the list
                 entitiesList.panels.push({
@@ -547,15 +549,17 @@ export class RelationshipHelperModel {
                 });
 
                 // attach entity fields information
-                this.lightRelationship(relationshipData.relationship)
-                  .forEach((labelValue) => {
-                    relationshipsInputs.push({
-                      type: V2SideDialogConfigInputType.KEY_VALUE,
-                      name: `relationship-list-key-value-${relationshipData.relationship.id}-${labelValue.label}`,
-                      placeholder: labelValue.label,
-                      value: labelValue.value
-                    });
+                this.lightRelationship(
+                  selectedOutbreak,
+                  relationshipData.relationship
+                ).forEach((labelValue) => {
+                  relationshipsInputs.push({
+                    type: V2SideDialogConfigInputType.KEY_VALUE,
+                    name: `relationship-list-key-value-${relationshipData.relationship.id}-${labelValue.label}`,
+                    placeholder: labelValue.label,
+                    value: labelValue.value
                   });
+                });
 
                 // add relationships to the list
                 relationshipList.panels.push({
@@ -612,9 +616,15 @@ export class RelationshipHelperModel {
     // retrieve entity details
     let data: ILabelValuePairModel[] = [];
     if (entity instanceof RelationshipModel) {
-      data = this.lightRelationship(entity);
+      data = this.lightRelationship(
+        selectedOutbreak,
+        entity
+      );
     } else {
-      data = this.lightEntity(entity);
+      data = this.lightEntity(
+        selectedOutbreak,
+        entity
+      );
     }
 
     // construct inputs
@@ -723,91 +733,209 @@ export class RelationshipHelperModel {
    * Get light entity
    */
   lightEntity(
+    useToFilterOutbreak: OutbreakModel,
     entity: CaseModel | EventModel | ContactModel | ContactOfContactModel
   ): ILabelValuePairModel[] {
     // create list of fields to display
     const lightObject: ILabelValuePairModel[] = [];
 
+    // determine entity type key
+    let visibleMandatoryKey: string = this.parent.case.visibleMandatoryKey;
+    switch (entity.type) {
+      case EntityType.CONTACT:
+        visibleMandatoryKey = this.parent.contact.visibleMandatoryKey;
+        break;
+
+      case EntityType.CONTACT_OF_CONTACT:
+        visibleMandatoryKey = this.parent.contactOfContact.visibleMandatoryKey;
+        break;
+
+      case EntityType.EVENT:
+        visibleMandatoryKey = this.parent.event.visibleMandatoryKey;
+        break;
+    }
+
     // case, contact and contact of contacts
     if (
       entity instanceof CaseModel ||
       entity instanceof ContactModel ||
       entity instanceof ContactOfContactModel
     ) {
-      // name
-      lightObject.push(
-        {
+      // first name
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'firstName'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
           value: entity.firstName
-        }, {
-          label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-          value: entity.lastName
-        }
-      );
-
-      // display age. decide between years and months
-      let ageUnit: string = this.parent.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
-      let ageValue: number = _.get(entity, 'age.years', 0);
-      const ageMonths = _.get(entity, 'age.months', 0);
-      if (ageMonths > 0) {
-        // show age in months
-        ageUnit = this.parent.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
-        ageValue = ageMonths;
+        });
       }
 
-      // push age
-      lightObject.push({
-        label: 'LNG_CASE_FIELD_LABEL_AGE',
-        value: `${ageValue} ${ageUnit}`
-      });
+      // last name
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'lastName'
+      )) {
+        lightObject.push({
+          label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+          value: entity.lastName
+        });
+      }
 
-      // other fields
-      lightObject.push(
-        {
+      // age
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'ageDob'
+      )) {
+        // display age. decide between years and months
+        let ageUnit: string = this.parent.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS');
+        let ageValue: number = _.get(entity, 'age.years', 0);
+        const ageMonths = _.get(entity, 'age.months', 0);
+        if (ageMonths > 0) {
+          // show age in months
+          ageUnit = this.parent.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS');
+          ageValue = ageMonths;
+        }
+
+        // push age
+        lightObject.push({
+          label: 'LNG_CASE_FIELD_LABEL_AGE',
+          value: `${ageValue} ${ageUnit}`
+        });
+      }
+
+      // gender
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'gender'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_GENDER',
           value: entity.gender
-        }, {
+        });
+      }
+
+      // occupation
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'occupation'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
           value: entity.occupation
-        }, {
+        });
+      }
+
+      // visualId
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'visualId'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_LAST_VISUAL_ID',
           value: entity.visualId
-        }, {
+        });
+      }
+
+      // riskLevel
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'riskLevel'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
           value: entity.riskLevel
-        }, {
+        });
+      }
+
+      // riskReason
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'riskReason'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
           value: entity.riskReason
-        }
-      );
+        });
+      }
     }
 
     // entity type = Case
     if (entity instanceof CaseModel) {
-      lightObject.push(
-        {
+      // classification
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'classification'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
           value: entity.classification
-        }, {
+        });
+      }
+
+      // dateOfOnset
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'dateOfOnset'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
           value: entity.dateOfOnset ?
             moment(entity.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
-        }, {
+        });
+      }
+
+      // dateBecomeCase
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'dateBecomeCase'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
           value: entity.dateBecomeCase ?
             moment(entity.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
-        }, {
+        });
+      }
+
+      // dateOfInfection
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'dateOfInfection'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
           value: entity.dateOfInfection ?
             moment(entity.dateOfInfection).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
-        }, {
+        });
+      }
+
+      // outcomeId
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'outcomeId'
+      )) {
+        lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
           value: entity.outcomeId
-        }
-      );
+        });
+      }
     }
 
     // case, contact and contact of contacts
@@ -816,38 +944,86 @@ export class RelationshipHelperModel {
       entity instanceof ContactModel ||
       entity instanceof ContactOfContactModel
     ) {
-      lightObject.push({
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-        value: entity.dateOfReporting ?
-          moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-          ''
-      });
+      // dateOfReporting
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'dateOfReporting'
+      )) {
+        lightObject.push({
+          label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+          value: entity.dateOfReporting ?
+            moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            ''
+        });
+      }
     }
 
     // entity type = Event
     if (entity instanceof EventModel) {
-      lightObject.push(
-        {
+      // name
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'name'
+      )) {
+        lightObject.push({
           label: 'LNG_EVENT_FIELD_LABEL_NAME',
           value: entity.name
-        }, {
+        });
+      }
+
+      // visualId
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'visualId'
+      )) {
+        lightObject.push({
           label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
           value: entity.visualId
-        }, {
+        });
+      }
+
+      // date
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'date'
+      )) {
+        lightObject.push({
           label: 'LNG_EVENT_FIELD_LABEL_DATE',
           value: entity.date ?
             moment(entity.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
-        }, {
+        });
+      }
+
+      // description
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'description'
+      )) {
+        lightObject.push({
           label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
           value: entity.description
-        }, {
+        });
+      }
+
+      // dateOfReporting
+      if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+        useToFilterOutbreak,
+        visibleMandatoryKey,
+        'dateOfReporting'
+      )) {
+        lightObject.push({
           label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
           value: entity.dateOfReporting ?
             moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
-        }
-      );
+        });
+      }
     }
 
     // finished
@@ -858,6 +1034,7 @@ export class RelationshipHelperModel {
    * Get light relationship
    */
   lightRelationship(
+    useToFilterOutbreak: OutbreakModel,
     relationship: RelationshipModel
   ): ILabelValuePairModel[] {
     // determine source and target
@@ -866,42 +1043,111 @@ export class RelationshipHelperModel {
     const destinationPeople = _.find(relationship.people, (people) => people.model.id !== sourcePerson.id);
 
     // create list of fields to display
-    const lightObject: ILabelValuePairModel[] = [];
-    lightObject.push(
-      {
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE',
-        value: sourcePeople.model.name
-      }, {
-        label: 'LNG_RELATIONSHIP_FIELD_LABEL_TARGET',
-        value: destinationPeople.model.name
-      }, {
+    const lightObject: ILabelValuePairModel[] = [{
+      label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE',
+      value: sourcePeople.model.name
+    }, {
+      label: 'LNG_RELATIONSHIP_FIELD_LABEL_TARGET',
+      value: destinationPeople.model.name
+    }];
+
+    // contactDate
+    if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+      useToFilterOutbreak,
+      this.visibleMandatoryKey,
+      'contactDate'
+    )) {
+      lightObject.push({
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
         value: relationship.contactDate ?
           moment(relationship.contactDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
           ''
-      }, {
+      });
+    }
+
+    // certaintyLevelId
+    if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+      useToFilterOutbreak,
+      this.visibleMandatoryKey,
+      'certaintyLevelId'
+    )) {
+      lightObject.push({
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
         value: relationship.certaintyLevelId
-      }, {
+      });
+    }
+
+    // exposureTypeId
+    if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+      useToFilterOutbreak,
+      this.visibleMandatoryKey,
+      'exposureTypeId'
+    )) {
+      lightObject.push({
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
         value: relationship.exposureTypeId
-      }, {
+      });
+    }
+
+    // exposureFrequencyId
+    if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+      useToFilterOutbreak,
+      this.visibleMandatoryKey,
+      'exposureFrequencyId'
+    )) {
+      lightObject.push({
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
         value: relationship.exposureFrequencyId
-      }, {
+      });
+    }
+
+    // exposureDurationId
+    if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+      useToFilterOutbreak,
+      this.visibleMandatoryKey,
+      'exposureDurationId'
+    )) {
+      lightObject.push({
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
         value: relationship.exposureDurationId
-      }, {
+      });
+    }
+
+    // socialRelationshipTypeId
+    if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+      useToFilterOutbreak,
+      this.visibleMandatoryKey,
+      'socialRelationshipTypeId'
+    )) {
+      lightObject.push({
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
         value: relationship.socialRelationshipTypeId
-      }, {
+      });
+    }
+
+    // socialRelationshipDetail
+    if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+      useToFilterOutbreak,
+      this.visibleMandatoryKey,
+      'socialRelationshipDetail'
+    )) {
+      lightObject.push({
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
         value: relationship.socialRelationshipDetail
-      }, {
+      });
+    }
+
+    // comment
+    if (this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+      useToFilterOutbreak,
+      this.visibleMandatoryKey,
+      'comment'
+    )) {
+      lightObject.push({
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
         value: relationship.comment
-      }
-    );
+      });
+    }
 
     // finished
     return lightObject;

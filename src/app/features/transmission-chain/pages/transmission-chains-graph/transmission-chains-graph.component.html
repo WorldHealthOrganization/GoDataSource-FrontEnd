@@ -24,12 +24,13 @@
         [class.multiple-selected]="selectedNodes.nodes.length > 1">
         <mat-card>
             <app-person-summary
-                [person]="person"
-                (remove)="removeSelectedNode(index)"
-                (modifyPerson)="modifySelectedPerson($event)"
-                (deletePerson)="deleteSelectedPerson($event)"
-                (createContact)="createContactForSelectedPerson($event)"
-                (createContactOfContact)="createContactOfContactForSelectedPerson($event)"
+              [selectedOutbreak]="selectedOutbreak"
+              [person]="person"
+              (remove)="removeSelectedNode(index)"
+              (modifyPerson)="modifySelectedPerson($event)"
+              (deletePerson)="deleteSelectedPerson($event)"
+              (createContact)="createContactForSelectedPerson($event)"
+              (createContactOfContact)="createContactOfContactForSelectedPerson($event)"
             ></app-person-summary>
         </mat-card>
     </div>
@@ -42,11 +43,12 @@
         [class.selected-relationship-edit]="selectedRelationship && currentNodeAction === NodeAction.MODIFY_EDGE">
         <mat-card>
             <app-relationship-summary
-                [relationship]="selectedRelationship"
-                (remove)="removeRelationship()"
-                (modifyRelationship)="modifySelectedRelationship()"
-                (deleteRelationship)="deleteSelectedRelationship()"
-                (reverseRelationshipPersons)="refreshAfterReverseRelationshipPersons()">
+              [selectedOutbreak]="selectedOutbreak"
+              [relationship]="selectedRelationship"
+              (remove)="removeRelationship()"
+              (modifyRelationship)="modifySelectedRelationship()"
+              (deleteRelationship)="deleteSelectedRelationship()"
+              (reverseRelationshipPersons)="refreshAfterReverseRelationshipPersons()">
             </app-relationship-summary>
         </mat-card>
     </div>
@@ -178,7 +180,7 @@
         <div class="create-contact-header">
             <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_TITLE' | translate}}</h1>
         </div>
-        
+
         <form #form="ngForm" (submit)="createContact(form)" class="create-contact-content">
 
             <div fxLayout="column" fxLayoutGap="0.8rem" fxLayoutAlign="start start">

@@ -12,7 +12,7 @@ if (environment.production) {
 // disable warnings for now
 // #TODO - enable deprecation warning by removing this code once this is addressed in the entire website
 (moment as any).suppressDeprecationWarnings = true;
-// #TODO remove once proper fix found
+// #TODO remove once proper fix
 ({} as IData);
 
 // eslint-disable-next-line no-console
