@@ -70,6 +70,15 @@ export abstract class BulkCreateModifyComponent<T, U extends (V2SpreadsheetEdito
 
             // attach required
             (column.validators as IV2SpreadsheetEditorColumnValidatorRequired).required = () => true;
+          } else if (
+            this.selectedOutbreak?.visibleAndMandatoryFields &&
+            this.selectedOutbreak.visibleAndMandatoryFields[column.visibleMandatory.key] &&
+            !this.selectedOutbreak.visibleAndMandatoryFields[column.visibleMandatory.key][column.visibleMandatory.field]?.mandatory &&
+            (column.validators as IV2SpreadsheetEditorColumnValidatorRequired)?.required &&
+            !column.visibleMandatory.keepRequired
+          ) {
+            // remove if it shouldn't be mandatory
+            delete (column.validators as IV2SpreadsheetEditorColumnValidatorRequired).required;
           }
 
           // add
