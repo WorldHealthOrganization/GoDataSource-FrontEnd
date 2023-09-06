@@ -1,6 +1,22 @@
 import { IV2Column } from '../../../../components-v2/app-list-table-v2/models/column.model';
 import { V2AdvancedFilter } from '../../../../components-v2/app-list-table-v2/models/advanced-filter.model';
 import { V2SpreadsheetEditorColumn } from '../../../../components-v2/app-spreadsheet-editor-v2/models/column.model';
+import { QuickEditorV2Input } from '../../../../components-v2/app-quick-editor-v2/models/input.model';
+
+/**
+ * Used by quick editor to configure specific things for visible/mandatory columns
+ */
+export type QuickEditorV2InputToVisibleMandatoryConf = QuickEditorV2Input & {
+  // required
+  visibleMandatory: {
+    // required
+    key: string,
+    field: string,
+
+    // optional
+    keepRequired?: boolean
+  };
+};
 
 /**
  * Used by lists to configure specific things for visible/mandatory columns
@@ -49,8 +65,12 @@ export interface ICreateViewModifyV2TabInputToVisibleMandatorySectionConf {
 export type V2SpreadsheetEditorColumnToVisibleMandatoryConf = V2SpreadsheetEditorColumn & {
   // required
   visibleMandatory: {
+    // required
     key: string,
-    field: string
+    field: string,
+
+    // optional
+    keepRequired?: boolean
   };
 };
 
