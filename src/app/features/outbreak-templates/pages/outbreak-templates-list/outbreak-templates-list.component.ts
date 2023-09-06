@@ -497,6 +497,19 @@ export class OutbreakTemplatesListComponent
         }
       },
       {
+        field: 'generateFollowUpsWhenCreatingContacts',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CONTACTS',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
         field: 'applyGeographicRestrictions',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS',
         notVisible: true,
@@ -798,6 +811,7 @@ export class OutbreakTemplatesListComponent
       'generateFollowUpsOverwriteExisting',
       'generateFollowUpsKeepTeamAssignment',
       'generateFollowUpsDateOfLastContact',
+      'generateFollowUpsWhenCreatingContacts',
       'applyGeographicRestrictions',
       'isContactLabResultsActive',
       'isDateOfOnsetRequired',

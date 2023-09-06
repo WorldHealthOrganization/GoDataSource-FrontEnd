@@ -46,6 +46,7 @@ export class OutbreakTemplateModel
   generateFollowUpsKeepTeamAssignment: boolean;
   generateFollowUpsTeamAssignmentAlgorithm: string;
   generateFollowUpsDateOfLastContact: boolean;
+  generateFollowUpsWhenCreatingContacts: boolean;
 
   allowedRefDataItems: ITreeEditorDataValue;
   visibleAndMandatoryFields: IVisibleMandatoryDataValue;
@@ -107,6 +108,7 @@ export class OutbreakTemplateModel
     this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
     this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
     this.generateFollowUpsDateOfLastContact = _.get(data, 'generateFollowUpsDateOfLastContact', false);
+    this.generateFollowUpsWhenCreatingContacts = _.get(data, 'generateFollowUpsWhenCreatingContacts', false);
     this.allowedRefDataItems = _.get(data, 'allowedRefDataItems');
 
     // CASE INVESTIGATION TEMPLATE

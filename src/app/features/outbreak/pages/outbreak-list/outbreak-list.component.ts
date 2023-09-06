@@ -831,6 +831,20 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
         }
       },
       {
+        field: 'generateFollowUpsWhenCreatingContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CONTACTS',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
         field: 'locationIds',
         label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATIONS',
         format: {
@@ -1216,6 +1230,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
       'isContactLabResultsActive',
       'isDateOfOnsetRequired',
       'generateFollowUpsDateOfLastContact',
+      'generateFollowUpsWhenCreatingContacts',
       'locationIds',
       'description',
       'eventIdMask',

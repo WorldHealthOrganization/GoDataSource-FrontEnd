@@ -1527,8 +1527,34 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                 EntityType.CONTACT,
                 contact.id,
                 relationship
-              )
-              .pipe(map(() => contact));
+              ).pipe(
+                map(() => contact)
+              );
+          }),
+          // generate follow-ups if create
+          switchMap((contact: ContactModel) => {
+            // do not generate follow-ups if the feature is not enabled
+            if (!this.selectedOutbreak.generateFollowUpsWhenCreatingContacts) {
+              return of(contact);
+            }
+
+            // generate follow-ups
+            return this.personAndRelatedHelperService.followUp.followUpsDataService
+              .generateFollowUps(
+                this.selectedOutbreak.id,
+                {
+                  contactIds: [contact.id]
+                }
+              ).pipe(
+                catchError((err) => {
+                  // show error
+                  this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                  // send the contact
+                  return of(contact);
+                }),
+                map(() => contact)
+              );
           }),
 
           // handle error

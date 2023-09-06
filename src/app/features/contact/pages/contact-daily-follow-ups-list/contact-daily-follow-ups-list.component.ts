@@ -2450,12 +2450,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       this.personAndRelatedHelperService.followUp.followUpsDataService
         .generateFollowUps(
           this.selectedOutbreak.id,
-          (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.startDate,
-          (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.endDate,
-          (response.data.map.targeted as IV2SideDialogConfigInputToggleCheckbox).value as unknown as boolean,
-          (response.data.map.overwriteExistingFollowUps as IV2SideDialogConfigInputSingleDropdown).value as unknown as boolean,
-          (response.data.map.keepTeamAssignment as IV2SideDialogConfigInputSingleDropdown).value as unknown as boolean,
-          (response.data.map.intervalOfFollowUp as IV2SideDialogConfigInputText).value
+          {
+            startDate: (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.startDate,
+            endDate: (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.endDate,
+            targeted: (response.data.map.targeted as IV2SideDialogConfigInputToggleCheckbox).value as unknown as boolean,
+            overwriteExistingFollowUps: (response.data.map.overwriteExistingFollowUps as IV2SideDialogConfigInputSingleDropdown).value as unknown as boolean,
+            keepTeamAssignment: (response.data.map.keepTeamAssignment as IV2SideDialogConfigInputSingleDropdown).value as unknown as boolean,
+            intervalOfFollowUp: (response.data.map.intervalOfFollowUp as IV2SideDialogConfigInputText).value
+          }
         )
         .pipe(
           catchError((err) => {
