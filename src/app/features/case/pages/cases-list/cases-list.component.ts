@@ -619,10 +619,10 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               }
             },
 
-            // See contacts follow-us belonging to this case
+            // See follow-ups for related contacts
             {
               label: {
-                get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS'
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS_FOR_RELATED_CONTACTS'
               },
               action: {
                 link: (item: CaseModel): string[] => {
@@ -631,6 +631,23 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               },
               visible: (item: CaseModel): boolean => {
                 return !item.deleted &&
+                  FollowUpModel.canList(this.authUser);
+              }
+            },
+
+            // See follow-ups registered as a contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS'
+              },
+              action: {
+                link: (item: CaseModel): string[] => {
+                  return ['/contacts', 'case-follow-ups', item.id];
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  item.wasContact &&
                   FollowUpModel.canList(this.authUser);
               }
             },

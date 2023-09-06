@@ -677,7 +677,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
 
     // add follow-ups breadcrumbs
     this.breadcrumbs.push({
-      label: this.entityData.type === EntityType.CONTACT ? 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
+      label: this.entityData.type === EntityType.CONTACT ? 'LNG_PAGE_LIST_FOLLOW_UPS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
       action: null
     });
   }
@@ -805,6 +805,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
               const followUpFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
 
               // show export
+              const fileName: string = this.entityData.type === EntityType.CONTACT ?
+                'LNG_PAGE_LIST_FOLLOW_UPS_CONTACT_TITLE' :
+                'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE';
               finished({
                 title: {
                   get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE'
@@ -813,7 +816,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                   url: `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE')} - ${moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant(fileName)} - ${moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}`,
                   queryBuilder: qb,
                   allow: {
                     types: [

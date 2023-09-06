@@ -1155,7 +1155,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: 'follow_ups',
-      label: 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS',
+      label: 'LNG_PAGE_MODIFY_CONTACT_TAB_FOLLOW_UPS_TITLE',
       visible: () => this.isView &&
         FollowUpModel.canList(this.authUser),
       definition: {

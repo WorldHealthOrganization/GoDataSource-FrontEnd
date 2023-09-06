@@ -487,18 +487,19 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               }
             },
 
-            // See contacts follow-us belonging to this contact of contact
+            // See follow-ups registered as a contact
             {
               label: {
                 get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_FOLLOW_UPS'
               },
               action: {
                 link: (item: ContactOfContactModel): string[] => {
-                  return ['/contacts', 'contact-of-contact-related-follow-ups', item.id];
+                  return ['/contacts', 'contact-of-contact-follow-ups', item.id];
                 }
               },
               visible: (item: ContactOfContactModel): boolean => {
                 return !item.deleted &&
+                  item.wasContact &&
                   FollowUpModel.canList(this.authUser);
               }
             },
