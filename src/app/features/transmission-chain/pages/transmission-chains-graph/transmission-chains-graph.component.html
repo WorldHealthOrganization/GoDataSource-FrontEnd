@@ -90,11 +90,9 @@
                     </button>
                 </div>
 
-                <app-form-relationship-quick
-                    name="relationship"
-                    [ngModel]="newRelationship"
-                    required="true"
-                ></app-form-relationship-quick>
+                <!-- Relationship -->
+                <app-quick-editor-v2
+                  [quick]="retrieveQuickInputHandlers(newRelationship)"></app-quick-editor-v2>
 
                 <div class="create-relationship-footer" fxLayout="row" fxLayoutAlign="center center">
                     <button mat-flat-button color="primary" type="submit">

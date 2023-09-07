@@ -551,7 +551,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
     // prepare relationship data
-    const relationshipData = fields.relationship;
+    const relationshipData = fields;
     relationshipData.persons = [{
       id: targetPerson.id
     }];
