@@ -85,6 +85,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   newRelationship = new RelationshipModel();
   // new contact model
   newContact = new ContactModel();
+  newContactOfContact = new ContactOfContactModel();
 
   // quick editor
   private _quickEditorDefinition: {
@@ -517,6 +518,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   resetFormModels() {
     // reset Contact model
     this.newContact = new ContactModel();
+    this.newContactOfContact = new ContactOfContactModel();
 
     // reset Relationship model
     this.newRelationship = new RelationshipModel();

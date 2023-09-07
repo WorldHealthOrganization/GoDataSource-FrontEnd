@@ -207,20 +207,19 @@
                     {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_LABEL_CONTACT_FIELDS' | translate}}
                 </span>
 
-                <app-form-contact-of-contact-quick
-                    name="contact"
-                    [ngModel]="newContact"
-                ></app-form-contact-of-contact-quick>
+                <!-- Contact of contact -->
+                <app-quick-editor-v2
+                  parentName="contact"
+                  [quick]="retrieveQuickInputHandlers(newContactOfContact)"></app-quick-editor-v2>
 
                 <span class="section-title">
                     {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_LABEL_RELATIONSHIP_FIELDS' | translate}}
                 </span>
 
-                <app-form-relationship-quick
-                    name="relationship"
-                    [ngModel]="newRelationship"
-                    required="true"
-                ></app-form-relationship-quick>
+                <!-- Relationship -->
+                <app-quick-editor-v2
+                  parentName="relationship"
+                  [quick]="retrieveQuickInputHandlers(newRelationship)"></app-quick-editor-v2>
 
                 <div class="create-contact-footer" fxLayout="row" fxLayoutAlign="center center">
                     <button mat-flat-button color="primary" type="submit">
