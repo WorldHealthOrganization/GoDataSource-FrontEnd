@@ -117,29 +117,10 @@
         </div>
 
         <form #form="ngForm" (submit)="modifyPerson(form)">
-            <app-form-case-quick
-                *ngIf="selectedNodes.nodes[0].type === EntityType.CASE"
-                name="person"
-                [ngModel]="selectedNodes.nodes[0]"
-            ></app-form-case-quick>
 
-            <app-form-contact-quick
-                *ngIf="selectedNodes.nodes[0].type === EntityType.CONTACT"
-                name="person"
-                [ngModel]="selectedNodes.nodes[0]"
-            ></app-form-contact-quick>
-
-            <app-form-event-quick
-                *ngIf="selectedNodes.nodes[0].type === EntityType.EVENT"
-                name="person"
-                [ngModel]="selectedNodes.nodes[0]"
-            ></app-form-event-quick>
-
-            <app-form-contact-of-contact-quick
-                *ngIf="selectedNodes.nodes[0].type === EntityType.CONTACT_OF_CONTACT"
-                name="person"
-                [ngModel]="selectedNodes.nodes[0]"
-            ></app-form-contact-of-contact-quick>
+          <!-- Case / Contact / Contact of Contact / Event -->
+          <app-quick-editor-v2
+            [sections]="retrieveQuickInputDefinition(selectedNodes.nodes[0])"></app-quick-editor-v2>
 
             <div class="modify-person-footer" fxLayout="row" fxLayoutAlign="center center">
                 <button mat-flat-button color="primary" type="submit">
