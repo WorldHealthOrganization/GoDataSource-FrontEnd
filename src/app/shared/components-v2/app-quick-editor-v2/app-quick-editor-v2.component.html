@@ -41,7 +41,7 @@
               *ngSwitchCase="QuickEditorV2InputType.TEXT"
               fxFlex
               [ngModel]="input.value.get()"
-              [name]="input.name"
+              [name]="parentName ? (parentName + '[' + input.name + ']') : input.name"
               [placeholder]="input.placeholder"
               [tooltip]="input.description"
               [disabled]="input.disabled ? input.disabled(input) : undefined"
@@ -54,7 +54,7 @@
               *ngSwitchCase="QuickEditorV2InputType.DATE"
               fxFlex
               [ngModel]="input.value.get()"
-              [name]="input.name"
+              [name]="parentName ? (parentName + '[' + input.name + ']') : input.name"
               [placeholder]="input.placeholder"
               [tooltip]="input.description"
               [disabled]="input.disabled ? input.disabled(input) : undefined"
@@ -72,7 +72,7 @@
               *ngSwitchCase="QuickEditorV2InputType.SELECT_SINGLE"
               fxFlex
               [ngModel]="input.value.get()"
-              [name]="input.name"
+              [name]="parentName ? (parentName + '[' + input.name + ']') : input.name"
               [placeholder]="input.placeholder"
               [tooltip]="input.description"
               [options]="input.options"
@@ -86,7 +86,7 @@
               *ngSwitchCase="QuickEditorV2InputType.ASYNC_VALIDATOR_TEXT"
               fxFlex
               [ngModel]="input.value.get()"
-              [name]="input.name"
+              [name]="parentName ? (parentName + '[' + input.name + ']') : input.name"
               [placeholder]="input.placeholder"
               [tooltip]="input.description"
               [disabled]="input.disabled ? input.disabled(input) : undefined"
@@ -102,7 +102,7 @@
               *ngSwitchCase="QuickEditorV2InputType.TEXTAREA"
               fxFlex
               [ngModel]="input.value.get()"
-              [name]="input.name"
+              [name]="parentName ? (parentName + '[' + input.name + ']') : input.name"
               [placeholder]="input.placeholder"
               [disabled]="input.disabled ? input.disabled(input) : undefined"
               [required]="input.validators?.required ? input.validators?.required() : undefined"
@@ -113,7 +113,7 @@
               *ngSwitchCase="QuickEditorV2InputType.TOGGLE_CHECKBOX"
               fxFlex
               [ngModel]="input.value.get()"
-              [name]="input.name"
+              [name]="parentName ? (parentName + '[' + input.name + ']') : input.name"
               [placeholder]="input.placeholder"
               [tooltip]="input.description"
               [disabled]="input.disabled ? input.disabled(input) : undefined"

@@ -26,6 +26,9 @@ export class AppQuickEditorV2Component implements OnDestroy {
     this.retrieveData();
   }
 
+  // parent name
+  @Input() parentName: string;
+
   // resource retrieval
   private _recordSubscription: Subscription;
   private _optionsSubscription: Subscription;

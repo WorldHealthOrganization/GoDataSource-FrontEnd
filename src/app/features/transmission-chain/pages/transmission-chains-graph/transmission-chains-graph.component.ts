@@ -17,7 +17,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import * as _ from 'lodash';
 import { catchError, switchMap } from 'rxjs/operators';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
@@ -88,9 +88,10 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
 
   // quick editor
   private _quickEditorDefinition: {
-    id: string,
-    handlers: IQuickEditorV2Handlers<CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel, QuickEditorV2InputToVisibleMandatoryConf>
-  };
+    [defId: string]: {
+      handlers: IQuickEditorV2Handlers<CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel, QuickEditorV2InputToVisibleMandatoryConf>
+    }
+  } = {};
 
   // timers
   private _scrollToEditModeTimer: number;
@@ -416,6 +417,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
 
   resetNodes() {
     this.selectedNodes = new SelectedNodes();
+    this._quickEditorDefinition = {};
   }
 
   modifySelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
@@ -2074,23 +2076,29 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     item: CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel
   ): IQuickEditorV2Handlers<CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel, QuickEditorV2InputToVisibleMandatoryConf> {
     // do we already have definitions ?
-    if (this._quickEditorDefinition?.id === item.id) {
-      return this._quickEditorDefinition.handlers;
+    const defId: string = item.id ?
+      item.id : (
+        item instanceof RelationshipModel ?
+          'rel' :
+          item.type
+      );
+    if (this._quickEditorDefinition[defId]) {
+      return this._quickEditorDefinition[defId].handlers;
     }
 
     // initialize
     if (item instanceof RelationshipModel) {
       // relationship
-      const sourcePerson = _.find(this.selectedRelationship.persons, (person) => person.source === true);
-      this._quickEditorDefinition = {
-        id: item.id,
+      const sourcePerson = _.find(item.persons, (person) => person.source === true);
+      this._quickEditorDefinition[defId] = {
         handlers: {
-          record$: this.personAndRelatedHelperService.relationship.relationshipDataService.getEntityRelationship(
-            this.selectedOutbreak.id,
-            sourcePerson.type,
-            sourcePerson.id,
-            item.id
-          ),
+          record$: item.id ?
+            this.personAndRelatedHelperService.relationship.relationshipDataService.getEntityRelationship(
+              this.selectedOutbreak.id,
+              sourcePerson.type,
+              sourcePerson.id,
+              item.id
+            ) : of(item),
           definitions: (data) => {
             return this.retrieveQuickInputDefinition(data);
           }
@@ -2098,14 +2106,14 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       };
     } else {
       // case / contact / contact of contact / event
-      this._quickEditorDefinition = {
-        id: item.id,
+      this._quickEditorDefinition[defId] = {
         handlers: {
-          record$: this.entityDataService.getEntity(
-            item.type,
-            this.selectedOutbreak.id,
-            item.id
-          ),
+          record$: item.id ?
+            this.entityDataService.getEntity(
+              item.type,
+              this.selectedOutbreak.id,
+              item.id
+            ) : of(item),
           definitions: (data) => {
             return this.retrieveQuickInputDefinition(data);
           }
@@ -2114,6 +2122,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     }
 
     // finished
-    return this._quickEditorDefinition.handlers;
+    return this._quickEditorDefinition[defId].handlers;
   }
 }
