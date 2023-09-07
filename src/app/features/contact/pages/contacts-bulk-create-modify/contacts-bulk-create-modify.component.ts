@@ -526,7 +526,8 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         visibleMandatory: {
           key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          field: 'addresses.geoLocation'
+          field: 'addresses.geoLocation',
+          keepRequired: true
         },
         field: 'model.mainAddress.geoLocation.lat',
         validators: {
@@ -544,7 +545,8 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         visibleMandatory: {
           key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
-          field: 'addresses.geoLocation'
+          field: 'addresses.geoLocation',
+          keepRequired: true
         },
         field: 'model.mainAddress.geoLocation.lng',
         validators: {

@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
 import { EntityType } from '../../../../core/models/entity-type';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
@@ -23,7 +22,9 @@ import { PersonAndRelatedHelperService } from '../../../../core/services/helper/
   styleUrls: ['./relationship-summary.component.scss']
 })
 export class RelationshipSummaryComponent implements OnInit, OnChanges {
+  @Input() selectedOutbreak: OutbreakModel;
   @Input() relationship: RelationshipModel;
+
   @Output() remove = new EventEmitter<void>();
   @Output() modifyRelationship = new EventEmitter<RelationshipModel>();
   @Output() deleteRelationship = new EventEmitter<RelationshipModel>();
@@ -78,7 +79,6 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
   authUser: UserModel;
   RelationshipModel = RelationshipModel;
 
-  selectedOutbreak: OutbreakModel;
   relationshipData: ILabelValuePairModel[] = [];
 
   relationshipLink: string;
@@ -90,7 +90,6 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
    */
   constructor(
     private authDataService: AuthDataService,
-    private outbreakDataService: OutbreakDataService,
     private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {}
 
@@ -111,13 +110,6 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
      */
   ngOnInit() {
     this.authUser = this.authDataService.getAuthenticatedUser();
-
-    // get selected outbreak
-    this.outbreakDataService
-      .getSelectedOutbreak()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-      });
 
     this.relationshipLink = this.getRelationshipLink();
 
@@ -204,7 +196,10 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
   }
 
   updateRelationshipData(relationship: RelationshipModel) {
-    this.relationshipData = this.personAndRelatedHelperService.relationship.lightRelationship(relationship);
+    this.relationshipData = this.personAndRelatedHelperService.relationship.lightRelationship(
+      this.selectedOutbreak,
+      relationship
+    );
   }
 
   onRemove() {

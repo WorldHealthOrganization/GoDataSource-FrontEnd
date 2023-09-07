@@ -224,6 +224,7 @@ interface ICreateViewModifyV2TabInputEmail extends Omit<ICreateViewModifyV2TabIn
     required?: () => boolean
   };
 }
+
 /**
  * Input - async validator text
  */

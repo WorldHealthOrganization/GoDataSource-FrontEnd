@@ -17,7 +17,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import * as _ from 'lodash';
 import { catchError, switchMap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
@@ -25,6 +25,15 @@ import { TransmissionChainsDashletComponent } from '../../components/transmissio
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { IQuickEditorV2Handlers, IQuickEditorV2InputValidatorRequired, IQuickEditorV2Section, QuickEditorV2InputType } from '../../../../shared/components-v2/app-quick-editor-v2/models/input.model';
+import { QuickEditorV2InputToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { TimerCache } from '../../../../core/helperClasses/timer-cache';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 
 enum NodeAction {
   MODIFY_PERSON = 'modify-person',
@@ -76,6 +85,14 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   newRelationship = new RelationshipModel();
   // new contact model
   newContact = new ContactModel();
+  newContactOfContact = new ContactOfContactModel();
+
+  // quick editor
+  private _quickEditorDefinition: {
+    [defId: string]: {
+      handlers: IQuickEditorV2Handlers<CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel, QuickEditorV2InputToVisibleMandatoryConf>
+    }
+  } = {};
 
   // timers
   private _scrollToEditModeTimer: number;
@@ -91,12 +108,14 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
    */
   constructor(
     private authDataService: AuthDataService,
-    protected route: ActivatedRoute,
+    protected activatedRoute: ActivatedRoute,
     private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService,
     private formHelper: FormHelperService,
     private personAndRelatedHelperService: PersonAndRelatedHelperService,
-    private domService: DomService
+    private domService: DomService,
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private clusterDataService: ClusterDataService
   ) {}
 
   /**
@@ -106,7 +125,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     // authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
 
-    this.route.queryParams
+    this.activatedRoute.queryParams
       .subscribe((params: {
         personId: string,
         selectedEntityType: EntityType,
@@ -147,6 +166,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
+
+        // cleanup
+        this.removeRelationship();
+        this.resetFormModels();
+        this.resetNodes();
+        this.currentNodeAction = null;
       });
   }
 
@@ -393,6 +418,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
 
   resetNodes() {
     this.selectedNodes = new SelectedNodes();
+    this._quickEditorDefinition = {};
   }
 
   modifySelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
@@ -492,6 +518,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   resetFormModels() {
     // reset Contact model
     this.newContact = new ContactModel();
+    this.newContactOfContact = new ContactOfContactModel();
 
     // reset Relationship model
     this.newRelationship = new RelationshipModel();
@@ -524,7 +551,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
     // prepare relationship data
-    const relationshipData = fields.relationship;
+    const relationshipData = fields;
     relationshipData.persons = [{
       id: targetPerson.id
     }];
@@ -817,7 +844,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         sourcePerson.type,
         sourcePerson.id,
         this.selectedRelationship.id,
-        dirtyFields.relationship
+        dirtyFields
       )
       .pipe(
         catchError((err) => {
@@ -917,5 +944,1186 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
 
     // reset node action
     this.currentNodeAction = null;
+  }
+
+  /**
+   * Section filter per outbreak visible and mandatory fields
+   */
+  private filterVisibleMandatorySectionFields(sections: IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[]): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
+    // filter
+    sections.forEach((section) => {
+      // filter
+      section.inputs = (section.inputs || []).filter((input) => {
+        // not visible ?
+        if (!this.personAndRelatedHelperService.list.shouldVisibleMandatoryTableColumnBeVisible(
+          this.selectedOutbreak,
+          input.visibleMandatory.key,
+          input.visibleMandatory.field
+        )) {
+          return false;
+        }
+
+        // must check for required ?
+        if (
+          this.selectedOutbreak?.visibleAndMandatoryFields &&
+          this.selectedOutbreak.visibleAndMandatoryFields[input.visibleMandatory.key] &&
+          this.selectedOutbreak.visibleAndMandatoryFields[input.visibleMandatory.key][input.visibleMandatory.field]?.mandatory
+        ) {
+          // must initialize ?
+          if (!input.validators) {
+            input.validators = {};
+          }
+
+          // attach required
+          if (!(input.validators as IQuickEditorV2InputValidatorRequired)?.required) {
+            (input.validators as IQuickEditorV2InputValidatorRequired).required = () => true;
+          }
+        } else if (
+          this.selectedOutbreak?.visibleAndMandatoryFields &&
+          this.selectedOutbreak.visibleAndMandatoryFields[input.visibleMandatory.key] &&
+          !this.selectedOutbreak.visibleAndMandatoryFields[input.visibleMandatory.key][input.visibleMandatory.field]?.mandatory &&
+          (input.validators as IQuickEditorV2InputValidatorRequired)?.required &&
+          !input.visibleMandatory.keepRequired
+        ) {
+          // remove if it shouldn't be mandatory
+          delete (input.validators as IQuickEditorV2InputValidatorRequired).required;
+        }
+
+        // visible
+        return true;
+      });
+    });
+
+    // finished
+    return sections;
+  }
+
+  /**
+   * Update quick editor definitions - case
+   */
+  private retrieveQuickInputCaseDefinition(caseModel: CaseModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
+    // init
+    const today = Constants.getCurrentDate();
+    const caseVisualIDMask: {
+      mask: string
+    } = {
+      mask: this.personAndRelatedHelperService.case.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+    };
+
+    // generate definition
+    return this.filterVisibleMandatorySectionFields([
+      {
+        label: 'LNG_FORM_CASE_QUICK_LABEL_PERSONAL',
+        inputs: [
+          {
+            type: QuickEditorV2InputType.TEXT,
+            name: 'firstName',
+            placeholder: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+            description: 'LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'firstName'
+            },
+            value: {
+              get: () => caseModel.firstName,
+              set: () => {}
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: QuickEditorV2InputType.TEXT,
+            name: 'lastName',
+            placeholder: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+            description: 'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'lastName'
+            },
+            value: {
+              get: () => caseModel.lastName,
+              set: () => {}
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'gender',
+            placeholder: 'LNG_CASE_FIELD_LABEL_GENDER',
+            description: 'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'gender'
+            },
+            value: {
+              get: () => caseModel.gender,
+              set: () => {}
+            },
+            options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'occupation',
+            placeholder: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+            description: 'LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'occupation'
+            },
+            value: {
+              get: () => caseModel.occupation,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              caseModel.occupation
+            )
+          }, {
+            type: QuickEditorV2InputType.ASYNC_VALIDATOR_TEXT,
+            name: 'visualId',
+            placeholder: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+            description: this.personAndRelatedHelperService.i18nService.instant(
+              'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+              caseVisualIDMask
+            ),
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'visualId'
+            },
+            value: {
+              get: () => caseModel.visualId,
+              set: (value) => {
+                caseModel.visualId = value;
+              }
+            },
+            suffixIconButtons: [
+              {
+                icon: 'refresh',
+                tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+                clickAction: (input) => {
+                  // generate
+                  caseModel.visualId = this.personAndRelatedHelperService.case.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
+
+                  // mark as dirty
+                  input.control?.markAsDirty();
+                }
+              }
+            ],
+            validators: {
+              async: new Observable((observer) => {
+                // construct cache key
+                const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
+                  caseVisualIDMask.mask +
+                  caseModel.visualId +
+                  (
+                    caseModel.id ?
+                      caseModel.id :
+                      ''
+                  );
+
+                // get data from cache or execute validator
+                TimerCache.run(
+                  cacheKey,
+                  this.personAndRelatedHelperService.case.caseDataService.checkCaseVisualIDValidity(
+                    this.selectedOutbreak.id,
+                    caseVisualIDMask.mask,
+                    caseModel.visualId,
+                    caseModel.id
+                  )
+                ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                  observer.next(isValid);
+                  observer.complete();
+                });
+              })
+            }
+          }
+        ]
+      }, {
+        label: 'LNG_FORM_CASE_QUICK_LABEL_EPIDEMIOLOGY',
+        inputs: [
+          {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'classification',
+            placeholder: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            description: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'classification'
+            },
+            value: {
+              get: () => caseModel.classification,
+              set: () => {}
+            },
+            validators: {
+              required: () => true
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              caseModel.classification
+            )
+          }, {
+            type: QuickEditorV2InputType.DATE,
+            name: 'dateOfOnset',
+            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+            description: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'dateOfOnset'
+            },
+            value: {
+              get: () => caseModel.dateOfOnset,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => !!this.selectedOutbreak?.isDateOfOnsetRequired,
+              dateSameOrBefore: () => [
+                today,
+                'dateOfOutcome'
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'outcomeId',
+            placeholder: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            description: 'LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'outcomeId'
+            },
+            value: {
+              get: () => caseModel.outcomeId,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              caseModel.outcomeId
+            )
+          }, {
+            type: QuickEditorV2InputType.DATE,
+            name: 'dateOfOutcome',
+            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+            description: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'dateOfOutcome'
+            },
+            value: {
+              get: () => caseModel.dateOfOutcome,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => !!this.selectedOutbreak?.isDateOfOnsetRequired,
+              dateSameOrBefore: () => [
+                today
+              ],
+              dateSameOrAfter: () => [
+                'dateOfOnset'
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.DATE,
+            name: 'dateOfReporting',
+            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+            description: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'dateOfReporting'
+            },
+            value: {
+              get: () => caseModel.dateOfReporting,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'riskLevel',
+            placeholder: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            description: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'riskLevel'
+            },
+            value: {
+              get: () => caseModel.riskLevel,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              caseModel.riskLevel
+            )
+          }, {
+            type: QuickEditorV2InputType.TEXTAREA,
+            name: 'riskReason',
+            placeholder: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+            description: 'LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.case.visibleMandatoryKey,
+              field: 'riskReason'
+            },
+            value: {
+              get: () => caseModel.riskReason,
+              set: () => {}
+            }
+          }
+        ]
+      }
+    ]);
+  }
+
+  /**
+   * Update quick editor definitions - contact
+   */
+  private retrieveQuickInputContactDefinition(contactModel: ContactModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
+    // init
+    const today = Constants.getCurrentDate();
+    const contactVisualIDMask: {
+      mask: string
+    } = {
+      mask: this.personAndRelatedHelperService.contact.generateContactIDMask(this.selectedOutbreak.contactIdMask)
+    };
+
+    // generate definition
+    return this.filterVisibleMandatorySectionFields([
+      {
+        label: 'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_TITLE',
+        inputs: [
+          {
+            type: QuickEditorV2InputType.TEXT,
+            name: 'firstName',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+            description: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+              field: 'firstName'
+            },
+            value: {
+              get: () => contactModel.firstName,
+              set: () => {}
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: QuickEditorV2InputType.TEXT,
+            name: 'lastName',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+            description: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+              field: 'lastName'
+            },
+            value: {
+              get: () => contactModel.lastName,
+              set: () => {}
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'gender',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_GENDER',
+            description: 'LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+              field: 'gender'
+            },
+            value: {
+              get: () => contactModel.gender,
+              set: () => {}
+            },
+            options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'occupation',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+            description: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+              field: 'occupation'
+            },
+            value: {
+              get: () => contactModel.occupation,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              contactModel.occupation
+            )
+          }, {
+            type: QuickEditorV2InputType.ASYNC_VALIDATOR_TEXT,
+            name: 'visualId',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+            description: this.personAndRelatedHelperService.i18nService.instant(
+              'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+              contactVisualIDMask
+            ),
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+              field: 'visualId'
+            },
+            value: {
+              get: () => contactModel.visualId,
+              set: (value) => {
+                contactModel.visualId = value;
+              }
+            },
+            suffixIconButtons: [
+              {
+                icon: 'refresh',
+                tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+                clickAction: (input) => {
+                  // generate
+                  contactModel.visualId = this.personAndRelatedHelperService.contact.generateContactIDMask(this.selectedOutbreak.contactIdMask);
+
+                  // mark as dirty
+                  input.control?.markAsDirty();
+                }
+              }
+            ],
+            validators: {
+              async: new Observable((observer) => {
+                // construct cache key
+                const cacheKey: string = 'CCO_' + this.selectedOutbreak.id +
+                  contactVisualIDMask.mask +
+                  contactModel.visualId +
+                  (
+                    contactModel.id ?
+                      contactModel.id :
+                      ''
+                  );
+
+                // get data from cache or execute validator
+                TimerCache.run(
+                  cacheKey,
+                  this.personAndRelatedHelperService.contact.contactDataService.checkContactVisualIDValidity(
+                    this.selectedOutbreak.id,
+                    contactVisualIDMask.mask,
+                    contactModel.visualId,
+                    contactModel.id
+                  )
+                ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                  observer.next(isValid);
+                  observer.complete();
+                });
+              })
+            }
+          }
+        ]
+      }, {
+        label: 'LNG_PAGE_MODIFY_CONTACT_TAB_INFECTION_TITLE',
+        inputs: [
+          {
+            type: QuickEditorV2InputType.DATE,
+            name: 'dateOfReporting',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+            description: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+              field: 'dateOfReporting'
+            },
+            value: {
+              get: () => contactModel.dateOfReporting,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'riskLevel',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
+            description: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+              field: 'riskLevel'
+            },
+            value: {
+              get: () => contactModel.riskLevel,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              contactModel.riskLevel
+            )
+          }, {
+            type: QuickEditorV2InputType.TEXTAREA,
+            name: 'riskReason',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+            description: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+              field: 'riskReason'
+            },
+            value: {
+              get: () => contactModel.riskReason,
+              set: () => {}
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'followUp.status',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+            description: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+              field: 'followUp[status]'
+            },
+            value: {
+              get: () => contactModel.followUp?.status,
+              set: () => {}
+            },
+            options: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          }
+        ]
+      }
+    ]);
+  }
+
+  /**
+   * Update quick editor definitions - event
+   */
+  private retrieveQuickInputEventDefinition(eventModel: EventModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
+    // init
+    const today = Constants.getCurrentDate();
+    const eventVisualIDMask: {
+      mask: string
+    } = {
+      mask: this.personAndRelatedHelperService.event.generateEventIDMask(this.selectedOutbreak.eventIdMask)
+    };
+
+    // generate definition
+    return [
+      {
+        label: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
+        inputs: [
+          {
+            type: QuickEditorV2InputType.TEXT,
+            name: 'name',
+            placeholder: 'LNG_EVENT_FIELD_LABEL_NAME',
+            description: 'LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.event.visibleMandatoryKey,
+              field: 'name'
+            },
+            value: {
+              get: () => eventModel.name,
+              set: () => {}
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: QuickEditorV2InputType.DATE,
+            name: 'date',
+            placeholder: 'LNG_EVENT_FIELD_LABEL_DATE',
+            description: 'LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.event.visibleMandatoryKey,
+              field: 'date'
+            },
+            value: {
+              get: () => eventModel.date,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.DATE,
+            name: 'dateOfReporting',
+            placeholder: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+            description: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.event.visibleMandatoryKey,
+              field: 'dateOfReporting'
+            },
+            value: {
+              get: () => eventModel.dateOfReporting,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.ASYNC_VALIDATOR_TEXT,
+            name: 'visualId',
+            placeholder: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+            description: this.personAndRelatedHelperService.i18nService.instant(
+              'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+              eventVisualIDMask
+            ),
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.event.visibleMandatoryKey,
+              field: 'visualId'
+            },
+            value: {
+              get: () => eventModel.visualId,
+              set: (value) => {
+                eventModel.visualId = value;
+              }
+            },
+            suffixIconButtons: [
+              {
+                icon: 'refresh',
+                tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+                clickAction: (input) => {
+                  // generate
+                  eventModel.visualId = this.personAndRelatedHelperService.event.generateEventIDMask(this.selectedOutbreak.eventIdMask);
+
+                  // mark as dirty
+                  input.control?.markAsDirty();
+                }
+              }
+            ],
+            validators: {
+              async: new Observable((observer) => {
+                // construct cache key
+                const cacheKey: string = 'CEV_' + this.selectedOutbreak.id +
+                  eventVisualIDMask.mask +
+                  eventModel.visualId +
+                  (
+                    eventModel.id ?
+                      eventModel.id :
+                      ''
+                  );
+
+                // get data from cache or execute validator
+                TimerCache.run(
+                  cacheKey,
+                  this.personAndRelatedHelperService.event.eventDataService.checkEventVisualIDValidity(
+                    this.selectedOutbreak.id,
+                    eventVisualIDMask.mask,
+                    eventModel.visualId,
+                    eventModel.id
+                  )
+                ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                  observer.next(isValid);
+                  observer.complete();
+                });
+              })
+            }
+          }, {
+            type: QuickEditorV2InputType.TEXTAREA,
+            name: 'description',
+            placeholder: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+            description: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.event.visibleMandatoryKey,
+              field: 'description'
+            },
+            value: {
+              get: () => eventModel.description,
+              set: () => {}
+            }
+          }
+        ]
+      }
+    ];
+  }
+
+  /**
+   * Update quick editor definitions - contact of contact
+   */
+  private retrieveQuickInputContactOfContactDefinition(contactOfContactModel: ContactOfContactModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
+    // init
+    const today = Constants.getCurrentDate();
+    const contactOfContactVisualIDMask: {
+      mask: string
+    } = {
+      mask: this.personAndRelatedHelperService.contactOfContact.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask)
+    };
+
+    // generate definition
+    return this.filterVisibleMandatorySectionFields([
+      {
+        label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE',
+        inputs: [
+          {
+            type: QuickEditorV2InputType.TEXT,
+            name: 'firstName',
+            placeholder: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
+            description: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+              field: 'firstName'
+            },
+            value: {
+              get: () => contactOfContactModel.firstName,
+              set: () => {}
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: QuickEditorV2InputType.TEXT,
+            name: 'lastName',
+            placeholder: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
+            description: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+              field: 'lastName'
+            },
+            value: {
+              get: () => contactOfContactModel.lastName,
+              set: () => {}
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'gender',
+            placeholder: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
+            description: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+              field: 'gender'
+            },
+            value: {
+              get: () => contactOfContactModel.gender,
+              set: () => {}
+            },
+            options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'occupation',
+            placeholder: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
+            description: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+              field: 'occupation'
+            },
+            value: {
+              get: () => contactOfContactModel.occupation,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              contactOfContactModel.occupation
+            )
+          }, {
+            type: QuickEditorV2InputType.ASYNC_VALIDATOR_TEXT,
+            name: 'visualId',
+            placeholder: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
+            description: this.personAndRelatedHelperService.i18nService.instant(
+              'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+              contactOfContactVisualIDMask
+            ),
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+              field: 'visualId'
+            },
+            value: {
+              get: () => contactOfContactModel.visualId,
+              set: (value) => {
+                contactOfContactModel.visualId = value;
+              }
+            },
+            suffixIconButtons: [
+              {
+                icon: 'refresh',
+                tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+                clickAction: (input) => {
+                  // generate
+                  contactOfContactModel.visualId = this.personAndRelatedHelperService.contactOfContact.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask);
+
+                  // mark as dirty
+                  input.control?.markAsDirty();
+                }
+              }
+            ],
+            validators: {
+              async: new Observable((observer) => {
+                // construct cache key
+                const cacheKey: string = 'CCC_' + this.selectedOutbreak.id +
+                  contactOfContactVisualIDMask.mask +
+                  contactOfContactModel.visualId +
+                  (
+                    contactOfContactModel.id ?
+                      contactOfContactModel.id :
+                      ''
+                  );
+
+                // get data from cache or execute validator
+                TimerCache.run(
+                  cacheKey,
+                  this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService.checkContactOfContactVisualIDValidity(
+                    this.selectedOutbreak.id,
+                    contactOfContactVisualIDMask.mask,
+                    contactOfContactModel.visualId,
+                    contactOfContactModel.id
+                  )
+                ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                  observer.next(isValid);
+                  observer.complete();
+                });
+              })
+            }
+          }
+        ]
+      }, {
+        label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_INFECTION_TITLE',
+        inputs: [
+          {
+            type: QuickEditorV2InputType.DATE,
+            name: 'dateOfReporting',
+            placeholder: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+            description: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+              field: 'dateOfReporting'
+            },
+            value: {
+              get: () => contactOfContactModel.dateOfReporting,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'riskLevel',
+            placeholder: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
+            description: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+              field: 'riskLevel'
+            },
+            value: {
+              get: () => contactOfContactModel.riskLevel,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              contactOfContactModel.riskLevel
+            )
+          }, {
+            type: QuickEditorV2InputType.TEXTAREA,
+            name: 'riskReason',
+            placeholder: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
+            description: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+              field: 'riskReason'
+            },
+            value: {
+              get: () => contactOfContactModel.riskReason,
+              set: () => {}
+            }
+          }
+        ]
+      }
+    ]);
+  }
+
+  /**
+   * Update quick editor definitions - relationship
+   */
+  private retrieveQuickInputRelationshipDefinition(relationship: RelationshipModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
+    // init
+    const today = Constants.getCurrentDate();
+
+    // generate definition
+    return [
+      {
+        label: 'LNG_COMMON_LABEL_DETAILS',
+        inputs: [
+          {
+            type: QuickEditorV2InputType.DATE,
+            name: 'contactDate',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'contactDate'
+            },
+            value: {
+              get: () => relationship.contactDate,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.TOGGLE_CHECKBOX,
+            name: 'contactDateEstimated',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'contactDateEstimated'
+            },
+            value: {
+              get: () => relationship.contactDateEstimated,
+              set: () => {}
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'certaintyLevelId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'certaintyLevelId'
+            },
+            value: {
+              get: () => relationship.certaintyLevelId,
+              set: () => {}
+            },
+            options: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'exposureTypeId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'exposureTypeId'
+            },
+            value: {
+              get: () => relationship.exposureTypeId,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationship.exposureTypeId
+            )
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'exposureFrequencyId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'exposureFrequencyId'
+            },
+            value: {
+              get: () => relationship.exposureFrequencyId,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationship.exposureFrequencyId
+            )
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'exposureDurationId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'exposureDurationId'
+            },
+            value: {
+              get: () => relationship.exposureDurationId,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationship.exposureDurationId
+            )
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'socialRelationshipTypeId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'socialRelationshipTypeId'
+            },
+            value: {
+              get: () => relationship.socialRelationshipTypeId,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationship.socialRelationshipTypeId
+            )
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'clusterId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'clusterId'
+            },
+            value: {
+              get: () => relationship.clusterId,
+              set: () => {}
+            },
+            options: [],
+            optionsLoad: (finished) => {
+              // retrieve only what is needed
+              const qb: RequestQueryBuilder = new RequestQueryBuilder();
+              qb.fields(
+                'id',
+                'name'
+              );
+
+              // sort them
+              qb.sort
+                .by('name', RequestSortDirection.ASC);
+
+              // retrieve clusters
+              this.clusterDataService
+                .getClusterList(
+                  this.selectedOutbreak.id,
+                  qb
+                )
+                .pipe(
+                  catchError((err) => {
+                    this.personAndRelatedHelperService.toastV2Service.error(err);
+                    return throwError(err);
+                  })
+                )
+                .subscribe((clusters) => {
+                  finished(clusters.map((cluster) => ({
+                    label: cluster.name,
+                    value: cluster.id
+                  })));
+                });
+            }
+          }, {
+            type: QuickEditorV2InputType.TEXT,
+            name: 'socialRelationshipDetail',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'socialRelationshipDetail'
+            },
+            value: {
+              get: () => relationship.socialRelationshipDetail,
+              set: () => {}
+            }
+          }
+        ]
+      }
+    ];
+  }
+
+  /**
+   * Retrieve quick editor definition
+   */
+  private retrieveQuickInputDefinition(
+    item: CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel
+  ): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
+    // generate sections
+    let sections: IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[];
+    if (item instanceof RelationshipModel) {
+      sections = this.retrieveQuickInputRelationshipDefinition(item as RelationshipModel);
+    } else {
+      switch (item.type) {
+        case EntityType.CASE:
+          sections = this.retrieveQuickInputCaseDefinition(item as CaseModel);
+          break;
+
+        case EntityType.CONTACT:
+          sections = this.retrieveQuickInputContactDefinition(item as ContactModel);
+          break;
+
+        case EntityType.EVENT:
+          sections = this.retrieveQuickInputEventDefinition(item as EventModel);
+          break;
+
+        case EntityType.CONTACT_OF_CONTACT:
+          sections = this.retrieveQuickInputContactOfContactDefinition(item as ContactOfContactModel);
+          break;
+      }
+    }
+
+    // finished
+    return sections;
+  }
+
+  /**
+   * Retrieve quick editor handlers
+   */
+  retrieveQuickInputHandlers(
+    item: CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel
+  ): IQuickEditorV2Handlers<CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel, QuickEditorV2InputToVisibleMandatoryConf> {
+    // do we already have definitions ?
+    const defId: string = item.id ?
+      item.id : (
+        item instanceof RelationshipModel ?
+          'rel' :
+          item.type
+      );
+    if (this._quickEditorDefinition[defId]) {
+      return this._quickEditorDefinition[defId].handlers;
+    }
+
+    // initialize
+    if (item instanceof RelationshipModel) {
+      // relationship
+      const sourcePerson = _.find(item.persons, (person) => person.source === true);
+      this._quickEditorDefinition[defId] = {
+        handlers: {
+          record$: item.id ?
+            this.personAndRelatedHelperService.relationship.relationshipDataService.getEntityRelationship(
+              this.selectedOutbreak.id,
+              sourcePerson.type,
+              sourcePerson.id,
+              item.id
+            ) : of(item),
+          definitions: (data) => {
+            return this.retrieveQuickInputDefinition(data);
+          }
+        }
+      };
+    } else {
+      // case / contact / contact of contact / event
+      this._quickEditorDefinition[defId] = {
+        handlers: {
+          record$: item.id ?
+            this.entityDataService.getEntity(
+              item.type,
+              this.selectedOutbreak.id,
+              item.id
+            ) : of(item),
+          definitions: (data) => {
+            return this.retrieveQuickInputDefinition(data);
+          }
+        }
+      };
+    }
+
+    // finished
+    return this._quickEditorDefinition[defId].handlers;
   }
 }
