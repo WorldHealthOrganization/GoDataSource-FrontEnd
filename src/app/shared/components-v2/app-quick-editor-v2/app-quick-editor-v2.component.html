@@ -1,113 +1,131 @@
 <div
   class="gd-quick-editor-v2">
 
-  <!-- Render sections -->
+  <!-- Loading data -->
   <div
-    *ngFor="let section of sections"
-    class="gd-quick-editor-v2-section">
-
-    <!-- Label -->
-    <div
-      class="gd-quick-editor-v2-section-label">
-      {{ section.label | translate }}
-    </div>
-
-    <!-- Render inputs -->
-    <div
-      *ngFor="let input of section.inputs"
-      class="gd-quick-editor-v2-section-input">
-
-      <!-- Render input -->
-      <ng-container
-        [ngSwitch]="input.type">
-
-        <!-- Text -->
-        <app-form-input-v2
-          *ngSwitchCase="QuickEditorV2InputType.TEXT"
-          fxFlex
-          [ngModel]="input.value.get()"
-          [name]="input.name"
-          [placeholder]="input.placeholder"
-          [tooltip]="input.description"
-          [disabled]="input.disabled ? input.disabled(input) : undefined"
-          autocomplete="off"
-          [required]="input.validators?.required ? input.validators?.required() : undefined"
-          (ngModelChange)="input.value.set($event)"></app-form-input-v2>
-
-        <!-- Date -->
-        <app-form-date-v2
-          *ngSwitchCase="QuickEditorV2InputType.DATE"
-          fxFlex
-          [ngModel]="input.value.get()"
-          [name]="input.name"
-          [placeholder]="input.placeholder"
-          [tooltip]="input.description"
-          [disabled]="input.disabled ? input.disabled(input) : undefined"
-          autocomplete="off"
-          [required]="input.validators?.required ? input.validators?.required() : undefined"
-          [minDate]="input.minDate"
-          [maxDate]="input.maxDate"
-          app-date-validator
-          [dateSameOrBefore]="input.validators?.dateSameOrBefore ? input.validators?.dateSameOrBefore() : undefined"
-          [dateSameOrAfter]="input.validators?.dateSameOrAfter ? input.validators?.dateSameOrAfter() : undefined"
-          (ngModelChange)="input.value.set($event)"></app-form-date-v2>
-
-        <!-- Dropdown - single -->
-        <app-form-select-single-v2
-          *ngSwitchCase="QuickEditorV2InputType.SELECT_SINGLE"
-          fxFlex
-          [ngModel]="input.value.get()"
-          [name]="input.name"
-          [placeholder]="input.placeholder"
-          [tooltip]="input.description"
-          [options]="input.options"
-          [clearable]="input.clearable === undefined || input.clearable"
-          [disabled]="input.disabled ? input.disabled(input) : undefined"
-          [required]="input.validators?.required ? input.validators?.required() : undefined"
-          (ngModelChange)="input.value.set($event)"></app-form-select-single-v2>
-
-        <!-- Async validator text -->
-        <app-form-input-v2
-          *ngSwitchCase="QuickEditorV2InputType.ASYNC_VALIDATOR_TEXT"
-          fxFlex
-          [ngModel]="input.value.get()"
-          [name]="input.name"
-          [placeholder]="input.placeholder"
-          [tooltip]="input.description"
-          [disabled]="input.disabled ? input.disabled(input) : undefined"
-          [suffixIconButtons]="input.suffixIconButtons"
-          autocomplete="off"
-          [required]="input.validators.required ? input.validators.required() : undefined"
-          app-general-async-validator
-          [asyncValidatorObservable]="input.validators.async"
-          (ngModelChange)="input.value.set($event)"></app-form-input-v2>
-
-        <!-- Textarea -->
-        <app-form-textarea-v2
-          *ngSwitchCase="QuickEditorV2InputType.TEXTAREA"
-          fxFlex
-          [ngModel]="input.value.get()"
-          [name]="input.name"
-          [placeholder]="input.placeholder"
-          [disabled]="input.disabled ? input.disabled(input) : undefined"
-          [required]="input.validators?.required ? input.validators?.required() : undefined"
-          (ngModelChange)="input.value.set($event)"></app-form-textarea-v2>
-
-        <!-- Toggle checkbox -->
-        <app-form-toggle-checkbox-v2
-          *ngSwitchCase="QuickEditorV2InputType.TOGGLE_CHECKBOX"
-          fxFlex
-          [ngModel]="input.value.get()"
-          [name]="input.name"
-          [placeholder]="input.placeholder"
-          [tooltip]="input.description"
-          [disabled]="input.disabled ? input.disabled(input) : undefined"
-          (ngModelChange)="input.value.set($event)"></app-form-toggle-checkbox-v2>
-
-      </ng-container>
-
-    </div>
-
+    *ngIf="loading; else displaySections"
+    class="gd-quick-editor-v2-loading">
+    <mat-progress-spinner
+      diameter="24"
+      mode="indeterminate"></mat-progress-spinner>
   </div>
+
+  <!-- Sections -->
+  <ng-template
+    #displaySections>
+    <div
+      class="gd-quick-editor-v2-sections">
+
+      <!-- Render sections -->
+      <div
+        *ngFor="let section of sections"
+        class="gd-quick-editor-v2-sections-section">
+
+        <!-- Label -->
+        <div
+          class="gd-quick-editor-v2-sections-section-label">
+          {{ section.label | translate }}
+        </div>
+
+        <!-- Render inputs -->
+        <div
+          *ngFor="let input of section.inputs"
+          class="gd-quick-editor-v2-sections-section-input">
+
+          <!-- Render input -->
+          <ng-container
+            [ngSwitch]="input.type">
+
+            <!-- Text -->
+            <app-form-input-v2
+              *ngSwitchCase="QuickEditorV2InputType.TEXT"
+              fxFlex
+              [ngModel]="input.value.get()"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.description"
+              [disabled]="input.disabled ? input.disabled(input) : undefined"
+              autocomplete="off"
+              [required]="input.validators?.required ? input.validators?.required() : undefined"
+              (ngModelChange)="input.value.set($event)"></app-form-input-v2>
+
+            <!-- Date -->
+            <app-form-date-v2
+              *ngSwitchCase="QuickEditorV2InputType.DATE"
+              fxFlex
+              [ngModel]="input.value.get()"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.description"
+              [disabled]="input.disabled ? input.disabled(input) : undefined"
+              autocomplete="off"
+              [required]="input.validators?.required ? input.validators?.required() : undefined"
+              [minDate]="input.minDate"
+              [maxDate]="input.maxDate"
+              app-date-validator
+              [dateSameOrBefore]="input.validators?.dateSameOrBefore ? input.validators?.dateSameOrBefore() : undefined"
+              [dateSameOrAfter]="input.validators?.dateSameOrAfter ? input.validators?.dateSameOrAfter() : undefined"
+              (ngModelChange)="input.value.set($event)"></app-form-date-v2>
+
+            <!-- Dropdown - single -->
+            <app-form-select-single-v2
+              *ngSwitchCase="QuickEditorV2InputType.SELECT_SINGLE"
+              fxFlex
+              [ngModel]="input.value.get()"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.description"
+              [options]="input.options"
+              [clearable]="input.clearable === undefined || input.clearable"
+              [disabled]="input.disabled ? input.disabled(input) : undefined"
+              [required]="input.validators?.required ? input.validators?.required() : undefined"
+              (ngModelChange)="input.value.set($event)"></app-form-select-single-v2>
+
+            <!-- Async validator text -->
+            <app-form-input-v2
+              *ngSwitchCase="QuickEditorV2InputType.ASYNC_VALIDATOR_TEXT"
+              fxFlex
+              [ngModel]="input.value.get()"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.description"
+              [disabled]="input.disabled ? input.disabled(input) : undefined"
+              [suffixIconButtons]="input.suffixIconButtons"
+              autocomplete="off"
+              [required]="input.validators.required ? input.validators.required() : undefined"
+              app-general-async-validator
+              [asyncValidatorObservable]="input.validators.async"
+              (ngModelChange)="input.value.set($event)"></app-form-input-v2>
+
+            <!-- Textarea -->
+            <app-form-textarea-v2
+              *ngSwitchCase="QuickEditorV2InputType.TEXTAREA"
+              fxFlex
+              [ngModel]="input.value.get()"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [disabled]="input.disabled ? input.disabled(input) : undefined"
+              [required]="input.validators?.required ? input.validators?.required() : undefined"
+              (ngModelChange)="input.value.set($event)"></app-form-textarea-v2>
+
+            <!-- Toggle checkbox -->
+            <app-form-toggle-checkbox-v2
+              *ngSwitchCase="QuickEditorV2InputType.TOGGLE_CHECKBOX"
+              fxFlex
+              [ngModel]="input.value.get()"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.description"
+              [disabled]="input.disabled ? input.disabled(input) : undefined"
+              (ngModelChange)="input.value.set($event)"></app-form-toggle-checkbox-v2>
+
+          </ng-container>
+
+        </div>
+
+      </div>
+
+    </div>
+  </ng-template>
 
 </div>

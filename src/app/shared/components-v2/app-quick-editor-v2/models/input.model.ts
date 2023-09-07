@@ -145,3 +145,12 @@ export interface IQuickEditorV2Section<T extends QuickEditorV2Input> {
   label: string;
   inputs: T[];
 }
+
+/**
+ * Quick editor handlers
+ */
+export interface IQuickEditorV2Handlers<T, U extends QuickEditorV2Input> {
+  // required
+  record$: Observable<T>;
+  definitions: (data: T) => IQuickEditorV2Section<U>[];
+}

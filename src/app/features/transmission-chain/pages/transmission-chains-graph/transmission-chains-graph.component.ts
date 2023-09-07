@@ -25,7 +25,7 @@ import { TransmissionChainsDashletComponent } from '../../components/transmissio
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
-import { IQuickEditorV2InputValidatorRequired, IQuickEditorV2Section, QuickEditorV2InputType } from '../../../../shared/components-v2/app-quick-editor-v2/models/input.model';
+import { IQuickEditorV2Handlers, IQuickEditorV2InputValidatorRequired, IQuickEditorV2Section, QuickEditorV2InputType } from '../../../../shared/components-v2/app-quick-editor-v2/models/input.model';
 import { QuickEditorV2InputToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -87,7 +87,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   // quick editor
   private _quickEditorDefinition: {
     id: string,
-    sections: IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[]
+    handlers: IQuickEditorV2Handlers<CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel, QuickEditorV2InputToVisibleMandatoryConf>
   };
 
   // timers
@@ -2002,46 +2002,84 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   /**
    * Retrieve quick editor definition
    */
-  retrieveQuickInputDefinition(
+  private retrieveQuickInputDefinition(
     item: CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel
   ): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
-    // do we already have definitions ?
-    if (this._quickEditorDefinition?.id === item.id) {
-      return this._quickEditorDefinition.sections;
-    }
-
     // generate sections
-    // - we need to clone node because in some cases we alter it and we don't want the changes to appear on the graph
     let sections: IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[];
     if (item instanceof RelationshipModel) {
-      sections = this.retrieveQuickInputRelationshipDefinition(_.cloneDeep(item as RelationshipModel));
+      sections = this.retrieveQuickInputRelationshipDefinition(item as RelationshipModel);
     } else {
       switch (item.type) {
         case EntityType.CASE:
-          sections = this.retrieveQuickInputCaseDefinition(_.cloneDeep(item as CaseModel));
+          sections = this.retrieveQuickInputCaseDefinition(item as CaseModel);
           break;
 
         case EntityType.CONTACT:
-          sections = this.retrieveQuickInputContactDefinition(_.cloneDeep(item as ContactModel));
+          sections = this.retrieveQuickInputContactDefinition(item as ContactModel);
           break;
 
         case EntityType.EVENT:
-          sections = this.retrieveQuickInputEventDefinition(_.cloneDeep(item as EventModel));
+          sections = this.retrieveQuickInputEventDefinition(item as EventModel);
           break;
 
         case EntityType.CONTACT_OF_CONTACT:
-          sections = this.retrieveQuickInputContactOfContactDefinition(_.cloneDeep(item as ContactOfContactModel));
+          sections = this.retrieveQuickInputContactOfContactDefinition(item as ContactOfContactModel);
           break;
       }
     }
 
+    // finished
+    return sections;
+  }
+
+  /**
+   * Retrieve quick editor handlers
+   */
+  retrieveQuickInputHandlers(
+    item: CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel
+  ): IQuickEditorV2Handlers<CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel, QuickEditorV2InputToVisibleMandatoryConf> {
+    // do we already have definitions ?
+    if (this._quickEditorDefinition?.id === item.id) {
+      return this._quickEditorDefinition.handlers;
+    }
+
     // initialize
-    this._quickEditorDefinition = {
-      id: item.id,
-      sections
-    };
+    if (item instanceof RelationshipModel) {
+      // relationship
+      const sourcePerson = _.find(this.selectedRelationship.persons, (person) => person.source === true);
+      this._quickEditorDefinition = {
+        id: item.id,
+        handlers: {
+          record$: this.personAndRelatedHelperService.relationship.relationshipDataService.getEntityRelationship(
+            this.selectedOutbreak.id,
+            sourcePerson.type,
+            sourcePerson.id,
+            item.id
+          ),
+          definitions: (data) => {
+            return this.retrieveQuickInputDefinition(data);
+          }
+        }
+      };
+    } else {
+      // case / contact / contact of contact / event
+      this._quickEditorDefinition = {
+        id: item.id,
+        handlers: {
+          record$: this.entityDataService.getEntity(
+            item.type,
+            this.selectedOutbreak.id,
+            item.id
+          ),
+          definitions: (data) => {
+            return this.retrieveQuickInputDefinition(data);
+          }
+        }
+      };
+    }
 
     // finished
-    return this._quickEditorDefinition.sections;
+    return this._quickEditorDefinition.handlers;
   }
 }
