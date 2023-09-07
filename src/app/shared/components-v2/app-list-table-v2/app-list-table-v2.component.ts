@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
-import { Params, Router } from '@angular/router';
+import { Params } from '@angular/router';
 import {
   IV2Column,
   IV2ColumnAction,
@@ -59,6 +59,7 @@ import { AppListTableV2DetailColumnComponent } from './components/detail/app-lis
 import { IV2RowExpandRow, V2RowType } from './models/row.model';
 import { determineIfTouchDevice } from '../../../core/methods/touch-device';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { RedirectService } from '../../../core/services/helper/redirect.service';
 
 /**
  * Component
@@ -619,10 +620,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     protected location: Location,
     protected renderer2: Renderer2,
     protected elementRef: ElementRef,
-    protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected authDataService: AuthDataService,
-    protected toastV2Service: ToastV2Service
+    protected toastV2Service: ToastV2Service,
+    private redirectService: RedirectService
   ) {
     // update bottom section collapse / expand
     this.loadBottomSectionConfig();
@@ -669,10 +670,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         }
 
         // redirect
-        this.router.navigate(
-          [url], {
-            queryParams: params
-          }
+        // - redirect service needed to reload current component if necessary since we're not always listening to url changes to trigger updates
+        this.redirectService.to(
+          [url],
+          params
         );
       }
     );
