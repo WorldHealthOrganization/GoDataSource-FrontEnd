@@ -1077,7 +1077,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             },
             value: {
               get: () => caseModel.visualId,
-              set: () => {}
+              set: (value) => {
+                caseModel.visualId = value;
+              }
             },
             suffixIconButtons: [
               {
@@ -1097,7 +1099,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                 // construct cache key
                 const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
                   caseVisualIDMask.mask +
-                  caseModel.id;
+                  caseModel.visualId +
+                  (
+                    caseModel.id ?
+                      caseModel.id :
+                      ''
+                  );
 
                 // get data from cache or execute validator
                 TimerCache.run(
@@ -1355,7 +1362,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             },
             value: {
               get: () => contactModel.visualId,
-              set: () => {
+              set: (value) => {
+                contactModel.visualId = value;
               }
             },
             suffixIconButtons: [
@@ -1376,7 +1384,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                 // construct cache key
                 const cacheKey: string = 'CCO_' + this.selectedOutbreak.id +
                   contactVisualIDMask.mask +
-                  contactModel.id;
+                  contactModel.visualId +
+                  (
+                    contactModel.id ?
+                      contactModel.id :
+                      ''
+                  );
 
                 // get data from cache or execute validator
                 TimerCache.run(
@@ -1472,8 +1485,152 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   /**
    * Update quick editor definitions - event
    */
-  private retrieveQuickInputEventDefinition(_eventModel: EventModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
-    return [];
+  private retrieveQuickInputEventDefinition(eventModel: EventModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
+    // init
+    const today = Constants.getCurrentDate();
+    const eventVisualIDMask: {
+      mask: string
+    } = {
+      mask: this.personAndRelatedHelperService.event.generateEventIDMask(this.selectedOutbreak.eventIdMask)
+    };
+
+    // generate definition
+    return [
+      {
+        label: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
+        inputs: [
+          {
+            type: QuickEditorV2InputType.TEXT,
+            name: 'name',
+            placeholder: 'LNG_EVENT_FIELD_LABEL_NAME',
+            description: 'LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.event.visibleMandatoryKey,
+              field: 'name'
+            },
+            value: {
+              get: () => eventModel.name,
+              set: () => {
+              }
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: QuickEditorV2InputType.DATE,
+            name: 'date',
+            placeholder: 'LNG_EVENT_FIELD_LABEL_DATE',
+            description: 'LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.event.visibleMandatoryKey,
+              field: 'date'
+            },
+            value: {
+              get: () => eventModel.date,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.DATE,
+            name: 'dateOfReporting',
+            placeholder: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+            description: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.event.visibleMandatoryKey,
+              field: 'dateOfReporting'
+            },
+            value: {
+              get: () => eventModel.dateOfReporting,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.ASYNC_VALIDATOR_TEXT,
+            name: 'visualId',
+            placeholder: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+            description: this.personAndRelatedHelperService.i18nService.instant(
+              'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+              eventVisualIDMask
+            ),
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.event.visibleMandatoryKey,
+              field: 'visualId'
+            },
+            value: {
+              get: () => eventModel.visualId,
+              set: (value) => {
+                eventModel.visualId = value;
+              }
+            },
+            suffixIconButtons: [
+              {
+                icon: 'refresh',
+                tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+                clickAction: (input) => {
+                  // generate
+                  eventModel.visualId = this.personAndRelatedHelperService.event.generateEventIDMask(this.selectedOutbreak.eventIdMask);
+
+                  // mark as dirty
+                  input.control?.markAsDirty();
+                }
+              }
+            ],
+            validators: {
+              async: new Observable((observer) => {
+                // construct cache key
+                const cacheKey: string = 'CEV_' + this.selectedOutbreak.id +
+                  eventVisualIDMask.mask +
+                  eventModel.visualId +
+                  (
+                    eventModel.id ?
+                      eventModel.id :
+                      ''
+                  );
+
+                // get data from cache or execute validator
+                TimerCache.run(
+                  cacheKey,
+                  this.personAndRelatedHelperService.event.eventDataService.checkEventVisualIDValidity(
+                    this.selectedOutbreak.id,
+                    eventVisualIDMask.mask,
+                    eventModel.visualId,
+                    eventModel.id
+                  )
+                ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                  observer.next(isValid);
+                  observer.complete();
+                });
+              })
+            }
+          }, {
+            type: QuickEditorV2InputType.TEXTAREA,
+            name: 'description',
+            placeholder: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+            description: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.event.visibleMandatoryKey,
+              field: 'description'
+            },
+            value: {
+              get: () => eventModel.description,
+              set: () => {}
+            }
+          }
+        ]
+      }
+    ];
   }
 
   /**
