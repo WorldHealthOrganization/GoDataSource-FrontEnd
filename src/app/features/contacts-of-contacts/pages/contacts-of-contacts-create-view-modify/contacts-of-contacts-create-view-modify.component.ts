@@ -1317,25 +1317,6 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             visible: () => ContactOfContactModel.canListLabResult(this.authUser)
           },
 
-          // follow-ups
-          {
-            type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
-            action: {
-              link: () => ['/contacts', 'contact-of-contact-related-follow-ups', this.itemData.id]
-            },
-            visible: () => FollowUpModel.canList(this.authUser)
-          },
-
-          // Divider
-          {
-            type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => ContactOfContactModel.canList(this.authUser) ||
-              ContactOfContactModel.canListRelationshipContacts(this.authUser) ||
-              ContactOfContactModel.canListRelationshipExposures(this.authUser) ||
-              FollowUpModel.canList(this.authUser)
-          },
-
           // movement map
           {
             type: CreateViewModifyV2MenuType.OPTION,
@@ -1354,6 +1335,31 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
               link: () => ['/contacts-of-contacts', this.itemData.id, 'chronology']
             },
             visible: () => ContactOfContactModel.canViewChronologyChart(this.authUser)
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER,
+            visible: () => ContactOfContactModel.canViewMovementMap(this.authUser) || ContactOfContactModel.canViewChronologyChart(this.authUser)
+          },
+
+          // Contact group
+          {
+            type: CreateViewModifyV2MenuType.GROUP,
+            label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_CONTACT_OF_CONTACT_WAS_CONTACT_TITLE',
+            visible: () => this.itemData.wasContact && (
+              FollowUpModel.canList(this.authUser)
+            )
+          },
+
+          // contact of contact => contact follow-ups
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_CONTACT_FOLLOW_UPS',
+            action: {
+              link: () => ['/contacts', 'contact-of-contact-follow-ups', this.itemData.id]
+            },
+            visible: () => this.itemData.wasContact && FollowUpModel.canList(this.authUser)
           }
         ]
       }

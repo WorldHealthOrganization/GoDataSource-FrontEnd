@@ -316,16 +316,6 @@ const routes: Routes = [
       ]
     }
   },
-  // Follow-ups list from a contact of contact
-  {
-    path: 'contact-of-contact-related-follow-ups/:contactOfContactId',
-    ...dailyFollowUpsListFoundation,
-    data: {
-      permissions: [
-        PERMISSION.FOLLOW_UP_LIST
-      ]
-    }
-  },
   // Follow-ups list from a contact
   {
     path: 'contact-related-follow-ups/:contactId',
