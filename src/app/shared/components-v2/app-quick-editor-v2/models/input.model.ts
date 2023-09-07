@@ -90,6 +90,7 @@ export interface IQuickEditorV2InputSingleSelect extends Omit<IQuickEditorV2Inpu
   // optional
   clearable?: boolean;
   validators?: IQuickEditorV2InputValidatorRequired;
+  optionsLoad?: (finished: (options: ILabelValuePairModel[]) => void) => void;
 }
 
 /**

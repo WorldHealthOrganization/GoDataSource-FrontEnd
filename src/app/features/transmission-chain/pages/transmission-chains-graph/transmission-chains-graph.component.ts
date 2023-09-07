@@ -32,6 +32,8 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 
 enum NodeAction {
   MODIFY_PERSON = 'modify-person',
@@ -110,7 +112,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     private formHelper: FormHelperService,
     private personAndRelatedHelperService: PersonAndRelatedHelperService,
     private domService: DomService,
-    private referenceDataHelperService: ReferenceDataHelperService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private clusterDataService: ClusterDataService
   ) {}
 
   /**
@@ -1979,7 +1982,38 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
               get: () => relationship.clusterId,
               set: () => {}
             },
-            options: []
+            options: [],
+            optionsLoad: (finished) => {
+              // retrieve only what is needed
+              const qb: RequestQueryBuilder = new RequestQueryBuilder();
+              qb.fields(
+                'id',
+                'name'
+              );
+
+              // sort them
+              qb.sort
+                .by('name', RequestSortDirection.ASC);
+
+              // retrieve clusters
+              this.clusterDataService
+                .getClusterList(
+                  this.selectedOutbreak.id,
+                  qb
+                )
+                .pipe(
+                  catchError((err) => {
+                    this.personAndRelatedHelperService.toastV2Service.error(err);
+                    return throwError(err);
+                  })
+                )
+                .subscribe((clusters) => {
+                  finished(clusters.map((cluster) => ({
+                    label: cluster.name,
+                    value: cluster.id
+                  })));
+                });
+            }
           }, {
             type: QuickEditorV2InputType.TEXT,
             name: 'socialRelationshipDetail',
