@@ -117,10 +117,9 @@
         </div>
 
         <form #form="ngForm" (submit)="modifyPerson(form)">
-
-          <!-- Case / Contact / Contact of Contact / Event -->
-          <app-quick-editor-v2
-            [sections]="retrieveQuickInputDefinition(selectedNodes.nodes[0])"></app-quick-editor-v2>
+            <!-- Case / Contact / Contact of Contact / Event -->
+            <app-quick-editor-v2
+              [sections]="retrieveQuickInputDefinition(selectedNodes.nodes[0])"></app-quick-editor-v2>
 
             <div class="modify-person-footer" fxLayout="row" fxLayoutAlign="center center">
                 <button mat-flat-button color="primary" type="submit">
@@ -137,12 +136,9 @@
         fxFlex fxLayout="column"
     >
         <form #form="ngForm" (submit)="modifyRelationship(form)">
-            <app-form-relationship-quick
-                name="relationship"
-                [ngModel]="selectedRelationship"
-                required="true"
-            >
-            </app-form-relationship-quick>
+            <!-- Relationship -->
+            <app-quick-editor-v2
+              [sections]="retrieveQuickInputDefinition(selectedRelationship)"></app-quick-editor-v2>
 
             <div class="modify-person-footer" fxLayout="row" fxLayoutAlign="center center">
                 <button mat-flat-button color="primary" type="submit">

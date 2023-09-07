@@ -28,7 +28,8 @@ export enum QuickEditorV2InputType {
   DATE,
   SELECT_SINGLE,
   ASYNC_VALIDATOR_TEXT,
-  TEXTAREA
+  TEXTAREA,
+  TOGGLE_CHECKBOX
 }
 
 /**
@@ -120,9 +121,21 @@ interface IQuickEditorV2InputTextArea extends Omit<IQuickEditorV2InputBase, 'val
 }
 
 /**
+ * Input - toggle checkbox
+ */
+interface IQuickEditorV2InputToggleCheckbox extends Omit<IQuickEditorV2InputBase, 'value'> {
+  // required
+  type: QuickEditorV2InputType.TOGGLE_CHECKBOX;
+  value: IQuickEditorV2InputValue<boolean>;
+
+  // never
+  validators?: never;
+}
+
+/**
  * Input
  */
-export type QuickEditorV2Input = IQuickEditorV2InputText | IQuickEditorV2InputDate | IQuickEditorV2InputSingleSelect | IQuickEditorV2InputAsyncValidatorText | IQuickEditorV2InputTextArea;
+export type QuickEditorV2Input = IQuickEditorV2InputText | IQuickEditorV2InputDate | IQuickEditorV2InputSingleSelect | IQuickEditorV2InputAsyncValidatorText | IQuickEditorV2InputTextArea | IQuickEditorV2InputToggleCheckbox;
 
 /**
  * Section

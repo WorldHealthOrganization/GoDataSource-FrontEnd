@@ -161,6 +161,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
+
+        // cleanup
+        this.removeRelationship();
+        this.resetFormModels();
+        this.resetNodes();
+        this.currentNodeAction = null;
       });
   }
 
@@ -1827,38 +1833,211 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Update quick editor definitions - relationship
+   */
+  private retrieveQuickInputRelationshipDefinition(relationship: RelationshipModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
+    // init
+    const today = Constants.getCurrentDate();
+
+    // generate definition
+    return [
+      {
+        label: 'LNG_COMMON_LABEL_DETAILS',
+        inputs: [
+          {
+            type: QuickEditorV2InputType.DATE,
+            name: 'contactDate',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'contactDate'
+            },
+            value: {
+              get: () => relationship.contactDate,
+              set: () => {}
+            },
+            maxDate: today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                today
+              ]
+            }
+          }, {
+            type: QuickEditorV2InputType.TOGGLE_CHECKBOX,
+            name: 'contactDateEstimated',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'contactDateEstimated'
+            },
+            value: {
+              get: () => relationship.contactDateEstimated,
+              set: () => {}
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'certaintyLevelId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'certaintyLevelId'
+            },
+            value: {
+              get: () => relationship.certaintyLevelId,
+              set: () => {}
+            },
+            options: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'exposureTypeId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'exposureTypeId'
+            },
+            value: {
+              get: () => relationship.exposureTypeId,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationship.exposureTypeId
+            )
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'exposureFrequencyId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'exposureFrequencyId'
+            },
+            value: {
+              get: () => relationship.exposureFrequencyId,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationship.exposureFrequencyId
+            )
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'exposureDurationId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'exposureDurationId'
+            },
+            value: {
+              get: () => relationship.exposureDurationId,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationship.exposureDurationId
+            )
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'socialRelationshipTypeId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'socialRelationshipTypeId'
+            },
+            value: {
+              get: () => relationship.socialRelationshipTypeId,
+              set: () => {}
+            },
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              relationship.socialRelationshipTypeId
+            )
+          }, {
+            type: QuickEditorV2InputType.SELECT_SINGLE,
+            name: 'clusterId',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'clusterId'
+            },
+            value: {
+              get: () => relationship.clusterId,
+              set: () => {}
+            },
+            options: []
+          }, {
+            type: QuickEditorV2InputType.TEXT,
+            name: 'socialRelationshipDetail',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+            description: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
+            visibleMandatory: {
+              key: this.personAndRelatedHelperService.relationship.visibleMandatoryKey,
+              field: 'socialRelationshipDetail'
+            },
+            value: {
+              get: () => relationship.socialRelationshipDetail,
+              set: () => {}
+            }
+          }
+        ]
+      }
+    ];
+  }
+
+  /**
    * Retrieve quick editor definition
    */
-  retrieveQuickInputDefinition(node: CaseModel | ContactModel | EventModel | ContactOfContactModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
+  retrieveQuickInputDefinition(
+    item: CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel
+  ): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
     // do we already have definitions ?
-    if (this._quickEditorDefinition?.id === node.id) {
+    if (this._quickEditorDefinition?.id === item.id) {
       return this._quickEditorDefinition.sections;
     }
 
     // generate sections
     // - we need to clone node because in some cases we alter it and we don't want the changes to appear on the graph
     let sections: IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[];
-    switch (node.type) {
-      case EntityType.CASE:
-        sections = this.retrieveQuickInputCaseDefinition(_.cloneDeep(node as CaseModel));
-        break;
+    if (item instanceof RelationshipModel) {
+      sections = this.retrieveQuickInputRelationshipDefinition(_.cloneDeep(item as RelationshipModel));
+    } else {
+      switch (item.type) {
+        case EntityType.CASE:
+          sections = this.retrieveQuickInputCaseDefinition(_.cloneDeep(item as CaseModel));
+          break;
 
-      case EntityType.CONTACT:
-        sections = this.retrieveQuickInputContactDefinition(_.cloneDeep(node as ContactModel));
-        break;
+        case EntityType.CONTACT:
+          sections = this.retrieveQuickInputContactDefinition(_.cloneDeep(item as ContactModel));
+          break;
 
-      case EntityType.EVENT:
-        sections = this.retrieveQuickInputEventDefinition(_.cloneDeep(node as EventModel));
-        break;
+        case EntityType.EVENT:
+          sections = this.retrieveQuickInputEventDefinition(_.cloneDeep(item as EventModel));
+          break;
 
-      case EntityType.CONTACT_OF_CONTACT:
-        sections = this.retrieveQuickInputContactOfContactDefinition(_.cloneDeep(node as ContactOfContactModel));
-        break;
+        case EntityType.CONTACT_OF_CONTACT:
+          sections = this.retrieveQuickInputContactOfContactDefinition(_.cloneDeep(item as ContactOfContactModel));
+          break;
+      }
     }
 
     // initialize
     this._quickEditorDefinition = {
-      id: node.id,
+      id: item.id,
       sections
     };
 

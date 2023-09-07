@@ -93,6 +93,17 @@
           [required]="input.validators?.required ? input.validators?.required() : undefined"
           (ngModelChange)="input.value.set($event)"></app-form-textarea-v2>
 
+        <!-- Toggle checkbox -->
+        <app-form-toggle-checkbox-v2
+          *ngSwitchCase="QuickEditorV2InputType.TOGGLE_CHECKBOX"
+          fxFlex
+          [ngModel]="input.value.get()"
+          [name]="input.name"
+          [placeholder]="input.placeholder"
+          [tooltip]="input.description"
+          [disabled]="input.disabled ? input.disabled(input) : undefined"
+          (ngModelChange)="input.value.set($event)"></app-form-toggle-checkbox-v2>
+
       </ng-container>
 
     </div>
