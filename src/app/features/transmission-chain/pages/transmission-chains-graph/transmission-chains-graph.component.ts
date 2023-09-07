@@ -840,7 +840,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         sourcePerson.type,
         sourcePerson.id,
         this.selectedRelationship.id,
-        dirtyFields.relationship
+        dirtyFields
       )
       .pipe(
         catchError((err) => {
