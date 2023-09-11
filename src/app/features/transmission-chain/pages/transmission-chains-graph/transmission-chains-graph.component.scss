@@ -5,6 +5,10 @@
     margin-top: 1.6rem;
   }
 
+  > .mat-card {
+    min-height: auto;
+  }
+
   .person-summary-container {
     @include breakpoint('gt-lg') {
       max-width: 45rem;
@@ -80,6 +84,26 @@
       > div {
         height: 100%;
       }
+
+      .gd-quick-editor-v2-sections-section-input {
+        width: calc(50% - 0.8rem);
+      
+        @include breakpoint('lg') {
+          width: calc(33.3333% - 0.8rem);
+        }
+    
+        @media only screen and (min-width: 960px) and (max-width: 1199px) {
+          width: calc(33.3333% - 0.8rem);
+        }
+      
+        @media only screen and (min-width: 768px) and (max-width: 959px) {
+          width: calc(50% - 0.8rem);
+        }
+      
+        @include breakpoint('xs') {
+          width: calc(100% - 0.8rem);
+        }
+      }
     }
   
     .create-relationship-content-inner {
@@ -97,12 +121,8 @@
   }
 
   .create-contact {
-    @include breakpoint('lt-lg') {
-      @include flex_val(1 1 100% !important);
-      margin-top: 1.6rem;
-      width: 100%;
-    }
-  
+    min-height: auto;
+
     @media only screen and (max-width: 959px) {
       margin-top: 0;
     }
@@ -124,6 +144,10 @@
 
       > div {
         height: 100%;
+
+        > * {
+          width: 100%;
+        }
       }
     }
 

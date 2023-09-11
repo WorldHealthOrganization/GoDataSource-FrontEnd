@@ -14,7 +14,7 @@
 
 <!-- Edit Mode -->
 <div
-    fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem"
+    fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutAlign="start" fxLayoutGap="1.6rem"
     class="transmission-chain-edit-mode">
     <div
         *ngFor="let person of selectedNodes.nodes; let index = index"
@@ -133,6 +133,10 @@
         class="modify-person"
         fxFlex fxLayout="column"
     >
+        <div class="modify-person-header">
+            <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_TITLE' | translate}}</h1>
+        </div>
+
         <form #form="ngForm" (submit)="modifyRelationship(form)">
             <!-- Relationship -->
             <app-quick-editor-v2
@@ -199,7 +203,7 @@
 
         <form #form="ngForm" (submit)="createContactOfContact(form)">
 
-            <div fxLayout="column" fxLayoutGap="10px">
+            <div fxLayout="column" fxLayoutGap="0.8rem" fxLayoutAlign="start start">
 
                 <span class="section-title">
                     {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_LABEL_CONTACT_FIELDS' | translate}}

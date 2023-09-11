@@ -30,7 +30,8 @@
         <!-- Render inputs -->
         <div
           *ngFor="let input of section.inputs"
-          class="gd-quick-editor-v2-sections-section-input">
+          class="gd-quick-editor-v2-sections-section-input"
+          [class.gd-quick-editor-v2-sections-section-input-textarea]="input.type === QuickEditorV2InputType.TEXTAREA">
 
           <!-- Render input -->
           <ng-container

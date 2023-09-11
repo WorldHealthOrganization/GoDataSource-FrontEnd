@@ -1,0 +1,45 @@
+@import 'mixins';
+@import 'font';
+
+/* Quick Editor */
+.gd-quick-editor-v2 {
+  padding-left: 0.8rem;
+}
+
+.gd-quick-editor-v2-sections-section {
+  @include flex_align_items(flex-start);
+  @include flex(flex);
+  @include flex_direction(row);
+  @include flex_wrap(wrap);
+  gap: 0.8rem;
+}
+
+.gd-quick-editor-v2-sections-section-label {
+  color: var(--gd-primary-alt);
+  font-weight: 700;
+  width: calc(100% - 0.8rem);
+}
+
+.gd-quick-editor-v2-sections-section-input {
+  width: calc(33.3333% - 0.8rem);
+
+  @include breakpoint('lg') {
+    width: calc(50% - 0.8rem);
+  }
+
+  @media only screen and (min-width: 960px) and (max-width: 1199px) {
+    width: calc(1000% - 0.8rem);
+  }
+
+  @media only screen and (min-width: 768px) and (max-width: 959px) {
+    width: calc(50% - 0.8rem);
+  }
+
+  @include breakpoint('xs') {
+    width: calc(100% - 0.8rem);
+  }
+}
+
+.gd-quick-editor-v2-sections-section-input-textarea {
+  width: calc(100% - 0.8rem);
+}

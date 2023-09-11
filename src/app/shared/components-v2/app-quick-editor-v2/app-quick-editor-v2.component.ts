@@ -12,6 +12,7 @@ import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model
 @Component({
   selector: 'app-quick-editor-v2',
   templateUrl: './app-quick-editor-v2.component.html',
+  styleUrls: ['./app-quick-editor-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm } ]
 })
