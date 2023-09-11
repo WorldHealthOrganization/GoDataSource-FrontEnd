@@ -65,6 +65,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   private routerEventsSubscriptionLoad: Subscription;
   private routerEventsSubscriptionRepetitive: Subscription;
   private tokenInfoSubjectSubscription: Subscription;
+  private _determineSelectedOutbreakSubscription: Subscription;
+  private _getSelectedOutbreakSubscription: Subscription;
 
   // constants
   RenderMode = RenderMode;
@@ -188,10 +190,14 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
 
     // determine the Selected Outbreak and display message if different than the active one.
     if (OutbreakModel.canView(this._authUser)) {
-      this.outbreakDataService
+      this._determineSelectedOutbreakSubscription = this.outbreakDataService
         .determineSelectedOutbreak()
         .subscribe(() => {
-          this.outbreakDataService.getSelectedOutbreakSubject()
+          // release
+          this.stopGetSelectedOutbreak();
+
+          // trigger
+          this._getSelectedOutbreakSubscription = this.outbreakDataService.getSelectedOutbreakSubject()
             .subscribe(() => {
               this.outbreakDataService.checkActiveSelectedOutbreak();
             });
@@ -267,6 +273,15 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       this.tokenCheckIfLoggedOutCaller = null;
     }
 
+    // release
+    this.stopGetSelectedOutbreak();
+
+    // release
+    if (this._determineSelectedOutbreakSubscription) {
+      this._determineSelectedOutbreakSubscription.unsubscribe();
+      this._determineSelectedOutbreakSubscription = undefined;
+    }
+
     // stop timers
     this.stopTokenExpireTimer();
 
@@ -299,6 +314,16 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     if (this.menuLoadingDialog) {
       this.menuLoadingDialog.close();
       this.menuLoadingDialog = null;
+    }
+  }
+
+  /**
+   * Stop get selected outbreak
+   */
+  private stopGetSelectedOutbreak(): void {
+    if (this._getSelectedOutbreakSubscription) {
+      this._getSelectedOutbreakSubscription.unsubscribe();
+      this._getSelectedOutbreakSubscription = undefined;
     }
   }
 

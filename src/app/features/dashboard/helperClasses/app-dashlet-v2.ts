@@ -63,6 +63,9 @@ export abstract class AppDashletV2 {
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
 
+        // stop timers
+        this.stopInitializeDashletTimer();
+
         // trigger outbreak selection changed
         // - wait for binding
         this._initializeDashletTimer = setTimeout(() => {

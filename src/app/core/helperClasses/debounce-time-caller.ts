@@ -83,8 +83,12 @@ export class DebounceTimeCaller {
    * Release resources
    */
   unsubscribe() {
+    // release
     if (this.subscriber) {
       this.subscriber = null;
     }
+
+    // stop previous request
+    this.clearRefreshTimeout();
   }
 }

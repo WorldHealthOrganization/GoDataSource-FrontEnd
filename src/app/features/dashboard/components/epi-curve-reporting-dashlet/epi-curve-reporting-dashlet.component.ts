@@ -128,8 +128,8 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
     this.outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
-        // reset
-        this.outbreakSubscriber = null;
+        // stop ref data
+        this.stopRefDataSubscriber();
 
         // nothing to do
         if (!selectedOutbreak?.id) {
@@ -138,9 +138,6 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
 
         // set outbreak
         this._selectedOutbreak = selectedOutbreak;
-
-        // stop ref data
-        this.stopRefDataSubscriber();
 
         // retrieve ref data
         this.displayLoading = true;
