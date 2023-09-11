@@ -123,12 +123,6 @@
   .create-contact {
     min-height: auto;
 
-    // @include breakpoint('lt-lg') {
-    //   @include flex_val(1 1 100% !important);
-    //   margin-top: 1.6rem;
-    //   width: 100%;
-    // }
-  
     @media only screen and (max-width: 959px) {
       margin-top: 0;
     }
