@@ -64,7 +64,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   // case/contact of contact
   entityData: CaseModel | ContactOfContactModel;
 
-  pageSettingsKey: string = UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS;
+  pageSettingsKey: UserSettings = UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS;
 
   // follow-up fields
   private followUpFields: ILabelValuePairModel[] = [

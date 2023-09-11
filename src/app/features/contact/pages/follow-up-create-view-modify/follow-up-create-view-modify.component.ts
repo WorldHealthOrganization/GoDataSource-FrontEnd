@@ -3,7 +3,7 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -29,7 +29,7 @@ import {
   V2SideDialogConfigInputType,
   IV2SideDialogConfigInputToggleCheckbox
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { catchError, map, takeUntil } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
@@ -39,6 +39,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 /**
  * Component
@@ -53,7 +54,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
 
   // entity
-  private _entityData: ContactOfContactModel | ContactModel | CaseModel;
+  private _entityData: ContactModel | CaseModel | ContactOfContactModel;
 
   // history ?
   isHistory: boolean;
@@ -152,7 +153,44 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         record ?
           record.id :
           this.activatedRoute.snapshot.params.followUpId
-      );
+      )
+      .pipe(switchMap((followUp) => {
+        // nothing to do ?
+        if (
+          !this._entityData?.id ||
+          this._entityData.id === followUp.personId
+        ) {
+          return of(followUp);
+        }
+
+        // construct query builder to include deleted records
+        const qb = new RequestQueryBuilder();
+
+        // retrieve our record
+        qb.filter.where({
+          id: followUp.personId
+        });
+
+        // include deleted
+        qb.includeDeleted();
+
+        // we can't have more than 1 with same id :)
+        qb.limit(1);
+
+        // retrieve person
+        return this.personAndRelatedHelperService.followUp.getPerson(
+          this.selectedOutbreak.id,
+          qb
+        ).pipe(map((data) => {
+          // set entity data
+          this._entityData = data?.length > 0 ?
+            data[0] :
+            null;
+
+          // finished
+          return followUp;
+        }));
+      }));
   }
 
   /**
