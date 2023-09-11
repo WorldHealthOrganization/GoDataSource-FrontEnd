@@ -255,6 +255,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
   // subscribers
   outbreakSubscriber: Subscription;
+  private _initializeReferenceDataSubscription: Subscription;
 
   // authenticated user
   authUser: UserModel;
@@ -645,7 +646,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.initializeReferenceData()
+    // release
+    this.stopInitializeReferenceDataSubscription();
+
+    // execute
+    this._initializeReferenceDataSubscription = this.initializeReferenceData()
       .pipe(
         catchError((err) => {
           this.personAndRelatedHelperService.toastV2Service.error(err);
@@ -844,6 +849,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber = null;
     }
 
+    // release
+    this.stopInitializeReferenceDataSubscription();
+
     // hide message
     this.personAndRelatedHelperService.toastV2Service.hide(AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT);
 
@@ -858,6 +866,16 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // stop timers
     this.stopUpdateViewTimer();
+  }
+
+  /**
+   * Stop subscription
+   */
+  private stopInitializeReferenceDataSubscription(): void {
+    if (this._initializeReferenceDataSubscription) {
+      this._initializeReferenceDataSubscription.unsubscribe();
+      this._initializeReferenceDataSubscription = undefined;
+    }
   }
 
   /**
