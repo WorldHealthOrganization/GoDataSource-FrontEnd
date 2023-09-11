@@ -2304,4 +2304,43 @@ export class FollowUpHelperModel {
       'questionnaireAnswers'
     ];
   }
+
+  /**
+   * Retrieve follow-up person
+   */
+  getPerson(
+    outbreakId: string,
+    qb: RequestQueryBuilder
+  ): Observable<ContactModel[] | CaseModel[] | ContactOfContactModel[]> {
+    // #TODO - The required refactoring is for the following requests not to be called unnecessarily: contactDataService.getContactsList(), caseDataService.getCasesList() and contactsOfContactsDataService.getContactsOfContactsList()
+    return this.parent.contact.contactDataService.getContactsList(
+      outbreakId,
+      qb
+    ).pipe(
+      switchMap((data) => {
+        // found ?
+        if (data?.length > 0) {
+          return of(data);
+        }
+
+        // check cases
+        return this.parent.case.caseDataService.getCasesList(
+          outbreakId,
+          qb
+        );
+      }),
+      switchMap((data) => {
+        // found ?
+        if (data?.length > 0) {
+          return of(data);
+        }
+
+        // check contacts of contacts
+        return this.parent.contactOfContact.contactsOfContactsDataService.getContactsOfContactsList(
+          outbreakId,
+          qb
+        );
+      })
+    );
+  }
 }

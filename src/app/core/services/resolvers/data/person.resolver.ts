@@ -1,18 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { ToastV2Service } from '../../helper/toast-v2.service';
+import { catchError, map } from 'rxjs/operators';
 import { CaseModel } from '../../../models/case.model';
 import { ContactModel } from '../../../models/contact.model';
 import { EventModel } from '../../../models/event.model';
 import { Resolve } from '@angular/router';
 import { ContactOfContactModel } from '../../../models/contact-of-contact.model';
 import { StorageKey, StorageService } from '../../helper/storage.service';
-import { ContactDataService } from '../../data/contact.data.service';
-import { CaseDataService } from '../../data/case.data.service';
-import { EventDataService } from '../../data/event.data.service';
-import { ContactsOfContactsDataService } from '../../data/contacts-of-contacts.data.service';
 import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
+import { PersonAndRelatedHelperService } from '../../helper/person-and-related-helper.service';
 
 @Injectable()
 export class PersonDataResolver implements Resolve<CaseModel | ContactModel | EventModel | ContactOfContactModel> {
@@ -20,12 +16,8 @@ export class PersonDataResolver implements Resolve<CaseModel | ContactModel | Ev
    * Constructor
    */
   constructor(
-    private toastV2Service: ToastV2Service,
     private storageService: StorageService,
-    private contactDataService: ContactDataService,
-    private caseDataService: CaseDataService,
-    private eventDataService: EventDataService,
-    private contactsOfContactsDataService: ContactsOfContactsDataService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {}
 
   /**
@@ -66,43 +58,20 @@ export class PersonDataResolver implements Resolve<CaseModel | ContactModel | Ev
 
     // contact ?
     // #TODO - /contacts/contact-related-follow-ups/<entityId> feature requires refactoring using alternative approaches: either a direct link on the person or a specific link for each entity type
-    // #TODO - The required refactoring is for the following requests not to be called unnecessarily: contactDataService.getContactsList(), caseDataService.getCasesList() and contactsOfContactsDataService.getContactsOfContactsList()
     if (
       route.params.contactId ||
       route.queryParams.contactId
     ) {
-      request = this.contactDataService.getContactsList(
+      request = this.personAndRelatedHelperService.followUp.getPerson(
         this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
         qb
-      ).pipe(switchMap((data) => {
-        // found ?
-        if (data?.length > 0) {
-          return of(data);
-        }
-
-        // check cases
-        return this.caseDataService.getCasesList(
-          this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
-          qb
-        );
-      })).pipe(switchMap((data) => {
-        // found ?
-        if (data?.length > 0) {
-          return of(data);
-        }
-
-        // check contacts of contacts
-        return this.contactsOfContactsDataService.getContactsOfContactsList(
-          this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
-          qb
-        );
-      }));
+      );
     } else if (
       route.params.caseId ||
       route.queryParams.caseId
     ) {
       // request
-      request = this.caseDataService.getCasesList(
+      request = this.personAndRelatedHelperService.case.caseDataService.getCasesList(
         this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
         qb
       );
@@ -111,7 +80,7 @@ export class PersonDataResolver implements Resolve<CaseModel | ContactModel | Ev
       route.queryParams.eventId
     ) {
       // request
-      request = this.eventDataService.getEventsList(
+      request = this.personAndRelatedHelperService.event.eventDataService.getEventsList(
         this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
         qb
       );
@@ -120,7 +89,7 @@ export class PersonDataResolver implements Resolve<CaseModel | ContactModel | Ev
       route.queryParams.contactOfContactId
     ) {
       // request
-      request = this.contactsOfContactsDataService.getContactsOfContactsList(
+      request = this.personAndRelatedHelperService.contactOfContact.contactsOfContactsDataService.getContactsOfContactsList(
         this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
         qb
       );
@@ -138,7 +107,7 @@ export class PersonDataResolver implements Resolve<CaseModel | ContactModel | Ev
         // should be last one
         catchError((err) => {
           // display error
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
 
           // send error further
           return throwError(err);
