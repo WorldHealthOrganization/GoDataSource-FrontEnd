@@ -256,18 +256,20 @@ export class EventsListComponent
                     })
                     .subscribe((response) => {
                       // canceled ?
-                      if ( response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
                         // finished
                         return;
                       }
 
                       // show loading
-                      const loading =
-                        this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+                      const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                       // delete event
                       this.personAndRelatedHelperService.event.eventDataService
-                        .deleteEvent(this.selectedOutbreak.id, item.id)
+                        .deleteEvent(
+                          this.selectedOutbreak.id,
+                          item.id
+                        )
                         .pipe(
                           catchError((err) => {
                             this.personAndRelatedHelperService.toastV2Service.error(err);
