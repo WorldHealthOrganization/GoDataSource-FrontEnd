@@ -75,7 +75,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
     // read route query params
     if (_.isEmpty(this.activatedRoute.snapshot.queryParams.selectedTargetIds)) {
       this.personAndRelatedHelperService.toastV2Service.error('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
-      this.router.navigate(['/contacts/follow-ups']);
+      this.router.navigate(['/']);
     } else {
       this.selectedTargetIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
       this.selectedPeopleIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedPersonsIds);

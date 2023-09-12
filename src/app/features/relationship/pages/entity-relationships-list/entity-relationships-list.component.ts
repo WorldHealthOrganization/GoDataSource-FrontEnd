@@ -257,9 +257,18 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel,
           action: {
             click: (selected: string[]) => {
               // pass the selected target persons for not including them in available peoples
-              const selectedTargetPersons = {};
-              _.forEach(this._relationshipsListRecordsMap, (model) => {
-                const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
+              const selectedTargetPersons = {
+                // exclude entity from which we want to move contacts
+                [this._entity.id]: true
+              };
+              selected.forEach((relationshipId) => {
+                // nothing found - this shouldn't happen
+                if (!this._relationshipsListRecordsMap[relationshipId]) {
+                  return;
+                }
+
+                // we always select targets
+                const targetPerson: RelationshipPersonModel = _.find(this._relationshipsListRecordsMap[relationshipId].relationship.persons, 'target');
                 selectedTargetPersons[targetPerson.id] = true;
               });
 
