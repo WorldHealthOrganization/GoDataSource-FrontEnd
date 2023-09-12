@@ -113,6 +113,13 @@ export class EventDataService {
   }
 
   /**
+   * Get exposed contacts for an event that user want to delete
+   */
+  getExposedContactsForEvent(outbreakId: string, caseId: string) {
+    return this.http.get(`outbreaks/${outbreakId}/events/${caseId}/isolated-contacts`);
+  }
+
+  /**
    * Restore a deleted event
    */
   restoreEvent(outbreakId: string, eventId: string): Observable<any> {
