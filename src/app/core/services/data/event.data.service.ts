@@ -115,8 +115,8 @@ export class EventDataService {
   /**
    * Get exposed contacts for an event that user want to delete
    */
-  getExposedContactsForEvent(outbreakId: string, caseId: string) {
-    return this.http.get(`outbreaks/${outbreakId}/events/${caseId}/isolated-contacts`);
+  getExposedContactsForEvent(outbreakId: string, eventId: string) {
+    return this.http.get(`outbreaks/${outbreakId}/events/${eventId}/isolated-contacts`);
   }
 
   /**
