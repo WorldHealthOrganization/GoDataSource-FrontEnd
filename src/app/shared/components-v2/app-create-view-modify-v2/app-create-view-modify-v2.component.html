@@ -1129,7 +1129,7 @@
                       clearable="true"
                       [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('locationId')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('locationId')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
-                      (selectedLocationChanged)="addressLocationChanged(input.value.get(parentItemIndex), $event)"></app-form-select-location-single-v2>
+                      (selectedLocationChanged)="addressLocationChanged(input, $event, parentInput, parentItemIndex)"></app-form-select-location-single-v2>
 
                     <!-- City -->
                     <app-form-input-v2
