@@ -12,6 +12,7 @@ import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 import { MatInput } from '@angular/material/input';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-form-number-v2',
@@ -47,22 +48,12 @@ export class AppFormNumberV2Component
   // tooltip
   tooltipButton: IAppFormIconButtonV2;
   private _tooltip: string;
-  tooltipTranslated: string;
   @Input() set tooltip(tooltip: string) {
     // set data
     this._tooltip = tooltip;
 
-    // translate tooltip
-    this.tooltipTranslated = this._tooltip ?
-      this.i18nService.instant(this._tooltip) :
-      this._tooltip;
-
-    // add / remove tooltip icon
-    this.tooltipButton = !this.tooltipTranslated ?
-      undefined : {
-        icon: 'help',
-        tooltip: this.tooltipTranslated
-      };
+    // update tooltip translation
+    this.updateTooltipTranslation(false);
   }
   get tooltip(): string {
     return this._tooltip;
@@ -84,6 +75,9 @@ export class AppFormNumberV2Component
     return this._input;
   }
 
+  // language handler
+  private languageSubscription: Subscription;
+
   // timers
   private _focusTimer: number;
 
@@ -95,11 +89,19 @@ export class AppFormNumberV2Component
     protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
+    // parent
     super(
       controlContainer,
       i18nService,
       changeDetectorRef
     );
+
+    // language change
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update tooltip translation
+        this.updateTooltipTranslation(true);
+      });
   }
 
   /**
@@ -111,6 +113,9 @@ export class AppFormNumberV2Component
 
     // timers
     this.stopFocusTimer();
+
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
   }
 
   /**
@@ -145,6 +150,39 @@ export class AppFormNumberV2Component
 
     // write value
     super.writeValue(value);
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = undefined;
+    }
+  }
+
+  /**
+   * Update tooltip translation
+   */
+  private updateTooltipTranslation(detectChanges: boolean): void {
+    // translate tooltip
+    const tooltipTranslated = this._tooltip ?
+      this.i18nService.instant(this._tooltip) :
+      this._tooltip;
+
+    // add / remove tooltip icon
+    this.tooltipButton = !tooltipTranslated ?
+      undefined : {
+        icon: 'help',
+        tooltip: tooltipTranslated
+      };
+
+    // update
+    if (detectChanges) {
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   /**
