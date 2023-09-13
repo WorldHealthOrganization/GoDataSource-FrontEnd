@@ -233,20 +233,68 @@ export class ContactsListComponent
               cssClasses: () => 'gd-list-table-actions-action-menu-warning',
               action: {
                 click: (item: ContactModel): void => {
+                  // data
+                  const message: {
+                    get: string,
+                    data?: {
+                      name: string,
+                      numberOfContacts: string
+                    }
+                  } = {
+                    get: ''
+                  };
+
                   // determine what we need to delete
                   this.personAndRelatedHelperService.dialogV2Service
                     .showConfirmDialog({
                       config: {
                         title: {
                           get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({ name: item.name })
+                          data: () => ({
+                            name: item.name
+                          })
                         },
                         message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_CONTACT',
-                          data: () => ({ name: item.name })
+                          get: () => message.get,
+                          data: () => message.data
                         }
                       },
-                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK',
+                      initialized: (handler) => {
+                        // display loading
+                        handler.loading.show();
+
+                        // determine if contact has exposed contacts
+                        this.personAndRelatedHelperService.contact.contactDataService
+                          .getIsolatedContactsForContact(this.selectedOutbreak.id, item.id)
+                          .pipe(
+                            catchError((err) => {
+                              // show error
+                              this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                              // hide loading
+                              handler.loading.hide();
+
+                              // send error down the road
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe((exposedContacts: { count: number }) => {
+                            // set message data
+                            message.data = {
+                              name: item.name,
+                              numberOfContacts: exposedContacts?.count.toLocaleString('en')
+                            };
+
+                            // determine message label
+                            message.get = !exposedContacts?.count ?
+                              'LNG_DIALOG_CONFIRM_DELETE_CONTACT' :
+                              'LNG_DIALOG_CONFIRM_DELETE_CONTACT_WITH_EXPOSED_CONTACTS';
+
+                            // hide loading
+                            handler.loading.hide();
+                          });
+                      }
                     })
                     .subscribe((response) => {
                       // canceled ?
