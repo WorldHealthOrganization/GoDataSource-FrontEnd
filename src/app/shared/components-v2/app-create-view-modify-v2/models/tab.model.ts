@@ -550,7 +550,7 @@ interface ICreateViewModifyV2TabInputDocument {
 /**
  * Input - address
  */
-interface ICreateViewModifyV2TabInputAddress extends ICreateViewModifyV2TabInputValidatorRequired {
+export interface ICreateViewModifyV2TabInputAddress extends ICreateViewModifyV2TabInputValidatorRequired {
   // required
   type: CreateViewModifyV2TabInputType.ADDRESS;
   typeOptions: ILabelValuePairModel[];
