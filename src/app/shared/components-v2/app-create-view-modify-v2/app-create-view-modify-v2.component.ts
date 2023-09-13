@@ -6,7 +6,7 @@ import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2,
   ICreateViewModifyV2Config,
-  ICreateViewModifyV2Tab,
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputAddress,
   ICreateViewModifyV2TabInputChanged,
   ICreateViewModifyV2TabInputList,
   ICreateViewModifyV2TabTable, ICreateViewModifyV2TabTableRecordsList
@@ -725,15 +725,23 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Address location changed
    */
   addressLocationChanged(
-    address: AddressModel,
-    locationInfo: ILocation
+    input: ICreateViewModifyV2TabInputAddress,
+    locationInfo: ILocation,
+    parentInput?: ICreateViewModifyV2TabInputList,
+    parentItemIndex?: number
   ): void {
     // should we copy location lat & lng ?
     if (
       locationInfo &&
       locationInfo.geoLocation &&
       locationInfo.geoLocation.lat &&
-      locationInfo.geoLocation.lng
+      locationInfo.geoLocation.lng && (
+        !input.visibleMandatoryChild?.visible ||
+        input.visibleMandatoryChild.visible('geoLocation')
+      ) && (
+        !parentInput?.visibleMandatoryChild?.visible ||
+        parentInput.visibleMandatoryChild.visible('geoLocation')
+      )
     ) {
       this.dialogV2Service
         .showConfirmDialog({
@@ -754,6 +762,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           }
 
           // change location lat & lng
+          const address: AddressModel = input.value.get(parentItemIndex);
           address.geoLocation.lat = locationInfo.geoLocation.lat;
           address.geoLocation.lng = locationInfo.geoLocation.lng;
 
