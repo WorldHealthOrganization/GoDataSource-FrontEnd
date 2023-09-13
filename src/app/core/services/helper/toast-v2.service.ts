@@ -54,6 +54,7 @@ export class ToastV2Service implements OnDestroy {
     private i18nService: I18nService,
     private toastrService: ToastrService
   ) {
+    // language change
     this.languageSubscription = this.i18nService.languageChangedEvent
       .subscribe(() => {
         // reprocess ToastV2Service._TOASTS
