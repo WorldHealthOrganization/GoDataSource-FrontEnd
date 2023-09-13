@@ -315,7 +315,7 @@ export abstract class BulkCreateModifyComponent<T, U extends (V2SpreadsheetEdito
   /**
    * Check if a column should be visible depending on outbreak visible/mandatory settings
    */
-  private shouldVisibleMandatoryTableColumnBeVisible(
+  protected shouldVisibleMandatoryTableColumnBeVisible(
     visibleMandatoryKey: string,
     prop: string
   ): boolean {

@@ -865,7 +865,13 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
     this.stopDisplayOnceGeoLocationChange();
 
     // nothing to do ?
-    if (this._geoData.contactsOfContacts.length < 1) {
+    if (
+      this._geoData.contactsOfContacts.length < 1 ||
+      !this.shouldVisibleMandatoryTableColumnBeVisible(
+        this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+        'addresses.geoLocation'
+      )
+    ) {
       return;
     }
 
