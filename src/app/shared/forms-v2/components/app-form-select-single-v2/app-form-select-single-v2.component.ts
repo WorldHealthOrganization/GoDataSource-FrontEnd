@@ -14,6 +14,7 @@ import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 import { MAT_SELECT_CONFIG, MatSelect } from '@angular/material/select';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-form-select-single-v2',
@@ -69,17 +70,8 @@ export class AppFormSelectSingleV2Component
     // set data
     this._tooltip = tooltip;
 
-    // translate tooltip
-    const tooltipTranslated = this._tooltip ?
-      this.i18nService.instant(this._tooltip) :
-      this._tooltip;
-
-    // add / remove tooltip icon
-    this.tooltipButton = !tooltipTranslated ?
-      undefined : {
-        icon: 'help',
-        tooltip: tooltipTranslated
-      };
+    // update tooltip translation
+    this.updateTooltipTranslation(false);
   }
   get tooltip(): string {
     return this._tooltip;
@@ -180,6 +172,9 @@ export class AppFormSelectSingleV2Component
     return this._input;
   }
 
+  // language handler
+  private languageSubscription: Subscription;
+
   // timers
   private _openTimer: number;
   private _firstOptionTimer: number;
@@ -192,11 +187,19 @@ export class AppFormSelectSingleV2Component
     protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
+    // parent
     super(
       controlContainer,
       i18nService,
       changeDetectorRef
     );
+
+    // language change
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update tooltip translation
+        this.updateTooltipTranslation(true);
+      });
   }
 
   /**
@@ -209,6 +212,9 @@ export class AppFormSelectSingleV2Component
     // timers
     this.stopOpenTimer();
     this.stopFirstOptionTimer();
+
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
   }
 
   /**
@@ -224,6 +230,39 @@ export class AppFormSelectSingleV2Component
       this.value
     ) {
       this.filterOptions();
+    }
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = undefined;
+    }
+  }
+
+  /**
+   * Update tooltip translation
+   */
+  private updateTooltipTranslation(detectChanges: boolean): void {
+    // translate tooltip
+    const tooltipTranslated = this._tooltip ?
+      this.i18nService.instant(this._tooltip) :
+      this._tooltip;
+
+    // add / remove tooltip icon
+    this.tooltipButton = !tooltipTranslated ?
+      undefined : {
+        icon: 'help',
+        tooltip: tooltipTranslated
+      };
+
+    // update
+    if (detectChanges) {
+      this.changeDetectorRef.detectChanges();
     }
   }
 
