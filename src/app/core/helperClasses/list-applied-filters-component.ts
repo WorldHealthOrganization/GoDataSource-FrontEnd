@@ -415,17 +415,30 @@ export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2Colu
 
         // construct query builder to filter by location
         const locationId = _.get(queryParams, 'locationId', null);
-        this.appliedListFilterQueryBuilder.filter.where({
+        const locationFilter: { [prop: string]: any }[] = [{
           addresses: {
             elemMatch: {
               typeId: AddressType.CURRENT_ADDRESS,
               parentLocationIdFilter: {
-                // fix for not beeing consistent through the website, sometimes we use elemMatch other times $elemMatch which causes some issues on the api
+                // fix for not being consistent through the website, sometimes we use elemMatch other times $elemMatch which causes some issues on the api
                 // if we want to fix this we need to change in many places, so this is an workaround
                 $in: [locationId]
               }
             }
           }
+        }];
+
+        // global location
+        // IMPORTANT - we need both the above one and this one to work properly, otherwise if you filter by location on dashboard might cause strange behaviour
+        if (globalFilters.locationId) {
+          locationFilter.push({
+            'addresses.parentLocationIdFilter': globalFilters.locationId
+          });
+        }
+
+        // append condition
+        this.appliedListFilterQueryBuilder.filter.where({
+          and: locationFilter
         });
 
         // date
