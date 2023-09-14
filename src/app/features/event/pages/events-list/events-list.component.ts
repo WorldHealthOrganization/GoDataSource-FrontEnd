@@ -191,6 +191,17 @@ export class EventsListComponent
               cssClasses: () => 'gd-list-table-actions-action-menu-warning',
               action: {
                 click: (item: EventModel): void => {
+                  // data
+                  const message: {
+                    get: string,
+                    data?: {
+                      name: string,
+                      numberOfContacts: string
+                    }
+                  } = {
+                    get: ''
+                  };
+
                   // determine what we need to delete
                   this.personAndRelatedHelperService.dialogV2Service
                     .showConfirmDialog({
@@ -202,28 +213,63 @@ export class EventsListComponent
                           })
                         },
                         message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_EVENT',
-                          data: () => ({
-                            name: item.name
-                          })
+                          get: () => message.get,
+                          data: () => message.data
                         }
                       },
-                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK',
+                      initialized: (handler) => {
+                        // display loading
+                        handler.loading.show();
+
+                        // determine if event has exposed contacts
+                        this.personAndRelatedHelperService.event.eventDataService
+                          .getExposedContactsForEvent(this.selectedOutbreak.id, item.id)
+                          .pipe(
+                            catchError((err) => {
+                              // show error
+                              this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                              // hide loading
+                              handler.loading.hide();
+
+                              // send error down the road
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe((exposedContacts: { count: number }) => {
+                            // set message data
+                            message.data = {
+                              name: item.name,
+                              numberOfContacts: exposedContacts?.count.toLocaleString('en')
+                            };
+
+                            // determine message label
+                            message.get = !exposedContacts?.count ?
+                              'LNG_DIALOG_CONFIRM_DELETE_EVENT' :
+                              'LNG_DIALOG_CONFIRM_DELETE_EVENT_WITH_EXPOSED_CONTACTS';
+
+                            // hide loading
+                            handler.loading.hide();
+                          });
+                      }
                     })
                     .subscribe((response) => {
                       // canceled ?
-                      if ( response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
                         // finished
                         return;
                       }
 
                       // show loading
-                      const loading =
-                        this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+                      const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                       // delete event
                       this.personAndRelatedHelperService.event.eventDataService
-                        .deleteEvent(this.selectedOutbreak.id, item.id)
+                        .deleteEvent(
+                          this.selectedOutbreak.id,
+                          item.id
+                        )
                         .pipe(
                           catchError((err) => {
                             this.personAndRelatedHelperService.toastV2Service.error(err);
