@@ -1533,8 +1533,11 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           }),
           // generate follow-ups if create
           switchMap((contact: ContactModel) => {
-            // do not generate follow-ups if the feature is not enabled
-            if (!this.selectedOutbreak.generateFollowUpsWhenCreatingContacts) {
+            // do not generate follow-ups if the feature is not enabled or it's update action
+            if (
+              !this.selectedOutbreak.generateFollowUpsWhenCreatingContacts ||
+              type === CreateViewModifyV2ActionType.UPDATE
+            ) {
               return of(contact);
             }
 
