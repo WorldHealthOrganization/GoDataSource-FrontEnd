@@ -84,8 +84,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   // new relationship model
   newRelationship = new RelationshipModel();
   // new contact model
-  newContact = new ContactModel();
-  newContactOfContact = new ContactOfContactModel();
+  newContact: ContactModel;
+  newContactOfContact: ContactOfContactModel;
 
   // quick editor
   private _quickEditorDefinition: {
@@ -516,9 +516,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   resetFormModels() {
-    // reset Contact model
+    // reset Contact and contact of contact model
     this.newContact = new ContactModel();
     this.newContactOfContact = new ContactOfContactModel();
+    if (this.selectedOutbreak?.id) {
+      this.newContact.visualId = this.personAndRelatedHelperService.contact.generateContactIDMask(this.selectedOutbreak.contactIdMask);
+      this.newContactOfContact.visualId = this.personAndRelatedHelperService.contactOfContact.generateContactOfContactIDMask(this.selectedOutbreak.contactOfContactIdMask);
+    }
 
     // reset Relationship model
     this.newRelationship = new RelationshipModel();
