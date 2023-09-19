@@ -24,6 +24,7 @@ import {
   ICreateViewModifyV2TabTableTreeAddNewItem
 } from '../../../components-v2/app-create-view-modify-v2/models/tab.model';
 import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
+import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 /**
  * Flatten type
@@ -170,6 +171,19 @@ export class AppFormTreeEditorV2Component
   private _newItemFlashTimers: {
     [id: string]: number
   } = {};
+
+  // filter - clear
+  filterSuffixIconButtons: IAppFormIconButtonV2[] = [{
+    icon: 'clear',
+    clickAction: () => {
+      this.filter(
+        '',
+        false,
+        false
+      );
+    },
+    visible: () => !!this.searchValue
+  }];
 
   // constants
   FlattenType = FlattenType;

@@ -13,6 +13,7 @@
       name="filterValue"
       placeholder="LNG_COMMON_LABEL_SEARCH"
       autocomplete="off"
+      [suffixIconButtons]="filterSuffixIconButtons"
       (ngModelChange)="filter($event, true, true)"></app-form-input-v2>
 
     <!-- Expand All -->
