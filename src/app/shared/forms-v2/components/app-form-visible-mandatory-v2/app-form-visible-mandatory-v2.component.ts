@@ -25,6 +25,7 @@ import {
 } from './models/visible-mandatory.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
+import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 /**
  * Flatten type
@@ -222,6 +223,19 @@ export class AppFormVisibleMandatoryV2Component
   get hasErrors(): boolean {
     return this._errorsCount > 0;
   }
+
+  // filter - clear
+  filterSuffixIconButtons: IAppFormIconButtonV2[] = [{
+    icon: 'clear',
+    clickAction: () => {
+      this.filter(
+        '',
+        false,
+        false
+      );
+    },
+    visible: () => !!this.searchValue
+  }];
 
   // constants
   FlattenType = FlattenType;
