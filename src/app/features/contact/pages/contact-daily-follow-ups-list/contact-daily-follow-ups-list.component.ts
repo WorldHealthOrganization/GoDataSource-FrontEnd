@@ -2349,6 +2349,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
    * Generate Follow Ups
    */
   generateFollowUps() {
+    // for startDate and endDate:
+    // - use "today" if contact tracing should start with the date of the last contact
+    // - otherwise, use "tomorrow"
+    const addDays: number = this.selectedOutbreak.generateFollowUpsDateOfLastContact ?
+      0 :
+      1;
     this.personAndRelatedHelperService.dialogV2Service.showSideDialog({
       // title
       title: {
@@ -2361,8 +2367,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: V2SideDialogConfigInputType.DATE_RANGE,
           name: 'dates',
           value: {
-            startDate: moment().add(1, 'days').startOf('day').format(),
-            endDate: moment().add(1, 'days').endOf('day').format()
+            startDate: moment().add(addDays, 'days').startOf('day').format(),
+            endDate: moment().add(addDays, 'days').endOf('day').format()
           },
           validators: {
             required: () => true
