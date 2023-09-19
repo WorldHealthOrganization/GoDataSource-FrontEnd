@@ -94,13 +94,14 @@ export class CaseModel
   numberOfContacts: number;
   numberOfExposures: number;
 
-  // this property was added to handle the legacy follow-ups (if the case was a contact)
+  // these properties were added to handle the legacy follow-ups (if the case was a contact)
   followUp: {
     originalStartDate: string,
     startDate: string,
     endDate: string,
     status: string
   };
+  followUpTeamId: string;
 
   responsibleUserId: string;
   responsibleUser: UserModel;
@@ -342,6 +343,7 @@ export class CaseModel
     });
 
     this.followUp = _.get(data, 'followUp', {});
+    this.followUpTeamId = _.get(data, 'followUpTeamId');
 
     this.responsibleUserId = _.get(data, 'responsibleUserId');
     this.responsibleUser = _.get(data, 'responsibleUser');

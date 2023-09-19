@@ -77,13 +77,14 @@ export class ContactOfContactModel
   numberOfContacts: number;
   numberOfExposures: number;
 
-  // this property was added to handle the legacy follow-ups (if the contact of a contact was a contact)
+  // these properties were added to handle the legacy follow-ups (if the contact of a contact was a contact)
   followUp: {
     originalStartDate: string,
     startDate: string,
     endDate: string,
     status: string
   };
+  followUpTeamId: string;
 
   dob: string | Moment;
   age: AgeModel;
@@ -234,6 +235,7 @@ export class ContactOfContactModel
     this.numberOfExposures = _.get(data, 'numberOfExposures');
 
     this.followUp = _.get(data, 'followUp');
+    this.followUpTeamId = _.get(data, 'followUpTeamId');
 
     // vaccines received
     const vaccinesReceived = _.get(data, 'vaccinesReceived');
