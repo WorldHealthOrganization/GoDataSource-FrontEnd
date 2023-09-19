@@ -45,6 +45,11 @@ interface IFlattenNodeGroup {
   text: string;
   data: IVisibleMandatoryDataGroup;
   tabs: IFlattenNodeGroupTab[];
+  checked: {
+    visible: number,
+    mandatory: number,
+    total: number
+  };
 }
 
 /**
@@ -57,6 +62,11 @@ interface IFlattenNodeGroupTab {
   text: string;
   data: IVisibleMandatoryDataGroupTab;
   sections: IFlattenNodeGroupTabSection[];
+  checked: {
+    visible: number,
+    mandatory: number,
+    total: number
+  };
 }
 
 /**
@@ -69,6 +79,11 @@ interface IFlattenNodeGroupTabSection {
   text: string;
   data: IVisibleMandatoryDataGroupTabSection;
   fields: IFlattenNodeGroupTabSectionField[];
+  checked: {
+    visible: number,
+    mandatory: number,
+    total: number
+  };
 }
 
 /**
@@ -161,6 +176,9 @@ export class AppFormVisibleMandatoryV2Component
 
     // update errors
     this.validateAll();
+
+    // count
+    this.countAll();
 
     // update error message
     this.updateErrorsMessage();
@@ -273,6 +291,9 @@ export class AppFormVisibleMandatoryV2Component
     // update errors
     this.validateAll();
 
+    // count
+    this.countAll();
+
     // update error message
     this.updateErrorsMessage();
   }
@@ -300,6 +321,9 @@ export class AppFormVisibleMandatoryV2Component
 
         // update errors
         this.updateErrorsMessage();
+
+        // count
+        this.countAll();
       });
   }
 
@@ -354,7 +378,12 @@ export class AppFormVisibleMandatoryV2Component
         type: FlattenType.GROUP,
         text: this.i18nService.instant(group.label),
         data: group,
-        tabs: []
+        tabs: [],
+        checked: {
+          visible: 0,
+          mandatory: 0,
+          total: 0
+        }
       };
       this._allFlattenedData.push(groupNode);
 
@@ -366,7 +395,12 @@ export class AppFormVisibleMandatoryV2Component
           parent: groupNode,
           text: this.i18nService.instant(tab.label),
           data: tab,
-          sections: []
+          sections: [],
+          checked: {
+            visible: 0,
+            mandatory: 0,
+            total: 0
+          }
         };
         this._allFlattenedData.push(groupTabNode);
         groupNode.tabs.push(groupTabNode);
@@ -379,7 +413,12 @@ export class AppFormVisibleMandatoryV2Component
             parent: groupTabNode,
             text: this.i18nService.instant(section.label),
             data: section,
-            fields: []
+            fields: [],
+            checked: {
+              visible: 0,
+              mandatory: 0,
+              total: 0
+            }
           };
           this._allFlattenedData.push(groupTabSectionNode);
           groupTabNode.sections.push(groupTabSectionNode);
@@ -622,6 +661,9 @@ export class AppFormVisibleMandatoryV2Component
     // redraw
     // - detect changes is triggered by this.nonFlatToFlat function
     this.nonFlatToFlat();
+
+    // count
+    this.countAll();
   }
 
   /**
@@ -655,7 +697,11 @@ export class AppFormVisibleMandatoryV2Component
 
     // refresh
     if (refresh) {
+      // redraw
       this.nonFlatToFlat();
+
+      // count
+      this.countAll();
     }
   }
 
@@ -723,6 +769,9 @@ export class AppFormVisibleMandatoryV2Component
     // validate field
     this.validateAll();
 
+    // count
+    this.countAll();
+
     // update error message
     this.updateErrorsMessage();
 
@@ -774,6 +823,9 @@ export class AppFormVisibleMandatoryV2Component
 
     // update errors
     this.validateAll();
+
+    // count
+    this.countAll();
 
     // update error message
     this.updateErrorsMessage();
@@ -855,6 +907,76 @@ export class AppFormVisibleMandatoryV2Component
 
     // emit errors updated
     this.errorsChanged.emit(errorsString);
+  }
+
+  /**
+   * Count checked
+   */
+  private countAll(): void {
+    // go through fields and count
+    let previousGroupId, previousGroupTabId, previousGroupTabSectionId: string;
+    this._allFlattenedFields?.forEach((field) => {
+      // reset - group
+      if (previousGroupId !== field.parent.parent.parent.data.id) {
+        // reset
+        field.parent.parent.parent.checked = {
+          visible: 0,
+          mandatory: 0,
+          total: 0
+        };
+
+        // north remembers
+        previousGroupId = field.parent.parent.parent.data.id;
+      }
+
+      // reset - group tab
+      if (previousGroupTabId !== field.parent.parent.data.id) {
+        // reset
+        field.parent.parent.checked = {
+          visible: 0,
+          mandatory: 0,
+          total: 0
+        };
+
+        // north remembers
+        previousGroupTabId = field.parent.parent.data.id;
+      }
+
+      // reset - group tab section
+      if (previousGroupTabSectionId !== field.parent.data.id) {
+        // reset
+        field.parent.checked = {
+          visible: 0,
+          mandatory: 0,
+          total: 0
+        };
+
+        // north remembers
+        previousGroupTabSectionId = field.parent.data.id;
+      }
+
+      // count
+      field.parent.parent.parent.checked.total++;
+      field.parent.parent.checked.total++;
+      field.parent.checked.total++;
+
+      // visible and required
+      if (this.value[field.parent.parent.parent.data.id]) {
+        // visible ?
+        if (this.value[field.parent.parent.parent.data.id][field.data.id]?.visible) {
+          field.parent.parent.parent.checked.visible++;
+          field.parent.parent.checked.visible++;
+          field.parent.checked.visible++;
+        }
+
+        // required ?
+        if (this.value[field.parent.parent.parent.data.id][field.data.id]?.mandatory) {
+          field.parent.parent.parent.checked.mandatory++;
+          field.parent.parent.checked.mandatory++;
+          field.parent.checked.mandatory++;
+        }
+      }
+    });
   }
 
   /**

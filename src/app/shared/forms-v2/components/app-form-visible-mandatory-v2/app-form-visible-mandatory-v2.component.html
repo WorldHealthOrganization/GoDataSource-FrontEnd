@@ -72,6 +72,13 @@
             fxFlex
             [innerHTML]="item.text | highlight:searchValue"></div>
 
+          <!-- Counted -->
+          <div
+            class="gd-form-visible-mandatory-v2-list-item-group-count"
+            fxFlex>
+            {{ item.checked.visible }} / {{ item.checked.mandatory }} / {{ item.checked.total }}
+          </div>
+
           <!-- Buttons -->
           <div
             *ngIf="!viewOnly"
@@ -116,6 +123,13 @@
             fxFlex
             [innerHTML]="item.text | highlight:searchValue"></div>
 
+          <!-- Counted -->
+          <div
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-count"
+            fxFlex>
+            {{ item.checked.visible }} / {{ item.checked.mandatory }} / {{ item.checked.total }}
+          </div>
+
           <!-- Buttons -->
           <div
             *ngIf="!viewOnly"
@@ -159,6 +173,13 @@
             class="gd-form-visible-mandatory-v2-list-item-group-tab-section-content"
             fxFlex
             [innerHTML]="item.text | highlight:searchValue"></div>
+
+          <!-- Counted -->
+          <div
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-section-count"
+            fxFlex>
+            {{ item.checked.visible }} / {{ item.checked.mandatory }} / {{ item.checked.total }}
+          </div>
 
           <!-- Buttons -->
           <div
