@@ -17,7 +17,6 @@
       padding-bottom: 0;
 
       .mat-form-field-flex {
-        @include flex_align_items(center);
         margin-top: 0;
         padding: 0 1.6rem;
 
@@ -120,8 +119,6 @@
 
         /* Form textarea suffix */
         .mat-form-field-suffix {
-          top: 0;
-
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
             font-size: 1.6rem;
