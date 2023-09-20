@@ -221,6 +221,33 @@
           }
         }
 
+        .gd-form-visible-mandatory-v2-list-item-group-count,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-count,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-count {
+          margin-right: 1.6rem;
+
+          @include breakpoint('xxs') {
+            display: none;
+          }
+
+          .visible {
+            color: var(--gd-primary);
+          }
+
+          .mandatory {
+            color: rgba(var(--gd-primary-rgb), 0.5);
+          }
+
+          .total {
+            color: var(--gd-text);
+          }
+
+          .separator {
+            color: var(--gd-secondary);
+            font-weight: normal;
+          }
+        }
+
         &.gd-form-visible-mandatory-v2-list-item-group-expanded {
           background: rgba(var(--gd-warning-rgb), 0.2);
           font-weight: 700;

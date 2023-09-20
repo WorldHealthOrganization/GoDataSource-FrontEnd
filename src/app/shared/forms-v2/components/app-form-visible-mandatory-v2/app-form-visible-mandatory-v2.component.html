@@ -13,6 +13,7 @@
       name="filterValue"
       placeholder="LNG_COMMON_LABEL_SEARCH"
       autocomplete="off"
+      [suffixIconButtons]="filterSuffixIconButtons"
       (ngModelChange)="filter($event, !!$event, true)"></app-form-input-v2>
 
     <!-- Expand All -->
@@ -74,9 +75,27 @@
 
           <!-- Counted -->
           <div
-            class="gd-form-visible-mandatory-v2-list-item-group-count"
-            fxFlex>
-            {{ item.checked.visible }} / {{ item.checked.mandatory }} / {{ item.checked.total }}
+            class="gd-form-visible-mandatory-v2-list-item-group-count">
+            <span
+              class="visible">
+              {{ item.checked.visible }}
+            </span>
+            <span
+              class="separator">
+              /
+            </span>
+            <span
+              class="mandatory">
+              {{ item.checked.mandatory }}
+            </span>
+            <span
+              class="separator">
+              /
+            </span>
+            <span
+              class="total">
+              {{ item.checked.total }}
+            </span>
           </div>
 
           <!-- Buttons -->
@@ -125,9 +144,27 @@
 
           <!-- Counted -->
           <div
-            class="gd-form-visible-mandatory-v2-list-item-group-tab-count"
-            fxFlex>
-            {{ item.checked.visible }} / {{ item.checked.mandatory }} / {{ item.checked.total }}
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-count">
+            <span
+              class="visible">
+              {{ item.checked.visible }}
+            </span>
+            <span
+              class="separator">
+              /
+            </span>
+            <span
+              class="mandatory">
+              {{ item.checked.mandatory }}
+            </span>
+            <span
+              class="separator">
+              /
+            </span>
+            <span
+              class="total">
+              {{ item.checked.total }}
+            </span>
           </div>
 
           <!-- Buttons -->
@@ -176,9 +213,27 @@
 
           <!-- Counted -->
           <div
-            class="gd-form-visible-mandatory-v2-list-item-group-tab-section-count"
-            fxFlex>
-            {{ item.checked.visible }} / {{ item.checked.mandatory }} / {{ item.checked.total }}
+            class="gd-form-visible-mandatory-v2-list-item-group-tab-section-count">
+            <span
+              class="visible">
+              {{ item.checked.visible }}
+            </span>
+            <span
+              class="separator">
+              /
+            </span>
+            <span
+              class="mandatory">
+              {{ item.checked.mandatory }}
+            </span>
+            <span
+              class="separator">
+              /
+            </span>
+            <span
+              class="total">
+              {{ item.checked.total }}
+            </span>
           </div>
 
           <!-- Buttons -->
