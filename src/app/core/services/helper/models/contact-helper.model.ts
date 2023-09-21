@@ -1527,7 +1527,7 @@ export class ContactHelperModel {
             'address.date'
           ),
           relationshipPath: ['followUps'],
-          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+          relationshipLabel: `${this.parent.i18nService.instant('LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS')} ${this.parent.i18nService.instant('LNG_EVENT_FIELD_LABEL_ADDRESS')}`
         },
         {
           type: V2AdvancedFilterType.TEXT,
