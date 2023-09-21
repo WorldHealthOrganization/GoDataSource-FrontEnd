@@ -2021,7 +2021,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'vaccinesReceived'
+            'vaccinesReceived.vaccine'
           ),
           options: data.options.vaccine,
           relationshipPath: ['relationships', 'people'],
@@ -2035,7 +2035,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'vaccinesReceived'
+            'vaccinesReceived.status'
           ),
           options: data.options.vaccineStatus,
           relationshipPath: ['relationships', 'people'],
@@ -2049,7 +2049,7 @@ export class ContactHelperModel {
           visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
             selectedOutbreak,
             this.parent.case.visibleMandatoryKey,
-            'vaccinesReceived'
+            'vaccinesReceived.date'
           ),
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
