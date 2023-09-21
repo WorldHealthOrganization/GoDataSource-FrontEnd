@@ -692,6 +692,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -727,6 +731,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                   required: () => true
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
@@ -830,6 +838,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
