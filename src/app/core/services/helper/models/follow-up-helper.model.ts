@@ -1706,22 +1706,14 @@ export class FollowUpHelperModel {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'createdBy',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
-          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
-            selectedOutbreak,
-            this.visibleMandatoryKey,
-            'createdBy'
-          ),
+          visibleMandatoryIf: () => true,
           options: data.options.user,
           sortable: true
         }, {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'updatedBy',
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
-          visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
-            selectedOutbreak,
-            this.visibleMandatoryKey,
-            'updatedBy'
-          ),
+          visibleMandatoryIf: () => true,
           options: data.options.user,
           sortable: true
         }
