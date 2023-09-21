@@ -704,6 +704,10 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -736,6 +740,10 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
@@ -950,6 +958,10 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }

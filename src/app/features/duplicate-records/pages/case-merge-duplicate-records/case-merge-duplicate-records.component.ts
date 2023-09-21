@@ -873,6 +873,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -906,6 +910,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                     }
                   }
                 }
+              },
+              visibleMandatoryChild: {
+                visible: () => true,
+                mandatory: () => false
               }
             }
           ]
@@ -1285,6 +1293,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -1317,6 +1329,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
