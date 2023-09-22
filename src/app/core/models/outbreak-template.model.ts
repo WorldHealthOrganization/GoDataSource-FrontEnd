@@ -37,7 +37,6 @@ export class OutbreakTemplateModel
   labResultsTemplate: QuestionModel[];
   isContactLabResultsActive: boolean;
   isContactsOfContactsActive: boolean;
-  isDateOfOnsetRequired: boolean;
   applyGeographicRestrictions: boolean;
   checkLastContactDateAgainstDateOnSet: boolean;
   disableModifyingLegacyQuestionnaire: boolean;
@@ -100,7 +99,6 @@ export class OutbreakTemplateModel
     this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
     this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
     this.isContactsOfContactsActive = _.get(data, 'isContactsOfContactsActive', false);
-    this.isDateOfOnsetRequired = _.get(data, 'isDateOfOnsetRequired', true);
     this.applyGeographicRestrictions = _.get(data, 'applyGeographicRestrictions', false);
     this.checkLastContactDateAgainstDateOnSet = _.get(data, 'checkLastContactDateAgainstDateOnSet', false);
     this.disableModifyingLegacyQuestionnaire = _.get(data, 'disableModifyingLegacyQuestionnaire', false);

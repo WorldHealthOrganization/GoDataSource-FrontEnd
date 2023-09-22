@@ -579,17 +579,6 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
               }
             }, {
               type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: 'isDateOfOnsetRequired',
-              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
-              description: () => 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED_DESCRIPTION',
-              value: {
-                get: () => this.itemData.isDateOfOnsetRequired,
-                set: (value) => {
-                  this.itemData.isDateOfOnsetRequired = value;
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
               name: 'isContactsOfContactsActive',
               placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE',
               description: () => 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION',

@@ -13,6 +13,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-import-case-data',
@@ -77,7 +78,8 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
     private router: Router,
     private outbreakDataService: OutbreakDataService,
     private authDataService: AuthDataService,
-    private redirectService: RedirectService
+    private redirectService: RedirectService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {}
 
   /**
@@ -103,7 +105,10 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
           ];
 
           // is dateOfOnset required for this outbreak ?
-          if (this.selectedOutbreak.isDateOfOnsetRequired) {
+          if (
+            this.selectedOutbreak?.visibleAndMandatoryFields &&
+            this.selectedOutbreak.visibleAndMandatoryFields[this.personAndRelatedHelperService.case.visibleMandatoryKey]?.dateOfOnset?.mandatory
+          ) {
             this.requiredDestinationFields.push('dateOfOnset');
           }
 
