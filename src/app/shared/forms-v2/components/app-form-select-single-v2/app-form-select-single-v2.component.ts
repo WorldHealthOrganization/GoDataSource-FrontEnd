@@ -298,17 +298,21 @@ export class AppFormSelectSingleV2Component
     }
 
     // case insensitive
-    const byValue: string = this.searchValue.toLowerCase();
+    const byValues: string[] = this.searchValue.toLowerCase().split(' ').filter((byValue) => byValue !== '');
 
     // filter
     this.filteredOptions = this.options.filter((item: ILabelValuePairModel): boolean => {
+      let labelLowered: string;
       return (
         this.allowDisabledToBeSelected ||
         !item.disabled || (
           this.value &&
           item.value === this.value
         )
-      ) && item.label.toLowerCase().indexOf(byValue) > -1;
+      ) && (
+        (labelLowered = item.label.toLowerCase()) &&
+        byValues.every((byValue) => labelLowered.indexOf(byValue) > -1)
+      );
     });
   }
 

@@ -700,7 +700,11 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
                 get: () => this.itemData.address
               },
               visible: () => !!this.itemData.address,
-              readonly: true
+              readonly: true,
+              visibleMandatoryChild: {
+                visible: () => true,
+                mandatory: () => false
+              }
             }
           ]
         },
