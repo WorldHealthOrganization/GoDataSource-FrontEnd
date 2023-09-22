@@ -538,20 +538,6 @@ export class OutbreakTemplatesListComponent
         }
       },
       {
-        field: 'isDateOfOnsetRequired',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
-        sortable: true,
-        notVisible: true,
-        format: {
-          type: V2ColumnFormat.BOOLEAN
-        },
-        filter: {
-          type: V2FilterType.BOOLEAN,
-          value: '',
-          defaultValue: ''
-        }
-      },
-      {
         field: 'isContactsOfContactsActive',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE',
         notVisible: true,
@@ -814,7 +800,6 @@ export class OutbreakTemplatesListComponent
       'generateFollowUpsWhenCreatingContacts',
       'applyGeographicRestrictions',
       'isContactLabResultsActive',
-      'isDateOfOnsetRequired',
       'isContactsOfContactsActive',
       'periodOfFollowup',
       'frequencyOfFollowUpPerDay',

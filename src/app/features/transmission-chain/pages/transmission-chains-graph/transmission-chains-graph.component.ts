@@ -1179,7 +1179,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             },
             maxDate: today,
             validators: {
-              required: () => !!this.selectedOutbreak?.isDateOfOnsetRequired,
+              required: () => this.selectedOutbreak?.visibleAndMandatoryFields &&
+                this.selectedOutbreak.visibleAndMandatoryFields[this.personAndRelatedHelperService.case.visibleMandatoryKey]?.dateOfOnset?.mandatory,
               dateSameOrBefore: () => [
                 today,
                 'dateOfOutcome'
@@ -1218,7 +1219,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             },
             maxDate: today,
             validators: {
-              required: () => !!this.selectedOutbreak?.isDateOfOnsetRequired,
               dateSameOrBefore: () => [
                 today
               ],

@@ -775,20 +775,6 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
         }
       },
       {
-        field: 'isDateOfOnsetRequired',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
-        sortable: true,
-        notVisible: true,
-        format: {
-          type: V2ColumnFormat.BOOLEAN
-        },
-        filter: {
-          type: V2FilterType.BOOLEAN,
-          value: '',
-          defaultValue: ''
-        }
-      },
-      {
         field: 'checkLastContactDateAgainstDateOnSet',
         label: 'LNG_OUTBREAK_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET',
         sortable: true,
@@ -1228,7 +1214,6 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
       'generateFollowUpsOverwriteExisting',
       'generateFollowUpsKeepTeamAssignment',
       'isContactLabResultsActive',
-      'isDateOfOnsetRequired',
       'generateFollowUpsDateOfLastContact',
       'generateFollowUpsWhenCreatingContacts',
       'locationIds',

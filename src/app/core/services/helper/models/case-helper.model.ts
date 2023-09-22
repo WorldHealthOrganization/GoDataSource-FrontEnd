@@ -479,7 +479,7 @@ export class CaseHelperModel {
               },
               maxDate: today,
               validators: {
-                required: () => !!data.selectedOutbreak.isDateOfOnsetRequired,
+                required: () => true,
                 dateSameOrBefore: () => [
                   today,
                   'dateOfOutcome'

@@ -404,13 +404,6 @@ export class OutbreakAndOutbreakTemplateHelperService {
       },
       {
         type: V2AdvancedFilterType.SELECT,
-        field: 'isDateOfOnsetRequired',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
         field: 'generateFollowUpsDateOfLastContact',
         label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
         options: data.options.yesNo,
@@ -666,13 +659,6 @@ export class OutbreakAndOutbreakTemplateHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'isContactLabResultsActive',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_LAB_RESULTS_ACTIVE',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'isDateOfOnsetRequired',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
         options: data.options.yesNo,
         sortable: true
       },
