@@ -45,6 +45,9 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
     responsibleUserId: ILabelValuePairModel[],
     dateOfReporting: ILabelValuePairModel[],
     isDateOfReportingApproximate: ILabelValuePairModel[],
+    outcomeId: ILabelValuePairModel[],
+    dateOfOutcome: ILabelValuePairModel[],
+    transferRefused: ILabelValuePairModel[],
     riskLevel: ILabelValuePairModel[],
     riskReason: ILabelValuePairModel[],
     followUpTeamId: ILabelValuePairModel[],
@@ -173,6 +176,18 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
               mergeRecords,
               'isDateOfReportingApproximate'
             ).options,
+            outcomeId: this.getFieldOptions(
+              mergeRecords,
+              'outcomeId'
+            ).options,
+            dateOfOutcome: this.getFieldOptions(
+              mergeRecords,
+              'dateOfOutcome'
+            ).options,
+            transferRefused: this.getFieldOptions(
+              mergeRecords,
+              'transferRefused'
+            ).options,
             riskLevel: this.getFieldOptions(
               mergeRecords,
               'riskLevel'
@@ -254,6 +269,15 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
           data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
             this._uniqueOptions.isDateOfReportingApproximate[0].value :
             data.isDateOfReportingApproximate;
+          data.outcomeId = this._uniqueOptions.outcomeId.length === 1 ?
+            this._uniqueOptions.outcomeId[0].value :
+            data.outcomeId;
+          data.dateOfOutcome = this._uniqueOptions.dateOfOutcome.length === 1 ?
+            this._uniqueOptions.dateOfOutcome[0].value :
+            data.dateOfOutcome;
+          data.transferRefused = this._uniqueOptions.transferRefused.length === 1 ?
+            this._uniqueOptions.transferRefused[0].value :
+            data.transferRefused;
           data.riskLevel = this._uniqueOptions.riskLevel.length === 1 ?
             this._uniqueOptions.riskLevel[0].value :
             data.riskLevel;
@@ -793,6 +817,42 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'outcomeId',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_OUTCOME_DESCRIPTION',
+            options: this._uniqueOptions.outcomeId,
+            value: {
+              get: () => this.itemData.outcomeId,
+              set: (value) => {
+                this.itemData.outcomeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'dateOfOutcome',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
+            options: this._uniqueOptions.dateOfOutcome,
+            value: {
+              get: () => this.itemData.dateOfOutcome as any,
+              set: (value) => {
+                this.itemData.dateOfOutcome = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'transferRefused',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
+            options: this._uniqueOptions.transferRefused,
+            value: {
+              get: () => this.itemData.transferRefused as any,
+              set: (value) => {
+                this.itemData.transferRefused = value as any;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'riskLevel',
             placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
             description: () => 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
@@ -1038,6 +1098,8 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
       case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'isDateOfReportingApproximate': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
+      case 'dateOfOutcome': return EntityModel.uniqueDateOptions(mergeRecords, key);
+      case 'transferRefused': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
       case 'wasCase': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
       case 'dateBecomeContact': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'responsibleUserId': {
