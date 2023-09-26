@@ -1,7 +1,6 @@
 import * as moment from 'moment-timezone';
 import { Moment as MomentOriginal } from 'moment-timezone';
 import { Constants } from '../models/constants';
-import { Locale, LocaleSpecification } from 'moment/moment';
 
 /**
  * Types
@@ -68,25 +67,5 @@ export abstract class LocalizationHelper {
     return data ?
       LocalizationHelper.toMoment(data).tz(LocalizationHelper.TIMEZONE).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
       '';
-  }
-
-  /**
-   * Update locale
-   */
-  static updateLocale(
-    language: string,
-    localeSpec: LocaleSpecification | null
-  ): Locale {
-    return moment.updateLocale(
-      language,
-      localeSpec
-    );
-  }
-
-  /**
-   * Locale
-   */
-  static locale(language?: string): string {
-    return moment.locale(language);
   }
 }
