@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import { moment, Moment } from '../helperClasses/x-moment';
 import { IPermissionBasic, IPermissionLanguage } from './permission.interface';
 import { PERMISSION } from './permission.model';
 import { UserModel } from './user.model';
+import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
 
 export class LanguageTokenModel {
   token: string;
@@ -23,7 +23,7 @@ export class LanguageTokenDetails {
     this.languageId = _.get(data, 'languageId');
 
     this.lastUpdateDate = _.get(data, 'lastUpdateDate');
-    this.lastUpdateDate = this.lastUpdateDate ? moment(this.lastUpdateDate) : null;
+    this.lastUpdateDate = this.lastUpdateDate ? LocalizationHelper.toMoment(this.lastUpdateDate) : null;
 
     this.tokens = _.get(data, 'tokens');
     this.tokens = (this.tokens || []).map((token) => new LanguageTokenModel(token));
@@ -76,7 +76,7 @@ implements
     // created at
     this.createdAt = _.get(data, 'createdAt');
     if (this.createdAt) {
-      this.createdAt = moment.utc(this.createdAt);
+      this.createdAt = LocalizationHelper.toMoment(this.createdAt);
     }
 
     // created by
@@ -91,7 +91,7 @@ implements
     // updated at
     this.updatedAt = _.get(data, 'updatedAt');
     if (this.updatedAt) {
-      this.updatedAt = moment.utc(this.updatedAt);
+      this.updatedAt = LocalizationHelper.toMoment(this.updatedAt);
     }
 
     // updated by
@@ -109,7 +109,7 @@ implements
     // deleted at
     this.deletedAt = _.get(data, 'deletedAt');
     if (this.deletedAt) {
-      this.deletedAt = moment.utc(this.deletedAt);
+      this.deletedAt = LocalizationHelper.toMoment(this.deletedAt);
     }
   }
 

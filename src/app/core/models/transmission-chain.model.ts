@@ -4,10 +4,10 @@ import { CaseModel } from './case.model';
 import { EntityType } from './entity-type';
 import { Constants } from './constants';
 import { EventModel } from './event.model';
-import { Moment, moment } from '../helperClasses/x-moment';
 import { IPermissionChainsOfTransmission } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
 
 export class TransmissionChainModel
 implements
@@ -109,7 +109,7 @@ implements
           this.eventsMap[personId] = eventModel;
           this.eventsCount++;
           const date = eventModel.date ?
-            moment(eventModel.date) :
+            LocalizationHelper.toMoment(eventModel.date) :
             undefined;
           if (
             date && (
@@ -125,7 +125,7 @@ implements
           this.casesMap[personId] = caseModel;
           this.casesMapLength++;
           const date = caseModel.dateOfOnset ?
-            moment(caseModel.dateOfOnset) :
+            LocalizationHelper.toMoment(caseModel.dateOfOnset) :
             undefined;
           if (
             date && (
@@ -168,7 +168,7 @@ implements
 
     // format
     this.earliestDateOfOnset = earliestDateOfOnset ?
-      moment(earliestDateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+      LocalizationHelper.toMoment(earliestDateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
       undefined;
   }
 

@@ -1,5 +1,3 @@
-import { moment, Moment } from '../helperClasses/x-moment';
-
 /**
  * Export status steps
  */
@@ -1219,21 +1217,6 @@ export class Constants {
 
   // regex email
   static readonly REGEX_EMAIL_VALIDATOR = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-
-  /**
-     * Today date
-     */
-  static getCurrentDate(): Moment {
-    return moment().startOf('day');
-  }
-
-  /**
-     * Check if a given date is in the future
-     */
-  static isDateInTheFuture(date): boolean {
-    const dateMoment = date ? moment(date) : null;
-    return !!(dateMoment && dateMoment.startOf('day').isAfter(Constants.getCurrentDate()));
-  }
 
   /**
      * Generate random string

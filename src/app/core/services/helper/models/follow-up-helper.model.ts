@@ -119,7 +119,7 @@ export class FollowUpHelperModel {
                 validators: {
                   required: () => true
                 },
-                disabled: () => data.isModify && Constants.isDateInTheFuture(data.itemData.date)
+                disabled: () => data.isModify && data.itemData.date && LocalizationHelper.toMoment(data.itemData.date).startOf('day').isAfter(LocalizationHelper.today())
               }, {
                 type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
                 name: 'responsibleUserId',
@@ -530,7 +530,10 @@ export class FollowUpHelperModel {
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
                   FollowUpModel.canModify(this.parent.authUser) &&
-                  !Constants.isDateInTheFuture(item.date);
+                  (
+                    !item.date ||
+                    LocalizationHelper.toMoment(item.date).isSameOrBefore(LocalizationHelper.today())
+                  );
               }
             },
 

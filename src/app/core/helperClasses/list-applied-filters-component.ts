@@ -4,11 +4,11 @@ import * as _ from 'lodash';
 import { AddressType } from '../models/address.model';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
-import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { ListQueryComponent } from './list-query-component';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { LocalizationHelper, Moment } from './localization-helper';
 
 /**
  * Applied filters
@@ -83,7 +83,7 @@ export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2Colu
 
     // parse date
     if (global.date) {
-      global.date = moment(global.date);
+      global.date = LocalizationHelper.toMoment(global.date);
     }
 
     // finished
@@ -271,7 +271,7 @@ export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2Colu
                         }
                       }, {
                         startDate: {
-                          $lte: moment(globalFilters.date).endOf('day').toISOString()
+                          $lte: LocalizationHelper.toMoment(globalFilters.date).endOf('day').toISOString()
                         }
                       }
                     ]
@@ -283,7 +283,7 @@ export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2Colu
                         }
                       }, {
                         endDate: {
-                          $gte: moment(globalFilters.date).startOf('day').toISOString()
+                          $gte: LocalizationHelper.toMoment(globalFilters.date).startOf('day').toISOString()
                         }
                       }
                     ]

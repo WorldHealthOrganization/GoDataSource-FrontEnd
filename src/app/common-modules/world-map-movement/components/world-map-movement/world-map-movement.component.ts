@@ -5,8 +5,8 @@ import { WorldMapComponent, WorldMapMarker, WorldMapPath, WorldMapPathType, Worl
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
 import { EntityType } from '../../../../core/models/entity-type';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-world-map-movement',
@@ -45,7 +45,7 @@ export class WorldMapMovementComponent {
                 _.isNumber(item.geoLocation.lat) &&
                 _.isNumber(item.geoLocation.lng);
     }).sortBy((item: AddressModel) => {
-      return moment(item.date);
+      return LocalizationHelper.toMoment(item.date);
     }).map((item, index) => {
       // add marker
       this.markers.push(new WorldMapMarker({

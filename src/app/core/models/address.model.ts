@@ -5,7 +5,7 @@ import {
   RequestFilterGenerator,
   RequestQueryBuilder
 } from '../helperClasses/request-query-builder';
-import { Moment } from '../helperClasses/x-moment';
+import { Moment } from '../helperClasses/localization-helper';
 
 // addresses types
 export enum AddressType {

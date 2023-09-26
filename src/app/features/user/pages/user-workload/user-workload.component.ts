@@ -4,7 +4,6 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
-import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { map, takeUntil, tap } from 'rxjs/operators';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -16,6 +15,7 @@ import { Location } from '@angular/common';
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../../core/models/saved-filters.model';
 import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-user-workload',
@@ -84,8 +84,8 @@ export class UserWorkloadComponent extends ListComponent<any, IV2Column> impleme
   selectedOutbreakChanged(): void {
     // set default advanced filters
     const defaultFilter: IV2DateRange = {
-      startDate: moment(Constants.getCurrentDate().subtract(28, 'days')).startOf('day'),
-      endDate: moment(Constants.getCurrentDate()).endOf('day')
+      startDate: LocalizationHelper.today().subtract(28, 'days').startOf('day'),
+      endDate: LocalizationHelper.today().endOf('day')
     };
     this.tableV2Component.generateFiltersFromFilterData(new SavedFilterData({
       appliedFilterOperator: RequestFilterOperator.AND,
@@ -251,13 +251,13 @@ export class UserWorkloadComponent extends ListComponent<any, IV2Column> impleme
               },
               followUpsPerDay: _.keyBy(user.dates, (entry) => {
                 // determine min & max dates
-                const date = moment(entry.date).startOf('day');
+                const date = LocalizationHelper.toMoment(entry.date).startOf('day');
                 minDate = minDate ?
                   (date.isBefore(minDate) ? date : minDate) :
                   date;
                 maxDate = maxDate ?
-                  (date.isAfter(maxDate) ? moment(date) : maxDate) :
-                  moment(date);
+                  (date.isAfter(maxDate) ? LocalizationHelper.toMoment(date) : maxDate) :
+                  LocalizationHelper.toMoment(date);
 
                 // mark date found
                 usedDates[date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)] = true;
@@ -305,7 +305,7 @@ export class UserWorkloadComponent extends ListComponent<any, IV2Column> impleme
                     }
 
                     // construct url
-                    const url: string = `/contacts/follow-ups?fromWorkload=true&date=${ moment(followUpsPerDay.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }&user=${ data.user && data.user.id ? data.user.id : '' }`;
+                    const url: string = `/contacts/follow-ups?fromWorkload=true&date=${ LocalizationHelper.toMoment(followUpsPerDay.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }&user=${ data.user && data.user.id ? data.user.id : '' }`;
 
                     // status for successful followups
                     const status: string = '&status=' + encodeURIComponent(JSON.stringify([

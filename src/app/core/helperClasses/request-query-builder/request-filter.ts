@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
-import { moment } from '../x-moment';
 import { RequestFilterGenerator } from './request-filter-generator';
+import { LocalizationHelper } from '../localization-helper';
 
 export enum RequestFilterOperator {
   AND = 'and',
@@ -614,10 +614,10 @@ export class RequestFilter {
     // convert date range to simple range
     const rangeValue: any = {};
     if (value.startDate) {
-      rangeValue.from = value.startDate.toISOString ? value.startDate.toISOString() : moment(value.startDate).toISOString();
+      rangeValue.from = value.startDate.toISOString ? value.startDate.toISOString() : LocalizationHelper.toMoment(value.startDate).toISOString();
     }
     if (value.endDate) {
-      rangeValue.to = value.endDate.toISOString ? value.endDate.toISOString() : moment(value.endDate).toISOString();
+      rangeValue.to = value.endDate.toISOString ? value.endDate.toISOString() : LocalizationHelper.toMoment(value.endDate).toISOString();
     }
 
     // filter by range
