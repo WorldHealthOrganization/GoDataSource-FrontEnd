@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { StorageService } from './storage.service';
 import { v4 as uuid } from 'uuid';
-import * as moment from 'moment';
-import { Moment } from 'moment';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
 
 @Injectable()
 export class BulkCacheHelperService {
@@ -34,7 +33,7 @@ export class BulkCacheHelperService {
     const cacheKey: string = `${this._keySelectedPrefix}${uuid()}`;
     this.storageService.setAny(
       cacheKey, {
-        created: moment(),
+        created: LocalizationHelper.now(),
         selected
       }
     );
@@ -87,7 +86,7 @@ export class BulkCacheHelperService {
         !onlyExpired ||
         !cacheData?.created ||
         !cacheData.selected?.length ||
-        moment(cacheData.created) < moment().add(-1, 'days')
+        LocalizationHelper.toMoment(cacheData.created) < LocalizationHelper.now().add(-1, 'days')
       ) {
         // delete
         this.storageService.removeAny(cacheKey);

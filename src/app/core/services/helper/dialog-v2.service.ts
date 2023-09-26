@@ -44,8 +44,6 @@ import {
 import * as _ from 'lodash';
 import { catchError } from 'rxjs/operators';
 import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { Constants, ExportStatusStep } from '../../models/constants';
 import { ExportLogDataService } from '../data/export-log.data.service';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
@@ -89,6 +87,7 @@ import {
 } from '../../../shared/forms-v2/components/app-form-select-groups-v2/app-form-select-groups-v2.component';
 import { ErrorModel } from '../../models/error.model';
 import { I18nService } from './i18n.service';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
 
 @Injectable()
 export class DialogV2Service {
@@ -895,7 +894,7 @@ export class DialogV2Service {
                     if (exportLogModel.processedNo > 0) {
                       // initialize start time if necessary
                       if (!startTime) {
-                        startTime = moment();
+                        startTime = LocalizationHelper.now();
                         processedErrorForCorrectTime = exportLogModel.processedNo;
                       }
 
@@ -903,10 +902,10 @@ export class DialogV2Service {
                       const processed: number = exportLogModel.processedNo - processedErrorForCorrectTime;
                       const total: number = exportLogModel.totalNo - processedErrorForCorrectTime;
                       if (processed > 0) {
-                        const processedSoFarTimeMs: number = moment().diff(startTime);
+                        const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                         const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                         const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                        estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                        estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                       }
                     }
 
@@ -1692,7 +1691,7 @@ export class DialogV2Service {
             // between
             const date = appliedFilter.value ?
               null :
-              moment(appliedFilter.value);
+              LocalizationHelper.toMoment(appliedFilter.value);
 
             // filter
             qb.filter.byDateRange(
@@ -2135,7 +2134,7 @@ export class DialogV2Service {
                   item.suffixIconButtons.push({
                     tooltip: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
-                        datetime: moment(savedData.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
+                        datetime: LocalizationHelper.toMoment(savedData.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
                       }
                     ),
                     icon: 'history'
@@ -2260,7 +2259,7 @@ export class DialogV2Service {
                   option.infos.push({
                     label: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
-                        datetime: moment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
+                        datetime: LocalizationHelper.toMoment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
                       }
                     ),
                     icon: 'history'
@@ -2586,7 +2585,7 @@ export class DialogV2Service {
     // created at
     let createdAt: string = '—';
     if (record.createdAt) {
-      createdAt = moment(record.createdAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+      createdAt = LocalizationHelper.toMoment(record.createdAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
@@ -2613,7 +2612,7 @@ export class DialogV2Service {
     // updated at
     let updatedAt: string = '—';
     if (record.updatedAt) {
-      updatedAt = moment(record.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+      updatedAt = LocalizationHelper.toMoment(record.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,

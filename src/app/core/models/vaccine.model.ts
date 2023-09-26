@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import { Moment } from 'moment';
 import { I18nService } from '../services/helper/i18n.service';
 import { moment } from '../helperClasses/x-moment';
 import { Constants } from './constants';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class VaccineModel {
   // data

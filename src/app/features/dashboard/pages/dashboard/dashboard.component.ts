@@ -17,7 +17,6 @@ import { ExportDataExtension, ExportDataMethod } from '../../../../core/services
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import * as momentOriginal from 'moment';
 import { ConvertHtmlToPDFStep, DomService } from '../../../../core/services/helper/dom.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { throwError } from 'rxjs';
@@ -38,6 +37,7 @@ import { ContactFollowUpOverviewDashletComponent } from '../../components/contac
 import { CasesBasedOnContactStatusDashletComponent } from '../../components/cases-based-on-contact-status-dashlet/cases-based-on-contact-status-dashlet.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-dashboard',
@@ -434,7 +434,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   url: `/outbreaks/${this._selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -502,7 +502,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   url: `/outbreaks/${this._selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -796,7 +796,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.domService
         .convertHTML2PDF(
           document.querySelector(elementSelector),
-          `${this.i18nService.instant(fileName)} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}.pdf`, {
+          `${this.i18nService.instant(fileName)} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}.pdf`, {
             splitType: exportAsSinglePage ?
               'grid' :
               'auto',

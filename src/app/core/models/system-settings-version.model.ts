@@ -3,14 +3,15 @@ import { CaptchaConfigModel } from './captcha-config.model';
 
 export class SystemSettingsVersionModel {
   // data
-  platform: string;
-  version: string;
-  build: string;
-  arch: string;
-  tokenTTL: number;
-  skipOldPasswordForUserModify: boolean;
-  captcha: CaptchaConfigModel;
-  demoInstance?: {
+  readonly platform: string;
+  readonly version: string;
+  readonly build: string;
+  readonly arch: string;
+  readonly timezone: string;
+  readonly tokenTTL: number;
+  readonly skipOldPasswordForUserModify: boolean;
+  readonly captcha: CaptchaConfigModel;
+  readonly demoInstance?: {
     enabled: boolean,
     label: string,
     style: {
@@ -21,7 +22,7 @@ export class SystemSettingsVersionModel {
       fontSize: string
     }
   };
-  duplicate: {
+  readonly duplicate: {
     disableCaseDuplicateCheck: boolean,
     disableContactDuplicateCheck: boolean,
     disableContactOfContactDuplicateCheck: boolean,
@@ -36,6 +37,7 @@ export class SystemSettingsVersionModel {
     this.version = _.get(data, 'version');
     this.build = _.get(data, 'build');
     this.arch = _.get(data, 'arch');
+    this.timezone = _.get(data, 'timezone');
     this.tokenTTL = _.get(data, 'tokenTTL');
     this.skipOldPasswordForUserModify = _.get(data, 'skipOldPasswordForUserModify');
     this.captcha = new CaptchaConfigModel(_.get(data, 'captcha'));

@@ -19,7 +19,6 @@ import { AnswerModel, IAnswerData, QuestionModel } from '../../../../core/models
 import { Constants } from '../../../../core/models/constants';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
-import * as moment from 'moment';
 import { IV2BottomDialogConfigButtonType } from '../../../components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { FileItem, FileUploader } from 'ng2-file-upload';
@@ -35,6 +34,7 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import * as FileSaver from 'file-saver';
 import { v4 as uuid } from 'uuid';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Flatten type
@@ -964,10 +964,10 @@ export class AppFormFillQuestionnaireV2Component
           // get parent date
           let dateFormatted = this.value[question.variable][childIndex].date;
           const dateISO = dateFormatted ?
-            moment(dateFormatted).toISOString() :
+            LocalizationHelper.toMoment(dateFormatted).toISOString() :
             undefined;
           dateFormatted = dateFormatted ?
-            moment(dateFormatted).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.toMoment(dateFormatted).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             dateFormatted;
 
           // if date provided, then search for child with same date
@@ -979,7 +979,7 @@ export class AppFormFillQuestionnaireV2Component
               ) || (
                 dateFormatted &&
                 answer.date &&
-                moment(answer.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) === dateFormatted
+                LocalizationHelper.toMoment(answer.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) === dateFormatted
               );
             });
 
@@ -1064,7 +1064,7 @@ export class AppFormFillQuestionnaireV2Component
     variables.forEach((variable) => {
       if (this.value[variable].length > item.index) {
         this.value[variable][item.index].date = this.value[item.parent.data.variable][item.index].date ?
-          moment(this.value[item.parent.data.variable][item.index].date) :
+          LocalizationHelper.toMoment(this.value[item.parent.data.variable][item.index].date) :
           this.value[item.parent.data.variable][item.index].date;
       }
     });

@@ -35,6 +35,8 @@ import { RedirectService } from '../../services/helper/redirect.service';
 import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { I18nService } from '../../services/helper/i18n.service';
 import { LanguageDataService } from '../../services/data/language.data.service';
+import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
+import { SystemSettingsDataService } from '../../services/data/system-settings.data.service';
 
 @Component({
   selector: 'app-topnav',
@@ -60,6 +62,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
   // language handler
   languageSubscription: Subscription;
+
+  // version information
+  versionData: SystemSettingsVersionModel;
 
   // global search
   globalSearchValue: string;
@@ -181,7 +186,8 @@ export class TopnavComponent implements OnInit, OnDestroy {
     private i18nService: I18nService,
     private globalEntitySearchDataService: GlobalEntitySearchDataService,
     private redirectService: RedirectService,
-    private languageDataService: LanguageDataService
+    private languageDataService: LanguageDataService,
+    private systemSettingsDataService: SystemSettingsDataService
   ) {
     // update render mode
     this.updateRenderMode();
@@ -270,6 +276,17 @@ export class TopnavComponent implements OnInit, OnDestroy {
           // update ui
           this.changeDetectorRef.detectChanges();
         }
+      });
+
+    // retrieve version data
+    this.systemSettingsDataService
+      .getAPIVersion()
+      .subscribe((versionData) => {
+        // set data version
+        this.versionData = versionData;
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
       });
 
     // subscribe to history changes

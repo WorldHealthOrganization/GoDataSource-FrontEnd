@@ -1,5 +1,4 @@
 import { AppFormBaseV2 } from './app-form-base-v2';
-import { Moment } from 'moment';
 import { Observable } from 'rxjs/internal/Observable';
 import { HierarchicalLocationModel } from '../../../core/models/hierarchical-location.model';
 import { ChangeDetectorRef, Directive, Input, ViewChild } from '@angular/core';
@@ -10,11 +9,11 @@ import { LocationDataService } from '../../../core/services/data/location.data.s
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { catchError, share } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { ControlContainer } from '@angular/forms';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { LocalizationHelper, Moment } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Location
@@ -127,7 +126,7 @@ export abstract class AppFormLocationBaseV2<T>
         _.each(
           items,
           (cached, localCacheKey) => {
-            if (moment().diff(cached.createdAt) >= AppFormLocationBaseV2.INVALIDATE_CACHE_AFTER_N_MS) {
+            if (LocalizationHelper.now().diff(cached.createdAt) >= AppFormLocationBaseV2.INVALIDATE_CACHE_AFTER_N_MS) {
               delete AppFormLocationBaseV2.CACHE[localMethodKey][localCacheKey];
             }
           }
@@ -153,7 +152,7 @@ export abstract class AppFormLocationBaseV2<T>
 
       // cache item
       AppFormLocationBaseV2.CACHE[methodKey][cacheKey] = {
-        createdAt: moment(),
+        createdAt: LocalizationHelper.now(),
         executeObserver$: executeObserver$,
         data: null,
         observer$: new Observable<HierarchicalLocationModel[]>((function(

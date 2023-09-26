@@ -26,11 +26,10 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
-import { Moment } from 'moment';
-import * as momentOriginal from 'moment';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-lab-results',
@@ -1332,17 +1331,17 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
 
                         // initialize start time if necessary
                         if (!startTime) {
-                          startTime = momentOriginal();
+                          startTime = LocalizationHelper.now();
                         }
 
                         // determine estimated time
                         const processed: number = selected.length - selectedShallowClone.length;
                         const total: number = selected.length;
                         if (processed > 0) {
-                          const processedSoFarTimeMs: number = momentOriginal().diff(startTime);
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                           const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                           const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                          estimatedEndDate = momentOriginal().add(remainingTimeMs, 'ms');
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                         }
 
                         // update progress
@@ -1461,17 +1460,17 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
 
                         // initialize start time if necessary
                         if (!startTime) {
-                          startTime = momentOriginal();
+                          startTime = LocalizationHelper.now();
                         }
 
                         // determine estimated time
                         const processed: number = selected.length - selectedShallowClone.length;
                         const total: number = selected.length;
                         if (processed > 0) {
-                          const processedSoFarTimeMs: number = momentOriginal().diff(startTime);
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                           const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                           const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                          estimatedEndDate = momentOriginal().add(remainingTimeMs, 'ms');
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                         }
 
                         // update progress

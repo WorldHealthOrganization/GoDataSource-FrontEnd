@@ -21,8 +21,6 @@ import {
   V2SpreadsheetEditorEventType
 } from './models/column.model';
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorError, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { NewValueParams, SuppressHeaderKeyboardEventParams, SuppressKeyboardEventParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { IV2SpreadsheetEditorChangeValues, V2SpreadsheetEditorChange, V2SpreadsheetEditorChangeType } from './models/change.model';
 import { Observable, of, Subscription, switchMap, throwError } from 'rxjs';
@@ -52,6 +50,7 @@ import { AppSpreadsheetEditorV2CellRowNoRendererModel } from './models/app-sprea
 import { AppSpreadsheetEditorV2CellBasicHeaderModel } from './models/app-spreadsheet-editor-v2-cell-basic-header.model';
 import { AppSpreadsheetEditorV2CellBasicHeaderPivotComponent } from './components/header-pivot/app-spreadsheet-editor-v2-cell-basic-header-pivot.component';
 import { AppMessages } from '../../../core/enums/app-messages.enum';
+import { LocalizationHelper, Moment } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -1742,7 +1741,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     if (
       !primaryButtonStillDown || (
         this.editor.selection.selected.outTime &&
-        moment().diff(this.editor.selection.selected.outTime) > AppSpreadsheetEditorV2Component.HOVER_OUTSIDE_LIMIT_UNTIL_MOUSE_OUT
+        LocalizationHelper.now().diff(this.editor.selection.selected.outTime) > AppSpreadsheetEditorV2Component.HOVER_OUTSIDE_LIMIT_UNTIL_MOUSE_OUT
       )
     ) {
       // wrap up
@@ -1808,7 +1807,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }
 
     // listen for leaving cells zone
-    this.editor.selection.selected.outTime = moment();
+    this.editor.selection.selected.outTime = LocalizationHelper.now();
   }
 
   /**
@@ -2139,7 +2138,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         (column.validators as IV2SpreadsheetEditorColumnValidatorDate)?.date
       ) {
         // date validation
-        const cellDataMoment: Moment = moment(cellData);
+        const cellDataMoment: Moment = LocalizationHelper.toMoment(cellData);
         isValid = cellDataMoment.isValid();
 
         // not integer ?
@@ -2152,23 +2151,23 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           const dateConf = (column.validators as IV2SpreadsheetEditorColumnValidatorDate)?.date(rowData);
 
           // min
-          isValid = dateConf.min === undefined || cellDataMoment.isSameOrAfter(moment(dateConf.min));
+          isValid = dateConf.min === undefined || cellDataMoment.isSameOrAfter(LocalizationHelper.toMoment(dateConf.min));
           if (!isValid) {
             error = {
               key: AppFormBaseErrorMsgV2Type.DATE,
               data: {
-                field: moment(dateConf.min).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+                field: LocalizationHelper.toMoment(dateConf.min).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
                 comparator: this.i18nService.instant('LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER')
               }
             };
           } else {
             // max
-            isValid = dateConf.max === undefined || cellDataMoment.isSameOrBefore(moment(dateConf.max));
+            isValid = dateConf.max === undefined || cellDataMoment.isSameOrBefore(LocalizationHelper.toMoment(dateConf.max));
             if (!isValid) {
               error = {
                 key: AppFormBaseErrorMsgV2Type.DATE,
                 data: {
-                  field: moment(dateConf.min).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+                  field: LocalizationHelper.toMoment(dateConf.min).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
                   comparator: this.i18nService.instant('LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE')
                 }
               };
@@ -2683,7 +2682,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       case V2SpreadsheetEditorColumnType.DATE:
         // format
         return value ?
-          moment(value as string | Moment).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+          LocalizationHelper.toMoment(value as string | Moment).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
           value as string;
 
       case V2SpreadsheetEditorColumnType.SINGLE_SELECT:
@@ -2928,7 +2927,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           );
 
           // convert date
-          if (value instanceof moment) {
+          if (value instanceof LocalizationHelper.moment) {
             value = (value as Moment).toISOString();
           }
 
@@ -3165,10 +3164,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               newValue &&
               typeof newValue === 'string'
             ) {
-              if (!moment(newValue).isValid()) {
+              if (!LocalizationHelper.toMoment(newValue).isValid()) {
                 newValue = undefined;
               }
-            } else if (newValue instanceof moment) {
+            } else if (newValue instanceof LocalizationHelper.moment) {
               // no changes
             } else {
               // not supported format

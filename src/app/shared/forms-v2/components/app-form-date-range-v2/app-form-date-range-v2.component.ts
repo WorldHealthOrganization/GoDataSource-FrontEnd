@@ -10,9 +10,9 @@ import {
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { IV2DateRange } from './models/date.model';
-import * as momentOriginal from 'moment';
 import { Moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-form-date-range-v2',
@@ -83,7 +83,7 @@ export class AppFormDateRangeV2Component
     // must update dates ?
     if (
       this.value?.endDate &&
-      this.value?.endDate instanceof momentOriginal
+      this.value?.endDate instanceof LocalizationHelper.moment
     ) {
       // mutable
       (this.value?.endDate as Moment).endOf('day');

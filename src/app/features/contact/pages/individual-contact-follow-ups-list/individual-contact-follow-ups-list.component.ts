@@ -1,7 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
@@ -29,6 +28,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-individual-contact-follow-ups-list',
@@ -92,11 +92,11 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
     this.suffixLegends = [
       {
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        value: this.entityData.dateOfLastContact ? moment(this.entityData.dateOfLastContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : this.entityData.dateOfLastContact
+        value: this.entityData.dateOfLastContact ? LocalizationHelper.toMoment(this.entityData.dateOfLastContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : this.entityData.dateOfLastContact
       },
       {
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP',
-        value: this.entityData.followUp.endDate ? moment(this.entityData.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : this.entityData.followUp.endDate
+        value: this.entityData.followUp.endDate ? LocalizationHelper.toMoment(this.entityData.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : this.entityData.followUp.endDate
       }
     ];
   }
@@ -816,7 +816,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                   url: `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.personAndRelatedHelperService.i18nService.instant(fileName)} - ${moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant(fileName)} - ${LocalizationHelper.now().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}`,
                   queryBuilder: qb,
                   allow: {
                     types: [

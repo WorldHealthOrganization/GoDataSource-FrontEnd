@@ -20,9 +20,9 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { Constants } from '../../../../core/models/constants';
 import { ChangeValue, ChangeValueArray, ChangeValueObject, ChangeValueType } from '../../../../shared/components-v2/app-changes-v2/models/change.model';
-import * as momentOriginal from 'moment';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-audit-logs-list',
@@ -430,7 +430,7 @@ export class AuditLogsListComponent
           url: '/audit-logs/export',
           async: true,
           method: ExportDataMethod.POST,
-          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
+          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ LocalizationHelper.now().format('YYYY-MM-DD HH:mm') }`,
           queryBuilder: qb,
           allow: {
             types: [

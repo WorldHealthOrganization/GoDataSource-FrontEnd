@@ -4,7 +4,6 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { GridReadyEvent, IsFullWidthRowParams, RowHeightParams, RowNode, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import * as _ from 'lodash';
-import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
 import { Params } from '@angular/router';
@@ -60,6 +59,7 @@ import { IV2RowExpandRow, V2RowType } from './models/row.model';
 import { determineIfTouchDevice } from '../../../core/methods/touch-device';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { RedirectService } from '../../../core/services/helper/redirect.service';
+import { LocalizationHelper } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -1303,15 +1303,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
           // DATE
           case V2ColumnFormat.DATE:
-            return fieldValue ?
-              moment(fieldValue).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-              '';
+            return LocalizationHelper.displayDate(fieldValue);
 
           // DATETIME
           case V2ColumnFormat.DATETIME:
-            return fieldValue ?
-              moment(fieldValue).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
-              '';
+            return LocalizationHelper.displayDateTime(fieldValue);
 
           // BOOLEAN
           case V2ColumnFormat.BOOLEAN:

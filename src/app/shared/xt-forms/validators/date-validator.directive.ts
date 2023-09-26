@@ -4,8 +4,8 @@ import * as _ from 'lodash';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Constants } from '../../../core/models/constants';
 import { moment, Moment, MomentBuiltinFormat } from '../../../core/helperClasses/x-moment';
-import * as momentOriginal from 'moment';
 import { AppFormBaseV2 } from '../../forms-v2/core/app-form-base-v2';
+import { LocalizationHelper } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Handle Date compare input
@@ -98,7 +98,7 @@ export class DateValidatorDirective implements Validator {
           );
         } else if (
           compare instanceof AppFormBaseV2 ||
-          compare instanceof momentOriginal ||
+          compare instanceof LocalizationHelper.moment ||
           _.isString(compare)
         ) {
           compareItem = new DateValidatorFieldComparator(
@@ -117,7 +117,7 @@ export class DateValidatorDirective implements Validator {
         // & label if necessary
         let compareWithDate: Moment;
         let fieldLabel = compareItem.fieldLabel;
-        if (compareItem.compareItemValue instanceof momentOriginal) {
+        if (compareItem.compareItemValue instanceof LocalizationHelper.moment) {
           compareWithDate = compareItem.compareItemValue as Moment;
         }
 
@@ -236,7 +236,7 @@ export class DateValidatorDirective implements Validator {
 
     // validate date
     let value: any = control.value;
-    if (control.value instanceof momentOriginal) {
+    if (control.value instanceof LocalizationHelper.moment) {
       value = _.isObject(value._i) ? value : value._i;
     }
 

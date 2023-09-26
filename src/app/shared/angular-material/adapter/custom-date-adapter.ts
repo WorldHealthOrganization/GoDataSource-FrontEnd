@@ -1,8 +1,6 @@
 import { MatMomentDateAdapterOptions, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { Moment } from 'moment';
-import * as moment from 'moment';
-import { moment as xMoment } from '../../../core/helperClasses/x-moment';
+import { LocalizationHelper, Moment } from '../../../core/helperClasses/localization-helper';
 
 export class CustomDateAdapter extends MomentDateAdapter {
 
@@ -185,7 +183,7 @@ export class CustomDateAdapter extends MomentDateAdapter {
    * Configure moment for custom translations
    */
   private configureMoment(): void {
-    moment.updateLocale(
+    LocalizationHelper.updateLocale(
       'custom', {
         months: this.getMonthNames('long'),
         monthsShort: this.getMonthNames('short')
@@ -198,19 +196,19 @@ export class CustomDateAdapter extends MomentDateAdapter {
    */
   format(date: Moment, displayFormat: string): string {
     // retrieve current locale
-    const currentLocale: string = moment.locale();
+    const currentLocale: string = LocalizationHelper.locale();
 
     // configure custom locale with custom month names
     this.configureMoment();
-    moment.locale('custom');
+    LocalizationHelper.locale('custom');
 
     // format date
     const formattedDate: string = date ?
-      xMoment(date.toISOString()).format(displayFormat) :
+      LocalizationHelper.toMoment(date).format(displayFormat) :
       '';
 
     // reset back to previous locale
-    moment.locale(currentLocale);
+    LocalizationHelper.locale(currentLocale);
 
     // finished
     return formattedDate;
