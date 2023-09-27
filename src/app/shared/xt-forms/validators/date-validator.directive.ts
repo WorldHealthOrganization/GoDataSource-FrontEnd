@@ -3,9 +3,8 @@ import { Validator, AbstractControl, NG_VALIDATORS, ControlContainer, NgForm, Ng
 import * as _ from 'lodash';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Constants } from '../../../core/models/constants';
-import { moment, Moment, MomentBuiltinFormat } from '../../../core/helperClasses/x-moment';
 import { AppFormBaseV2 } from '../../forms-v2/core/app-form-base-v2';
-import { LocalizationHelper } from '../../../core/helperClasses/localization-helper';
+import { LocalizationHelper, Moment, MomentBuiltinFormat } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Handle Date compare input
@@ -14,8 +13,7 @@ export class DateValidatorFieldComparator {
   constructor(
     public compareItemValue: string | Moment | AppFormBaseV2<any>,
     public fieldLabel: string = null
-  ) {
-  }
+  ) {}
 }
 
 /**
@@ -54,7 +52,7 @@ export class DateValidatorDirective implements Validator {
   @Input() displayFormat: string = Constants.DEFAULT_DATE_DISPLAY_FORMAT;
   @Input() allowedDateFormats: (string | MomentBuiltinFormat)[] = [
     Constants.DEFAULT_DATE_DISPLAY_FORMAT,
-    moment.ISO_8601
+    LocalizationHelper.moment.ISO_8601
   ];
 
   // date must be bigger than
@@ -158,9 +156,7 @@ export class DateValidatorDirective implements Validator {
             );
           } else {
             // value from string
-            (moment as any).suppressDeprecationWarnings = true;
-            compareWithDate = moment(compareItem.compareItemValue as string);
-            (moment as any).suppressDeprecationWarnings = false;
+            compareWithDate = LocalizationHelper.toMoment(compareItem.compareItemValue as string);
           }
         }
 
@@ -171,7 +167,7 @@ export class DateValidatorDirective implements Validator {
           element = compareItem.compareItemValue as AppFormBaseV2<any>;
 
           // value
-          compareWithDate = element.value ? moment(element.value) : null;
+          compareWithDate = element.value ? LocalizationHelper.toMoment(element.value) : null;
 
           // label
           if (!fieldLabel) {
@@ -246,7 +242,7 @@ export class DateValidatorDirective implements Validator {
       invalidDateValidator: true
     };
     this.allowedDateFormats.forEach((format) => {
-      controlDate = moment(value, format, true);
+      controlDate = LocalizationHelper.toMoment(value, format, true);
       if (controlDate.isValid()) {
         // at least one format is valid
         invalid = null;

@@ -1,12 +1,13 @@
 import * as moment from 'moment-timezone';
 import { Moment as MomentOriginal, unitOfTime as MomentUnitOfTime } from 'moment-timezone';
 import { Constants } from '../models/constants';
-import { Duration, DurationInputArg1 } from 'moment/moment';
+import { Duration, DurationInputArg1, MomentBuiltinFormat as MomentBuiltinFormatOriginal } from 'moment/moment';
 
 /**
  * Types
  */
 export type Moment = MomentOriginal;
+export type MomentBuiltinFormat = MomentBuiltinFormatOriginal;
 
 /**
  * Localization helper
@@ -50,11 +51,13 @@ export abstract class LocalizationHelper {
    */
   static toMoment(
     data: string | Date | Moment,
-    format?: moment.MomentFormatSpecification
+    format?: moment.MomentFormatSpecification,
+    strict?: boolean
   ): Moment {
     return moment(
       data,
-      format
+      format,
+      strict
     ).tz(LocalizationHelper.TIMEZONE);
   }
 

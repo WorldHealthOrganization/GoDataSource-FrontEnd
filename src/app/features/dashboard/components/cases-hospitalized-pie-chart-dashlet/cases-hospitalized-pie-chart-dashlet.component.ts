@@ -9,7 +9,6 @@ import { catchError, map } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -17,6 +16,7 @@ import { PieDonutChartComponent, PieDonutChartData } from '../../../../shared/co
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-cases-hospitalized-pie-chart-dashlet',
@@ -184,7 +184,7 @@ implements OnInit, OnDestroy {
     if (this.globalFilterDate) {
       qb.filter.byDateRange(
         'dateOfReporting', {
-          endDate: moment(this.globalFilterDate).endOf('day').format()
+          endDate: LocalizationHelper.toMoment(this.globalFilterDate).endOf('day').format()
         }
       );
     }
