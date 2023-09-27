@@ -817,7 +817,7 @@ export class DialogV2Service {
                         processed: data.processed.toLocaleString('en'),
                         total: data.total.toLocaleString('en'),
                         estimatedEnd: data.estimatedEndDate ?
-                          data.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+                          LocalizationHelper.displayDateTime(data.estimatedEndDate) :
                           '—'
                       }
                     );
@@ -2134,7 +2134,7 @@ export class DialogV2Service {
                   item.suffixIconButtons.push({
                     tooltip: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
-                        datetime: LocalizationHelper.toMoment(savedData.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
+                        datetime: LocalizationHelper.displayDateTime(savedData.updatedAt)
                       }
                     ),
                     icon: 'history'
@@ -2259,7 +2259,7 @@ export class DialogV2Service {
                   option.infos.push({
                     label: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
-                        datetime: LocalizationHelper.toMoment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
+                        datetime: LocalizationHelper.displayDateTime(item.updatedAt)
                       }
                     ),
                     icon: 'history'
@@ -2585,7 +2585,7 @@ export class DialogV2Service {
     // created at
     let createdAt: string = '—';
     if (record.createdAt) {
-      createdAt = LocalizationHelper.toMoment(record.createdAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+      createdAt = LocalizationHelper.displayDateTime(record.createdAt);
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
@@ -2612,7 +2612,7 @@ export class DialogV2Service {
     // updated at
     let updatedAt: string = '—';
     if (record.updatedAt) {
-      updatedAt = LocalizationHelper.toMoment(record.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+      updatedAt = LocalizationHelper.displayDateTime(record.updatedAt);
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,

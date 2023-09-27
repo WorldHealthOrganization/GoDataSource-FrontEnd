@@ -1,6 +1,5 @@
 import * as moment from 'moment-timezone';
 import { Moment as MomentOriginal, unitOfTime as MomentUnitOfTime, Duration, DurationInputArg1, Locale, LocaleSpecification, MomentBuiltinFormat as MomentBuiltinFormatOriginal } from 'moment-timezone';
-import { Constants } from '../models/constants';
 
 /**
  * Types
@@ -17,6 +16,10 @@ export abstract class LocalizationHelper {
 
   // other constants
   static readonly ISO_8601: MomentBuiltinFormat = moment.ISO_8601;
+
+  // default display constants
+  private static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
+  private static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
 
   /**
    * Initialize
@@ -64,7 +67,7 @@ export abstract class LocalizationHelper {
    */
   static displayDate(data: string | Date | Moment): string {
     return data ?
-      LocalizationHelper.toMoment(data).tz(LocalizationHelper.TIMEZONE).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+      LocalizationHelper.toMoment(data).format(LocalizationHelper.DEFAULT_DATE_DISPLAY_FORMAT) :
       '';
   }
 
@@ -73,7 +76,7 @@ export abstract class LocalizationHelper {
    */
   static displayDateTime(data: string | Date | Moment): string {
     return data ?
-      LocalizationHelper.toMoment(data).tz(LocalizationHelper.TIMEZONE).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+      LocalizationHelper.toMoment(data).format(LocalizationHelper.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
       '';
   }
 

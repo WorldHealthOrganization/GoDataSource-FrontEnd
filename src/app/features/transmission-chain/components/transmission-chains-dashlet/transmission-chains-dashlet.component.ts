@@ -2389,7 +2389,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Retrieve proper label for snapshot dropdown option
      */
   private getSnapshotOptionLabel(snapshot: CotSnapshotModel): string {
-    const name: string = `${snapshot.name} - ${snapshot.startDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)}`;
+    const name: string = `${snapshot.name} - ${LocalizationHelper.displayDateTime(snapshot.startDate)}`;
     switch (snapshot.status) {
       case Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value:
         return this.personAndRelatedHelperService.i18nService.instant(
