@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Input, ViewEncapsulation } from '@angular/core';
 import { ChronologyItem } from './typings/chronology-item';
 import { Constants } from '../../../core/models/constants';
-import { moment } from '../../../core/helperClasses/x-moment';
 import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode.enum';
+import { LocalizationHelper } from '../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-chronology',
@@ -48,7 +48,7 @@ export class ChronologyComponent {
       this._entries.forEach((item: ChronologyItem, index: number) => {
         // we don't need to determine number of days for the first item
         if (index > 0) {
-          item.daysSincePreviousEvent = moment(previousItem.date).startOf('day').diff(moment(item.date).startOf('day'), 'days');
+          item.daysSincePreviousEvent = LocalizationHelper.toMoment(previousItem.date).startOf('day').diff(LocalizationHelper.toMoment(item.date).startOf('day'), 'days');
         }
 
         // previous item

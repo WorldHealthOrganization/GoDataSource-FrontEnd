@@ -7,7 +7,6 @@ import { catchError, map, takeUntil } from 'rxjs/operators';
 import { CaseModel } from '../../../../core/models/case.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import * as _ from 'lodash';
-import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
@@ -35,7 +34,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 import { IV2ColumnToVisibleMandatoryConf, V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
-import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -1074,16 +1073,16 @@ export class ContactRangeFollowUpsListComponent
               }
 
               // process date
-              followUp.date = moment(followUp.date).startOf('day');
+              followUp.date = LocalizationHelper.toMoment(followUp.date).startOf('day');
 
               // determine min & max dates
               if (followUp.statusId) {
                 minDate = minDate ?
-                  (followUp.date.isBefore(minDate) ? moment(followUp.date) : minDate) :
-                  moment(followUp.date);
+                  (followUp.date.isBefore(minDate) ? LocalizationHelper.toMoment(followUp.date) : minDate) :
+                  LocalizationHelper.toMoment(followUp.date);
                 maxDate = maxDate ?
-                  (followUp.date.isAfter(maxDate) ? moment(followUp.date) : maxDate) :
-                  moment(followUp.date);
+                  (followUp.date.isAfter(maxDate) ? LocalizationHelper.toMoment(followUp.date) : maxDate) :
+                  LocalizationHelper.toMoment(followUp.date);
               }
 
               // init ?

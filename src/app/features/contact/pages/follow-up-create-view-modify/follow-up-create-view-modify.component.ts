@@ -14,7 +14,6 @@ import {
   ICreateViewModifyV2TabTable
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { Constants } from '../../../../core/models/constants';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
@@ -40,6 +39,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -209,13 +209,13 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     } else if (this.isModify) {
       this.pageTitle = 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE';
       this.pageTitleData = {
-        dateFormatted: moment(this.itemData.date).format('YYYY-MM-DD')
+        dateFormatted: LocalizationHelper.toMoment(this.itemData.date).format('YYYY-MM-DD')
       };
     } else {
       // view
       this.pageTitle = 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE';
       this.pageTitleData = {
-        dateFormatted: moment(this.itemData.date).format('YYYY-MM-DD')
+        dateFormatted: LocalizationHelper.toMoment(this.itemData.date).format('YYYY-MM-DD')
       };
     }
   }
@@ -387,7 +387,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       this.breadcrumbs.push({
         label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE', {
-            dateFormatted: moment(this.itemData.date).format('YYYY-MM-DD')
+            dateFormatted: LocalizationHelper.toMoment(this.itemData.date).format('YYYY-MM-DD')
           }
         ),
         action: null
@@ -397,7 +397,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       this.breadcrumbs.push({
         label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_FOLLOW_UP_TITLE', {
-            dateFormatted: moment(this.itemData.date).format('YYYY-MM-DD')
+            dateFormatted: LocalizationHelper.toMoment(this.itemData.date).format('YYYY-MM-DD')
           }
         ),
         action: null
@@ -464,7 +464,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
           buttonLabel: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_CREATE_FOLLOW_UP_ACTION_CREATE_FOLLOW_UP_BUTTON'),
           message: () => this.personAndRelatedHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL', {
-              name: moment(this.itemData.date).format('YYYY-MM-DD')
+              name: LocalizationHelper.toMoment(this.itemData.date).format('YYYY-MM-DD')
             }
           )
         }
@@ -710,7 +710,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
           return item.uiStatusForms;
         },
         text: (item: FollowUpModel) => item.date ?
-          moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+          LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
           '-',
         details: undefined
       }
