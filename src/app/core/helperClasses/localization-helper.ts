@@ -18,8 +18,8 @@ export abstract class LocalizationHelper {
   static readonly ISO_8601: MomentBuiltinFormat = moment.ISO_8601;
 
   // default display constants
-  private static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
-  private static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
+  private static readonly DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
+  private static readonly DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
 
   /**
    * Initialize
@@ -31,6 +31,13 @@ export abstract class LocalizationHelper {
     // default timezone
     LocalizationHelper.TIMEZONE = timezone;
     moment.tz.setDefault(LocalizationHelper.TIMEZONE);
+  }
+
+  /**
+   * Date display format
+   */
+  static getDateDisplayFormat(): string {
+    return LocalizationHelper.DEFAULT_DATE_DISPLAY_FORMAT;
   }
 
   /**
