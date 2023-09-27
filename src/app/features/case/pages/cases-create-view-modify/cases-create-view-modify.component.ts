@@ -19,7 +19,6 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { Constants } from '../../../../core/models/constants';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -52,6 +51,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -168,7 +168,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     return new CaseModel({
       addresses: [new AddressModel({
         typeId: AddressType.CURRENT_ADDRESS,
-        date: moment().toISOString()
+        date: LocalizationHelper.now().toISOString()
       })]
     });
   }
@@ -345,7 +345,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.breadcrumbInfos.push({
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
         tooltip: this.itemData.dateBecomeCase ?
-          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${LocalizationHelper.toMoment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -355,7 +355,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.breadcrumbInfos.push({
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
         tooltip: this.itemData.dateBecomeCase ?
-          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${moment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE')}: ${LocalizationHelper.toMoment(this.itemData.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -1291,21 +1291,21 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                         name: 'followUp.originalStartDate',
                         placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_ORIGINAL_START_DATE',
                         value: this.itemData.followUp?.originalStartDate ?
-                          moment(this.itemData.followUp.originalStartDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          LocalizationHelper.toMoment(this.itemData.followUp.originalStartDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                           '—'
                       }, {
                         type: V2SideDialogConfigInputType.KEY_VALUE,
                         name: 'followUp.startDate',
                         placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_START_DATE',
                         value: this.itemData.followUp?.startDate ?
-                          moment(this.itemData.followUp.startDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          LocalizationHelper.toMoment(this.itemData.followUp.startDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                           '—'
                       }, {
                         type: V2SideDialogConfigInputType.KEY_VALUE,
                         name: 'followUp.endDate',
                         placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
                         value: this.itemData.followUp?.endDate ?
-                          moment(this.itemData.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          LocalizationHelper.toMoment(this.itemData.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                           '—'
                       }
                     ]
@@ -2126,7 +2126,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     if (
       this.itemData.dateOfOnset &&
       this.itemData.dateOfReporting &&
-      moment(this.itemData.dateOfOnset).isAfter(moment(this.itemData.dateOfReporting))
+      LocalizationHelper.toMoment(this.itemData.dateOfOnset).isAfter(LocalizationHelper.toMoment(this.itemData.dateOfReporting))
     ) {
       this.personAndRelatedHelperService.toastV2Service.notice(
         'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_IS_AFTER_DATE_OF_REPORTING',
@@ -2145,7 +2145,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // return if there is no valid date of onset or no hospitalization
     if (
       !this.itemData.dateOfOnset ||
-      !moment(this.itemData.dateOfOnset).isValid() ||
+      !LocalizationHelper.toMoment(this.itemData.dateOfOnset).isValid() ||
       !this.itemData.dateRanges?.length
     ) {
       // make sure that there is no warning
@@ -2158,8 +2158,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     for (const item of this.itemData.dateRanges) {
       if (
         item.startDate &&
-        moment(item.startDate).isValid() &&
-        moment(item.startDate).isBefore(moment(this.itemData.dateOfOnset))
+        LocalizationHelper.toMoment(item.startDate).isValid() &&
+        LocalizationHelper.toMoment(item.startDate).isBefore(LocalizationHelper.toMoment(this.itemData.dateOfOnset))
       ) {
         this.personAndRelatedHelperService.toastV2Service.notice(
           'LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE',

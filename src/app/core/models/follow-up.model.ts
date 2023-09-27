@@ -10,9 +10,9 @@ import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { EntityType } from './entity-type';
 import { CaseModel } from './case.model';
-import { Moment } from '../helperClasses/x-moment';
 import { SafeHtml } from '@angular/platform-browser';
 import { ContactOfContactModel } from './contact-of-contact.model';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class FollowUpModel
   extends BaseModel

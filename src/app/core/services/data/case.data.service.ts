@@ -17,9 +17,9 @@ import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validat
 import { MetricCasesCountStratifiedOutcome } from '../../models/metrics/metric-cases-count-stratified-outcome.model';
 import { MetricCasesBasedOnContactStatusModel } from '../../models/metrics/metric-cases-based-on-contact-status.model';
 import { catchError, map } from 'rxjs/operators';
-import { moment } from '../../helperClasses/x-moment';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ICasesHospitalizedCount } from '../../models/cases-hospitalized-count.interface';
+import { LocalizationHelper } from '../../helperClasses/localization-helper';
 
 @Injectable()
 export class CaseDataService {
@@ -179,7 +179,7 @@ export class CaseDataService {
   ): Observable<any> {
     // set default date ?
     if (!date) {
-      date = moment();
+      date = LocalizationHelper.today();
     }
 
     // get the query builder and call the endpoint

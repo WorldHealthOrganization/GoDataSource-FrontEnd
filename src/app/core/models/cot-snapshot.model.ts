@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
-import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { IPermissionBasic } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { FileSize } from '../helperClasses/file-size';
+import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
 
 export class CotSnapshotModel
   extends BaseModel
@@ -72,7 +72,7 @@ export class CotSnapshotModel
     // start date
     this.startDate = _.get(data, 'startDate');
     if (this.startDate) {
-      this.startDate = moment(this.startDate);
+      this.startDate = LocalizationHelper.toMoment(this.startDate);
     }
 
     // file size
@@ -81,7 +81,7 @@ export class CotSnapshotModel
     // end date
     this.endDate = _.get(data, 'endDate');
     if (this.endDate) {
-      this.endDate = moment(this.endDate);
+      this.endDate = LocalizationHelper.toMoment(this.endDate);
     }
   }
 

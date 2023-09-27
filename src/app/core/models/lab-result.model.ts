@@ -16,9 +16,9 @@ import {
 import { PERMISSION } from './permission.model';
 import { IAnswerData } from './question.model';
 import { UserModel } from './user.model';
-import { Moment } from '../helperClasses/x-moment';
 import { SafeHtml } from '@angular/platform-browser';
 import { Constants } from './constants';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class LabResultModel
   extends BaseModel

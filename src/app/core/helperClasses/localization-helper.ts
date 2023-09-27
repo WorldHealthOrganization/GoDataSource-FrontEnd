@@ -1,6 +1,7 @@
 import * as moment from 'moment-timezone';
 import { Moment as MomentOriginal, unitOfTime as MomentUnitOfTime } from 'moment-timezone';
 import { Constants } from '../models/constants';
+import { Duration, DurationInputArg1 } from 'moment/moment';
 
 /**
  * Types
@@ -15,6 +16,7 @@ export abstract class LocalizationHelper {
   private static TIMEZONE: string = 'UTC';
 
   // moment
+  // #TODO - remove and add functions, otherwise we might do mistakes and use this one instead of toMoment
   static readonly moment = moment;
 
   /**
@@ -45,10 +47,15 @@ export abstract class LocalizationHelper {
 
   /**
    * Convert / Clone moment
-   * @param data
    */
-  static toMoment(data: string | Date | Moment): Moment {
-    return moment(data).tz(LocalizationHelper.TIMEZONE);
+  static toMoment(
+    data: string | Date | Moment,
+    format?: moment.MomentFormatSpecification
+  ): Moment {
+    return moment(
+      data,
+      format
+    ).tz(LocalizationHelper.TIMEZONE);
   }
 
   /**
@@ -112,5 +119,12 @@ export abstract class LocalizationHelper {
 
     // return the formatted duration
     return formattedDuration;
+  }
+
+  /**
+   * Determine duration
+   */
+  static duration(inp: DurationInputArg1): Duration {
+    return moment.duration(inp);
   }
 }

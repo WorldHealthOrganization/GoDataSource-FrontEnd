@@ -6,7 +6,6 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { Constants } from '../../../models/constants';
 import { AgeModel } from '../../../models/age.model';
-import { moment, Moment } from '../../../helperClasses/x-moment';
 import { Observable } from 'rxjs';
 import { TimerCache } from '../../../helperClasses/timer-cache';
 import { ContactsOfContactsDataService } from '../../data/contacts-of-contacts.data.service';
@@ -22,6 +21,7 @@ import { IResolverV2ResponseModel } from '../../resolvers/data/models/resolver-r
 import { ReferenceDataEntryModel } from '../../../models/reference-data.model';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
+import { LocalizationHelper, Moment } from '../../../helperClasses/localization-helper';
 
 export class ContactOfContactHelperModel {
   // data
@@ -234,7 +234,7 @@ export class ContactOfContactHelperModel {
                         data.itemData.age = data.itemData.age || new AgeModel();
 
                         // add data
-                        const now = moment();
+                        const now = LocalizationHelper.now();
                         data.itemData.age.years = now.diff(data.itemData.dob, 'years');
                         data.itemData.age.months = data.itemData.age.years < 1 ? now.diff(data.itemData.dob, 'months') : 0;
                       } else {
@@ -413,7 +413,7 @@ export class ContactOfContactHelperModel {
                 add: {
                   label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
                   newItem: () => new AddressModel({
-                    date: moment().toISOString()
+                    date: LocalizationHelper.now().toISOString()
                   })
                 },
                 remove: {
@@ -461,7 +461,7 @@ export class ContactOfContactHelperModel {
     }
   ): ICreateViewModifyV2Tab {
     // today
-    const today: Moment = moment();
+    const today: Moment = LocalizationHelper.today();
 
     // finished
     const tab: ICreateViewModifyV2Tab = this.parent.createViewModify.tabFilter(
@@ -1053,7 +1053,7 @@ export class ContactOfContactHelperModel {
     // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
     // !!!!!!!!!!!!!!!
     return contactOfContactIdMask
-      .replace(/YYYY/g, moment().format('YYYY'))
+      .replace(/YYYY/g, LocalizationHelper.now().format('YYYY'))
       .replace(/\*/g, '');
   }
 }

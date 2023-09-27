@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
 import { I18nService } from '../services/helper/i18n.service';
-import { moment } from '../helperClasses/x-moment';
 import { Constants } from './constants';
-import { Moment } from '../helperClasses/localization-helper';
+import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
 
 export class VaccineModel {
   // data
@@ -25,7 +24,7 @@ export class VaccineModel {
     // create value
     let value: string = '';
     vaccines.forEach((vac) => {
-      value += `${value.length < 1 ? '' : ', '}${vac.vaccine?.length > 0 ? i18nService.instant(vac.vaccine) : ''} - ${vac.date ? moment(vac.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '' }: ${vac.status?.length > 0 ? i18nService.instant(vac.status) : ''}`;
+      value += `${value.length < 1 ? '' : ', '}${vac.vaccine?.length > 0 ? i18nService.instant(vac.vaccine) : ''} - ${vac.date ? LocalizationHelper.toMoment(vac.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '' }: ${vac.status?.length > 0 ? i18nService.instant(vac.status) : ''}`;
     });
 
     // finished

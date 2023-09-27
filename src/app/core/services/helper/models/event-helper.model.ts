@@ -12,7 +12,7 @@ import { QuestionModel } from '../../../models/question.model';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { moment } from '../../../helperClasses/x-moment';
+import { LocalizationHelper } from '../../../helperClasses/localization-helper';
 
 export class EventHelperModel {
   // data
@@ -585,7 +585,7 @@ export class EventHelperModel {
     // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
     // !!!!!!!!!!!!!!!
     return eventIdMask
-      .replace(/YYYY/g, moment().format('YYYY'))
+      .replace(/YYYY/g, LocalizationHelper.today().format('YYYY'))
       .replace(/\*/g, '');
   }
 }

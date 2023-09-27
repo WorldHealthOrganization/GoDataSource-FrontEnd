@@ -7,7 +7,6 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { Constants } from '../../../models/constants';
 import { AgeModel } from '../../../models/age.model';
-import { moment, Moment } from '../../../helperClasses/x-moment';
 import { Observable } from 'rxjs';
 import { TimerCache } from '../../../helperClasses/timer-cache';
 import { ContactDataService } from '../../data/contact.data.service';
@@ -28,6 +27,7 @@ import { EntityType } from '../../../models/entity-type';
 import { ReferenceDataEntryModel } from '../../../models/reference-data.model';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
+import { LocalizationHelper, Moment } from '../../../helperClasses/localization-helper';
 
 export class ContactHelperModel {
   // data
@@ -243,7 +243,7 @@ export class ContactHelperModel {
                         data.itemData.age = data.itemData.age || new AgeModel();
 
                         // add data
-                        const now = moment();
+                        const now = LocalizationHelper.now();
                         data.itemData.age.years = now.diff(data.itemData.dob, 'years');
                         data.itemData.age.months = data.itemData.age.years < 1 ? now.diff(data.itemData.dob, 'months') : 0;
                       } else {
@@ -422,7 +422,7 @@ export class ContactHelperModel {
                 add: {
                   label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
                   newItem: () => new AddressModel({
-                    date: moment().toISOString()
+                    date: LocalizationHelper.now().toISOString()
                   })
                 },
                 remove: {
@@ -473,7 +473,7 @@ export class ContactHelperModel {
     }
   ): ICreateViewModifyV2Tab {
     // today
-    const today: Moment = moment();
+    const today: Moment = LocalizationHelper.today();
 
     // finished
     const tab: ICreateViewModifyV2Tab = this.parent.createViewModify.tabFilter(
@@ -2378,7 +2378,7 @@ export class ContactHelperModel {
     // as per current date
     if (
       info.item.followUp?.startDate &&
-      moment().isSameOrBefore(info.item.followUp?.startDate)
+      LocalizationHelper.today().isSameOrBefore(info.item.followUp?.startDate)
     ) {
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
@@ -2388,7 +2388,7 @@ export class ContactHelperModel {
     } else if (
       info.item.followUp?.startDate &&
       info.item.followUp?.endDate &&
-      moment().isBetween(
+      LocalizationHelper.now().isBetween(
         info.item.followUp?.startDate,
         info.item.followUp?.endDate,
         undefined,
@@ -2402,7 +2402,7 @@ export class ContactHelperModel {
       });
     } else if (
       info.item.followUp?.endDate &&
-      moment().isSameOrAfter(info.item.followUp?.endDate)
+      LocalizationHelper.today().isSameOrAfter(info.item.followUp?.endDate)
     ) {
       forms.push({
         type: IV2ColumnStatusFormType.SQUARE,
@@ -2445,7 +2445,7 @@ export class ContactHelperModel {
     // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
     // !!!!!!!!!!!!!!!
     return contactIdMask
-      .replace(/YYYY/g, moment().format('YYYY'))
+      .replace(/YYYY/g, LocalizationHelper.now().format('YYYY'))
       .replace(/\*/g, '');
   }
 }

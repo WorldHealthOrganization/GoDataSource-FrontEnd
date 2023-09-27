@@ -20,7 +20,6 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { Constants } from '../../../../core/models/constants';
 import { ChangeValue, ChangeValueArray, ChangeValueObject, ChangeValueType } from '../../../../shared/components-v2/app-changes-v2/models/change.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
@@ -143,12 +142,12 @@ export class AuditLogsListComponent
         filter: {
           type: V2FilterType.DATE_RANGE,
           value: {
-            startDate: moment().subtract(7, 'days').startOf('day'),
-            endDate: moment().endOf('day')
+            startDate: LocalizationHelper.now().subtract(7, 'days').startOf('day'),
+            endDate: LocalizationHelper.now().endOf('day')
           },
           defaultValue: {
-            startDate: moment().subtract(7, 'days').startOf('day'),
-            endDate: moment().endOf('day')
+            startDate: LocalizationHelper.now().subtract(7, 'days').startOf('day'),
+            endDate: LocalizationHelper.now().endOf('day')
           }
         }
       },
