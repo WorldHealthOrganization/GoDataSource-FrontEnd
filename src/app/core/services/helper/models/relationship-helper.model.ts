@@ -14,7 +14,6 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputAccordion, V2Sid
 import { catchError } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
-import { Constants } from '../../../models/constants';
 import { RelationshipType } from '../../../enums/relationship-type.enum';
 import { IV2Column, IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
@@ -892,7 +891,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
           value: entity.dateOfOnset ?
-            LocalizationHelper.toMoment(entity.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(entity.dateOfOnset) :
             ''
         });
       }
@@ -906,7 +905,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
           value: entity.dateBecomeCase ?
-            LocalizationHelper.toMoment(entity.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(entity.dateBecomeCase) :
             ''
         });
       }
@@ -920,7 +919,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
           value: entity.dateOfInfection ?
-            LocalizationHelper.toMoment(entity.dateOfInfection).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(entity.dateOfInfection) :
             ''
         });
       }
@@ -953,7 +952,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
           value: entity.dateOfReporting ?
-            LocalizationHelper.toMoment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(entity.dateOfReporting) :
             ''
         });
       }
@@ -994,7 +993,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_EVENT_FIELD_LABEL_DATE',
           value: entity.date ?
-            LocalizationHelper.toMoment(entity.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(entity.date) :
             ''
         });
       }
@@ -1020,7 +1019,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
           value: entity.dateOfReporting ?
-            LocalizationHelper.toMoment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(entity.dateOfReporting) :
             ''
         });
       }
@@ -1060,7 +1059,7 @@ export class RelationshipHelperModel {
       lightObject.push({
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
         value: relationship.contactDate ?
-          LocalizationHelper.toMoment(relationship.contactDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+          LocalizationHelper.displayDate(relationship.contactDate) :
           ''
       });
     }

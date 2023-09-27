@@ -1086,7 +1086,7 @@ export class ContactRangeFollowUpsListComponent
               }
 
               // init ?
-              const formattedDate: string = followUp.date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const formattedDate: string = LocalizationHelper.displayDate(followUp.date);
               if (!followUpGrouped[formattedDate]) {
                 followUpGrouped[formattedDate] = [];
               }
@@ -1123,7 +1123,7 @@ export class ContactRangeFollowUpsListComponent
             while (minDate.isSameOrBefore(maxDate)) {
               // add day to list
               // - exclude dates with no data
-              const formattedFieldDate: string = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const formattedFieldDate: string = LocalizationHelper.displayDate(minDate);
               if (usedDates[formattedFieldDate]) {
                 daysColumns.push({
                   field: formattedFieldDate,

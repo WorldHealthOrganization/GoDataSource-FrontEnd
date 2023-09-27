@@ -690,7 +690,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             this._entity.dateOfOnset &&
             LocalizationHelper.toMoment(newValue).isBefore(LocalizationHelper.toMoment(this._entity.dateOfOnset))
           ) {
-            this._warnings.dateOfOnset = LocalizationHelper.toMoment(this._entity.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+            this._warnings.dateOfOnset = LocalizationHelper.displayDate(this._entity.dateOfOnset);
             this._warnings.rows[data.rowIndex + 1] = true;
             refreshWarning = true;
           } else {
@@ -1152,7 +1152,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
     // do we need to set date ?
     if (!entity.model.mainAddress?.date) {
       // set date
-      entity.model.mainAddress.date = LocalizationHelper.now().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+      entity.model.mainAddress.date = LocalizationHelper.displayDate(LocalizationHelper.now());
 
       // update grid
       data.handler.rowValidate(data.rowIndex);

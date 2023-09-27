@@ -381,7 +381,7 @@ export class FollowUpHelperModel {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
                         data: () => ({
                           name: item.date ?
-                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.displayDate(item.date) :
                             ''
                         })
                       },
@@ -389,7 +389,7 @@ export class FollowUpHelperModel {
                         get: () => 'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP',
                         data: () => ({
                           name: item.date ?
-                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.displayDate(item.date) :
                             ''
                         })
                       }
@@ -459,7 +459,7 @@ export class FollowUpHelperModel {
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
                         data: () => ({
                           name: item.date ?
-                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.displayDate(item.date) :
                             ''
                         })
                       },
@@ -467,7 +467,7 @@ export class FollowUpHelperModel {
                         get: () => 'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP',
                         data: () => ({
                           name: item.date ?
-                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.displayDate(item.date) :
                             ''
                         })
                       }
