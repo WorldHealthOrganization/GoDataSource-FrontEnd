@@ -52,7 +52,7 @@ export class DateValidatorDirective implements Validator {
   @Input() displayFormat: string = Constants.DEFAULT_DATE_DISPLAY_FORMAT;
   @Input() allowedDateFormats: (string | MomentBuiltinFormat)[] = [
     Constants.DEFAULT_DATE_DISPLAY_FORMAT,
-    LocalizationHelper.moment.ISO_8601
+    LocalizationHelper.ISO_8601
   ];
 
   // date must be bigger than
@@ -96,7 +96,7 @@ export class DateValidatorDirective implements Validator {
           );
         } else if (
           compare instanceof AppFormBaseV2 ||
-          compare instanceof LocalizationHelper.moment ||
+          LocalizationHelper.isInstanceOfMoment(compare) ||
           _.isString(compare)
         ) {
           compareItem = new DateValidatorFieldComparator(
@@ -115,7 +115,7 @@ export class DateValidatorDirective implements Validator {
         // & label if necessary
         let compareWithDate: Moment;
         let fieldLabel = compareItem.fieldLabel;
-        if (compareItem.compareItemValue instanceof LocalizationHelper.moment) {
+        if (LocalizationHelper.isInstanceOfMoment(compareItem.compareItemValue)) {
           compareWithDate = compareItem.compareItemValue as Moment;
         }
 
@@ -232,7 +232,7 @@ export class DateValidatorDirective implements Validator {
 
     // validate date
     let value: any = control.value;
-    if (control.value instanceof LocalizationHelper.moment) {
+    if (LocalizationHelper .isInstanceOfMoment(control.value)) {
       value = _.isObject(value._i) ? value : value._i;
     }
 

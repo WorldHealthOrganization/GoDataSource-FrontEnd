@@ -44,14 +44,6 @@ const DEFAULT_FORMAT = {
       multi: true
     },
 
-    // always UTC
-    {
-      provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS,
-      useValue: {
-        useUtc: true
-      }
-    },
-
     {
       provide: MAT_DATE_FORMATS,
       useValue: DEFAULT_FORMAT

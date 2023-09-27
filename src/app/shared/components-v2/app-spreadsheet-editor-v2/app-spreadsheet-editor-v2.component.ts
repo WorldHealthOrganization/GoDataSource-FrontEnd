@@ -2927,7 +2927,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           );
 
           // convert date
-          if (value instanceof LocalizationHelper.moment) {
+          if (LocalizationHelper.isInstanceOfMoment(value)) {
             value = (value as Moment).toISOString();
           }
 
@@ -3167,7 +3167,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               if (!LocalizationHelper.toMoment(newValue).isValid()) {
                 newValue = undefined;
               }
-            } else if (newValue instanceof LocalizationHelper.moment) {
+            } else if (LocalizationHelper.isInstanceOfMoment(newValue)) {
               // no changes
             } else {
               // not supported format

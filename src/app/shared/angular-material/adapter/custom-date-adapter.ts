@@ -183,7 +183,7 @@ export class CustomDateAdapter extends MomentDateAdapter {
    * Configure moment for custom translations
    */
   private configureMoment(): void {
-    LocalizationHelper.moment.updateLocale(
+    LocalizationHelper.updateLocale(
       'custom', {
         months: this.getMonthNames('long'),
         monthsShort: this.getMonthNames('short')
@@ -196,11 +196,11 @@ export class CustomDateAdapter extends MomentDateAdapter {
    */
   format(date: Moment, displayFormat: string): string {
     // retrieve current locale
-    const currentLocale: string = LocalizationHelper.moment.locale();
+    const currentLocale: string = LocalizationHelper.locale();
 
     // configure custom locale with custom month names
     this.configureMoment();
-    LocalizationHelper.moment.locale('custom');
+    LocalizationHelper.locale('custom');
 
     // format date
     const formattedDate: string = date ?
@@ -208,7 +208,7 @@ export class CustomDateAdapter extends MomentDateAdapter {
       '';
 
     // reset back to previous locale
-    LocalizationHelper.moment.locale(currentLocale);
+    LocalizationHelper.locale(currentLocale);
 
     // finished
     return formattedDate;
