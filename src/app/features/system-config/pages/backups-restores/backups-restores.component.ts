@@ -15,7 +15,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ActivatedRoute } from '@angular/router';
 import { UserModel } from '../../../../core/models/user.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-backups-restores',
@@ -145,7 +145,7 @@ export class BackupsRestoresComponent extends ListComponent<RestoreLogModel, IV2
         label: 'LNG_BACKUP_RESTORE_FIELD_LABEL_BACKUP_ID',
         sortable: true,
         format: {
-          type: (item: RestoreLogModel) => `${item.backup?.date ? moment(item.backup.date).format(this.Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : ''} - ${item.backup?.location ? item.backup.location : ''} - ${item.backup?.description ? item.backup.description : '' }`
+          type: (item: RestoreLogModel) => `${item.backup?.date ? LocalizationHelper.toMoment(item.backup.date).format(this.Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : ''} - ${item.backup?.location ? item.backup.location : ''} - ${item.backup?.description ? item.backup.description : '' }`
         }
       }
     ];

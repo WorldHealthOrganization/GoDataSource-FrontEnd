@@ -5,7 +5,6 @@ import { throwError } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -198,7 +197,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
                         data: () => ({
-                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
+                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? LocalizationHelper.toMoment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
                         })
                       },
                       message: {
@@ -276,7 +275,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                       title: {
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
                         data: () => ({
-                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
+                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? LocalizationHelper.toMoment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
                         })
                       },
                       message: {
@@ -1687,7 +1686,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                 url: `/outbreaks/${ this.selectedOutbreak.id }/lab-results/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
+                fileName: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_TITLE') } - ${ LocalizationHelper.now().format('YYYY-MM-DD') }`,
                 queryBuilder: qb,
                 allow: {
                   types: [

@@ -10,12 +10,12 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { Constants } from '../../../../core/models/constants';
 import { DataItem } from 'billboard.js';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -277,7 +277,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
       if (this.globalFilterDate) {
         qb.filter.byEquality(
           'endDate',
-          moment(this.globalFilterDate).toISOString()
+          LocalizationHelper.toMoment(this.globalFilterDate).toISOString()
         );
       }
 

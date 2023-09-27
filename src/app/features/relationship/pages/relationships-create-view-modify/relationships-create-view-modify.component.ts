@@ -19,7 +19,6 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
@@ -35,6 +34,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -825,19 +825,19 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       if (
         (sourceEntity as CaseModel)?.dateOfOnset &&
         contactDate &&
-        moment(contactDate).isValid() &&
-        moment(contactDate).isBefore(moment((sourceEntity as CaseModel).dateOfOnset))
+        LocalizationHelper.toMoment(contactDate).isValid() &&
+        LocalizationHelper.toMoment(contactDate).isBefore(LocalizationHelper.toMoment((sourceEntity as CaseModel).dateOfOnset))
       ) {
         // when new contacts are added keep the source date of onset
         if (RelationshipType.CONTACT) {
-          this._warnings.sourceDateOfOnset = moment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+          this._warnings.sourceDateOfOnset = LocalizationHelper.toMoment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
         }
 
         this._warnings.entities[this.isCreate ? entityId : sourceEntity.id] = {
           id: this.isCreate ? entityId : sourceEntity.id,
           name: this.isCreate ? entities[entityId] : sourceEntity.name,
           type: this.isCreate ? (this._createEntitiesMap[entityId] as CaseModel).type : sourceEntity.type,
-          dateOfOnset: moment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+          dateOfOnset: LocalizationHelper.toMoment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
         };
       } else {
         // remove if exists

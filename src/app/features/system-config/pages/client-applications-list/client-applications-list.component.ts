@@ -5,7 +5,6 @@ import { Observable, of, Subscriber, throwError } from 'rxjs';
 import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 import { environment } from '../../../../../environments/environment';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
@@ -22,6 +21,7 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-client-applications-list',
@@ -508,7 +508,7 @@ export class ClientApplicationsListComponent
         method: ExportDataMethod.POST,
         fileName: this.i18nService.instant('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_FILE_NAME') +
           ' - ' +
-          moment().format('YYYY-MM-DD'),
+          LocalizationHelper.now().format('YYYY-MM-DD'),
         allow: {
           types: [
             ExportDataExtension.QR

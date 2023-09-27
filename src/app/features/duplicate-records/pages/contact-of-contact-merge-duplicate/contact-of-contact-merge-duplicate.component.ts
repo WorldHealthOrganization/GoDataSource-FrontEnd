@@ -5,7 +5,6 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -23,6 +22,7 @@ import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/servi
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contact-of-contact-merge-duplicate',
@@ -276,7 +276,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                       // address is newer?
                       if (
                         !currentAddress.date ||
-                        moment(currentAddress.date).isBefore(moment(address.date))
+                        LocalizationHelper.toMoment(currentAddress.date).isBefore(LocalizationHelper.toMoment(address.date))
                       ) {
                         currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
                         data.addresses.push(currentAddress);

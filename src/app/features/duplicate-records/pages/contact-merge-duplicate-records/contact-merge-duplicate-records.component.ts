@@ -7,7 +7,6 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Constants } from '../../../../core/models/constants';
 import { Observable, throwError } from 'rxjs';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { ICreateViewModifyV2Refresh } from '../../../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -24,6 +23,7 @@ import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/servi
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contact-merge-duplicate-records',
@@ -379,7 +379,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
                       // address is newer?
                       if (
                         !currentAddress.date ||
-                        moment(currentAddress.date).isBefore(moment(address.date))
+                        LocalizationHelper.toMoment(currentAddress.date).isBefore(LocalizationHelper.toMoment(address.date))
                       ) {
                         currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
                         data.addresses.push(currentAddress);

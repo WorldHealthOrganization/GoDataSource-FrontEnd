@@ -8,7 +8,6 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { Constants } from '../../../../core/models/constants';
 import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../../core/models/saved-filters.model';
 import * as _ from 'lodash';
-import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { RequestFilterOperator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -37,7 +36,7 @@ import { ContactFollowUpOverviewDashletComponent } from '../../components/contac
 import { CasesBasedOnContactStatusDashletComponent } from '../../components/cases-based-on-contact-status-dashlet/cases-based-on-contact-status-dashlet.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
-import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-dashboard',
@@ -170,7 +169,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   quickActions: IV2ActionMenuLabel;
 
   // used to filter dashlets
-  globalFilterDate: string | Moment = moment();
+  globalFilterDate: string | Moment = LocalizationHelper.now();
   globalFilterLocationId: string = undefined;
   globalFilterClassificationId: string[] = [];
 
@@ -400,7 +399,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               if (this.globalFilterDate) {
                 qb.filter.byDateRange(
                   'dateOfReporting', {
-                    endDate: moment(this.globalFilterDate).endOf('day').format()
+                    endDate: LocalizationHelper.toMoment(this.globalFilterDate).endOf('day').format()
                   }
                 );
               }
@@ -463,13 +462,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 // pdf report
                 qb.filter.flag(
                   'dateOfFollowUp',
-                  moment(this.globalFilterDate).startOf('day').format()
+                  LocalizationHelper.toMoment(this.globalFilterDate).startOf('day').format()
                 );
 
                 // same as list view
                 qb.filter.byDateRange(
                   'dateOfReporting', {
-                    endDate: moment(this.globalFilterDate).endOf('day').format()
+                    endDate: LocalizationHelper.toMoment(this.globalFilterDate).endOf('day').format()
                   }
                 );
               }

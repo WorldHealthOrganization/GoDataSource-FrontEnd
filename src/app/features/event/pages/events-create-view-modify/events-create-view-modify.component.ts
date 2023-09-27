@@ -32,7 +32,6 @@ import { Constants } from '../../../../core/models/constants';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
@@ -45,6 +44,7 @@ import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-ta
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -160,7 +160,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     return new EventModel({
       address: new AddressModel({
         typeId: AddressType.CURRENT_ADDRESS,
-        date: moment().toISOString()
+        date: LocalizationHelper.now().toISOString()
       })
     });
   }

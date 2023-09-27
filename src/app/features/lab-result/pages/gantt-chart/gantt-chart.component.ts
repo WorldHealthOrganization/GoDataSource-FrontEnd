@@ -6,7 +6,6 @@ import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-cha
 import { throwError } from 'rxjs';
 import { Constants } from '../../../../core/models/constants';
 import { catchError } from 'rxjs/operators';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { GanttChartModel } from '../../../../core/models/gantt-chart.model';
@@ -21,6 +20,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-gantt-chart',
@@ -140,7 +140,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
       label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
       filterBy: (_qb, filter) => {
         // set filters
-        this.globalFilterDate = moment(filter.value);
+        this.globalFilterDate = LocalizationHelper.toMoment(filter.value);
       }
     }];
   }

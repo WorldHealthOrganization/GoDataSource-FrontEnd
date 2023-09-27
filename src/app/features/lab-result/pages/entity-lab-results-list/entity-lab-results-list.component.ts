@@ -5,7 +5,6 @@ import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -35,6 +34,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-entity-lab-results-list',
@@ -1073,7 +1073,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
                 url: `/outbreaks/${ this.selectedOutbreak.id }/${ EntityModel.getLinkForEntityType(this.personType) }/${ personId }/lab-results/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${ this.personAndRelatedHelperService.i18nService.instant(pageTitle) } - ${ moment().format('YYYY-MM-DD') }`,
+                fileName: `${ this.personAndRelatedHelperService.i18nService.instant(pageTitle) } - ${ LocalizationHelper.now().format('YYYY-MM-DD') }`,
                 queryBuilder: qb,
                 allow: {
                   types: [

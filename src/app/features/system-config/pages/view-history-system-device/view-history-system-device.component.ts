@@ -10,13 +10,13 @@ import { Observable } from 'rxjs';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { map, takeUntil } from 'rxjs/operators';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import * as _ from 'lodash';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-view-history-system-device',
@@ -91,7 +91,7 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
 
             // format createdAt
             return item.createdAt ?
-              moment(item.createdAt).format(this.Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+              LocalizationHelper.toMoment(item.createdAt).format(this.Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
               '';
           });
 
