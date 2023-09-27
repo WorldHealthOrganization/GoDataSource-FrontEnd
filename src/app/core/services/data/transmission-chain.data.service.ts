@@ -1145,8 +1145,8 @@ export class TransmissionChainDataService {
           sourceDate &&
           targetDate
         ) {
-          const momentTargetDate = LocalizationHelper.toMoment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-          const momentSourceDate = LocalizationHelper.toMoment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+          const momentTargetDate = LocalizationHelper.toMoment(targetDate, LocalizationHelper.getDateDisplayFormat());
+          const momentSourceDate = LocalizationHelper.toMoment(sourceDate, LocalizationHelper.getDateDisplayFormat());
           noDays = Math.round(LocalizationHelper.duration(momentTargetDate.diff(momentSourceDate)).asDays());
           graphEdge.label = String(noDays);
         }
