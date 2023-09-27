@@ -1,7 +1,6 @@
 import * as moment from 'moment-timezone';
-import { Moment as MomentOriginal, unitOfTime as MomentUnitOfTime } from 'moment-timezone';
+import { Moment as MomentOriginal, unitOfTime as MomentUnitOfTime, Duration, DurationInputArg1, Locale, LocaleSpecification, MomentBuiltinFormat as MomentBuiltinFormatOriginal } from 'moment-timezone';
 import { Constants } from '../models/constants';
-import { Duration, DurationInputArg1, Locale, LocaleSpecification, MomentBuiltinFormat as MomentBuiltinFormatOriginal } from 'moment/moment';
 
 /**
  * Types
