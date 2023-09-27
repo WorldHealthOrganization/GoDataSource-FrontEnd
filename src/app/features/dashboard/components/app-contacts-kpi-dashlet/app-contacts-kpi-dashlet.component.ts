@@ -228,7 +228,7 @@ export class AppContactsKpiDashletComponent
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE',
         prefixData: () => ({
           date: this.globalFilterDate ?
-            LocalizationHelper.toMoment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(this.globalFilterDate) :
             '—'
         }),
         refresh: (
@@ -644,7 +644,7 @@ export class AppContactsKpiDashletComponent
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY',
         prefixData: () => ({
           date: this.globalFilterDate ?
-            LocalizationHelper.toMoment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(this.globalFilterDate) :
             '—'
         }),
         refresh: (
@@ -703,7 +703,7 @@ export class AppContactsKpiDashletComponent
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP',
         prefixData: () => ({
           date: this.globalFilterDate ?
-            LocalizationHelper.toMoment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(this.globalFilterDate) :
             '—'
         }),
         refresh: (

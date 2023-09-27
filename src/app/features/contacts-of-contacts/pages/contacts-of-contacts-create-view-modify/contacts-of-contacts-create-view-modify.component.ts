@@ -327,7 +327,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       this.breadcrumbInfos.push({
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE',
         tooltip: this.itemData.dateBecomeContactOfContact ?
-          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${LocalizationHelper.toMoment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${LocalizationHelper.displayDate(this.itemData.dateBecomeContactOfContact)}` :
           undefined
       });
     }
@@ -337,7 +337,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       this.breadcrumbInfos.push({
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT',
         tooltip: this.itemData.dateBecomeContactOfContact ?
-          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${LocalizationHelper.toMoment(this.itemData.dateBecomeContactOfContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT_OF_CONTACT')}: ${LocalizationHelper.displayDate(this.itemData.dateBecomeContactOfContact)}` :
           undefined
       });
     }
@@ -1249,21 +1249,21 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
                         name: 'followUp.originalStartDate',
                         placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_ORIGINAL_START_DATE',
                         value: this.itemData.followUp?.originalStartDate ?
-                          LocalizationHelper.toMoment(this.itemData.followUp.originalStartDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          LocalizationHelper.displayDate(this.itemData.followUp.originalStartDate) :
                           '—'
                       }, {
                         type: V2SideDialogConfigInputType.KEY_VALUE,
                         name: 'followUp.startDate',
                         placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_START_DATE',
                         value: this.itemData.followUp?.startDate ?
-                          LocalizationHelper.toMoment(this.itemData.followUp.startDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          LocalizationHelper.displayDate(this.itemData.followUp.startDate) :
                           '—'
                       }, {
                         type: V2SideDialogConfigInputType.KEY_VALUE,
                         name: 'followUp.endDate',
                         placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
                         value: this.itemData.followUp?.endDate ?
-                          LocalizationHelper.toMoment(this.itemData.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          LocalizationHelper.displayDate(this.itemData.followUp.endDate) :
                           '—'
                       }
                     ]

@@ -4,7 +4,6 @@ import { CaseModel } from './case.model';
 import { EventModel } from './event.model';
 import { EntityType } from './entity-type';
 import { IAnswerData, QuestionModel } from './question.model';
-import { Constants } from './constants';
 import { BaseModel } from './base.model';
 import { RelationshipPersonModel } from './relationship-person.model';
 import { UserModel } from './user.model';
@@ -268,7 +267,7 @@ export class EntityModel {
       // no need to do something custom
       (value) => value,
       (value) => ({
-        label: LocalizationHelper.toMoment(value).isValid() ? LocalizationHelper.toMoment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : value,
+        label: LocalizationHelper.toMoment(value).isValid() ? LocalizationHelper.displayDate(value) : value,
         value
       })
     );
@@ -334,7 +333,7 @@ export class EntityModel {
       !(entity.model instanceof EventModel)
     ) {
       if (entity.model.dob) {
-        dob = ', ' + LocalizationHelper.toMoment(entity.model.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        dob = ', ' + LocalizationHelper.displayDate(entity.model.dob);
       } else if (
         entity.model.age && (
           entity.model.age.years > 0 ||
@@ -384,9 +383,9 @@ export class EntityModel {
       records,
       '',
       // no need to do something custom
-      (value: CaseModel | ContactModel | ContactOfContactModel) => LocalizationHelper.toMoment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+      (value: CaseModel | ContactModel | ContactOfContactModel) => LocalizationHelper.displayDate(value.dob),
       (value: CaseModel | ContactModel | ContactOfContactModel) => ({
-        label: LocalizationHelper.toMoment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+        label: LocalizationHelper.displayDate(value.dob),
         value: value.dob
       })
     );

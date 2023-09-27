@@ -168,7 +168,7 @@ implements
 
     // format
     this.earliestDateOfOnset = earliestDateOfOnset ?
-      LocalizationHelper.toMoment(earliestDateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+      LocalizationHelper.displayDate(earliestDateOfOnset) :
       undefined;
   }
 

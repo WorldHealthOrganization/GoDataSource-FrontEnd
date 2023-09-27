@@ -92,11 +92,11 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
     this.suffixLegends = [
       {
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        value: this.entityData.dateOfLastContact ? LocalizationHelper.toMoment(this.entityData.dateOfLastContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : this.entityData.dateOfLastContact
+        value: this.entityData.dateOfLastContact ? LocalizationHelper.displayDate(this.entityData.dateOfLastContact) : this.entityData.dateOfLastContact
       },
       {
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP',
-        value: this.entityData.followUp.endDate ? LocalizationHelper.toMoment(this.entityData.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : this.entityData.followUp.endDate
+        value: this.entityData.followUp.endDate ? LocalizationHelper.displayDate(this.entityData.followUp.endDate) : this.entityData.followUp.endDate
       }
     ];
   }
@@ -816,7 +816,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                   url: `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.personAndRelatedHelperService.i18nService.instant(fileName)} - ${LocalizationHelper.now().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant(fileName)} - ${LocalizationHelper.displayDate(LocalizationHelper.now())}`,
                   queryBuilder: qb,
                   allow: {
                     types: [

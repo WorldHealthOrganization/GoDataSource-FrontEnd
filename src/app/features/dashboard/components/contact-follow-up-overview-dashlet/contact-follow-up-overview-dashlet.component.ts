@@ -193,7 +193,7 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
     // build chart data
     (metricData || []).forEach((metric) => {
       // create the array with categories ( dates displayed on x axis )
-      this.chartDataCategories.push(LocalizationHelper.toMoment(metric.day).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+      this.chartDataCategories.push(LocalizationHelper.displayDate(metric.day));
 
       if (chartData[followedUpTranslated]) {
         chartData[followedUpTranslated].push(metric.followedUp);

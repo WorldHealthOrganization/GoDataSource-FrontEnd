@@ -23,7 +23,6 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
@@ -197,7 +196,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
                         data: () => ({
-                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? LocalizationHelper.toMoment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
+                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? LocalizationHelper.displayDate(item.dateSampleTaken) : ''}`
                         })
                       },
                       message: {
@@ -275,7 +274,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                       title: {
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
                         data: () => ({
-                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? LocalizationHelper.toMoment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
+                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? LocalizationHelper.displayDate(item.dateSampleTaken) : ''}`
                         })
                       },
                       message: {
@@ -1349,7 +1348,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                           messageData: {
                             no: processed.toLocaleString('en'),
                             total: total.toLocaleString('en'),
-                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
                           }
                         });
 
@@ -1478,7 +1477,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
                           messageData: {
                             no: processed.toLocaleString('en'),
                             total: total.toLocaleString('en'),
-                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
                           }
                         });
 

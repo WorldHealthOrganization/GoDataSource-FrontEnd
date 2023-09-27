@@ -91,7 +91,7 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
 
             // format createdAt
             return item.createdAt ?
-              LocalizationHelper.toMoment(item.createdAt).format(this.Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+              LocalizationHelper.displayDateTime(item.createdAt) :
               '';
           });
 

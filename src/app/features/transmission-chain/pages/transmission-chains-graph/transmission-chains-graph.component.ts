@@ -1509,7 +1509,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     };
 
     // generate definition
-    return [
+    return this.filterVisibleMandatorySectionFields([
       {
         label: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
         inputs: [
@@ -1643,7 +1643,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           }
         ]
       }
-    ];
+    ]);
   }
 
   /**
@@ -1850,7 +1850,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   private retrieveQuickInputRelationshipDefinition(relationship: RelationshipModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
     // init
     const today = LocalizationHelper.today();
-    return [
+    return this.filterVisibleMandatorySectionFields([
       {
         label: 'LNG_COMMON_LABEL_DETAILS',
         inputs: [
@@ -2037,7 +2037,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           }
         ]
       }
-    ];
+    ]);
   }
 
   /**

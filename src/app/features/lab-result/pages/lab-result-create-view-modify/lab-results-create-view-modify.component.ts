@@ -19,7 +19,6 @@ import {
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { Constants } from '../../../../core/models/constants';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
@@ -768,7 +767,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         },
         text: (item: LabResultModel) => item.sampleIdentifier?.trim().length > 0 ?
           item.sampleIdentifier :
-          LocalizationHelper.toMoment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+          LocalizationHelper.displayDate(item.dateSampleTaken),
         details: undefined
       }
     };

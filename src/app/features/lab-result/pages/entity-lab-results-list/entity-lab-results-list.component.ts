@@ -29,7 +29,6 @@ import {
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { Moment } from 'moment/moment';
 import * as momentOriginal from 'moment/moment';
-import { Constants } from '../../../../core/models/constants';
 import { UserModel } from '../../../../core/models/user.model';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
@@ -561,7 +560,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
                           messageData: {
                             no: processed.toLocaleString('en'),
                             total: total.toLocaleString('en'),
-                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
                           }
                         });
 
@@ -690,7 +689,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
                           messageData: {
                             no: processed.toLocaleString('en'),
                             total: total.toLocaleString('en'),
-                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
                           }
                         });
 

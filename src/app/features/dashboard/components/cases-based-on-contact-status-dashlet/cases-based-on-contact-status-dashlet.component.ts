@@ -167,7 +167,7 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
     // build chart data
     _.forEach(metricData, (metric) => {
       // create the array with categories ( dates displayed on x axis )
-      this.chartDataCategories.push(LocalizationHelper.toMoment(metric.start).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+      this.chartDataCategories.push(LocalizationHelper.displayDate(metric.start));
 
       if (chartData[totalCasesNotFromContactTranslated]) {
         chartData[totalCasesNotFromContactTranslated].push(metric.totalCasesNotFromContact);

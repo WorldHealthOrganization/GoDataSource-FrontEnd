@@ -2,7 +2,6 @@ import { Directive, forwardRef, Input } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS, ControlContainer, NgForm, NgModelGroup } from '@angular/forms';
 import * as _ from 'lodash';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { Constants } from '../../../core/models/constants';
 import { AppFormBaseV2 } from '../../forms-v2/core/app-form-base-v2';
 import { LocalizationHelper, Moment, MomentBuiltinFormat } from '../../../core/helperClasses/localization-helper';
 
@@ -49,10 +48,10 @@ export class DateValidatorFieldComparator {
 })
 export class DateValidatorDirective implements Validator {
   // allowed formats
-  @Input() displayFormat: string = Constants.DEFAULT_DATE_DISPLAY_FORMAT;
+  @Input() displayFormat: string = LocalizationHelper.getDateDisplayFormat();
   @Input() allowedDateFormats: (string | MomentBuiltinFormat)[] = [
-    Constants.DEFAULT_DATE_DISPLAY_FORMAT,
-    LocalizationHelper.moment.ISO_8601
+    LocalizationHelper.getDateDisplayFormat(),
+    LocalizationHelper.ISO_8601
   ];
 
   // date must be bigger than
@@ -96,7 +95,7 @@ export class DateValidatorDirective implements Validator {
           );
         } else if (
           compare instanceof AppFormBaseV2 ||
-          compare instanceof LocalizationHelper.moment ||
+          LocalizationHelper.isInstanceOfMoment(compare) ||
           _.isString(compare)
         ) {
           compareItem = new DateValidatorFieldComparator(
@@ -115,7 +114,7 @@ export class DateValidatorDirective implements Validator {
         // & label if necessary
         let compareWithDate: Moment;
         let fieldLabel = compareItem.fieldLabel;
-        if (compareItem.compareItemValue instanceof LocalizationHelper.moment) {
+        if (LocalizationHelper.isInstanceOfMoment(compareItem.compareItemValue)) {
           compareWithDate = compareItem.compareItemValue as Moment;
         }
 
@@ -232,7 +231,7 @@ export class DateValidatorDirective implements Validator {
 
     // validate date
     let value: any = control.value;
-    if (control.value instanceof LocalizationHelper.moment) {
+    if (LocalizationHelper .isInstanceOfMoment(control.value)) {
       value = _.isObject(value._i) ? value : value._i;
     }
 

@@ -62,10 +62,6 @@ export enum ApplyListFilter {
 }
 
 export class Constants {
-  // default display constants
-  static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
-  static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
-
   // default random configs
   static DEFAULT_RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   static DEFAULT_RANDOM_KEY_LENGTH = 16;

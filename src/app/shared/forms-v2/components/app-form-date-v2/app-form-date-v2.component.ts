@@ -14,19 +14,18 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { CustomDateAdapter } from '../../../angular-material/adapter/custom-date-adapter';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
-import { Constants } from '../../../../core/models/constants';
 import { MatInput } from '@angular/material/input';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { Subscription } from 'rxjs';
-import { Moment } from '../../../../core/helperClasses/localization-helper';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 // Define format to be used into datepicker
 const DEFAULT_FORMAT = {
   parse: {
-    dateInput: Constants.DEFAULT_DATE_DISPLAY_FORMAT
+    dateInput: LocalizationHelper.getDateDisplayFormat()
   },
   display: {
-    dateInput: Constants.DEFAULT_DATE_DISPLAY_FORMAT,
+    dateInput: LocalizationHelper.getDateDisplayFormat(),
     monthYearLabel: 'MMM YYYY',
     dateA11yLabel: 'LL',
     monthYearA11yLabel: 'MMMM YYYY'
@@ -42,14 +41,6 @@ const DEFAULT_FORMAT = {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => AppFormDateV2Component),
       multi: true
-    },
-
-    // always UTC
-    {
-      provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS,
-      useValue: {
-        useUtc: true
-      }
     },
 
     {

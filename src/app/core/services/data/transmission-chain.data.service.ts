@@ -898,14 +898,14 @@ export class TransmissionChainDataService {
               node.model instanceof EventModel &&
               node.model.date
             ) {
-              nodeData.label = LocalizationHelper.toMoment(node.model.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              nodeData.label = LocalizationHelper.displayDate(node.model.date);
             }
             if (
               node.type === EntityType.CASE &&
               node.model instanceof CaseModel &&
               node.model.dateOfOnset
             ) {
-              nodeData.label = LocalizationHelper.toMoment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              nodeData.label = LocalizationHelper.displayDate(node.model.dateOfOnset);
             }
             // gender
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
@@ -1007,7 +1007,7 @@ export class TransmissionChainDataService {
               let onset = '';
               if (node.model instanceof CaseModel) {
                 onset = node.model.dateOfOnset ?
-                  '\n' + onsetLabel + ' ' + LocalizationHelper.toMoment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + (node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '') :
+                  '\n' + onsetLabel + ' ' + LocalizationHelper.displayDate(node.model.dateOfOnset) + (node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '') :
                   '';
               }
               // concatenate results
@@ -1037,7 +1037,7 @@ export class TransmissionChainDataService {
       const momentMaxTimelineDate = LocalizationHelper.toMoment(maxTimelineDate);
       while (counterDate.isBefore(momentMaxTimelineDate)) {
         counterDate.add(1, 'days');
-        const counterDateFormatted = counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        const counterDateFormatted = LocalizationHelper.displayDate(counterDate);
         // generate node
         const checkpointNode = new GraphNodeModel({
           dateTimeline: counterDateFormatted,
@@ -1145,8 +1145,8 @@ export class TransmissionChainDataService {
           sourceDate &&
           targetDate
         ) {
-          const momentTargetDate = LocalizationHelper.toMoment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-          const momentSourceDate = LocalizationHelper.toMoment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+          const momentTargetDate = LocalizationHelper.toMoment(targetDate, LocalizationHelper.getDateDisplayFormat());
+          const momentSourceDate = LocalizationHelper.toMoment(sourceDate, LocalizationHelper.getDateDisplayFormat());
           noDays = Math.round(LocalizationHelper.duration(momentTargetDate.diff(momentSourceDate)).asDays());
           graphEdge.label = String(noDays);
         }

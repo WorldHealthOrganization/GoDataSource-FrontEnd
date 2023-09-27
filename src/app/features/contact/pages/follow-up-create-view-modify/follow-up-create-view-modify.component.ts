@@ -13,7 +13,6 @@ import {
   ICreateViewModifyV2Tab,
   ICreateViewModifyV2TabTable
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
@@ -710,7 +709,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
           return item.uiStatusForms;
         },
         text: (item: FollowUpModel) => item.date ?
-          LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+          LocalizationHelper.displayDate(item.date) :
           '-',
         details: undefined
       }

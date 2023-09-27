@@ -1,7 +1,5 @@
 import * as moment from 'moment-timezone';
-import { Moment as MomentOriginal, unitOfTime as MomentUnitOfTime } from 'moment-timezone';
-import { Constants } from '../models/constants';
-import { Duration, DurationInputArg1, MomentBuiltinFormat as MomentBuiltinFormatOriginal } from 'moment/moment';
+import { Moment as MomentOriginal, unitOfTime as MomentUnitOfTime, Duration, DurationInputArg1, Locale, LocaleSpecification, MomentBuiltinFormat as MomentBuiltinFormatOriginal } from 'moment-timezone';
 
 /**
  * Types
@@ -16,9 +14,12 @@ export abstract class LocalizationHelper {
   // server default timezone
   private static TIMEZONE: string = 'UTC';
 
-  // moment
-  // #TODO - remove and add functions, otherwise we might do mistakes and use this one instead of toMoment
-  static readonly moment = moment;
+  // other constants
+  static readonly ISO_8601: MomentBuiltinFormat = moment.ISO_8601;
+
+  // default display constants
+  private static readonly DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
+  private static readonly DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
 
   /**
    * Initialize
@@ -30,6 +31,13 @@ export abstract class LocalizationHelper {
     // default timezone
     LocalizationHelper.TIMEZONE = timezone;
     moment.tz.setDefault(LocalizationHelper.TIMEZONE);
+  }
+
+  /**
+   * Date display format
+   */
+  static getDateDisplayFormat(): string {
+    return LocalizationHelper.DEFAULT_DATE_DISPLAY_FORMAT;
   }
 
   /**
@@ -66,7 +74,7 @@ export abstract class LocalizationHelper {
    */
   static displayDate(data: string | Date | Moment): string {
     return data ?
-      LocalizationHelper.toMoment(data).tz(LocalizationHelper.TIMEZONE).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+      LocalizationHelper.toMoment(data).format(LocalizationHelper.DEFAULT_DATE_DISPLAY_FORMAT) :
       '';
   }
 
@@ -75,7 +83,7 @@ export abstract class LocalizationHelper {
    */
   static displayDateTime(data: string | Date | Moment): string {
     return data ?
-      LocalizationHelper.toMoment(data).tz(LocalizationHelper.TIMEZONE).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+      LocalizationHelper.toMoment(data).format(LocalizationHelper.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
       '';
   }
 
@@ -129,5 +137,32 @@ export abstract class LocalizationHelper {
    */
   static duration(inp: DurationInputArg1): Duration {
     return moment.duration(inp);
+  }
+
+  /**
+   * Update locale
+   */
+  static updateLocale(
+    language: string,
+    localeSpec: LocaleSpecification | null
+  ): Locale {
+    return moment.updateLocale(
+      language,
+      localeSpec
+    );
+  }
+
+  /**
+   * Locale
+   */
+  static locale(language?: string): string {
+    return moment.locale(language);
+  }
+
+  /**
+   * Is instance of moment ?
+   */
+  static isInstanceOfMoment(value: any): boolean {
+    return value instanceof moment;
   }
 }

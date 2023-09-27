@@ -2,7 +2,6 @@ import { ActivatedRoute } from '@angular/router';
 import { Component, OnDestroy } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import { TeamModel } from '../../../../core/models/team.model';
@@ -260,10 +259,10 @@ export class TeamWorkloadComponent extends ListComponent<any, IV2Column> impleme
                   LocalizationHelper.toMoment(date);
 
                 // mark date found
-                usedDates[date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)] = true;
+                usedDates[LocalizationHelper.displayDate(date)] = true;
 
                 // set keys to dates
-                return [date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)];
+                return [LocalizationHelper.displayDate(date)];
               })
             };
           });
@@ -277,7 +276,7 @@ export class TeamWorkloadComponent extends ListComponent<any, IV2Column> impleme
             // push dates
             while (minDate.isSameOrBefore(maxDate)) {
               // - exclude dates with no data
-              const formattedDate = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const formattedDate = LocalizationHelper.displayDate(minDate);
               if (usedDates[formattedDate]) {
                 daysColumns.push({
                   field: formattedDate,
@@ -304,7 +303,7 @@ export class TeamWorkloadComponent extends ListComponent<any, IV2Column> impleme
                     }
 
                     // construct url
-                    const url: string = `/contacts/follow-ups?fromWorkload=true&date=${ LocalizationHelper.toMoment(followUpsPerDay.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }&team=${ data.team && data.team.id ? data.team.id : '' }`;
+                    const url: string = `/contacts/follow-ups?fromWorkload=true&date=${ LocalizationHelper.displayDate(followUpsPerDay.date) }&team=${ data.team && data.team.id ? data.team.id : '' }`;
 
                     // status for successful followups
                     const status: string = '&status=' + encodeURIComponent(JSON.stringify([

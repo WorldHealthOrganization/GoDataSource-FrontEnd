@@ -1,6 +1,5 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { Observable, throwError } from 'rxjs';
@@ -8,7 +7,6 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { TeamModel } from '../../../../core/models/team.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { Constants } from '../../../../core/models/constants';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
@@ -122,7 +120,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
 
             // add follow-up date
             if (followUp.date) {
-              const date: string = LocalizationHelper.toMoment(followUp.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const date: string = LocalizationHelper.displayDate(followUp.date);
               if (!this.followUpDates.find((item) => item === date)) {
                 this.followUpDates.push(date);
               }

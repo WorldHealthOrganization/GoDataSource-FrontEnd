@@ -145,7 +145,7 @@ export class BackupsRestoresComponent extends ListComponent<RestoreLogModel, IV2
         label: 'LNG_BACKUP_RESTORE_FIELD_LABEL_BACKUP_ID',
         sortable: true,
         format: {
-          type: (item: RestoreLogModel) => `${item.backup?.date ? LocalizationHelper.toMoment(item.backup.date).format(this.Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : ''} - ${item.backup?.location ? item.backup.location : ''} - ${item.backup?.description ? item.backup.description : '' }`
+          type: (item: RestoreLogModel) => `${item.backup?.date ? LocalizationHelper.displayDateTime(item.backup.date) : ''} - ${item.backup?.location ? item.backup.location : ''} - ${item.backup?.description ? item.backup.description : '' }`
         }
       }
     ];

@@ -82,7 +82,7 @@ export class AppFormDateRangeV2Component
     // must update dates ?
     if (
       this.value?.endDate &&
-      this.value?.endDate instanceof LocalizationHelper.moment
+      LocalizationHelper.isInstanceOfMoment(this.value?.endDate)
     ) {
       // mutable
       (this.value?.endDate as Moment).endOf('day');

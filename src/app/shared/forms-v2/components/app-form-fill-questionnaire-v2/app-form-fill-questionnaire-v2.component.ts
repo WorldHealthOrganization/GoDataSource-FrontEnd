@@ -967,7 +967,7 @@ export class AppFormFillQuestionnaireV2Component
             LocalizationHelper.toMoment(dateFormatted).toISOString() :
             undefined;
           dateFormatted = dateFormatted ?
-            LocalizationHelper.toMoment(dateFormatted).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(dateFormatted) :
             dateFormatted;
 
           // if date provided, then search for child with same date
@@ -979,7 +979,7 @@ export class AppFormFillQuestionnaireV2Component
               ) || (
                 dateFormatted &&
                 answer.date &&
-                LocalizationHelper.toMoment(answer.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) === dateFormatted
+                LocalizationHelper.displayDate(answer.date) === dateFormatted
               );
             });
 

@@ -1038,7 +1038,7 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
     // do we need to set date ?
     if (!entity.model.mainAddress?.date) {
       // set date
-      entity.model.mainAddress.date = LocalizationHelper.now().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+      entity.model.mainAddress.date = LocalizationHelper.displayDate(LocalizationHelper.now());
 
       // update grid
       data.handler.rowValidate(data.rowIndex);

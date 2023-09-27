@@ -51,7 +51,7 @@ export class GraphNodeModel {
 
     // timeline render ?
     if ( this.dateTimeline ) {
-      this.dateTimeline = LocalizationHelper.toMoment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+      this.dateTimeline = LocalizationHelper.displayDate(this.dateTimeline);
     } else {
       this.displayTimeline = 'none';
     }

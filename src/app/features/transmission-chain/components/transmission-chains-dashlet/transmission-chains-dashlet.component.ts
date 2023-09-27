@@ -136,7 +136,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     [idLocation: string]: LocationModel
   } = {};
   personName: string = '';
-  dateGlobalFilter: string = LocalizationHelper.now().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+  dateGlobalFilter: string = LocalizationHelper.displayDate(LocalizationHelper.now());
 
   // reference data categories needed for filters
   referenceDataCategories: any = [
@@ -632,7 +632,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
       // date
       if (global.date) {
-        this.dateGlobalFilter = global.date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        this.dateGlobalFilter = LocalizationHelper.displayDate(global.date);
       }
 
       // location
@@ -2389,7 +2389,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Retrieve proper label for snapshot dropdown option
      */
   private getSnapshotOptionLabel(snapshot: CotSnapshotModel): string {
-    const name: string = `${snapshot.name} - ${snapshot.startDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)}`;
+    const name: string = `${snapshot.name} - ${LocalizationHelper.displayDateTime(snapshot.startDate)}`;
     switch (snapshot.status) {
       case Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value:
         return this.personAndRelatedHelperService.i18nService.instant(
@@ -3196,7 +3196,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           const date = (response.data.map.dateGlobalFilter as IV2SideDialogConfigInputDate).value;
           this.dateGlobalFilter = typeof date === 'string' ?
             date :
-            (date ? date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : undefined);
+            (date ? LocalizationHelper.displayDate(date) : undefined);
 
           // panel filters - map inputs
           const panelMap: {
