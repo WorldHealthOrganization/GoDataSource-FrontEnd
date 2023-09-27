@@ -11,7 +11,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { Constants } from '../../../../core/models/constants';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
@@ -301,10 +300,10 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
                     (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName] ?
                       this.personAndRelatedHelperService.i18nService.instant((this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName].value) :
                       '—'
-                  } (${result.dateSampleTaken ? LocalizationHelper.toMoment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '—'})` :
+                  } (${result.dateSampleTaken ? LocalizationHelper.displayDate(result.dateSampleTaken) : '—'})` :
                   (
                     result.dateSampleTaken ?
-                      LocalizationHelper.toMoment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                      LocalizationHelper.displayDate(result.dateSampleTaken) :
                       '—'
                   ),
                 action: {

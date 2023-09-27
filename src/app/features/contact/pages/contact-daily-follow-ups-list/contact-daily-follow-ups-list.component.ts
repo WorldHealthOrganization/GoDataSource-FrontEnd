@@ -247,7 +247,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         get: () => 'LNG_COMMON_LABEL_DELETE',
                         data: () => ({
                           name: item.date ?
-                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.displayDate(item.date) :
                             ''
                         })
                       },
@@ -255,7 +255,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         get: () => 'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP',
                         data: () => ({
                           name: item.date ?
-                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.displayDate(item.date) :
                             ''
                         })
                       }
@@ -320,7 +320,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
                         data: () => ({
                           name: item.date ?
-                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.displayDate(item.date) :
                             ''
                         })
                       },
@@ -328,7 +328,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         get: () => 'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP',
                         data: () => ({
                           name: item.date ?
-                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.displayDate(item.date) :
                             ''
                         })
                       }
@@ -1058,7 +1058,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         sortable: true,
         format: {
           type: (item) => item.person?.dateOfLastContact ?
-            LocalizationHelper.toMoment(item.person.dateOfLastContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(item.person.dateOfLastContact) :
             '—'
         },
         filter: {
@@ -1073,7 +1073,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         sortable: true,
         format: {
           type: (item) => item.person?.followUp?.endDate ?
-            LocalizationHelper.toMoment(item.person.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(item.person.followUp.endDate) :
             '—'
         },
         filter: {
@@ -2532,7 +2532,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   url: `outbreaks/${ this.selectedOutbreak.id }/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ LocalizationHelper.now().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
+                  fileName: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ LocalizationHelper.displayDate(LocalizationHelper.now()) }`,
                   queryBuilder: qb,
                   allow: {
                     types: [

@@ -1,5 +1,4 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Constants } from '../../../core/models/constants';
 import { LocalizationHelper } from '../../../core/helperClasses/localization-helper';
 
 @Pipe({
@@ -7,6 +6,6 @@ import { LocalizationHelper } from '../../../core/helperClasses/localization-hel
 })
 export class DateDefaultPipe implements PipeTransform {
   transform(value: any): any {
-    return value ? LocalizationHelper.toMoment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '';
+    return value ? LocalizationHelper.displayDate(value) : '';
   }
 }

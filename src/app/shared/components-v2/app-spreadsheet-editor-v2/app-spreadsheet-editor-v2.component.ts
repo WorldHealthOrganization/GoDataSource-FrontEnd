@@ -2156,7 +2156,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             error = {
               key: AppFormBaseErrorMsgV2Type.DATE,
               data: {
-                field: LocalizationHelper.toMoment(dateConf.min).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+                field: LocalizationHelper.displayDate(dateConf.min),
                 comparator: this.i18nService.instant('LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER')
               }
             };
@@ -2167,7 +2167,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               error = {
                 key: AppFormBaseErrorMsgV2Type.DATE,
                 data: {
-                  field: LocalizationHelper.toMoment(dateConf.min).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+                  field: LocalizationHelper.displayDate(dateConf.min),
                   comparator: this.i18nService.instant('LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE')
                 }
               };
@@ -2682,7 +2682,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       case V2SpreadsheetEditorColumnType.DATE:
         // format
         return value ?
-          LocalizationHelper.toMoment(value as string | Moment).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+          LocalizationHelper.displayDate(value as string | Moment) :
           value as string;
 
       case V2SpreadsheetEditorColumnType.SINGLE_SELECT:

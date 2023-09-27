@@ -27,7 +27,6 @@ import * as _ from 'lodash';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IAppFormIconButtonV2 } from '../../../../shared/forms-v2/core/app-form-icon-button-v2';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
-import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Location } from '@angular/common';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
@@ -830,14 +829,14 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       ) {
         // when new contacts are added keep the source date of onset
         if (RelationshipType.CONTACT) {
-          this._warnings.sourceDateOfOnset = LocalizationHelper.toMoment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+          this._warnings.sourceDateOfOnset = LocalizationHelper.displayDate((sourceEntity as CaseModel).dateOfOnset);
         }
 
         this._warnings.entities[this.isCreate ? entityId : sourceEntity.id] = {
           id: this.isCreate ? entityId : sourceEntity.id,
           name: this.isCreate ? entities[entityId] : sourceEntity.name,
           type: this.isCreate ? (this._createEntitiesMap[entityId] as CaseModel).type : sourceEntity.type,
-          dateOfOnset: LocalizationHelper.toMoment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+          dateOfOnset: LocalizationHelper.displayDate((sourceEntity as CaseModel).dateOfOnset)
         };
       } else {
         // remove if exists
