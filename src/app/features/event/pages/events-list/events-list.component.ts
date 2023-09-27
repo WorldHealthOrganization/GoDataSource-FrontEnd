@@ -1,7 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -36,9 +35,9 @@ import {
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { Moment } from 'moment';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-events-list',
@@ -1435,17 +1434,17 @@ export class EventsListComponent
 
                         // initialize start time if necessary
                         if (!startTime) {
-                          startTime = moment();
+                          startTime = LocalizationHelper.now();
                         }
 
                         // determine estimated time
                         const processed: number = selected.length - selectedShallowClone.length;
                         const total: number = selected.length;
                         if (processed > 0) {
-                          const processedSoFarTimeMs: number = moment().diff(startTime);
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                           const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                           const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                          estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                         }
 
                         // update progress
@@ -1553,17 +1552,17 @@ export class EventsListComponent
 
                         // initialize start time if necessary
                         if (!startTime) {
-                          startTime = moment();
+                          startTime = LocalizationHelper.now();
                         }
 
                         // determine estimated time
                         const processed: number = selected.length - selectedShallowClone.length;
                         const total: number = selected.length;
                         if (processed > 0) {
-                          const processedSoFarTimeMs: number = moment().diff(startTime);
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                           const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                           const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                          estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                         }
 
                         // update progress
@@ -1667,7 +1666,7 @@ export class EventsListComponent
                   url: `/outbreaks/${this.selectedOutbreak.id}/events/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_EVENTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_EVENTS_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -1746,7 +1745,7 @@ export class EventsListComponent
                   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${LocalizationHelper.now().format('YYYY-MM-DD')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [

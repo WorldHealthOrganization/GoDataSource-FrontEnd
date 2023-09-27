@@ -1,10 +1,9 @@
-import { Moment } from 'moment';
 import { Observable } from 'rxjs/internal/Observable';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { share } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { Subscriber } from 'rxjs';
+import { LocalizationHelper, Moment } from './localization-helper';
 
 export class TimerCache {
   static readonly INVALIDATE_CACHE_AFTER_N_MS = 60000; // 1 minute
@@ -28,7 +27,7 @@ export class TimerCache {
     _.each(
       TimerCache.CACHE,
       (cached, localCacheKey) => {
-        if (moment().diff(cached.createdAt) >= TimerCache.INVALIDATE_CACHE_AFTER_N_MS) {
+        if (LocalizationHelper.now().diff(cached.createdAt) >= TimerCache.INVALIDATE_CACHE_AFTER_N_MS) {
           delete TimerCache.CACHE[localCacheKey];
         }
       }
@@ -38,7 +37,7 @@ export class TimerCache {
     if (!TimerCache.CACHE[cacheKey]) {
       // cache item
       TimerCache.CACHE[cacheKey] = {
-        createdAt: moment(),
+        createdAt: LocalizationHelper.now(),
         executeObserver$: executeObserver$,
         data: null,
         observer$: new Observable<any>((function(

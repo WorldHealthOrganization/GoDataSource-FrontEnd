@@ -5,7 +5,6 @@ import { EMPTY, ObservableInput, throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
@@ -26,6 +25,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, 
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { Constants } from '../../../../core/models/constants';
 import { ExportSyncErrorModel, ExportSyncErrorModelCode } from '../../../../core/models/export-sync-error.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-system-sync-logs-list',
@@ -765,7 +765,7 @@ export class SystemSyncLogsComponent
         url: 'sync/database-snapshot',
         async: false,
         method: ExportDataMethod.GET,
-        fileName: `${ this.i18nService.instant('LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE') } - ${ moment().format('YYYY-MM-DD') }`,
+        fileName: `${ this.i18nService.instant('LNG_PAGE_SYSTEM_BACKUPS_EXPORT_SYNC_PACKAGE') } - ${ LocalizationHelper.now().format('YYYY-MM-DD') }`,
         allow: {
           types: [ExportDataExtension.ZIP],
           encrypt: false

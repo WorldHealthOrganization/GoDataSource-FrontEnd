@@ -12,9 +12,9 @@ import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { Moment } from '../../../../core/helperClasses/x-moment';
 import { v4 as uuid } from 'uuid';
 import { IGanttDataInterface } from '../../interfaces/gantt-data.interface';
+import { Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-gantt-chart-delay-onset-dashlet',

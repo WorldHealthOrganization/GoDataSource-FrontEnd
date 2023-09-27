@@ -19,7 +19,6 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { Constants } from '../../../../core/models/constants';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -54,6 +53,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -169,7 +169,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     return new ContactModel({
       addresses: [new AddressModel({
         typeId: AddressType.CURRENT_ADDRESS,
-        date: moment().toISOString()
+        date: LocalizationHelper.now().toISOString()
       })]
     });
   }
@@ -358,7 +358,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       this.breadcrumbInfos.push({
         label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
         tooltip: this.itemData.dateBecomeContact ?
-          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT')}: ${moment(this.itemData.dateBecomeContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT')}: ${LocalizationHelper.toMoment(this.itemData.dateBecomeContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -368,7 +368,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       this.breadcrumbInfos.push({
         label: 'LNG_CONTACT_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
         tooltip: this.itemData.dateBecomeContact ?
-          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT')}: ${moment(this.itemData.dateBecomeContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
+          `${this.personAndRelatedHelperService.i18nService.instant('LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT')}: ${LocalizationHelper.toMoment(this.itemData.dateBecomeContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}` :
           undefined
       });
     }
@@ -1334,21 +1334,21 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                         name: 'followUp.originalStartDate',
                         placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_ORIGINAL_START_DATE',
                         value: this.itemData.followUp?.originalStartDate ?
-                          moment(this.itemData.followUp.originalStartDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          LocalizationHelper.toMoment(this.itemData.followUp.originalStartDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                           '—'
                       }, {
                         type: V2SideDialogConfigInputType.KEY_VALUE,
                         name: 'followUp.startDate',
                         placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_START_DATE',
                         value: this.itemData.followUp?.startDate ?
-                          moment(this.itemData.followUp.startDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          LocalizationHelper.toMoment(this.itemData.followUp.startDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                           '—'
                       }, {
                         type: V2SideDialogConfigInputType.KEY_VALUE,
                         name: 'followUp.endDate',
                         placeholder: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
                         value: this.itemData.followUp?.endDate ?
-                          moment(this.itemData.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                          LocalizationHelper.toMoment(this.itemData.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                           '—'
                       }
                     ]
@@ -2255,13 +2255,13 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     if (
       (this._parentEntity as CaseModel)?.dateOfOnset &&
       this._relationship.contactDate &&
-      moment(this._relationship.contactDate).isValid() &&
-      moment(this._relationship.contactDate).isBefore(moment((this._parentEntity as CaseModel).dateOfOnset))
+      LocalizationHelper.toMoment(this._relationship.contactDate).isValid() &&
+      LocalizationHelper.toMoment(this._relationship.contactDate).isBefore(LocalizationHelper.toMoment((this._parentEntity as CaseModel).dateOfOnset))
     ) {
       this.toastV2Service.notice(
         'LNG_PAGE_CREATE_CONTACT_WARNING_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET',
         {
-          dateOfOnset: moment((this._parentEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+          dateOfOnset: LocalizationHelper.toMoment((this._parentEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
         },
         AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
       );

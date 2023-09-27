@@ -10,7 +10,6 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { CaseModel } from '../../../../core/models/case.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
@@ -21,6 +20,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contact-follow-ups-bulk-modify',
@@ -122,22 +122,24 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
 
             // add follow-up date
             if (followUp.date) {
-              const date: string = moment(followUp.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const date: string = LocalizationHelper.toMoment(followUp.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
               if (!this.followUpDates.find((item) => item === date)) {
                 this.followUpDates.push(date);
               }
             }
 
             // has future follow-ups ?
-            if (Constants.isDateInTheFuture(followUp.date)) {
+            if (
+              followUp.date &&
+              LocalizationHelper.toMoment(followUp.date).startOf('day').isAfter(LocalizationHelper.today())
+            ) {
               this.futureFollowUps = true;
             }
           }
 
           // sort dates
-          this.followUpDates = _.sortBy(
-            this.followUpDates,
-            (item1, item2) => moment(item1).diff(moment(item2))
+          this.followUpDates.sort(
+            (item1, item2) => LocalizationHelper.toMoment(item1).diff(LocalizationHelper.toMoment(item2))
           );
 
           // finished - no item to edit

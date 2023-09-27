@@ -7,7 +7,6 @@ import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
 import { IAnswerData } from './question.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { Moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import {
@@ -29,6 +28,7 @@ import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { LocationModel } from './location.model';
 import { SafeHtml } from '@angular/platform-browser';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class CaseModel
   extends BaseModel

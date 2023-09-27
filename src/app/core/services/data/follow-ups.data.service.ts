@@ -15,7 +15,7 @@ import { UserFollowupsPerDayModel } from '../../models/user-followups-per-day.mo
 import { RangeFollowUpsModel } from '../../models/range-follow-ups.model';
 import { map, mergeMap } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
-import { Moment } from '../../helperClasses/x-moment';
+import { Moment } from '../../helperClasses/localization-helper';
 
 @Injectable()
 export class FollowUpsDataService {

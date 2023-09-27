@@ -6,7 +6,6 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -24,6 +23,7 @@ import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/c
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleLocation, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-locations-list',
@@ -563,7 +563,7 @@ export class LocationsListComponent extends ListComponent<LocationModel, IV2Colu
                     url: 'locations/hierarchical/export',
                     async: false,
                     method: ExportDataMethod.GET,
-                    fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
+                    fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE') } - ${ LocalizationHelper.now().format('YYYY-MM-DD') }`,
                     allow: {
                       types: [ExportDataExtension.JSON]
                     },

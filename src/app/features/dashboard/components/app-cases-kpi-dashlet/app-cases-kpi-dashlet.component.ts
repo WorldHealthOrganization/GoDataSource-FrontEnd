@@ -6,7 +6,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { MetricCasesWithContactsModel } from '../../../../core/models/metrics/metric-cases-contacts.model';
 import { Constants } from '../../../../core/models/constants';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -20,6 +19,7 @@ import { MetricCasesTransmissionChainsModel } from '../../../../core/models/metr
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { AppKpiDashletComponent } from '../app-kpi-dashlet/app-kpi-dashlet.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -97,7 +97,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.byDateRange(
               'dateOfOutcome', {
-                endDate: moment(globalFilterDate).endOf('day').format()
+                endDate: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             );
           }
@@ -269,7 +269,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.byDateRange(
               'contactDate', {
-                endDate: moment(globalFilterDate).endOf('day').format()
+                endDate: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             );
           }
@@ -400,7 +400,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               dateOfReporting: {
-                lte: moment(globalFilterDate).toISOString()
+                lte: LocalizationHelper.toMoment(globalFilterDate).toISOString()
               }
             });
           }
@@ -409,7 +409,7 @@ export class AppCasesKpiDashletComponent
           if (inputValue !== undefined) {
             // add number of days until current day
             if (globalFilterDate) {
-              inputValue += moment().endOf('day').diff(moment(globalFilterDate).endOf('day'), 'days');
+              inputValue += LocalizationHelper.now().endOf('day').diff(LocalizationHelper.toMoment(globalFilterDate).endOf('day'), 'days');
             }
 
             // create filter for daysNotSeen
@@ -506,7 +506,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               dateOfReporting: {
-                lte: moment(globalFilterDate).endOf('day').format()
+                lte: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             });
           }
@@ -576,7 +576,7 @@ export class AppCasesKpiDashletComponent
           if (inputValue !== undefined) {
             // add number of days until current day
             if (globalFilterDate) {
-              inputValue += moment().endOf('day').diff(moment(globalFilterDate).endOf('day'), 'days');
+              inputValue += LocalizationHelper.now().endOf('day').diff(LocalizationHelper.toMoment(globalFilterDate).endOf('day'), 'days');
             }
 
             // create filter
@@ -590,7 +590,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               contactDate: {
-                lte: moment(globalFilterDate).toISOString()
+                lte: LocalizationHelper.toMoment(globalFilterDate).toISOString()
               }
             });
           }
@@ -707,7 +707,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               dateOfReporting: {
-                lte: moment(globalFilterDate).endOf('day').format()
+                lte: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             });
           }
@@ -794,7 +794,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               dateOfReporting: {
-                lte: moment(globalFilterDate).endOf('day').format()
+                lte: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             });
           }

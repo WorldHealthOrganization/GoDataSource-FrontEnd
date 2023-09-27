@@ -3,6 +3,7 @@ import { I18nService } from './core/services/helper/i18n.service';
 import { SystemSettingsDataService } from './core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from './core/models/system-settings-version.model';
 import { BulkCacheHelperService } from './core/services/helper/bulk-cache-helper.service';
+import { LocalizationHelper } from './core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-root',
@@ -40,7 +41,12 @@ export class AppComponent implements OnInit {
     this.systemSettingsDataService
       .getAPIVersion()
       .subscribe((systemSettingsVersion) => {
+        // retrieve api info
         this.systemSettingsVersion = systemSettingsVersion;
+
+        // set default timezone
+        // IMPORTANT: this could be done at user level at a later stage, for now it was proposed but WHO decided to keep it per instance
+        LocalizationHelper.initialize(this.systemSettingsVersion.timezone);
       });
 
     // clear expired cache data

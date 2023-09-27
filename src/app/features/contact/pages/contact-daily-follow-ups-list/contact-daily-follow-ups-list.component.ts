@@ -5,7 +5,6 @@ import { throwError } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { AddressModel } from '../../../../core/models/address.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { Constants } from '../../../../core/models/constants';
@@ -51,6 +50,7 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -99,8 +99,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
 
   // print follow-up
   printFollowUpsDialogExtraAPIData = {
-    startDate: moment().startOf('day'),
-    endDate: moment().endOf('day')
+    startDate: LocalizationHelper.today(),
+    endDate: LocalizationHelper.now().endOf('day')
   };
 
   // redirect from team workload ?
@@ -132,7 +132,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     // from team/user workload ?
     if (this.activatedRoute.snapshot.queryParams.fromWorkload) {
       this._workloadData = {
-        date: moment(this.activatedRoute.snapshot.queryParams.date),
+        date: LocalizationHelper.toMoment(this.activatedRoute.snapshot.queryParams.date),
         team: this.activatedRoute.snapshot.queryParams.team,
         user: this.activatedRoute.snapshot.queryParams.user,
         status: this.activatedRoute.snapshot.queryParams.status ?
@@ -247,7 +247,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         get: () => 'LNG_COMMON_LABEL_DELETE',
                         data: () => ({
                           name: item.date ?
-                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                             ''
                         })
                       },
@@ -255,7 +255,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         get: () => 'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP',
                         data: () => ({
                           name: item.date ?
-                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                             ''
                         })
                       }
@@ -320,7 +320,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
                         data: () => ({
                           name: item.date ?
-                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                             ''
                         })
                       },
@@ -328,7 +328,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         get: () => 'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP',
                         data: () => ({
                           name: item.date ?
-                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                             ''
                         })
                       }
@@ -391,7 +391,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   item.person?.type !== EntityType.CONTACT_OF_CONTACT &&
                   this.selectedOutbreakIsActive &&
                   FollowUpModel.canModify(this.authUser) &&
-                  !Constants.isDateInTheFuture(item.date);
+                  (
+                    !item.date ||
+                    LocalizationHelper.toMoment(item.date).isSameOrBefore(LocalizationHelper.today())
+                  );
               }
             },
 
@@ -807,19 +810,19 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: V2FilterType.DATE_RANGE,
           value: this._workloadData?.date ?
             {
-              startDate: moment(this._workloadData.date).startOf('day'),
-              endDate: moment(this._workloadData.date).endOf('day')
+              startDate: LocalizationHelper.toMoment(this._workloadData.date).startOf('day'),
+              endDate: LocalizationHelper.toMoment(this._workloadData.date).endOf('day')
             } : {
-              startDate: moment().startOf('day'),
-              endDate: moment().endOf('day')
+              startDate: LocalizationHelper.today(),
+              endDate: LocalizationHelper.now().endOf('day')
             },
           defaultValue: this._workloadData?.date ?
             {
-              startDate: moment(this._workloadData.date).startOf('day'),
-              endDate: moment(this._workloadData.date).endOf('day')
+              startDate: LocalizationHelper.toMoment(this._workloadData.date).startOf('day'),
+              endDate: LocalizationHelper.toMoment(this._workloadData.date).endOf('day')
             } : {
-              startDate: moment().startOf('day'),
-              endDate: moment().endOf('day')
+              startDate: LocalizationHelper.today(),
+              endDate: LocalizationHelper.now().endOf('day')
             },
           search: (column) => {
             const startDate = (column.filter as IV2FilterDate).value.startDate;
@@ -827,8 +830,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
 
             if (startDate) {
               this.printFollowUpsDialogExtraAPIData = {
-                startDate: moment((column.filter as IV2FilterDate).value.startDate).startOf('day'),
-                endDate: moment((column.filter as IV2FilterDate).value.startDate).endOf('day')
+                startDate: LocalizationHelper.toMoment((column.filter as IV2FilterDate).value.startDate).startOf('day'),
+                endDate: LocalizationHelper.toMoment((column.filter as IV2FilterDate).value.startDate).endOf('day')
               };
             }
 
@@ -841,15 +844,15 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             if (startDate && endDate) {
               operator = 'between';
               valueToCompare = [
-                moment(startDate).startOf('day'),
-                moment(endDate).endOf('day')
+                LocalizationHelper.toMoment(startDate).startOf('day'),
+                LocalizationHelper.toMoment(endDate).endOf('day')
               ];
             } else if (startDate && endDate === null) {
               operator = 'gte';
-              valueToCompare = moment(startDate).startOf('day');
+              valueToCompare = LocalizationHelper.toMoment(startDate).startOf('day');
             } else if (startDate === null && endDate) {
               operator = 'lte';
-              valueToCompare = moment(endDate).endOf('day');
+              valueToCompare = LocalizationHelper.toMoment(endDate).endOf('day');
             }
 
             // filter
@@ -1055,7 +1058,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         sortable: true,
         format: {
           type: (item) => item.person?.dateOfLastContact ?
-            moment(item.person.dateOfLastContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.toMoment(item.person.dateOfLastContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             '—'
         },
         filter: {
@@ -1070,7 +1073,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         sortable: true,
         format: {
           type: (item) => item.person?.followUp?.endDate ?
-            moment(item.person.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.toMoment(item.person.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             '—'
         },
         filter: {
@@ -1604,8 +1607,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                           placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DATE',
                           value: this.printFollowUpsDialogExtraAPIData.startDate,
                           change: (data: IV2SideDialogData) => {
-                            this.printFollowUpsDialogExtraAPIData.startDate = moment((data.map.date as IV2SideDialogConfigInputDate).value).startOf('day');
-                            this.printFollowUpsDialogExtraAPIData.endDate = moment((data.map.date as IV2SideDialogConfigInputDate).value).endOf('day');
+                            this.printFollowUpsDialogExtraAPIData.startDate = LocalizationHelper.toMoment((data.map.date as IV2SideDialogConfigInputDate).value).startOf('day');
+                            this.printFollowUpsDialogExtraAPIData.endDate = LocalizationHelper.toMoment((data.map.date as IV2SideDialogConfigInputDate).value).endOf('day');
                           },
                           validators: {
                             required: () => true
@@ -1732,8 +1735,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     or: [{
                       date: {
                         between: [
-                          moment(date).startOf('day'),
-                          moment(date).endOf('day')
+                          LocalizationHelper.toMoment(date).startOf('day'),
+                          LocalizationHelper.toMoment(date).endOf('day')
                         ]
                       }
                     }, {
@@ -1746,8 +1749,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       },
                       date: {
                         between: [
-                          moment(date).add(-(response.data.map.displayMissedFollowUpsNoDays as IV2SideDialogConfigInputNumber).value, 'days').startOf('day'),
-                          moment(date).endOf('day')
+                          LocalizationHelper.toMoment(date).add(-(response.data.map.displayMissedFollowUpsNoDays as IV2SideDialogConfigInputNumber).value, 'days').startOf('day'),
+                          LocalizationHelper.toMoment(date).endOf('day')
                         ]
                       }
                     }]
@@ -2353,8 +2356,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     // - use "today" if contact tracing should start with the date of the last contact
     // - otherwise, use "tomorrow"
     const followUpDate: Moment = this.selectedOutbreak.generateFollowUpsDateOfLastContact ?
-      moment() :
-      moment().add(1, 'days');
+      LocalizationHelper.today() :
+      LocalizationHelper.today().add(1, 'days');
     this.personAndRelatedHelperService.dialogV2Service.showSideDialog({
       // title
       title: {
@@ -2529,7 +2532,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   url: `outbreaks/${ this.selectedOutbreak.id }/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
+                  fileName: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ LocalizationHelper.now().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
                   queryBuilder: qb,
                   allow: {
                     types: [

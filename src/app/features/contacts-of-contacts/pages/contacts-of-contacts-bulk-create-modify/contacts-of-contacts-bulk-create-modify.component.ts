@@ -14,7 +14,6 @@ import { AddressModel, AddressType } from '../../../../core/models/address.model
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2SpreadsheetEditorChange, V2SpreadsheetEditorChangeType } from '../../../../shared/components-v2/app-spreadsheet-editor-v2/models/change.model';
 import { IV2SpreadsheetEditorExtendedColDefEditorColumnMap } from '../../../../shared/components-v2/app-spreadsheet-editor-v2/models/extended-column.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
@@ -27,6 +26,7 @@ import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-ca
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 import { V2SpreadsheetEditorColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contacts-of-contacts-bulk-create-modify',
@@ -539,7 +539,7 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
         validators: {
           required: () => true,
           date: () => ({
-            max: moment()
+            max: LocalizationHelper.now()
           })
         }
       }, {
@@ -586,7 +586,7 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
         visible: this.isCreate,
         validators: {
           date: () => ({
-            max: moment()
+            max: LocalizationHelper.now()
           })
         }
       }, {
@@ -601,7 +601,7 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
         validators: {
           required: () => true,
           date: () => ({
-            max: moment()
+            max: LocalizationHelper.now()
           })
         }
       }, {
@@ -1038,7 +1038,7 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
     // do we need to set date ?
     if (!entity.model.mainAddress?.date) {
       // set date
-      entity.model.mainAddress.date = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+      entity.model.mainAddress.date = LocalizationHelper.now().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
       // update grid
       data.handler.rowValidate(data.rowIndex);

@@ -3,7 +3,6 @@ import { AddressModel } from './address.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { Moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
@@ -20,6 +19,7 @@ import {
 } from './permission.interface';
 import { IAnswerData } from './question.model';
 import { SafeHtml } from '@angular/platform-browser';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class EventModel
   extends BaseModel

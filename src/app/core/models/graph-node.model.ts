@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { EntityType } from './entity-type';
 import { Constants } from './constants';
-import { moment } from '../helperClasses/x-moment';
+import { LocalizationHelper } from '../helperClasses/localization-helper';
 
 export class GraphNodeModel {
   id: string;
@@ -51,7 +51,7 @@ export class GraphNodeModel {
 
     // timeline render ?
     if ( this.dateTimeline ) {
-      this.dateTimeline = moment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+      this.dateTimeline = LocalizationHelper.toMoment(this.dateTimeline).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
     } else {
       this.displayTimeline = 'none';
     }
@@ -66,12 +66,12 @@ export class GraphNodeModel {
       this.borderColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_BORDER;
       this.nodeColor = Constants.DEFAULT_BACKGROUND_COLOR_NODES_CHAINS;
       // change color if first day of week or first day of month
-      if (moment(this.dateTimeline).isoWeekday() === 1) {
+      if (LocalizationHelper.toMoment(this.dateTimeline).isoWeekday() === 1) {
         // monday
         this.borderColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_WEEK_BORDER;
         this.nodeNameColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_WEEK_TEXT;
       }
-      if (moment(this.dateTimeline).format('D') === '1') {
+      if (LocalizationHelper.toMoment(this.dateTimeline).format('D') === '1') {
         // first day of month
         this.borderColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH_BORDER;
         this.nodeNameColor = Constants.DEFAULT_COLOR_CHAINS_TIMELINE_CHECKPOINTS_FIRST_DAY_OF_MONTH_TEXT;

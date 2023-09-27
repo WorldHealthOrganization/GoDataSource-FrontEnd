@@ -6,10 +6,10 @@ import { TransmissionChainBarsModel } from '../typings/transmission-chain-bars.m
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { EntityBarModel } from '../typings/entity-bar.model';
 import { EntityType } from '../../../core/models/entity-type';
-import { moment } from '../../../core/helperClasses/x-moment';
 import { v4 as uuid } from 'uuid';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
+import { LocalizationHelper } from '../../../core/helperClasses/localization-helper';
 
 // define cell types that we need to draw
 enum drawCellType {
@@ -452,7 +452,7 @@ export class TransmissionChainBarsService {
         const cursorPT = pt.matrixTransform(svg.getScreenCTM().inverse());
 
         // determine date
-        const date: string = moment(this.graphData.minGraphDate)
+        const date: string = LocalizationHelper.toMoment(this.graphData.minGraphDate)
           .add(Math.floor(cursorPT.y / this.cellHeight), 'days')
           .format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
@@ -663,7 +663,7 @@ export class TransmissionChainBarsService {
 
 
     // keep case date of onset / event date for later use
-    const dateMoment = moment(entityData.date).startOf('day');
+    const dateMoment = LocalizationHelper.toMoment(entityData.date).startOf('day');
     const date = dateMoment.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
     // determine all cell that we need to draw
@@ -673,7 +673,7 @@ export class TransmissionChainBarsService {
     const dateOfOnsetLabel = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_CASE_ONSET_LABEL');
     cells.push(new DrawCell({
       type: drawCellType.DATE_OF_ONSET,
-      date: moment(date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+      date: LocalizationHelper.toMoment(date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
       label: dateOfOnsetLabel
     }));
 
@@ -697,7 +697,7 @@ export class TransmissionChainBarsService {
             // add cell
             cells.push(new DrawCell({
               type: drawCellType.DATE_OF_BURIAL,
-              date: moment(entityData.dateOfBurial).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+              date: LocalizationHelper.toMoment(entityData.dateOfBurial).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
               label: entityData.safeBurial ?
                 this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_BURIAL_DATE_SAFE_LABEL') :
                 this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_BURIAL_DATE_NOT_SAFE_LABEL')
@@ -714,7 +714,7 @@ export class TransmissionChainBarsService {
       // add cell
       cells.push(new DrawCell({
         type: drawCellType.DATE_OF_OUTCOME,
-        date: moment(entityData.dateOfOutcome).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+        date: LocalizationHelper.toMoment(entityData.dateOfOutcome).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
         label: dateOfOutcomeLabel
       }));
     }
@@ -733,7 +733,7 @@ export class TransmissionChainBarsService {
       isolationDates.forEach((isolationDate) => {
         cells.push(new DrawCell({
           type: drawCellType.CASE_ISO_HSP,
-          date: moment(isolationDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+          date: LocalizationHelper.toMoment(isolationDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
           label: isolationLabel,
           centerName: isolation.centerName
         }));
@@ -754,9 +754,9 @@ export class TransmissionChainBarsService {
       let labResultDate: string;
       let labPending: boolean = false;
       if (labResult.dateOfResult) {
-        labResultDate = moment(labResult.dateOfResult).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        labResultDate = LocalizationHelper.toMoment(labResult.dateOfResult).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
       } else {
-        labResultDate = moment(labResult.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        labResultDate = LocalizationHelper.toMoment(labResult.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
         labPending = true;
       }
 
@@ -838,7 +838,7 @@ export class TransmissionChainBarsService {
               );
 
             // check if date is before date of onset
-            const opacity = moment(drawCell.date).isBefore(dateMoment) ?
+            const opacity = LocalizationHelper.toMoment(drawCell.date).isBefore(dateMoment) ?
               this.graphConfig.beforeDateOfOnsetOpacity :
               1;
 
@@ -917,7 +917,7 @@ export class TransmissionChainBarsService {
       .attr('y', this.datesMap[date] * this.cellHeight);
     entityBar.append('rect')
       .attr('width', this.cellWidth)
-      .attr('height', (moment(entityData.lastGraphDate).startOf('day').diff(dateMoment, 'days') + 1) * this.cellHeight)
+      .attr('height', (LocalizationHelper.toMoment(entityData.lastGraphDate).startOf('day').diff(dateMoment, 'days') + 1) * this.cellHeight)
       .attr('fill', 'transparent')
       .attr('stroke', 'var(--gd-secondary)')
       .attr('stroke-width', '1')
@@ -1014,8 +1014,8 @@ export class TransmissionChainBarsService {
       return;
     }
 
-    const sourceEntityFirstGraphDate = moment(sourceEntityData.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-    const targetEntityFirstGraphDate = moment(targetEntityData.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+    const sourceEntityFirstGraphDate = LocalizationHelper.toMoment(sourceEntityData.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+    const targetEntityFirstGraphDate = LocalizationHelper.toMoment(targetEntityData.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
     // mark the relation as being drawn, to avoid duplicates
     _.set(this.drawnRelations, `[${sourceEntityId}][${targetEntityId}]`, true);
@@ -1288,8 +1288,8 @@ export class TransmissionChainBarsService {
    */
   private getDaysBetween(startDate: string, endDate: string): string[] {
     // start from the start date and increment it
-    const dateMoment = moment(startDate).startOf('day');
-    const endDateMoment = moment(endDate).startOf('day');
+    const dateMoment = LocalizationHelper.toMoment(startDate).startOf('day');
+    const endDateMoment = LocalizationHelper.toMoment(endDate).startOf('day');
 
     const days = [];
     while (!dateMoment.isAfter(endDateMoment)) {

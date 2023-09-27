@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
-import { Moment } from '../../../../core/helperClasses/x-moment';
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { CustomDateAdapter } from '../../../angular-material/adapter/custom-date-adapter';
@@ -19,6 +18,7 @@ import { Constants } from '../../../../core/models/constants';
 import { MatInput } from '@angular/material/input';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { Subscription } from 'rxjs';
+import { Moment } from '../../../../core/helperClasses/localization-helper';
 
 // Define format to be used into datepicker
 const DEFAULT_FORMAT = {

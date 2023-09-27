@@ -8,11 +8,11 @@ import { IV2SpreadsheetEditorExtendedColDefEditorColumnMap } from './extended-co
 import { Observable } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { V2SpreadsheetEditorChange } from './change.model';
-import { Moment } from '../../../../core/helperClasses/x-moment';
 import { AppSpreadsheetEditorV2CellBasicRendererModel } from './app-spreadsheet-editor-v2-cell-basic-renderer.model';
 import { AppSpreadsheetEditorV2CellSelectRendererModel } from './app-spreadsheet-editor-v2-cell-select-renderer.model';
 import { AppSpreadsheetEditorV2CellDateRendererModel } from './app-spreadsheet-editor-v2-cell-date-renderer.model';
 import { AppSpreadsheetEditorV2CellLocationRendererModel } from './app-spreadsheet-editor-v2-cell-location-renderer.model';
+import { Moment } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Editor handler

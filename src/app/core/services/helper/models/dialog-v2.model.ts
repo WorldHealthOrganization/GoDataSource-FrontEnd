@@ -1,10 +1,10 @@
 import { ExportStatusStep } from '../../../models/constants';
-import { Moment } from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
 import { IV2SideDialogData, IV2SideDialogHandler, V2SideDialogConfigInput } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ObservableInput } from 'rxjs';
 import { ErrorModel } from '../../../models/error.model';
+import { Moment } from '../../../helperClasses/localization-helper';
 
 /**
  * Export data config progress answer

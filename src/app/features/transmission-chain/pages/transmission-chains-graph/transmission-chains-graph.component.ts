@@ -34,6 +34,7 @@ import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 enum NodeAction {
   MODIFY_PERSON = 'modify-person',
@@ -1007,7 +1008,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
    */
   private retrieveQuickInputCaseDefinition(caseModel: CaseModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
     // init
-    const today = Constants.getCurrentDate();
+    const today = LocalizationHelper.today();
     const caseVisualIDMask: {
       mask: string
     } = {
@@ -1288,7 +1289,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
    */
   private retrieveQuickInputContactDefinition(contactModel: ContactModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
     // init
-    const today = Constants.getCurrentDate();
+    const today = LocalizationHelper.today();
     const contactVisualIDMask: {
       mask: string
     } = {
@@ -1500,7 +1501,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
    */
   private retrieveQuickInputEventDefinition(eventModel: EventModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
     // init
-    const today = Constants.getCurrentDate();
+    const today = LocalizationHelper.today();
     const eventVisualIDMask: {
       mask: string
     } = {
@@ -1650,7 +1651,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
    */
   private retrieveQuickInputContactOfContactDefinition(contactOfContactModel: ContactOfContactModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
     // init
-    const today = Constants.getCurrentDate();
+    const today = LocalizationHelper.today();
     const contactOfContactVisualIDMask: {
       mask: string
     } = {
@@ -1848,9 +1849,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
    */
   private retrieveQuickInputRelationshipDefinition(relationship: RelationshipModel): IQuickEditorV2Section<QuickEditorV2InputToVisibleMandatoryConf>[] {
     // init
-    const today = Constants.getCurrentDate();
-
-    // generate definition
+    const today = LocalizationHelper.today();
     return [
       {
         label: 'LNG_COMMON_LABEL_DETAILS',

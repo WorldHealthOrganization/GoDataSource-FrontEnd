@@ -15,9 +15,9 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import * as moment from 'moment';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ActivatedRoute } from '@angular/router';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-reference-data-categories-list',
@@ -218,7 +218,7 @@ export class ReferenceDataCategoriesListComponent
                   url: 'reference-data/export',
                   async: true,
                   method: ExportDataMethod.GET,
-                  fileName: `${ this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE') } - ${ moment().format('YYYY-MM-DD HH:mm') }`,
+                  fileName: `${ this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE') } - ${ LocalizationHelper.now().format('YYYY-MM-DD HH:mm') }`,
                   queryBuilder: this.queryBuilder,
                   allow: {
                     types: [

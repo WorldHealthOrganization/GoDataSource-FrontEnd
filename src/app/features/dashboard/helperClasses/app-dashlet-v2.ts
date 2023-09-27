@@ -2,10 +2,10 @@ import { Subscription } from 'rxjs';
 import { IDashletValue } from './dashlet-value';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { Moment } from '../../../core/helperClasses/x-moment';
 import { Directive, Input } from '@angular/core';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../core/models/user.model';
+import { Moment } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Dashlet

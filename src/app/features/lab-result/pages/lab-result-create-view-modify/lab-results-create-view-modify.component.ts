@@ -25,7 +25,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -39,6 +38,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -768,7 +768,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         },
         text: (item: LabResultModel) => item.sampleIdentifier?.trim().length > 0 ?
           item.sampleIdentifier :
-          moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+          LocalizationHelper.toMoment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
         details: undefined
       }
     };

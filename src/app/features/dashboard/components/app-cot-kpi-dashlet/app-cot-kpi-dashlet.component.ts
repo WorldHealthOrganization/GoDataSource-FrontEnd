@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, ViewC
 import { AppDashletV2 } from '../../helperClasses/app-dashlet-v2';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -12,6 +11,7 @@ import { Constants } from '../../../../core/models/constants';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { AppKpiDashletComponent } from '../app-kpi-dashlet/app-kpi-dashlet.component';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-cot-kpi-dashlet',
@@ -82,7 +82,7 @@ export class AppCotKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.byEquality(
               'endDate',
-              moment(globalFilterDate).endOf('day').toISOString()
+              LocalizationHelper.toMoment(globalFilterDate).endOf('day').toISOString()
             );
           }
 
@@ -197,7 +197,7 @@ export class AppCotKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.byEquality(
               'endDate',
-              moment(globalFilterDate).endOf('day').toISOString()
+              LocalizationHelper.toMoment(globalFilterDate).endOf('day').toISOString()
             );
           }
 
@@ -310,7 +310,7 @@ export class AppCotKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.byDateRange(
               'contactDate', {
-                endDate: moment(globalFilterDate).endOf('day').format()
+                endDate: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             );
           }

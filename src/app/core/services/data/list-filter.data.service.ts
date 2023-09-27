@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestFilterOperator } from '../../helperClasses/request-query-builder';
 import { OutbreakDataService } from './outbreak.data.service';
 import { FollowUpsDataService } from './follow-ups.data.service';
 import { Observable, of } from 'rxjs';
@@ -8,11 +8,10 @@ import { RelationshipDataService } from './relationship.data.service';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { Constants } from '../../models/constants';
 import * as _ from 'lodash';
-import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
 import { ContactDataService } from './contact.data.service';
 import { DateType } from '../../enums/date-types.enum';
 import { map, mergeMap } from 'rxjs/operators';
-import { Moment, moment } from '../../helperClasses/x-moment';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
 
 @Injectable()
 export class ListFilterDataService {
@@ -61,10 +60,10 @@ export class ListFilterDataService {
         qb.filter
           .byEquality(
             'startDate',
-            moment(date).startOf('day').toISOString()
+            LocalizationHelper.toMoment(date).startOf('day').toISOString()
           ).byEquality(
             'endDate',
-            moment(date).endOf('day').toISOString()
+            LocalizationHelper.toMoment(date).endOf('day').toISOString()
           );
       }
 
@@ -126,7 +125,7 @@ export class ListFilterDataService {
       if (_.isNumber(noDaysNotSeen)) {
         // add number of days until current day
         if (date) {
-          noDaysNotSeen += moment().endOf('day').diff(moment(date).endOf('day'), 'days');
+          noDaysNotSeen += LocalizationHelper.today().endOf('day').diff(LocalizationHelper.toMoment(date).endOf('day'), 'days');
         }
 
         // create filter
@@ -140,7 +139,7 @@ export class ListFilterDataService {
       if (date) {
         qb.filter.where({
           date: {
-            lte: moment(date).toISOString()
+            lte: LocalizationHelper.toMoment(date).toISOString()
           }
         });
       }
@@ -196,7 +195,7 @@ export class ListFilterDataService {
                 }
               }, {
                 startDate: {
-                  $lte: moment(date).endOf('day').toISOString()
+                  $lte: LocalizationHelper.toMoment(date).endOf('day').toISOString()
                 }
               }
             ]
@@ -208,7 +207,7 @@ export class ListFilterDataService {
                 }
               }, {
                 endDate: {
-                  $gte: moment(date).startOf('day').toISOString()
+                  $gte: LocalizationHelper.toMoment(date).startOf('day').toISOString()
                 }
               }
             ]
@@ -283,7 +282,7 @@ export class ListFilterDataService {
                   }
                 }, {
                   startDate: {
-                    $lte: moment(date).endOf('day').toISOString()
+                    $lte: LocalizationHelper.toMoment(date).endOf('day').toISOString()
                   }
                 }
               ]
@@ -295,7 +294,7 @@ export class ListFilterDataService {
                   }
                 }, {
                   endDate: {
-                    $gte: moment(date).startOf('day').toISOString()
+                    $gte: LocalizationHelper.toMoment(date).startOf('day').toISOString()
                   }
                 }
               ]
@@ -404,7 +403,7 @@ export class ListFilterDataService {
       if (date) {
         qb.filter.where({
           dateOfReporting: {
-            lte: moment(date).toISOString()
+            lte: LocalizationHelper.toMoment(date).toISOString()
           }
         });
       }
@@ -468,7 +467,7 @@ export class ListFilterDataService {
       if (_.isNumber(noDaysInChains)) {
         // add number of days until current day
         if (date) {
-          noDaysInChains += moment().endOf('day').diff(moment(date).endOf('day'), 'days');
+          noDaysInChains += LocalizationHelper.today().endOf('day').diff(LocalizationHelper.toMoment(date).endOf('day'), 'days');
         }
 
         // create filter
@@ -482,7 +481,7 @@ export class ListFilterDataService {
       if (date) {
         qb.filter.where({
           contactDate: {
-            lte: moment(date).toISOString()
+            lte: LocalizationHelper.toMoment(date).toISOString()
           }
         });
       }
@@ -567,7 +566,7 @@ export class ListFilterDataService {
       if (date) {
         qb.filter.where({
           dateOfReporting: {
-            lte: moment(date).toISOString()
+            lte: LocalizationHelper.toMoment(date).toISOString()
           }
         });
       }
@@ -577,7 +576,7 @@ export class ListFilterDataService {
       if (_.isNumber(noDaysAmongContacts)) {
         // add number of days until current day
         if (date) {
-          noDaysAmongContacts += moment().endOf('day').diff(moment(date).endOf('day'), 'days');
+          noDaysAmongContacts += LocalizationHelper.today().endOf('day').diff(LocalizationHelper.toMoment(date).endOf('day'), 'days');
         }
 
         // create filter
@@ -696,15 +695,15 @@ export class ListFilterDataService {
 
       // empty date ?
       if (_.isEmpty(date)) {
-        date = moment();
+        date = LocalizationHelper.today();
       }
 
       // filter by date
       qb.filter.byDateRange(
         'date', {
           // clone date
-          startDate: moment(date).startOf('day'),
-          endDate: moment(date).endOf('day')
+          startDate: LocalizationHelper.toMoment(date).startOf('day'),
+          endDate: LocalizationHelper.toMoment(date).endOf('day')
         }
       );
 
@@ -748,15 +747,15 @@ export class ListFilterDataService {
 
       // empty date ?
       if (_.isEmpty(date)) {
-        date = moment();
+        date = LocalizationHelper.today();
       }
 
       // filter by date
       qb.filter.byDateRange(
         'date', {
           // clone date
-          startDate: moment(date).startOf('day'),
-          endDate: moment(date).endOf('day')
+          startDate: LocalizationHelper.toMoment(date).startOf('day'),
+          endDate: LocalizationHelper.toMoment(date).endOf('day')
         }
       );
 

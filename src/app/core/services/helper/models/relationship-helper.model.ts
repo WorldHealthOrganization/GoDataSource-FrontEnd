@@ -7,7 +7,6 @@ import { EventModel } from '../../../models/event.model';
 import { OutbreakModel } from '../../../models/outbreak.model';
 import { EntityModel, RelationshipModel } from '../../../models/entity-and-relationship.model';
 import { IAppFormIconButtonV2 } from '../../../../shared/forms-v2/core/app-form-icon-button-v2';
-import { moment, Moment } from '../../../helperClasses/x-moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { Observable, throwError } from 'rxjs';
@@ -30,6 +29,7 @@ import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../../shared/compo
 import { PersonAndRelatedHelperService } from '../person-and-related-helper.service';
 import { RelationshipDataService } from '../../data/relationship.data.service';
 import { IV2ColumnToVisibleMandatoryConf, V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { LocalizationHelper, Moment } from '../../../helperClasses/localization-helper';
 
 /**
  * From ?
@@ -197,7 +197,7 @@ export class RelationshipHelperModel {
     }
   ): ICreateViewModifyV2Tab {
     // today
-    const today: Moment = moment();
+    const today: Moment = LocalizationHelper.today();
 
     // create tab
     const tab: ICreateViewModifyV2Tab = this.parent.createViewModify.tabFilter(
@@ -892,7 +892,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
           value: entity.dateOfOnset ?
-            moment(entity.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.toMoment(entity.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
         });
       }
@@ -906,7 +906,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
           value: entity.dateBecomeCase ?
-            moment(entity.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.toMoment(entity.dateBecomeCase).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
         });
       }
@@ -920,7 +920,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
           value: entity.dateOfInfection ?
-            moment(entity.dateOfInfection).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.toMoment(entity.dateOfInfection).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
         });
       }
@@ -953,7 +953,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
           value: entity.dateOfReporting ?
-            moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.toMoment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
         });
       }
@@ -994,7 +994,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_EVENT_FIELD_LABEL_DATE',
           value: entity.date ?
-            moment(entity.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.toMoment(entity.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
         });
       }
@@ -1020,7 +1020,7 @@ export class RelationshipHelperModel {
         lightObject.push({
           label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
           value: entity.dateOfReporting ?
-            moment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.toMoment(entity.dateOfReporting).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
         });
       }
@@ -1060,7 +1060,7 @@ export class RelationshipHelperModel {
       lightObject.push({
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
         value: relationship.contactDate ?
-          moment(relationship.contactDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+          LocalizationHelper.toMoment(relationship.contactDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
           ''
       });
     }

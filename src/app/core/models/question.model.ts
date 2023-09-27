@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Constants } from './constants';
-import { Moment } from '../helperClasses/x-moment';
 import { IModelArrayProperties, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportDataExtension } from '../../features/import-export-data/components/import-data/model';
+import { Moment } from '../helperClasses/localization-helper';
 
 export interface IAnswerData {
   date?: string | Moment;

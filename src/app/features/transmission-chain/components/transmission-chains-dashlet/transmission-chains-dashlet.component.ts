@@ -18,7 +18,6 @@ import { ClusterDataService } from '../../../../core/services/data/cluster.data.
 import { ActivatedRoute } from '@angular/router';
 import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { catchError, tap } from 'rxjs/operators';
-import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapMarkerType, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../../../../common-modules/world-map/components/world-map/world-map.component';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -64,6 +63,7 @@ import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-da
 import { IV2NumberRange } from '../../../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -136,7 +136,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     [idLocation: string]: LocationModel
   } = {};
   personName: string = '';
-  dateGlobalFilter: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+  dateGlobalFilter: string = LocalizationHelper.now().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
   // reference data categories needed for filters
   referenceDataCategories: any = [
@@ -627,7 +627,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
       // parse date
       if (global.date) {
-        global.date = moment(global.date);
+        global.date = LocalizationHelper.toMoment(global.date);
       }
 
       // date
@@ -986,7 +986,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     if (this.dateGlobalFilter) {
       requestQueryBuilder.filter.byEquality(
         'endDate',
-        moment(this.dateGlobalFilter).toISOString()
+        LocalizationHelper.toMoment(this.dateGlobalFilter).toISOString()
       );
     }
 
@@ -1528,8 +1528,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
   getMaxRankDateInterval(startDate, endDate) {
     let maxRank = -1;
-    let sDate = moment(startDate);
-    const eDate = moment(endDate);
+    let sDate = LocalizationHelper.toMoment(startDate);
+    const eDate = LocalizationHelper.toMoment(endDate);
     while (sDate < eDate) {
       sDate = sDate.add(1, 'days');
       const maxRankDate = this.getMaxRankDate(this.timelineDatesRanks[sDate.format('YYYY-MM-DD')]);
@@ -1613,8 +1613,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           maxRankPerParentNode = maxRankRelatedNode + 1;
         }
         // block rank on previous dates
-        let startDate = moment(node.data.dateTimeline);
-        const endDate = moment(relatedNode.data.dateTimeline);
+        let startDate = LocalizationHelper.toMoment(node.data.dateTimeline);
+        const endDate = LocalizationHelper.toMoment(relatedNode.data.dateTimeline);
         // add an entry called maxRank on all the dates between the nodes
         while (startDate < endDate) {
           startDate = startDate.add(1, 'days');

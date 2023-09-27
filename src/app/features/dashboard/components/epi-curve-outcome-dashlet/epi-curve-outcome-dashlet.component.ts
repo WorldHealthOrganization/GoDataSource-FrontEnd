@@ -11,11 +11,11 @@ import { Subscription } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { MetricCasesCountStratifiedOutcome } from '../../../../core/models/metrics/metric-cases-count-stratified-outcome.model';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-epi-curve-outcome-dashlet',
@@ -304,12 +304,12 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
       if (this.globalFilterDate) {
         qb.filter.byEquality(
           'endDate',
-          moment(this.globalFilterDate).clone().endOf('day').toISOString()
+          LocalizationHelper.toMoment(this.globalFilterDate).clone().endOf('day').toISOString()
         );
       } else {
         qb.filter.byEquality(
           'endDate',
-          moment().endOf('day').toISOString()
+          LocalizationHelper.now().endOf('day').toISOString()
         );
       }
 

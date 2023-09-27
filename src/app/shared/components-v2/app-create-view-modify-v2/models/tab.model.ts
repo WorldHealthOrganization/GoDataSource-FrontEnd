@@ -1,6 +1,5 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { NgForm } from '@angular/forms';
-import { Moment } from '../../../../core/helperClasses/x-moment';
 import { Observable } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { AddressModel } from '../../../../core/models/address.model';
@@ -32,6 +31,7 @@ import {
   IVisibleMandatoryDataGroup,
   IVisibleMandatoryDataValue
 } from '../../../forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { Moment } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Input type

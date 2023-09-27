@@ -5,7 +5,6 @@ import { EventModel } from './event.model';
 import { EntityType } from './entity-type';
 import { IAnswerData, QuestionModel } from './question.model';
 import { Constants } from './constants';
-import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { RelationshipPersonModel } from './relationship-person.model';
 import { UserModel } from './user.model';
@@ -15,6 +14,7 @@ import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermiss
 import { ContactOfContactModel } from './contact-of-contact.model';
 import { DocumentModel } from './document.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
 
 export class RelationshipModel
   extends BaseModel
@@ -268,7 +268,7 @@ export class EntityModel {
       // no need to do something custom
       (value) => value,
       (value) => ({
-        label: moment(value).isValid() ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : value,
+        label: LocalizationHelper.toMoment(value).isValid() ? LocalizationHelper.toMoment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : value,
         value
       })
     );
@@ -334,7 +334,7 @@ export class EntityModel {
       !(entity.model instanceof EventModel)
     ) {
       if (entity.model.dob) {
-        dob = ', ' + moment(entity.model.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        dob = ', ' + LocalizationHelper.toMoment(entity.model.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
       } else if (
         entity.model.age && (
           entity.model.age.years > 0 ||
@@ -384,9 +384,9 @@ export class EntityModel {
       records,
       '',
       // no need to do something custom
-      (value: CaseModel | ContactModel | ContactOfContactModel) => moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+      (value: CaseModel | ContactModel | ContactOfContactModel) => LocalizationHelper.toMoment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
       (value: CaseModel | ContactModel | ContactOfContactModel) => ({
-        label: moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+        label: LocalizationHelper.toMoment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
         value: value.dob
       })
     );
@@ -519,14 +519,14 @@ export class EntityModel {
     if (Array.isArray(this.labResults)) {
       this.labResults = this.labResults.sort((lab1, lab2) => {
         // retrieve lab 1 date
-        const lab1Date = moment(
+        const lab1Date = LocalizationHelper.toMoment(
           lab1.sequence && lab1.sequence.dateResult ?
             lab1.sequence.dateResult :
             lab1.dateSampleTaken
         );
 
         // retrieve lab 2 date
-        const lab2Date = moment(
+        const lab2Date = LocalizationHelper.toMoment(
           lab2.sequence && lab2.sequence.dateResult ?
             lab2.sequence.dateResult :
             lab2.dateSampleTaken

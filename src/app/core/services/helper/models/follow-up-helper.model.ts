@@ -15,7 +15,6 @@ import { IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnForm
 import { TeamModel } from '../../../models/team.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { EntityType } from '../../../models/entity-type';
-import * as moment from 'moment';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { FollowUpsDataService } from '../../data/follow-ups.data.service';
 import { catchError, map, switchMap } from 'rxjs/operators';
@@ -29,6 +28,7 @@ import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
 import { LocationModel } from '../../../models/location.model';
 import { IBasicCount } from '../../../models/basic-count.interface';
+import { LocalizationHelper } from '../../../helperClasses/localization-helper';
 
 export class FollowUpHelperModel {
   // data
@@ -119,7 +119,7 @@ export class FollowUpHelperModel {
                 validators: {
                   required: () => true
                 },
-                disabled: () => data.isModify && Constants.isDateInTheFuture(data.itemData.date)
+                disabled: () => data.isModify && data.itemData.date && LocalizationHelper.toMoment(data.itemData.date).startOf('day').isAfter(LocalizationHelper.today())
               }, {
                 type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
                 name: 'responsibleUserId',
@@ -381,7 +381,7 @@ export class FollowUpHelperModel {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
                         data: () => ({
                           name: item.date ?
-                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                             ''
                         })
                       },
@@ -389,7 +389,7 @@ export class FollowUpHelperModel {
                         get: () => 'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP',
                         data: () => ({
                           name: item.date ?
-                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                             ''
                         })
                       }
@@ -459,7 +459,7 @@ export class FollowUpHelperModel {
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
                         data: () => ({
                           name: item.date ?
-                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                             ''
                         })
                       },
@@ -467,7 +467,7 @@ export class FollowUpHelperModel {
                         get: () => 'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP',
                         data: () => ({
                           name: item.date ?
-                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            LocalizationHelper.toMoment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
                             ''
                         })
                       }
@@ -530,7 +530,10 @@ export class FollowUpHelperModel {
                   definitions.entityData.type === EntityType.CONTACT &&
                   definitions.selectedOutbreakIsActive() &&
                   FollowUpModel.canModify(this.parent.authUser) &&
-                  !Constants.isDateInTheFuture(item.date);
+                  (
+                    !item.date ||
+                    LocalizationHelper.toMoment(item.date).isSameOrBefore(LocalizationHelper.today())
+                  );
               }
             },
 

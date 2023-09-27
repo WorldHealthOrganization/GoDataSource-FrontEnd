@@ -7,11 +7,11 @@ import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreak, IPermissionQuestionnaire, IPermissionRestorable } from './permission.interface';
 import { Constants } from './constants';
-import { Moment } from '../helperClasses/x-moment';
 import {
   ITreeEditorDataValue
 } from '../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 import { IVisibleMandatoryDataValue } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class OutbreakModel
   extends BaseModel

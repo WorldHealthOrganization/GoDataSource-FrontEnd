@@ -5,7 +5,6 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { Moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import { UserModel } from './user.model';
@@ -24,6 +23,7 @@ import {
 } from './permission.interface';
 import { SafeHtml } from '@angular/platform-browser';
 import { IAnswerData } from './question.model';
+import { Moment } from '../helperClasses/localization-helper';
 
 export interface IContactOfContactIsolated {
   id: string,

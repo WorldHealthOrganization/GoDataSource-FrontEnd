@@ -19,7 +19,6 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -27,6 +26,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -461,7 +461,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                       // address is newer?
                       if (
                         !currentAddress.date ||
-                        moment(currentAddress.date).isBefore(moment(address.date))
+                        LocalizationHelper.toMoment(currentAddress.date).isBefore(LocalizationHelper.toMoment(address.date))
                       ) {
                         currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
                         data.addresses.push(currentAddress);
