@@ -38,8 +38,9 @@ export class AppComponent implements OnInit {
     this.i18nService.loadUserLanguage().subscribe();
 
     // determine if this is a demo or production instance
+    // - we need to retrieve no cache to make sure we have the latest timezone
     this.systemSettingsDataService
-      .getAPIVersion()
+      .getAPIVersionNoCache()
       .subscribe((systemSettingsVersion) => {
         // retrieve api info
         this.systemSettingsVersion = systemSettingsVersion;
