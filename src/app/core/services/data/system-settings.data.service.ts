@@ -76,7 +76,7 @@ export class SystemSettingsDataService {
     const cache = this.cacheService.get(CacheKey.API_VERSION);
     if (
       _.isEmpty(apiUrl) &&
-            cache
+      cache
     ) {
       return of(cache);
     } else {
