@@ -6,7 +6,7 @@ import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2,
   ICreateViewModifyV2Config,
-  ICreateViewModifyV2Tab,
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputAddress,
   ICreateViewModifyV2TabInputChanged,
   ICreateViewModifyV2TabInputList,
   ICreateViewModifyV2TabTable, ICreateViewModifyV2TabTableRecordsList
@@ -136,6 +136,27 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     (this.tabData?.tabs || []).forEach((tab, tabIndex) => {
       // keep default tab order
       this._tabsDefaultOrder[tab.name || tab.label] = tabIndex;
+
+      // map inputs
+      if (tab.type === CreateViewModifyV2TabInputType.TAB) {
+        tab.nameToInput = {};
+        tab.sections?.forEach((section) => {
+          section.inputs?.forEach((input) => {
+            // nothing to do ?
+            const inputWithName: {
+              name?: string
+            } = input as {
+              name?: string
+            };
+            if (!inputWithName.name) {
+              return;
+            }
+
+            // map
+            tab.nameToInput[inputWithName.name] = input;
+          });
+        });
+      }
 
       // not important ?
       if (tab.type !== CreateViewModifyV2TabInputType.TAB_TABLE) {
@@ -704,15 +725,23 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Address location changed
    */
   addressLocationChanged(
-    address: AddressModel,
-    locationInfo: ILocation
+    input: ICreateViewModifyV2TabInputAddress,
+    locationInfo: ILocation,
+    parentInput?: ICreateViewModifyV2TabInputList,
+    parentItemIndex?: number
   ): void {
     // should we copy location lat & lng ?
     if (
       locationInfo &&
       locationInfo.geoLocation &&
       locationInfo.geoLocation.lat &&
-      locationInfo.geoLocation.lng
+      locationInfo.geoLocation.lng && (
+        !input.visibleMandatoryChild?.visible ||
+        input.visibleMandatoryChild.visible('geoLocation')
+      ) && (
+        !parentInput?.visibleMandatoryChild?.visible ||
+        parentInput.visibleMandatoryChild.visible('geoLocation')
+      )
     ) {
       this.dialogV2Service
         .showConfirmDialog({
@@ -733,6 +762,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           }
 
           // change location lat & lng
+          const address: AddressModel = input.value.get(parentItemIndex);
           address.geoLocation.lat = locationInfo.geoLocation.lat;
           address.geoLocation.lng = locationInfo.geoLocation.lng;
 
@@ -1371,7 +1401,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // initialize query paginator
     tab.definition.queryBuilder.paginator.setPage({
-      pageSize: tab.definition.queryBuilder.paginator.limit,
+      pageSize: tab.definition.queryBuilder.paginator.limit ?
+        tab.definition.queryBuilder.paginator.limit :
+        Constants.DEFAULT_PAGE_SIZE,
       pageIndex: 0
     }, true);
 

@@ -12,26 +12,25 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import * as _ from 'lodash';
 import { takeUntil } from 'rxjs/operators';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 @Component({
   selector: 'app-entity-relationships-list-assign',
   templateUrl: './entity-relationships-list-assign.component.html'
 })
-export class EntityRelationshipsListAssignComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+export class EntityRelationshipsListAssignComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
   // entity
   private _entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
   // selected records
@@ -53,11 +52,9 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
     protected activatedRoute: ActivatedRoute,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
-    protected entityHelperService: EntityHelperService,
-    protected i18nService: I18nService,
-    private toastV2Service: ToastV2Service,
     private genericDataService: GenericDataService,
-    private referenceDataHelperService: ReferenceDataHelperService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       listHelperService, {
@@ -75,7 +72,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
 
     // get selected records ids
     if (_.isEmpty(this.activatedRoute.snapshot.queryParams.selectedTargetIds)) {
-      this.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
+      this.personAndRelatedHelperService.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
       this.router.navigate(['..']);
     } else {
       this.selectedTargetIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
@@ -121,6 +118,16 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'lastName',
         label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'lastName'
+        ),
         sortable: true,
         pinned: IV2ColumnPinned.LEFT,
         filter: {
@@ -131,6 +138,16 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'firstName',
         label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'firstName'
+        ),
         sortable: true,
         pinned: IV2ColumnPinned.LEFT,
         format: {
@@ -144,6 +161,19 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'visualId',
         label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'visualId'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -153,6 +183,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
@@ -185,7 +216,11 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
-              tooltip: this.i18nService.instant(data.type)
+              tooltip: this.personAndRelatedHelperService.i18nService.instant(data.type)
+            });
+          } else {
+            forms.push({
+              type: IV2ColumnStatusFormType.EMPTY
             });
           }
 
@@ -196,6 +231,16 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'age',
         label: 'LNG_ENTITY_FIELD_LABEL_AGE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'ageDob'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'ageDob'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'ageDob'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.AGE
@@ -209,6 +254,16 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'gender',
         label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'gender'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'gender'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'gender'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -218,6 +273,16 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'riskLevel',
         label: 'LNG_ENTITY_FIELD_LABEL_RISK',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'riskLevel'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'riskLevel'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'riskLevel'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -231,6 +296,10 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'classification',
         label: 'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'classification'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -244,6 +313,13 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'dateOfOnset',
         label: 'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateOfOnset'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'dateOfOnset'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -255,6 +331,19 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'place',
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.locationId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.locationId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.locationId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.locationId'
+        ),
         format: {
           type: 'mainAddress.location.name'
         },
@@ -267,6 +356,19 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       {
         field: 'address',
         label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.typeId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.typeId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.typeId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.typeId'
+        ),
         format: {
           type: 'mainAddress.fullAddress'
         }
@@ -304,11 +406,12 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = [
+    this.advancedFilters = this.personAndRelatedHelperService.list.filterVisibleMandatoryAdvancedFilters([
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'type',
         label: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+        visibleMandatoryIf: () => true,
         options: this.activatedRoute.snapshot.data.personType.options,
         sortable: true
       },
@@ -316,18 +419,48 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'firstName'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
         label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'lastName'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'gender',
         label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'gender'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'gender'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'gender'
+        ),
         options: this.activatedRoute.snapshot.data.gender.options,
         sortable: true
       },
@@ -335,24 +468,67 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
         type: V2AdvancedFilterType.RANGE_AGE,
         field: 'age',
         label: 'LNG_ENTITY_FIELD_LABEL_AGE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'ageDob'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'ageDob'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'ageDob'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.ADDRESS,
         field: 'addresses',
         label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.typeId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.typeId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.typeId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.typeId'
+        ),
         isArray: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dob',
         label: 'LNG_ENTITY_FIELD_LABEL_DOB',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'ageDob'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'ageDob'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'ageDob'
+        ),
         sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'riskLevel',
         label: 'LNG_ENTITY_FIELD_LABEL_RISK',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'riskLevel'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'riskLevel'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'riskLevel'
+        ),
         options: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           this.activatedRoute.snapshot.data.risk.options,
@@ -360,7 +536,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
         ),
         sortable: true
       }
-    ];
+    ]);
   }
 
   /**
@@ -442,15 +618,15 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
           }
         },
         {
-          label: this.entityHelperService.entityMap[this._entity.type].label,
+          label: this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].label,
           action: {
-            link: [this.entityHelperService.entityMap[this._entity.type].link]
+            link: [this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link]
           }
         },
         {
           label: this._entity.name,
           action: {
-            link: [`${ this.entityHelperService.entityMap[this._entity.type].link }/${ this._entity.id }/view`]
+            link: [`${ this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link }/${ this._entity.id }/view`]
           }
         },
         {
@@ -539,6 +715,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

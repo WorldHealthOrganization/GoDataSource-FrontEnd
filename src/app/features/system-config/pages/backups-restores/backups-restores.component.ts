@@ -9,19 +9,19 @@ import { RestoreLogDataService } from '../../../../core/services/data/restore-lo
 import { RestoreLogModel } from '../../../../core/models/restore-log.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { BackupModel } from '../../../../core/models/backup.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ActivatedRoute } from '@angular/router';
 import { UserModel } from '../../../../core/models/user.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-backups-restores',
   templateUrl: './backups-restores.component.html'
 })
-export class BackupsRestoresComponent extends ListComponent<RestoreLogModel> implements OnDestroy {
+export class BackupsRestoresComponent extends ListComponent<RestoreLogModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */
@@ -119,7 +119,7 @@ export class BackupsRestoresComponent extends ListComponent<RestoreLogModel> imp
         field: 'createdBy',
         label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY',
         format: {
-          type: 'createdByUser.name'
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -145,7 +145,7 @@ export class BackupsRestoresComponent extends ListComponent<RestoreLogModel> imp
         label: 'LNG_BACKUP_RESTORE_FIELD_LABEL_BACKUP_ID',
         sortable: true,
         format: {
-          type: (item: RestoreLogModel) => `${item.backup?.date ? moment(item.backup.date).format(this.Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : ''} - ${item.backup?.location ? item.backup.location : ''} - ${item.backup?.description ? item.backup.description : '' }`
+          type: (item: RestoreLogModel) => `${item.backup?.date ? LocalizationHelper.displayDateTime(item.backup.date) : ''} - ${item.backup?.location ? item.backup.location : ''} - ${item.backup?.description ? item.backup.description : '' }`
         }
       }
     ];
@@ -268,6 +268,7 @@ export class BackupsRestoresComponent extends ListComponent<RestoreLogModel> imp
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

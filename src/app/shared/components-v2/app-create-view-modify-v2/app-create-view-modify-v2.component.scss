@@ -667,7 +667,8 @@
       > form,
       .gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire,
       .gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire,
-      .gd-create-view-modify-bottom-section-content-input-has-tree-editor {
+      .gd-create-view-modify-bottom-section-content-input-has-tree-editor,
+      .gd-create-view-modify-bottom-section-content-input-has-visible-and-mandatory {
         height: 100%;
       }
     }
@@ -715,10 +716,26 @@
 
       + .mat-tab-group {
         .mat-tab-header {
-          padding-left: 8rem;
+          @include breakpoint('gt-md') {
+            padding-left: 8rem;
+          }
 
-          @include breakpoint('lt-md') {
+          @include breakpoint('md') {
             padding-left: 6rem;
+          }
+
+          @include breakpoint('sm') {
+            padding-left: 6rem;
+          }
+
+          @include breakpoint('xs') {
+            padding-left: 4rem;
+          }
+
+          &.mat-tab-header-pagination-controls-enabled {
+            @include breakpoint('xs') {
+              padding-left: 6rem;
+            }
           }
         }
       }

@@ -13,6 +13,7 @@
       name="filterValue"
       placeholder="LNG_COMMON_LABEL_SEARCH"
       autocomplete="off"
+      [suffixIconButtons]="filterSuffixIconButtons"
       (ngModelChange)="filter($event, true, true)"></app-form-input-v2>
 
     <!-- Expand All -->
@@ -20,6 +21,7 @@
       type="button"
       mat-flat-button
       color="text"
+      [disabled]="!!searchValue"
       (click)="collapseExpandAll(false, true)">
       {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_EXPAND_ALL' | translate}}
     </button>
@@ -29,6 +31,7 @@
       type="button"
       mat-flat-button
       color="text"
+      [disabled]="!!searchValue"
       (click)="collapseExpandAll(true, true)">
       {{'LNG_REFERENCE_DATA_CATEGORY_LABEL_COLLAPSE_ALL' | translate}}
     </button>
@@ -243,9 +246,9 @@
 
   <!-- Legend -->
   <div
-    *ngIf="!viewOnly"
+    *ngIf="!viewOnly && !isSmallScreenMode"
     class="gd-form-tree-editor-v2-legend"
-    fxLayout="row" fxLayoutAlign="start center">
+    fxLayout="row" fxLayoutAlign="start center" fxLayoutAlign.sm="start start">
 
     <!-- Header -->
     <div
@@ -278,6 +281,12 @@
         class="gd-form-tree-editor-v2-legend-items-item">
         <mat-icon>playlist_add</mat-icon>
         <span>{{'LNG_COMMON_BUTTON_ADD' | translate}}</span>
+      </div>
+
+      <!-- No option selected info -->
+      <div
+        class="gd-form-tree-editor-v2-legend-items-item">
+        <span>{{'LNG_COMMON_BUTTON_ALL_BECAUSE_NONE_SELECTED' | translate}}</span>
       </div>
 
     </div>

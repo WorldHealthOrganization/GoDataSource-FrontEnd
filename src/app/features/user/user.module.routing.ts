@@ -13,6 +13,7 @@ import { UserCreateViewModifyComponent } from './pages';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -24,7 +25,8 @@ const createViewModifyFoundation: Route = {
     outbreak: OutbreakDataResolver,
     team: TeamDataResolver,
     user: UserDataResolver,
-    language: LanguageDataResolver
+    language: LanguageDataResolver,
+    yesNo: YesNoDataResolver
   }
 };
 
@@ -38,15 +40,18 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.USER_LIST
-      ]
+      ],
+      outbreakIncludeDeleted: true
     },
     resolve: {
       team: TeamDataResolver,
       yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
       institution: InstitutionDataResolver,
       userRole: UserRoleDataResolver,
       outbreak: OutbreakDataResolver,
-      language: LanguageDataResolver
+      language: LanguageDataResolver,
+      user: UserDataResolver
     }
   },
   // Create User
@@ -57,7 +62,8 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_CREATE
       ],
-      action: CreateViewModifyV2Action.CREATE
+      action: CreateViewModifyV2Action.CREATE,
+      outbreakIncludeDeleted: true
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -71,7 +77,8 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_VIEW
       ],
-      action: CreateViewModifyV2Action.VIEW
+      action: CreateViewModifyV2Action.VIEW,
+      outbreakIncludeDeleted: true
     }
   },
   // Edit user
@@ -82,7 +89,8 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_MODIFY
       ],
-      action: CreateViewModifyV2Action.MODIFY
+      action: CreateViewModifyV2Action.MODIFY,
+      outbreakIncludeDeleted: true
     },
     canDeactivate: [
       PageChangeConfirmationGuard

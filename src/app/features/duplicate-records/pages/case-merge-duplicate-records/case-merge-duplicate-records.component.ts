@@ -2,12 +2,8 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -23,14 +19,14 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -84,25 +80,22 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected caseDataService: CaseDataService,
-    protected i18nService: I18nService,
-    protected toastV2Service: ToastV2Service,
-    protected dialogV2Service: DialogV2Service,
+    protected renderer2: Renderer2,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected router: Router,
     protected entityDataService: EntityDataService,
     protected outbreakDataService: OutbreakDataService,
-    protected locationDataService: LocationDataService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve cases ids
@@ -265,14 +258,14 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             questionnaireAnswers: mergeRecords
               .filter((item) => (item.model as CaseModel).questionnaireAnswers && Object.keys((item.model as CaseModel).questionnaireAnswers).length > 0)
               .map((item, index) => ({
-                label: `${this.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE')} ${index + 1}`,
+                label: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE')} ${index + 1}`,
                 value: index,
                 data: (item.model as CaseModel).questionnaireAnswers
               })),
             questionnaireHistoryAnswers: mergeRecords
               .filter((item) => (item.model as CaseModel).questionnaireAnswersContact && Object.keys((item.model as CaseModel).questionnaireAnswersContact).length > 0)
               .map((item, index) => ({
-                label: `${this.i18nService.instant(EntityType.CONTACT)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()} ${index + 1}`,
+                label: `${this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()} ${index + 1}`,
                 value: index,
                 data: (item.model as CaseModel).questionnaireAnswersContact
               })),
@@ -468,7 +461,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                       // address is newer?
                       if (
                         !currentAddress.date ||
-                        moment(currentAddress.date).isBefore(moment(address.date))
+                        LocalizationHelper.toMoment(currentAddress.date).isBefore(LocalizationHelper.toMoment(address.date))
                       ) {
                         currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
                         data.addresses.push(currentAddress);
@@ -560,7 +553,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             );
 
             // retrieve locations
-            this.locationDataService
+            this.personAndRelatedHelperService.locationDataService
               .getLocationsList(qbLocations)
               .pipe(
                 catchError((err) => {
@@ -812,7 +805,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'visualId',
               placeholder: () => 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-              description: () => this.i18nService.instant(
+              description: () => this.personAndRelatedHelperService.i18nService.instant(
                 'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this.selectedOutbreak.caseIdMask
               ),
@@ -837,7 +830,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.i18nService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -870,6 +863,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -903,6 +900,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                     }
                   }
                 }
+              },
+              visibleMandatoryChild: {
+                visible: () => true,
+                mandatory: () => false
               }
             }
           ]
@@ -952,7 +953,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               }
             },
             validators: {
-              required: () => !!this.selectedOutbreak.isDateOfOnsetRequired
+              required: () => this.selectedOutbreak?.visibleAndMandatoryFields &&
+                this.selectedOutbreak.visibleAndMandatoryFields[this.personAndRelatedHelperService.case.visibleMandatoryKey]?.dateOfOnset?.mandatory
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -1209,7 +1211,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: '_selectedQuestionnaireHistoryAnswers',
-              placeholder: () => `${this.i18nService.instant(EntityType.CONTACT)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()}`,
+              placeholder: () => `${this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()}`,
               options: this._uniqueOptions.questionnaireHistoryAnswers,
               value: {
                 get: () => this._selectedQuestionnaireHistoryAnswers as any,
@@ -1282,6 +1284,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -1314,6 +1320,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
@@ -1354,7 +1364,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: 'questionnaire_as_contact',
-      label: `${this.i18nService.instant(EntityType.CONTACT)} ${this.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersContact',
@@ -1494,8 +1504,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
         mergeRecords,
-        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+        this.personAndRelatedHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.personAndRelatedHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
       );
       case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);

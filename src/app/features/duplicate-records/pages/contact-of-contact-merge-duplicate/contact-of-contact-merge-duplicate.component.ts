@@ -5,23 +5,24 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ICreateViewModifyV2Refresh } from '../../../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contact-of-contact-merge-duplicate',
@@ -52,20 +53,22 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
    * Constructor
    */
   constructor(
-    private activatedRoute: ActivatedRoute,
-    private outbreakDataService: OutbreakDataService,
-    private i18nService: I18nService,
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
+    private outbreakDataService: OutbreakDataService
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve contacts ids
@@ -273,7 +276,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                       // address is newer?
                       if (
                         !currentAddress.date ||
-                        moment(currentAddress.date).isBefore(moment(address.date))
+                        LocalizationHelper.toMoment(currentAddress.date).isBefore(LocalizationHelper.toMoment(address.date))
                       ) {
                         currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
                         data.addresses.push(currentAddress);
@@ -689,6 +692,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -724,6 +731,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                   required: () => true
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
@@ -827,6 +838,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }

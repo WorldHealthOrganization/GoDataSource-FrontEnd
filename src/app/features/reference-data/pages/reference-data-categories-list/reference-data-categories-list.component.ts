@@ -14,17 +14,17 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import * as moment from 'moment';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ActivatedRoute } from '@angular/router';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-reference-data-categories-list',
   templateUrl: './reference-data-categories-list.component.html'
 })
 export class ReferenceDataCategoriesListComponent
-  extends ListComponent<ReferenceDataCategoryModel>
+  extends ListComponent<ReferenceDataCategoryModel, IV2Column>
   implements OnDestroy {
 
   // hidden categories
@@ -33,6 +33,7 @@ export class ReferenceDataCategoriesListComponent
   } = {
       [ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE]: true,
       [ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM]: true,
+      [ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_SECURITY_QUESTIONS_QUESTION]: true,
 
       // IMPORTANT: required since this exists in db because it was removed at a later stage without a migration script to remove existing values from db
       'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_INTENSITY': true
@@ -217,7 +218,7 @@ export class ReferenceDataCategoriesListComponent
                   url: 'reference-data/export',
                   async: true,
                   method: ExportDataMethod.GET,
-                  fileName: `${ this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE') } - ${ moment().format('YYYY-MM-DD HH:mm') }`,
+                  fileName: `${ this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE') } - ${ LocalizationHelper.now().format('YYYY-MM-DD HH:mm') }`,
                   queryBuilder: this.queryBuilder,
                   allow: {
                     types: [

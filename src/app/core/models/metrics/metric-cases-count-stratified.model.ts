@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Moment, moment } from '../../helperClasses/x-moment';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
 
 export class MetricCasesCountStratified {
   start: Moment;
@@ -12,12 +12,12 @@ export class MetricCasesCountStratified {
   constructor(data = null) {
     this.start = _.get(data, 'start');
     if (this.start) {
-      this.start = moment(this.start);
+      this.start = LocalizationHelper.toMoment(this.start);
     }
 
     this.end = _.get(data, 'end');
     if (this.end) {
-      this.end = moment(this.end);
+      this.end = LocalizationHelper.toMoment(this.end);
     }
 
     this.classification = _.get(data, 'classification', {});

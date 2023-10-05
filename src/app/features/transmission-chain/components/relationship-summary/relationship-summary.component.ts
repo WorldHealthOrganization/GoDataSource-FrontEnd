@@ -1,9 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { UserModel } from '../../../../core/models/user.model';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
 import { EntityType } from '../../../../core/models/entity-type';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
@@ -12,12 +10,10 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-relationship-summary',
@@ -26,7 +22,9 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   styleUrls: ['./relationship-summary.component.scss']
 })
 export class RelationshipSummaryComponent implements OnInit, OnChanges {
+  @Input() selectedOutbreak: OutbreakModel;
   @Input() relationship: RelationshipModel;
+
   @Output() remove = new EventEmitter<void>();
   @Output() modifyRelationship = new EventEmitter<RelationshipModel>();
   @Output() deleteRelationship = new EventEmitter<RelationshipModel>();
@@ -81,7 +79,6 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
   authUser: UserModel;
   RelationshipModel = RelationshipModel;
 
-  selectedOutbreak: OutbreakModel;
   relationshipData: ILabelValuePairModel[] = [];
 
   relationshipLink: string;
@@ -93,11 +90,7 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
    */
   constructor(
     private authDataService: AuthDataService,
-    private relationshipDataService: RelationshipDataService,
-    private outbreakDataService: OutbreakDataService,
-    private dialogV2Service: DialogV2Service,
-    private entityHelperService: EntityHelperService,
-    private toastV2Service: ToastV2Service
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -117,13 +110,6 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
      */
   ngOnInit() {
     this.authUser = this.authDataService.getAuthenticatedUser();
-
-    // get selected outbreak
-    this.outbreakDataService
-      .getSelectedOutbreak()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-      });
 
     this.relationshipLink = this.getRelationshipLink();
 
@@ -157,7 +143,7 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
    * Reverse persons of an existing relationship
    */
   reverseExistingRelationship() {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showConfirmDialog({
         config: {
           title: {
@@ -176,13 +162,13 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
         }
 
         // show loading
-        const loading = this.dialogV2Service.showLoadingDialog();
+        const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
         const relationshipPersons = {
           sourceId: _.find(this.relationship.persons, { target: true }).id,
           targetId: this.relationship.sourcePerson.id
         };
-        this.relationshipDataService
+        this.personAndRelatedHelperService.relationship.relationshipDataService
           .reverseExistingRelationship(
             this.selectedOutbreak.id,
             this.relationship.id,
@@ -192,7 +178,7 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
           .pipe(
             catchError((err) => {
               // show error
-              this.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
 
               // hide loading
               loading.close();
@@ -210,7 +196,10 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
   }
 
   updateRelationshipData(relationship: RelationshipModel) {
-    this.relationshipData = this.entityHelperService.lightRelationship(relationship);
+    this.relationshipData = this.personAndRelatedHelperService.relationship.lightRelationship(
+      this.selectedOutbreak,
+      relationship
+    );
   }
 
   onRemove() {

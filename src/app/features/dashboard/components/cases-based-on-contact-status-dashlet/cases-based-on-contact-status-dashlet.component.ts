@@ -9,7 +9,7 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { MetricCasesBasedOnContactStatusModel } from '../../../../core/models/metrics/metric-cases-based-on-contact-status.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-cases-based-on-contact-status-dashlet',
@@ -167,7 +167,7 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
     // build chart data
     _.forEach(metricData, (metric) => {
       // create the array with categories ( dates displayed on x axis )
-      this.chartDataCategories.push(moment(metric.start).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+      this.chartDataCategories.push(LocalizationHelper.displayDate(metric.start));
 
       if (chartData[totalCasesNotFromContactTranslated]) {
         chartData[totalCasesNotFromContactTranslated].push(metric.totalCasesNotFromContact);
@@ -245,9 +245,9 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
       qb.filter.firstLevelConditions();
 
       // date
-      let endDate: string = moment().endOf('day').toISOString();
+      let endDate: string = LocalizationHelper.now().endOf('day').toISOString();
       if (this.globalFilterDate) {
-        endDate = moment(this.globalFilterDate).clone().endOf('day').toISOString();
+        endDate = LocalizationHelper.toMoment(this.globalFilterDate).clone().endOf('day').toISOString();
       }
 
       // location

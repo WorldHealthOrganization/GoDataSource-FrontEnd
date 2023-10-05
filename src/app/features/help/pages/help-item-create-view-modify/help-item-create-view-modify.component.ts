@@ -3,11 +3,8 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -23,6 +20,10 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-help-item-create-view-modify',
@@ -36,22 +37,24 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected helpDataService: HelpDataService,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    protected dialogV2Service: DialogV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected i18nService: I18nService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected router: Router,
+    protected helpDataService: HelpDataService,
+    protected dialogV2Service: DialogV2Service
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService,
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService,
       true
     );
     this.selectedCategory = this.activatedRoute.snapshot.data.category;

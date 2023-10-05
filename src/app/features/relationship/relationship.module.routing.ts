@@ -22,6 +22,7 @@ import { ClassificationDataResolver } from '../../core/services/resolvers/data/c
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 import { SelectedEntitiesDataResolver } from '../../core/services/resolvers/data/selected-entities.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 
 // create - view - modify relationship
 const createViewModifyRelationship: Route = {
@@ -37,7 +38,8 @@ const createViewModifyRelationship: Route = {
     contextOfTransmission: ContextOfTransmissionDataResolver,
     cluster: ClusterDataResolver,
     user: UserDataResolver,
-    selectedEntities: SelectedEntitiesDataResolver
+    selectedEntities: SelectedEntitiesDataResolver,
+    yesNo: YesNoDataResolver
   }
 };
 
@@ -56,6 +58,7 @@ const relationshipTypeChildrenRoutes = [
     },
     resolve: {
       yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
       certaintyLevel: CertaintyLevelDataResolver,
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
@@ -166,7 +169,7 @@ const relationshipTypeChildrenRoutes = [
     },
     resolve: {
       outbreak: SelectedOutbreakDataResolver,
-      certainty: CertaintyLevelDataResolver,
+      certaintyLevel: CertaintyLevelDataResolver,
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
@@ -211,7 +214,7 @@ const relationshipTypeChildrenRoutes = [
     },
     resolve: {
       outbreak: SelectedOutbreakDataResolver,
-      certainty: CertaintyLevelDataResolver,
+      certaintyLevel: CertaintyLevelDataResolver,
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,

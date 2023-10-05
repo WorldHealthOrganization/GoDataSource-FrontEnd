@@ -25,6 +25,15 @@ import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
+import { DailyFollowUpStatusDataResolver } from '../../core/services/resolvers/data/daily-follow-up-status.resolver';
+import { LabNameDataResolver } from '../../core/services/resolvers/data/lab-name.resolver';
+import { LabSampleTypeDataResolver } from '../../core/services/resolvers/data/lab-sample-type.resolver';
+import { LabTestTypeDataResolver } from '../../core/services/resolvers/data/lab-test-type.resolver';
+import { LabTestResultDataResolver } from '../../core/services/resolvers/data/lab-test-result.resolver';
+import { LabProgressDataResolver } from '../../core/services/resolvers/data/lab-progress.resolver';
+import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers/data/lab-sequence-laboratory.resolver';
+import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -50,7 +59,16 @@ const createViewModifyFoundation: Route = {
     contextOfTransmission: ContextOfTransmissionDataResolver,
     yesNoAll: YesNoAllDataResolver,
     yesNo: YesNoDataResolver,
-    entity: RelationshipPersonDataResolver
+    labName: LabNameDataResolver,
+    labSampleType: LabSampleTypeDataResolver,
+    labTestType: LabTestTypeDataResolver,
+    labTestResult: LabTestResultDataResolver,
+    labResultProgress: LabProgressDataResolver,
+    labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
+    labSequenceResult: LabSequenceResultDataResolver,
+    entity: RelationshipPersonDataResolver,
+    team: TeamDataResolver,
+    dailyFollowUpStatus: DailyFollowUpStatusDataResolver
   }
 };
 
@@ -66,7 +84,12 @@ const routes: Routes = [
       gender: GenderDataResolver,
       yesNoAll: YesNoAllDataResolver,
       yesNo: YesNoDataResolver,
-      occupation: OccupationDataResolver
+      occupation: OccupationDataResolver,
+      pregnancy: PregnancyStatusDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver,
+      vaccine: VaccineDataResolver,
+      vaccineStatus: VaccineStatusDataResolver
     }
   },
   // Create contact of contact

@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { moment } from '../x-moment';
+import { LocalizationHelper } from '../localization-helper';
 
 export class RequestFilterGenerator {
   /**
@@ -14,27 +14,38 @@ export class RequestFilterGenerator {
   }
 
   /**
-     * Text is exactly the provided value ( case insensitive )
-     * @param value
-     */
-  static textIs(value: string): any {
-    return {
-      regexp: '/^' +
-        RequestFilterGenerator.escapeStringForRegex(value)
-          .replace(/%/g, '.*')
-          .replace(/\\\?/g, '.')
-          .replace(/&/g, '%26')
-          .replace(/#/g, '%23')
-          .replace(/\+/g, '%2B') +
-        '$/i'
-    };
+   * Text is exactly the provided value ( case-insensitive )
+   */
+  static textIs(
+    value: string,
+    useLike?: boolean
+  ): any {
+    return useLike ?
+      {
+        like: '^' +
+          RequestFilterGenerator.escapeStringForRegex(value)
+            .replace(/%/g, '.*')
+            .replace(/\\\?/g, '.')
+            .replace(/&/g, '%26')
+            .replace(/#/g, '%23')
+            .replace(/\+/g, '%2B') +
+          '$',
+        options: 'i'
+      } : {
+        regexp: '/^' +
+          RequestFilterGenerator.escapeStringForRegex(value)
+            .replace(/%/g, '.*')
+            .replace(/\\\?/g, '.')
+            .replace(/&/g, '%26')
+            .replace(/#/g, '%23')
+            .replace(/\+/g, '%2B') +
+          '$/i'
+      };
   }
 
   /**
-     * Text contains the provided value ( case insensitive )
-     * @param value
-     * @param useLike
-     */
+   * Text contains the provided value ( case-insensitive )
+   */
   static textContains(
     value: string,
     useLike?: boolean
@@ -137,10 +148,10 @@ export class RequestFilterGenerator {
     // convert date range to simple range
     const rangeValue: any = {};
     if (value.startDate) {
-      rangeValue.from = value.startDate.toISOString ? value.startDate.toISOString() : moment(value.startDate).toISOString();
+      rangeValue.from = value.startDate.toISOString ? value.startDate.toISOString() : LocalizationHelper.toMoment(value.startDate).toISOString();
     }
     if (value.endDate) {
-      rangeValue.to = value.endDate.toISOString ? value.endDate.toISOString() : moment(value.endDate).toISOString();
+      rangeValue.to = value.endDate.toISOString ? value.endDate.toISOString() : LocalizationHelper.toMoment(value.endDate).toISOString();
     }
 
     // filter
@@ -150,25 +161,42 @@ export class RequestFilterGenerator {
   }
 
   /**
-     * Check if field has value
-     */
-  static hasValue() {
+   * Check if field has value
+   */
+  static hasValue(field: string) {
     // since some mongo filters don't work with $neq null / $eq null, we need to find different solution
     return {
-      exists: true,
-      not: {
-        $type: 'null'
-      },
-      $ne: ''
+      // needs to be an object with just one property otherwise loopback sends to mongo when using find only the first property and its value and ignores all others, this is why we need to use $and
+      $and: [
+        {
+          [field]: {
+            $exists: true
+          }
+        }, {
+          [field]: {
+            $ne: null
+          }
+        }, {
+          [field]: {
+            $ne: ''
+          }
+        }, {
+          [field]: {
+            $not: {
+              $size: 0
+            }
+          }
+        }
+      ]
     };
   }
 
   /**
-     * Check if field doesn't have value
-     * @param field
-     */
+   * Check if field doesn't have value
+   */
   static doesntHaveValue(
     field: string,
+    checkForEmptyString: boolean,
     forMongo: boolean = false
   ) {
     // since some mongo filters don't work with $neq null / $eq null, we need to find different solution
@@ -180,13 +208,18 @@ export class RequestFilterGenerator {
           }
         }, {
           [field]: {
-            $type: 'null'
+            $eq: null
           }
-        }, {
-          [field]: {
-            $eq: ''
-          }
-        }
+        },
+        ...(
+          checkForEmptyString ?
+            [{
+              [field]: {
+                $eq: ''
+              }
+            }] :
+            []
+        )
       ]
     } : {
       or: [
@@ -196,13 +229,18 @@ export class RequestFilterGenerator {
           }
         }, {
           [field]: {
-            type: 'null'
+            eq: null
           }
-        }, {
-          [field]: {
-            eq: ''
-          }
-        }
+        },
+        ...(
+          checkForEmptyString ?
+            [{
+              [field]: {
+                eq: ''
+              }
+            }] :
+            []
+        )
       ]
     };
   }

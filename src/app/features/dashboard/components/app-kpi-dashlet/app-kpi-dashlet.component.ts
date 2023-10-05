@@ -3,11 +3,11 @@ import { DashletValueStatus, IDashletValue } from '../../helperClasses/dashlet-v
 import { ReplaySubject, throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { Moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-kpi-dashlet',

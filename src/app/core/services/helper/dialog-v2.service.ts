@@ -44,8 +44,6 @@ import {
 import * as _ from 'lodash';
 import { catchError } from 'rxjs/operators';
 import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { Constants, ExportStatusStep } from '../../models/constants';
 import { ExportLogDataService } from '../data/export-log.data.service';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
@@ -89,6 +87,7 @@ import {
 } from '../../../shared/forms-v2/components/app-form-select-groups-v2/app-form-select-groups-v2.component';
 import { ErrorModel } from '../../models/error.model';
 import { I18nService } from './i18n.service';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
 
 @Injectable()
 export class DialogV2Service {
@@ -818,7 +817,7 @@ export class DialogV2Service {
                         processed: data.processed.toLocaleString('en'),
                         total: data.total.toLocaleString('en'),
                         estimatedEnd: data.estimatedEndDate ?
-                          data.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+                          LocalizationHelper.displayDateTime(data.estimatedEndDate) :
                           '—'
                       }
                     );
@@ -895,7 +894,7 @@ export class DialogV2Service {
                     if (exportLogModel.processedNo > 0) {
                       // initialize start time if necessary
                       if (!startTime) {
-                        startTime = moment();
+                        startTime = LocalizationHelper.now();
                         processedErrorForCorrectTime = exportLogModel.processedNo;
                       }
 
@@ -903,10 +902,10 @@ export class DialogV2Service {
                       const processed: number = exportLogModel.processedNo - processedErrorForCorrectTime;
                       const total: number = exportLogModel.totalNo - processedErrorForCorrectTime;
                       if (processed > 0) {
-                        const processedSoFarTimeMs: number = moment().diff(startTime);
+                        const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                         const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                         const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                        estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                        estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                       }
                     }
 
@@ -1423,7 +1422,8 @@ export class DialogV2Service {
                   filterDefinition.field,
                   appliedFilter.value,
                   false,
-                  true
+                  true,
+                  filterDefinition.useLike
                 );
 
                 // finished
@@ -1452,6 +1452,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  true,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1615,6 +1616,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  false,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1660,6 +1662,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  false,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1688,7 +1691,7 @@ export class DialogV2Service {
             // between
             const date = appliedFilter.value ?
               null :
-              moment(appliedFilter.value);
+              LocalizationHelper.toMoment(appliedFilter.value);
 
             // filter
             qb.filter.byDateRange(
@@ -1719,6 +1722,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  true,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1814,7 +1818,10 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.FREE_TEXT.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.IS:
-                        valueQuery = RequestFilterGenerator.textIs(value);
+                        valueQuery = RequestFilterGenerator.textIs(
+                          value,
+                          filterDefinition.useLike
+                        );
                         break;
                       case V2AdvancedFilterComparatorType.CONTAINS_TEXT:
                         valueQuery = RequestFilterGenerator.textContains(
@@ -1823,10 +1830,8 @@ export class DialogV2Service {
                         );
                         break;
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1845,10 +1850,8 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.DATE_TIME.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1865,10 +1868,8 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1886,10 +1887,8 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.NUMERIC.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1906,10 +1905,8 @@ export class DialogV2Service {
                     // neq: null / $eq null doesn't work due to a mongodb bug ( the issue occurs when trying to filter an element from an array which is this case )
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
                     }
@@ -1928,9 +1925,17 @@ export class DialogV2Service {
                 // do we need to attach a value condition as well ?
                 if (valueQuery) {
                   query[`${filterDefinition.field}.${question.variable}.0.value`] = valueQuery;
+                } else if (extraComparator === V2AdvancedFilterComparatorType.HAS_VALUE) {
+                  // handle has value case
+                  const condition: any = RequestFilterGenerator.hasValue(`${filterDefinition.field}.${question.variable}.0.value`);
+                  const key: string = Object.keys(condition)[0];
+                  query[key] = condition[key];
                 } else if (extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE) {
                   // handle no value case
-                  const condition: any = RequestFilterGenerator.doesntHaveValue(`${filterDefinition.field}.${question.variable}.0.value`);
+                  const condition: any = RequestFilterGenerator.doesntHaveValue(
+                    `${filterDefinition.field}.${question.variable}.0.value`,
+                    true
+                  );
                   const key: string = Object.keys(condition)[0];
                   query[key] = condition[key];
                 }
@@ -1950,6 +1955,7 @@ export class DialogV2Service {
                   // handle no value case
                   const condition: any = RequestFilterGenerator.doesntHaveValue(
                     'value',
+                    true,
                     true
                   );
                   const key: string = Object.keys(condition)[0];
@@ -2099,12 +2105,46 @@ export class DialogV2Service {
                 );
 
                 // update icons
-                item.suffixIconButtons = savedData.isPublic ?
-                  [{
+                item.suffixIconButtons = [];
+
+                // public
+                if (savedData.isPublic) {
+                  item.suffixIconButtons.push({
                     tooltip: this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_IS_PUBLIC_LABEL'),
                     icon: 'public'
-                  }] :
-                  undefined;
+                  });
+                }
+
+                // readonly
+                if (savedData.readOnly) {
+                  item.suffixIconButtons.push({
+                    tooltip: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL', {
+                        name: savedData.createdByUser?.name ?
+                          savedData.createdByUser?.name :
+                          ''
+                      }
+                    ),
+                    icon: 'edit_off'
+                  });
+                }
+
+                // updated at
+                if (savedData.updatedAt) {
+                  item.suffixIconButtons.push({
+                    tooltip: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
+                        datetime: LocalizationHelper.displayDateTime(savedData.updatedAt)
+                      }
+                    ),
+                    icon: 'history'
+                  });
+                }
+
+                // nothing ?
+                if (item.suffixIconButtons.length < 1) {
+                  item.suffixIconButtons = undefined;
+                }
               }
             }
           }, {
@@ -2219,7 +2259,7 @@ export class DialogV2Service {
                   option.infos.push({
                     label: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
-                        datetime: moment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
+                        datetime: LocalizationHelper.displayDateTime(item.updatedAt)
                       }
                     ),
                     icon: 'history'
@@ -2533,7 +2573,7 @@ export class DialogV2Service {
       record.createdBy &&
       users.map[record.createdBy]
     ) {
-      createdByName = users.map[record.createdBy].name;
+      createdByName = users.map[record.createdBy].nameAndEmail;
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
@@ -2545,7 +2585,7 @@ export class DialogV2Service {
     // created at
     let createdAt: string = '—';
     if (record.createdAt) {
-      createdAt = moment(record.createdAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+      createdAt = LocalizationHelper.displayDateTime(record.createdAt);
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
@@ -2560,7 +2600,7 @@ export class DialogV2Service {
       record.updatedBy &&
       users.map[record.updatedBy]
     ) {
-      updatedByName = users.map[record.updatedBy].name;
+      updatedByName = users.map[record.updatedBy].nameAndEmail;
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
@@ -2572,7 +2612,7 @@ export class DialogV2Service {
     // updated at
     let updatedAt: string = '—';
     if (record.updatedAt) {
-      updatedAt = moment(record.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+      updatedAt = LocalizationHelper.displayDateTime(record.updatedAt);
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
@@ -2591,7 +2631,7 @@ export class DialogV2Service {
       title: {
         get: () => title
       },
-      width: '45rem',
+      width: '60rem',
       inputs: detailsInputs,
       bottomButtons: [{
         type: IV2SideDialogConfigButtonType.CANCEL,

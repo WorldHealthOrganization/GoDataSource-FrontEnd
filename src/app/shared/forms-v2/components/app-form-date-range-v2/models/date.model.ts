@@ -1,4 +1,4 @@
-import { Moment } from '../../../../../core/helperClasses/x-moment';
+import { Moment } from '../../../../../core/helperClasses/localization-helper';
 
 /**
  * Date range model

@@ -239,7 +239,8 @@ export class AppSideDialogV2Component implements OnDestroy {
 
         // filter
         this.filterInputs();
-      }
+      },
+      visible: () => !!this.filterByValue
     }
   ];
 

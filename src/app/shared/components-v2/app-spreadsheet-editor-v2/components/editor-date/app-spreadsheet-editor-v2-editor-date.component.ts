@@ -3,8 +3,8 @@ import { ICellEditorParams } from '@ag-grid-community/core';
 import { ICellEditorAngularComp } from '@ag-grid-community/angular';
 import { AppFormDateV2Component } from '../../../../forms-v2/components/app-form-date-v2/app-form-date-v2.component';
 import { IV2SpreadsheetEditorExtendedColDef } from '../../models/extended-column.model';
-import { Moment } from 'moment';
 import { IV2SpreadsheetEditorColumnValidatorDate } from '../../models/column.model';
+import { Moment } from '../../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-spreadsheet-editor-v2-editor-date',

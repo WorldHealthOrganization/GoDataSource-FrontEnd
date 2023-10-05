@@ -19,12 +19,46 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import {
+  ExportDataExtension,
+  ExportDataMethod
+} from '../../../../core/services/helper/models/dialog-v2.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import * as momentOriginal from 'moment/moment';
 
 @Component({
   selector: 'app-user-list',
   templateUrl: './user-list.component.html'
 })
-export class UserListComponent extends ListComponent<UserModel> implements OnDestroy {
+export class UserListComponent extends ListComponent<UserModel, IV2Column> implements OnDestroy {
+  // user fields
+  userFields: ILabelValuePairModel[] = [
+    { label: 'LNG_USER_FIELD_LABEL_EMAIL', value: 'email' },
+    { label: 'LNG_COMMON_FIELD_LABEL_PASSWORD', value: 'password' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_USER_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
+    { label: 'LNG_USER_FIELD_LABEL_LAST_NAME', value: 'lastName' },
+    { label: 'LNG_USER_FIELD_LABEL_ROLES', value: 'roleIds' },
+    { label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS', value: 'outbreakIds' },
+    { label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK', value: 'activeOutbreakId' },
+    { label: 'LNG_LAYOUT_LANGUAGE_LABEL', value: 'languageId' },
+    { label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME', value: 'institutionName' },
+    { label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS', value: 'telephoneNumbers' },
+    { label: 'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE', value: 'telephoneNumbers.LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE' },
+    { label: 'LNG_USER_FIELD_LABEL_SECURITY_QUESTIONS', value: 'securityQuestions' },
+    { label: 'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS', value: 'disregardGeographicRestrictions' },
+    { label: 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS', value: 'dontCacheFilters' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+  ];
+
   // list of existing teams mapped by user
   userTeamMap: {
     [userId: string]: TeamModel[]
@@ -38,7 +72,8 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
     private userDataService: UserDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private i18nService: I18nService
   ) {
     // parent
     super(
@@ -306,13 +341,14 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
         link: (user: UserModel) => {
           return user.activeOutbreakId &&
             OutbreakModel.canView(this.authUser) &&
-            (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId] ?
+            (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId] &&
+            !(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId].deleted ?
             `/outbreaks/${user.activeOutbreakId}/view` :
             undefined;
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
+          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options.filter((item) => !item.data.deleted),
           includeNoValue: true
         }
       },
@@ -324,11 +360,14 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
         },
         links: (item: UserModel) => item.outbreakIds?.length > 0 ?
           item.outbreakIds
-            .filter((outbreakId) => !!(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId])
             .map((outbreakId) => {
               return {
-                label: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].name,
-                href: OutbreakModel.canView(this.authUser) ?
+                label: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId] ?
+                  (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].name :
+                  outbreakId,
+                href: OutbreakModel.canView(this.authUser) &&
+                  (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId] &&
+                  !(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].deleted ?
                   `/outbreaks/${outbreakId}/view` :
                   null
               };
@@ -336,7 +375,7 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
           [],
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options
+          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options.filter((item) => !item.data.deleted)
         }
       },
       {
@@ -356,6 +395,94 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options
         }
+      },
+      {
+        field: 'disregardGeographicRestrictions',
+        label: 'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'dontCacheFilters',
+        label: 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        link: (data) => {
+          return data.createdBy && UserModel.canView(this.authUser) ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_USER_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        link: (data) => {
+          return data.updatedBy && UserModel.canView(this.authUser) ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_USER_FIELD_LABEL_UPDATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
 
@@ -444,9 +571,11 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
       options: {
         institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options,
-        outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
+        outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options.filter((item) => !item.data.deleted),
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
-        language: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options
+        language: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }
@@ -459,10 +588,50 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return UserModel.canListWorkload(this.authUser);
+        return UserModel.canListWorkload(this.authUser) ||
+          UserModel.canExport(this.authUser) ||
+          UserModel.canImport(this.authUser);
       },
       menuOptions: [
-        // Onset report
+        // Export users
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USERS_EXPORT_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.exportUsers(this.queryBuilder);
+            }
+          },
+          visible: (): boolean => {
+            return UserModel.canExport(this.authUser);
+          }
+        },
+
+        // Import users
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USERS_IMPORT_BUTTON'
+          },
+          action: {
+            link: () => ['/import-export-data', 'user-data', 'import']
+          },
+          visible: (): boolean => {
+            return UserModel.canImport(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return (
+              UserModel.canExport(this.authUser) ||
+              UserModel.canImport(this.authUser)
+            );
+          }
+        },
+
+        // View workload
         {
           label: {
             get: () => 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USERS_WORKLOAD'
@@ -481,7 +650,45 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {}
+  protected initializeGroupActions(): void {
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => UserModel.canExport(this.authUser),
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USERS_GROUP_ACTION_EXPORT_SELECTED_USERS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect('id', selected, true, null);
+
+              // allow deleted records
+              qb.includeDeleted();
+
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
+              }
+
+              // export
+              this.exportUsers(qb);
+            }
+          },
+          visible: (): boolean => {
+            return UserModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table add action
@@ -540,7 +747,13 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
       'roles',
       'activeOutbreakId',
       'outbreakIds',
-      'languageId'
+      'languageId',
+      'disregardGeographicRestrictions',
+      'dontCacheFilters',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
     ];
   }
 
@@ -548,6 +761,10 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
    * Re(load) the Users list
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
     // get the list of existing users
     this.records$ = this.userDataService
       .getUsersList(this.queryBuilder)
@@ -573,6 +790,7 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
@@ -595,6 +813,45 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
       )
       .subscribe((response) => {
         this.pageCount = response;
+      });
+  }
+
+  /**
+   * Export selected records
+   */
+  private exportUsers(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_USERS_EXPORT_TITLE'
+        },
+        export: {
+          url: '/users/export',
+          async: true,
+          method: ExportDataMethod.POST,
+          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_USERS_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
+          queryBuilder: qb,
+          allow: {
+            types: [
+              ExportDataExtension.CSV,
+              ExportDataExtension.XLS,
+              ExportDataExtension.XLSX,
+              ExportDataExtension.JSON,
+              ExportDataExtension.ODS,
+              ExportDataExtension.PDF
+            ],
+            encrypt: true,
+            anonymize: {
+              fields: this.userFields
+            },
+            fields: {
+              options: this.userFields
+            },
+            dbColumns: true,
+            dbValues: true,
+            jsonReplaceUndefinedWithNull: true
+          }
+        }
       });
   }
 }

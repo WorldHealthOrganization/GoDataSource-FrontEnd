@@ -4,7 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -14,7 +13,6 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { LocationModel } from '../../../../core/models/location.model';
@@ -26,8 +24,11 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { LocationIdentifierModel } from '../../../../core/models/location-identifier.model';
 import * as _ from 'lodash';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -45,23 +46,25 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
-    protected locationDataService: LocationDataService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected locationDataService: LocationDataService
   ) {
     // parent
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // get data

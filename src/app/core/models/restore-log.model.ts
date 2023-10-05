@@ -3,8 +3,8 @@ import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { IPermissionBasic } from './permission.interface';
 import { RestoreStatusStep } from './constants';
-import { Moment } from 'moment';
 import { BackupModel } from './backup.model';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class RestoreLogModel
   extends BaseModel

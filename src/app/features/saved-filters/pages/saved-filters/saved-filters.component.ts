@@ -15,7 +15,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
@@ -23,7 +23,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDi
   selector: 'app-saved-filters',
   templateUrl: './saved-filters.component.html'
 })
-export class SavedFiltersComponent extends ListComponent<SavedFilterModel> implements OnDestroy {
+export class SavedFiltersComponent extends ListComponent<SavedFilterModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */
@@ -447,6 +447,7 @@ export class SavedFiltersComponent extends ListComponent<SavedFilterModel> imple
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

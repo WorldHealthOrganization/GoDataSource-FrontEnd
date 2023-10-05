@@ -2,10 +2,7 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { Observable, throwError } from 'rxjs';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, takeUntil } from 'rxjs/operators';
@@ -22,14 +19,11 @@ import {
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { Constants } from '../../../../core/models/constants';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -37,9 +31,13 @@ import {
   IV2SideDialogConfigInputToggleCheckbox,
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { UserSettings } from '../../../../core/models/user.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -53,7 +51,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
   private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
 
   // data
-  entityData: CaseModel | ContactModel;
+  entityData: CaseModel | ContactModel | ContactOfContactModel;
   private _personType: EntityType;
 
   // constants
@@ -66,25 +64,23 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected router: Router,
-    private labResultDataService: LabResultDataService,
-    private activatedRoute: ActivatedRoute,
-    private i18nService: I18nService,
-    private dialogV2Service: DialogV2Service,
     private domSanitizer: DomSanitizer,
     private referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    toastV2Service: ToastV2Service,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // get data
@@ -126,7 +122,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Retrieve item
    */
   protected retrieveItem(record?: LabResultModel): Observable<LabResultModel> {
-    return this.labResultDataService
+    return this.personAndRelatedHelperService.labResult.labResultDataService
       .getOutbreakLabResult(
         this.selectedOutbreak.id,
         record ?
@@ -196,6 +192,18 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
     // entity list
     if (
+      this._personType === EntityType.CONTACT_OF_CONTACT &&
+      ContactOfContactModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+          action: {
+            link: ['/contacts-of-contacts']
+          }
+        }
+      );
+    } else if (
       this._personType === EntityType.CONTACT &&
       ContactModel.canList(this.authUser)
     ) {
@@ -225,6 +233,18 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     if (this.entityData) {
       // entity view
       if (
+        this._personType === EntityType.CONTACT_OF_CONTACT &&
+        ContactOfContactModel.canView(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          {
+            label: this.entityData.name,
+            action: this.entityData.deleted ? null : {
+              link: [`/contacts-of-contacts/${this.entityData.id}/view`]
+            }
+          }
+        );
+      } else if (
         this._personType === EntityType.CONTACT &&
         ContactModel.canView(this.authUser)
       ) {
@@ -252,12 +272,24 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
       // lab result list
       if (
+        this._personType === EntityType.CONTACT_OF_CONTACT &&
+        ContactOfContactModel.canListLabResult(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          {
+            label: `${this.personAndRelatedHelperService.i18nService.instant(this.entityData.name)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
+            action: this.entityData.deleted ? null : {
+              link: [`/lab-results/contacts-of-contacts/${this.entityData.id}`]
+            }
+          }
+        );
+      } else if (
         this._personType === EntityType.CONTACT &&
         ContactModel.canListLabResult(this.authUser)
       ) {
         this.breadcrumbs.push(
           {
-            label: `${this.i18nService.instant(this.entityData.name)} ${this.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
+            label: `${this.personAndRelatedHelperService.i18nService.instant(this.entityData.name)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
             action: this.entityData.deleted ? null : {
               link: [`/lab-results/contacts/${this.entityData.id}`]
             }
@@ -269,7 +301,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       ) {
         this.breadcrumbs.push(
           {
-            label: `${this.i18nService.instant(this.entityData.name)} ${this.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
+            label: `${this.personAndRelatedHelperService.i18nService.instant(this.entityData.name)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
             action: this.entityData.deleted ? null : {
               link: [`/lab-results/cases/${this.entityData.id}`]
             }
@@ -289,7 +321,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     } else if (this.isModify) {
       this.breadcrumbs.push(
         {
-          label: this.i18nService.instant(
+          label: this.personAndRelatedHelperService.i18nService.instant(
             'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
             {
               sampleIdentifier: this.itemData.sampleIdentifier ?
@@ -304,7 +336,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       // view
       this.breadcrumbs.push(
         {
-          label: this.i18nService.instant(
+          label: this.personAndRelatedHelperService.i18nService.instant(
             'LNG_PAGE_VIEW_LAB_RESULT_TITLE',
             {
               sampleIdentifier: this.itemData.sampleIdentifier ?
@@ -374,8 +406,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON'),
-          message: () => this.i18nService.instant(
+          buttonLabel: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON'),
+          message: () => this.personAndRelatedHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.entityData
           )
@@ -394,8 +426,11 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         // redirect to view
         this.router.navigate(
           this._personType === EntityType.CASE ?
-            [`/lab-results/cases/${this.entityData.id}/${data.id}/view`] :
-            [`/lab-results/contacts/${this.entityData.id}/${data.id}/view`], {
+            [`/lab-results/cases/${this.entityData.id}/${data.id}/view`] : (
+              this._personType === EntityType.CONTACT_OF_CONTACT ?
+                [`/lab-results/contacts-of-contacts/${this.entityData.id}/${data.id}/view`] :
+                [`/lab-results/contacts/${this.entityData.id}/${data.id}/view`]
+            ), {
             queryParams: extraQueryParams
           }
         );
@@ -407,338 +442,43 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Initialize tabs - Details
    */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'details',
-      label: this.isCreate ? 'LNG_PAGE_CREATE_LAB_RESULT_TAB_DETAILS' : 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE',
-      sections: [
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: this.isCreate ? 'LNG_PAGE_CREATE_LAB_RESULT_TAB_DETAILS' : 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE',
-          inputs: [
-            {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'sampleIdentifier',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID_DESCRIPTION',
-              value: {
-                get: () => this.itemData.sampleIdentifier,
-                set: (value) => {
-                  // set data
-                  this.itemData.sampleIdentifier = value;
-                }
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.DATE,
-              name: 'dateSampleTaken',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN_DESCRIPTION',
-              value: {
-                get: () => this.itemData.dateSampleTaken,
-                set: (value) => {
-                  this.itemData.dateSampleTaken = value;
-                }
-              },
-              validators: {
-                required: () => true,
-                dateSameOrBefore: () => [
-                  'dateSampleDelivered',
-                  'dateTesting',
-                  'dateOfResult'
-                ]
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.DATE,
-              name: 'dateSampleDelivered',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED_DESCRIPTION',
-              value: {
-                get: () => this.itemData.dateSampleDelivered,
-                set: (value) => {
-                  this.itemData.dateSampleDelivered = value;
-                }
-              },
-              validators: {
-                dateSameOrBefore: () => [
-                  'dateTesting',
-                  'dateOfResult'
-                ],
-                dateSameOrAfter: () => [
-                  'dateSampleTaken'
-                ]
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.DATE,
-              name: 'dateTesting',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING_DESCRIPTION',
-              value: {
-                get: () => this.itemData.dateTesting,
-                set: (value) => {
-                  this.itemData.dateTesting = value;
-                }
-              },
-              validators: {
-                dateSameOrBefore: () => [
-                  'dateOfResult'
-                ],
-                dateSameOrAfter: () => [
-                  'dateSampleDelivered',
-                  'dateSampleTaken'
-                ]
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.DATE,
-              name: 'dateOfResult',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT_DESCRIPTION',
-              value: {
-                get: () => this.itemData.dateOfResult,
-                set: (value) => {
-                  this.itemData.dateOfResult = value;
-                }
-              },
-              validators: {
-                dateSameOrAfter: () => [
-                  'dateTesting',
-                  'dateSampleDelivered',
-                  'dateSampleTaken'
-                ]
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'labName',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME_DESCRIPTION',
-              options: this.referenceDataHelperService.filterPerOutbreakOptions(
-                this.selectedOutbreak,
-                (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                this.itemData.labName
-              ),
-              value: {
-                get: () => this.itemData.labName,
-                set: (value) => {
-                  this.itemData.labName = value;
-                }
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'sampleType',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE_DESCRIPTION',
-              options: this.referenceDataHelperService.filterPerOutbreakOptions(
-                this.selectedOutbreak,
-                (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                this.itemData.sampleType
-              ),
-              value: {
-                get: () => this.itemData.sampleType,
-                set: (value) => {
-                  this.itemData.sampleType = value;
-                }
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'testType',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE_DESCRIPTION',
-              options: this.referenceDataHelperService.filterPerOutbreakOptions(
-                this.selectedOutbreak,
-                (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                this.itemData.testType
-              ),
-              value: {
-                get: () => this.itemData.testType,
-                set: (value) => {
-                  this.itemData.testType = value;
-                }
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'result',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION',
-              options: this.referenceDataHelperService.filterPerOutbreakOptions(
-                this.selectedOutbreak,
-                (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                this.itemData.result
-              ),
-              value: {
-                get: () => this.itemData.result,
-                set: (value) => {
-                  this.itemData.result = value;
-                }
-              },
-              validators: {
-                required: () => this.itemData.status === Constants.LAB_TEST_RESULT_STATUS.COMPLETED
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'testedFor',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR_DESCRIPTION',
-              value: {
-                get: () => this.itemData.testedFor,
-                set: (value) => {
-                  // set data
-                  this.itemData.testedFor = value;
-                }
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'status',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_STATUS_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              value: {
-                get: () => this.itemData.status,
-                set: (value) => {
-                  this.itemData.status = value;
-                }
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.TEXTAREA,
-              name: 'quantitativeResult',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT_DESCRIPTION',
-              value: {
-                get: () => this.itemData.quantitativeResult,
-                set: (value) => {
-                  this.itemData.quantitativeResult = value;
-                }
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.TEXTAREA,
-              name: 'notes',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_NOTES_DESCRIPTION',
-              value: {
-                get: () => this.itemData.notes,
-                set: (value) => {
-                  this.itemData.notes = value;
-                }
-              }
-            }
-          ]
-        },
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE',
-          inputs: [
-            {
-              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: 'sequence[hasSequence]',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE_DESCRIPTION',
-              value: {
-                get: () => this.itemData.sequence.hasSequence,
-                set: (value) => {
-                  // set value
-                  this.itemData.sequence.hasSequence = value;
-
-                  // reset data
-                  if (this.itemData.sequence.hasSequence) {
-                    this.itemData.sequence.noSequenceReason = undefined;
-                  } else {
-                    this.itemData.sequence.dateSampleSent = undefined;
-                    this.itemData.sequence.labId = undefined;
-                    this.itemData.sequence.dateResult = undefined;
-                    this.itemData.sequence.resultId = undefined;
-                  }
-                }
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.DATE,
-              name: 'sequence[dateSampleSent]',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT_DESCRIPTION',
-              value: {
-                get: () => this.itemData.sequence.dateSampleSent,
-                set: (value) => {
-                  this.itemData.sequence.dateSampleSent = value;
-                }
-              },
-              disabled: () => !this.itemData.sequence.hasSequence
-            },
-            {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'sequence[labId]',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB_DESCRIPTION',
-              options: this.referenceDataHelperService.filterPerOutbreakOptions(
-                this.selectedOutbreak,
-                (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                this.itemData.sequence?.labId
-              ),
-              value: {
-                get: () => this.itemData.sequence.labId,
-                set: (value) => {
-                  this.itemData.sequence.labId = value;
-                }
-              },
-              disabled: () => !this.itemData.sequence.hasSequence
-            },
-            {
-              type: CreateViewModifyV2TabInputType.DATE,
-              name: 'sequence[dateResult]',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT_DESCRIPTION',
-              value: {
-                get: () => this.itemData.sequence.dateResult,
-                set: (value) => {
-                  this.itemData.sequence.dateResult = value;
-                }
-              },
-              disabled: () => !this.itemData.sequence.hasSequence
-            },
-            {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'sequence[resultId]',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT_DESCRIPTION',
-              options: this.referenceDataHelperService.filterPerOutbreakOptions(
-                this.selectedOutbreak,
-                (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                this.itemData.sequence?.resultId
-              ),
-              value: {
-                get: () => this.itemData.sequence.resultId,
-                set: (value) => {
-                  this.itemData.sequence.resultId = value;
-                }
-              },
-              disabled: () => !this.itemData.sequence.hasSequence
-            },
-            {
-              type: CreateViewModifyV2TabInputType.TEXTAREA,
-              name: 'sequence[noSequenceReason]',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON_DESCRIPTION',
-              value: {
-                get: () => this.itemData.sequence.noSequenceReason,
-                set: (value) => {
-                  this.itemData.sequence.noSequenceReason = value;
-                }
-              },
-              disabled: () => this.itemData.sequence.hasSequence
-            }
-          ]
-        }
-      ]
-    };
+    return this.personAndRelatedHelperService.labResult.generateTabsDetails(this.selectedOutbreak, {
+      isCreate: this.isCreate,
+      itemData: this.itemData,
+      options: {
+        labName: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.labName
+        ),
+        labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.sampleType
+        ),
+        labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.testType
+        ),
+        labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.result
+        ),
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.sequence?.labId
+        ),
+        labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          this.itemData.sequence?.resultId
+        )
+      }
+    });
   }
 
   /**
@@ -782,12 +522,21 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       view: {
         link: {
           link: () => {
-            if (this._personType === EntityType.CASE &&
-              CaseModel.canViewLabResult(this.authUser)) {
+            if (
+              this._personType === EntityType.CASE &&
+              CaseModel.canViewLabResult(this.authUser)
+            ) {
               return [`/lab-results/cases/${this.entityData.id}/${this.itemData?.id}/view`];
-            } else if (this._personType === EntityType.CONTACT &&
-              ContactModel.canViewLabResult(this.authUser)) {
+            } else if (
+              this._personType === EntityType.CONTACT &&
+              ContactModel.canViewLabResult(this.authUser)
+            ) {
               return [`/lab-results/contacts/${this.entityData.id}/${this.itemData?.id}/view`];
+            } else if (
+              this._personType === EntityType.CONTACT_OF_CONTACT &&
+              ContactOfContactModel.canViewLabResult(this.authUser)
+            ) {
+              return [`/lab-results/contacts-of-contacts/${this.entityData.id}/${this.itemData?.id}/view`];
             }
           }
         }
@@ -795,12 +544,21 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       modify: {
         link: {
           link: () => {
-            if (this._personType === EntityType.CASE &&
-              CaseModel.canModifyLabResult(this.authUser)) {
+            if (
+              this._personType === EntityType.CASE &&
+              CaseModel.canModifyLabResult(this.authUser)
+            ) {
               return [`/lab-results/cases/${this.entityData.id}/${this.itemData?.id}/modify`];
-            } else if (this._personType === EntityType.CONTACT &&
-              ContactModel.canModifyLabResult(this.authUser)) {
+            } else if (
+              this._personType === EntityType.CONTACT &&
+              ContactModel.canModifyLabResult(this.authUser)
+            ) {
               return [`/lab-results/contacts/${this.entityData.id}/${this.itemData?.id}/modify`];
+            } else if (
+              this._personType === EntityType.CONTACT_OF_CONTACT &&
+              ContactOfContactModel.canModifyLabResult(this.authUser)
+            ) {
+              return [`/lab-results/contacts-of-contacts/${this.entityData.id}/${this.itemData?.id}/modify`];
             }
           }
         },
@@ -809,6 +567,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
             return CaseModel.canModifyLabResult(this.authUser);
           } else if (this._personType === EntityType.CONTACT) {
             return ContactModel.canModifyLabResult(this.authUser);
+          } else if (this._personType === EntityType.CONTACT_OF_CONTACT) {
+            return ContactOfContactModel.canModifyLabResult(this.authUser);
           } else {
             return false;
           }
@@ -817,12 +577,21 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       createCancel: {
         link: {
           link: () => {
-            if (this._personType === EntityType.CASE &&
-              CaseModel.canViewLabResult(this.authUser)) {
+            if (
+              this._personType === EntityType.CASE &&
+              CaseModel.canViewLabResult(this.authUser)
+            ) {
               return [`/lab-results/cases/${this.entityData.id}/${this.itemData?.id}/view`];
-            } else if (this._personType === EntityType.CONTACT &&
-              ContactModel.canViewLabResult(this.authUser)) {
+            } else if (
+              this._personType === EntityType.CONTACT &&
+              ContactModel.canViewLabResult(this.authUser)
+            ) {
               return [`/lab-results/contacts/${this.entityData.id}/${this.itemData?.id}/view`];
+            } else if (
+              this._personType === EntityType.CONTACT_OF_CONTACT &&
+              ContactOfContactModel.canViewLabResult(this.authUser)
+            ) {
+              return [`/lab-results/contacts-of-contacts/${this.entityData.id}/${this.itemData?.id}/view`];
             }
           }
         }
@@ -830,12 +599,21 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       viewCancel: {
         link: {
           link: () => {
-            if (this._personType === EntityType.CASE &&
-              CaseModel.canViewLabResult(this.authUser)) {
+            if (
+              this._personType === EntityType.CASE &&
+              CaseModel.canViewLabResult(this.authUser)
+            ) {
               return [`/lab-results/cases/${this.entityData.id}`];
-            } else if (this._personType === EntityType.CONTACT &&
-              ContactModel.canViewLabResult(this.authUser)) {
+            } else if (
+              this._personType === EntityType.CONTACT &&
+              ContactModel.canViewLabResult(this.authUser)
+            ) {
               return [`/lab-results/contacts/${this.entityData.id}`];
+            } else if (
+              this._personType === EntityType.CONTACT_OF_CONTACT &&
+              ContactOfContactModel.canViewLabResult(this.authUser)
+            ) {
+              return [`/lab-results/contacts-of-contacts/${this.entityData.id}`];
             }
           }
         }
@@ -843,12 +621,21 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       modifyCancel: {
         link: {
           link: () => {
-            if (this._personType === EntityType.CASE &&
-              CaseModel.canViewLabResult(this.authUser)) {
+            if (
+              this._personType === EntityType.CASE &&
+              CaseModel.canViewLabResult(this.authUser)
+            ) {
               return [`/lab-results/cases/${this.entityData.id}/${this.itemData?.id}/view`];
-            } else if (this._personType === EntityType.CONTACT &&
-              ContactModel.canViewLabResult(this.authUser)) {
+            } else if (
+              this._personType === EntityType.CONTACT &&
+              ContactModel.canViewLabResult(this.authUser)
+            ) {
               return [`/lab-results/contacts/${this.entityData.id}/${this.itemData?.id}/view`];
+            } else if (
+              this._personType === EntityType.CONTACT_OF_CONTACT &&
+              ContactOfContactModel.canViewLabResult(this.authUser)
+            ) {
+              return [`/lab-results/contacts-of-contacts/${this.entityData.id}/${this.itemData?.id}/view`];
             }
           }
         }
@@ -862,7 +649,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
             action: {
               click: () => {
                 // show record details dialog
-                this.dialogV2Service.showRecordDetailsDialog(
+                this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
                   'LNG_PAGE_MODIFY_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user
@@ -895,13 +682,13 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
       // finished
       (type === CreateViewModifyV2ActionType.CREATE ?
-        this.labResultDataService.createLabResult(
+        this.personAndRelatedHelperService.labResult.labResultDataService.createLabResult(
           this.selectedOutbreak.id,
           EntityModel.getLinkForEntityType(this._personType),
           this.entityData.id,
           data
         ) :
-        this.labResultDataService
+        this.personAndRelatedHelperService.labResult.labResultDataService
           .modifyLabResult(
             this.selectedOutbreak.id,
             this.itemData.id,
@@ -922,7 +709,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         takeUntil(this.destroyed$)
       ).subscribe((item: LabResultModel) => {
         // success creating / updating event
-        this.toastV2Service.success(
+        this.personAndRelatedHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_LAB_RESULT_ACTION_MODIFY_LAB_RESULT_SUCCESS_MESSAGE'
@@ -941,7 +728,9 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     this.expandListColumnRenderer = this.entityData.deleted ? undefined : {
       type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: LabResultModel) => {
-        if (this._personType === EntityType.CONTACT) {
+        if (this._personType === EntityType.CONTACT_OF_CONTACT) {
+          return [`/lab-results/contacts-of-contacts/${this.entityData.id}/${item.id}`];
+        } else if (this._personType === EntityType.CONTACT) {
           return [`/lab-results/contacts/${this.entityData.id}/${item.id}`];
         } else if (this._personType === EntityType.CASE) {
           return [`/lab-results/cases/${this.entityData.id}/${item.id}`];
@@ -956,9 +745,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
           if (!item.uiStatusForms) {
             // determine forms
-            const forms: V2ColumnStatusForm[] = LabResultModel.getStatusForms({
-              item,
-              i18nService: this.i18nService
+            const forms: V2ColumnStatusForm[] = this.personAndRelatedHelperService.labResult.getStatusForms({
+              item
             });
 
             // create html
@@ -979,7 +767,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         },
         text: (item: LabResultModel) => item.sampleIdentifier?.trim().length > 0 ?
           item.sampleIdentifier :
-          moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+          LocalizationHelper.displayDate(item.dateSampleTaken),
         details: undefined
       }
     };
@@ -1001,8 +789,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = LabResultModel.generateAdvancedFilters({
-      selectedOutbreak: () => this.selectedOutbreak,
+    this.expandListAdvancedFilters = this.personAndRelatedHelperService.labResult.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -1022,6 +809,25 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         )
       }
@@ -1045,7 +851,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     data.queryBuilder.clearRelationships();
 
     // retrieve data
-    this.expandListRecords$ = this.labResultDataService
+    this.expandListRecords$ = this.personAndRelatedHelperService.labResult.labResultDataService
       .getEntityLabResults(
         this.selectedOutbreak.id,
         EntityModel.getLinkForEntityType(this._personType),
@@ -1055,7 +861,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       .pipe(
         // determine alertness
         map((labResults: LabResultModel[]) => {
-          return LabResultModel.determineAlertness(
+          return this.personAndRelatedHelperService.labResult.determineAlertness(
             this.selectedOutbreak.labResultsTemplate,
             labResults
           );

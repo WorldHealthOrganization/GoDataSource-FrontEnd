@@ -5,7 +5,6 @@ import { ToastV2Service } from '../../helper/toast-v2.service';
 import { IMapResolverV2, IResolverV2ResponseModel } from './models/resolver-response.model';
 import { UserModel } from '../../../models/user.model';
 import { UserDataService } from '../../data/user.data.service';
-import { RequestQueryBuilder, RequestSortDirection } from '../../../helperClasses/request-query-builder';
 import { AuthDataService } from '../../data/auth.data.service';
 
 @Injectable()
@@ -32,23 +31,10 @@ export class UserDataResolver implements IMapResolverV2<UserModel> {
       });
     }
 
-    // construct query
-    const qb = new RequestQueryBuilder();
-    qb.fields(
-      'id',
-      'firstName',
-      'lastName',
-      'email'
-    );
-
-    // sort them
-    qb.sort
-      .by('firstName', RequestSortDirection.ASC)
-      .by('lastName', RequestSortDirection.ASC);
-
     // retrieve users
+    // IMPORTANT: no need to specify fields or sort rules since this is done automatically by API for users/for-filters endpoint
     return this.userDataService
-      .getUsersList(qb)
+      .getUsersListForFilters()
       .pipe(
         map((data) => {
           // construct map
@@ -63,7 +49,7 @@ export class UserDataResolver implements IMapResolverV2<UserModel> {
 
             // add option
             response.options.push({
-              label: item.name,
+              label: item.nameAndEmail,
               value: item.id,
               data: item
             });

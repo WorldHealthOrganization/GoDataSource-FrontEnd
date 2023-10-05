@@ -4,14 +4,16 @@ import * as _ from 'lodash';
 import { AddressType } from '../models/address.model';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
-import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { ListQueryComponent } from './list-query-component';
+import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { LocalizationHelper, Moment } from './localization-helper';
 
 /**
  * Applied filters
  */
-export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
+export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2ColumnToVisibleMandatoryConf)> extends ListQueryComponent<T> {
   // Applied list filter on this list page
   appliedListFilter: ApplyListFilter;
 
@@ -37,6 +39,7 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
     ) => void
   ) {
     super(
+      listHelperService,
       queryBuilderChangedCallback,
       refreshCallback
     );
@@ -80,7 +83,7 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
 
     // parse date
     if (global.date) {
-      global.date = moment(global.date);
+      global.date = LocalizationHelper.toMoment(global.date);
     }
 
     // finished
@@ -268,7 +271,7 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
                         }
                       }, {
                         startDate: {
-                          $lte: moment(globalFilters.date).endOf('day').toISOString()
+                          $lte: LocalizationHelper.toMoment(globalFilters.date).endOf('day').toISOString()
                         }
                       }
                     ]
@@ -280,7 +283,7 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
                         }
                       }, {
                         endDate: {
-                          $gte: moment(globalFilters.date).startOf('day').toISOString()
+                          $gte: LocalizationHelper.toMoment(globalFilters.date).startOf('day').toISOString()
                         }
                       }
                     ]
@@ -412,17 +415,30 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
 
         // construct query builder to filter by location
         const locationId = _.get(queryParams, 'locationId', null);
-        this.appliedListFilterQueryBuilder.filter.where({
+        const locationFilter: { [prop: string]: any }[] = [{
           addresses: {
             elemMatch: {
               typeId: AddressType.CURRENT_ADDRESS,
               parentLocationIdFilter: {
-                // fix for not beeing consistent through the website, sometimes we use elemMatch other times $elemMatch which causes some issues on the api
+                // fix for not being consistent through the website, sometimes we use elemMatch other times $elemMatch which causes some issues on the api
                 // if we want to fix this we need to change in many places, so this is an workaround
                 $in: [locationId]
               }
             }
           }
+        }];
+
+        // global location
+        // IMPORTANT - we need both the above one and this one to work properly, otherwise if you filter by location on dashboard might cause strange behaviour
+        if (globalFilters.locationId) {
+          locationFilter.push({
+            'addresses.parentLocationIdFilter': globalFilters.locationId
+          });
+        }
+
+        // append condition
+        this.appliedListFilterQueryBuilder.filter.where({
+          and: locationFilter
         });
 
         // date

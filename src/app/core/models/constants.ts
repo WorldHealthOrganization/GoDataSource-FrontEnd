@@ -1,5 +1,3 @@
-import { moment, Moment } from '../helperClasses/x-moment';
-
 /**
  * Export status steps
  */
@@ -64,10 +62,6 @@ export enum ApplyListFilter {
 }
 
 export class Constants {
-  // default display constants
-  static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
-  static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
-
   // default random configs
   static DEFAULT_RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   static DEFAULT_RANDOM_KEY_LENGTH = 16;
@@ -76,6 +70,9 @@ export class Constants {
   static DEFAULT_DEBOUNCE_TIME_MILLISECONDS = 500;
   static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
   static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
+
+  // json property . replacer
+  static readonly DEFAULT_DB_DOT_REPLACER: string = '____';
 
   // pagination defaults and configuration
   static PAGE_SIZE_OPTIONS = [50, 100, 500, 1000];
@@ -223,6 +220,10 @@ export class Constants {
     CONTACT_LAB_RESULTS: {
       label: 'LNG_APP_PAGE_CONTACT_LAB_RESULTS',
       value: 'LNG_APP_PAGE_CONTACT_LAB_RESULTS'
+    },
+    CONTACT_OF_CONTACT_LAB_RESULTS: {
+      label: 'LNG_APP_PAGE_CONTACT_OF_CONTACT_LAB_RESULTS',
+      value: 'LNG_APP_PAGE_CONTACT_OF_CONTACT_LAB_RESULTS'
     },
     AVAILABLE_ENTITIES_FOR_RELATIONSHIPS: {
       label: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS',
@@ -458,6 +459,18 @@ export class Constants {
     RELATIONSHIP_DATA: {
       label: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA',
       value: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA'
+    },
+    USER_DATA: {
+      label: 'LNG_APP_PAGE_IMPORT_USER_DATA',
+      value: 'LNG_APP_PAGE_IMPORT_USER_DATA'
+    },
+    ROLE_DATA: {
+      label: 'LNG_APP_PAGE_IMPORT_USER_ROLE_DATA',
+      value: 'LNG_APP_PAGE_IMPORT_USER_ROLE_DATA'
+    },
+    TEAM_DATA: {
+      label: 'LNG_APP_PAGE_IMPORT_TEAM_DATA',
+      value: 'LNG_APP_PAGE_IMPORT_TEAM_DATA'
     }
   };
 
@@ -1200,21 +1213,6 @@ export class Constants {
 
   // regex email
   static readonly REGEX_EMAIL_VALIDATOR = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-
-  /**
-     * Today date
-     */
-  static getCurrentDate(): Moment {
-    return moment().startOf('day');
-  }
-
-  /**
-     * Check if a given date is in the future
-     */
-  static isDateInTheFuture(date): boolean {
-    const dateMoment = date ? moment(date) : null;
-    return !!(dateMoment && dateMoment.startOf('day').isAfter(Constants.getCurrentDate()));
-  }
 
   /**
      * Generate random string

@@ -8,12 +8,12 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Router } from '@angular/router';
 import { Constants } from '../../../../core/models/constants';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { PieDonutChartComponent, PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
 import { CaseModel } from '../../../../core/models/case.model';
 import { map } from 'rxjs/operators';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-case-by-geographic-location-dashlet',
@@ -179,7 +179,7 @@ implements OnInit, OnDestroy {
     if (this.globalFilterDate) {
       qb.filter.byDateRange(
         'dateOfReporting', {
-          endDate: moment(this.globalFilterDate).endOf('day').format()
+          endDate: LocalizationHelper.toMoment(this.globalFilterDate).endOf('day').format()
         }
       );
     }

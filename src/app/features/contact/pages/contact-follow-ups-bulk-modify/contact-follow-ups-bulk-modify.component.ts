@@ -1,7 +1,5 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as _ from 'lodash';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { Observable, throwError } from 'rxjs';
@@ -9,18 +7,18 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { TeamModel } from '../../../../core/models/team.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { Constants } from '../../../../core/models/constants';
 import { CaseModel } from '../../../../core/models/case.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contact-follow-ups-bulk-modify',
@@ -30,28 +28,28 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
   // data
   selectedFollowUps: FollowUpModel[] = [];
   futureFollowUps: boolean = false;
-  selectedContacts: (ContactModel | CaseModel)[] = [];
+  selectedContacts: (ContactOfContactModel | ContactModel | CaseModel)[] = [];
   followUpDates: string[] = [];
 
   /**
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private followUpsDataService: FollowUpsDataService,
-    protected toastV2Service: ToastV2Service,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -87,7 +85,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
       );
 
       // retrieve follow-ups and contact details
-      this.followUpsDataService
+      this.personAndRelatedHelperService.followUp.followUpsDataService
         .getFollowUpsList(
           this.selectedOutbreak.id,
           qb
@@ -122,22 +120,24 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
 
             // add follow-up date
             if (followUp.date) {
-              const date: string = moment(followUp.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const date: string = LocalizationHelper.displayDate(followUp.date);
               if (!this.followUpDates.find((item) => item === date)) {
                 this.followUpDates.push(date);
               }
             }
 
             // has future follow-ups ?
-            if (Constants.isDateInTheFuture(followUp.date)) {
+            if (
+              followUp.date &&
+              LocalizationHelper.toMoment(followUp.date).startOf('day').isAfter(LocalizationHelper.today())
+            ) {
               this.futureFollowUps = true;
             }
           }
 
           // sort dates
-          this.followUpDates = _.sortBy(
-            this.followUpDates,
-            (item1, item2) => moment(item1).diff(moment(item2))
+          this.followUpDates.sort(
+            (item1, item2) => LocalizationHelper.toMoment(item1).diff(LocalizationHelper.toMoment(item2))
           );
 
           // finished - no item to edit
@@ -246,7 +246,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
    */
   private initializeDetailTab(): ICreateViewModifyV2Tab {
     // modify ?
-    return {
+    return this.personAndRelatedHelperService.createViewModify.tabFilter({
       // Details
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'details',
@@ -255,6 +255,9 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
         {
           type: CreateViewModifyV2TabInputType.SECTION,
           label: null,
+          visibleMandatoryConf: {
+            dontFilter: true
+          },
           inputs: [
             // warnings
             {
@@ -298,8 +301,12 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
                 get: () => 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES'
               },
               labels: this.followUpDates
-            },
-
+            }
+          ]
+        }, {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE',
+          inputs: [
             // inputs
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -338,7 +345,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
           ]
         }
       ]
-    };
+    }, this.personAndRelatedHelperService.followUp.visibleMandatoryKey, this.selectedOutbreak);
   }
 
   /**
@@ -400,7 +407,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
       });
 
       // do request
-      this.followUpsDataService
+      this.personAndRelatedHelperService.followUp.followUpsDataService
         .bulkModifyFollowUps(
           this.selectedOutbreak.id,
           data,

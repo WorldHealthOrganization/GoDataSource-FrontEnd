@@ -1,18 +1,20 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { map } from 'rxjs/operators';
 import { I18nService } from './i18n.service';
 import { ToastrService } from 'ngx-toastr';
 import { v4 as uuid } from 'uuid';
+import { IToastV2, ToastV2Type } from './models/toast.model';
 
 @Injectable()
-export class ToastV2Service {
+export class ToastV2Service implements OnDestroy {
   // Keep a list of errors that can be viewed later
   private static _HISTORY: {
     id: string,
     title: string,
-    details: string
+    details: string,
+    definition: IToastV2
   }[] = [];
   static get HISTORY(): {
     data: {
@@ -32,12 +34,18 @@ export class ToastV2Service {
   private static TIMEOUT: number = 5000;
 
   // keep toast id to payload
-  private static TOASTS: {
-    [messageId: string]: number
+  private static readonly _TOASTS: {
+    [messageId: string]: {
+      id: number,
+      definition: IToastV2
+    }
   } = {};
 
   // history changed
   readonly historyChanged: BehaviorSubject<void> = new BehaviorSubject<void>(null);
+
+  // language handler
+  private languageSubscription: Subscription;
 
   /**
    * Constructor
@@ -45,7 +53,95 @@ export class ToastV2Service {
   constructor(
     private i18nService: I18nService,
     private toastrService: ToastrService
-  ) {}
+  ) {
+    // language change
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // reprocess ToastV2Service._TOASTS
+        Object.keys(ToastV2Service._TOASTS).forEach((messageId) => {
+          // retrieve definition
+          const definition: IToastV2 = ToastV2Service._TOASTS[messageId].definition;
+
+          // remove
+          this.hide(messageId);
+
+          // show again with new translation - works as long as we have tokens in definition and not translated text...which is a different matter
+          this.processDefinition(definition);
+        });
+
+        // reprocess ToastV2Service._HISTORY
+        ToastV2Service._HISTORY.forEach((item) => {
+          // retrieve definition
+          const definition: IToastV2 = item.definition;
+
+          // remove
+          this.removeHistory(item.id);
+
+          // show again with new translation - works as long as we have tokens in definition and not translated text...which is a different matter
+          this.processDefinition(definition);
+        });
+      });
+  }
+
+  /**
+   * Destroyed
+   */
+  ngOnDestroy(): void {
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
+  }
+
+  /**
+   * Process definition
+   */
+  private processDefinition(definition: IToastV2): void {
+    switch (definition.type) {
+      case ToastV2Type.ERROR:
+        // show error
+        this.error(
+          definition.err,
+          definition.translateData,
+          definition.messageId,
+          definition.details
+        );
+
+        // finished
+        break;
+
+      case ToastV2Type.SUCCESS:
+        // show error
+        this.success(
+          definition.message,
+          definition.translateData,
+          definition.messageId
+        );
+
+        // finished
+        break;
+
+      case ToastV2Type.NOTICE:
+        // show error
+        this.notice(
+          definition.message,
+          definition.translateData,
+          definition.messageId
+        );
+
+        // finished
+        break;
+    }
+  }
 
   /**
    * Clear history
@@ -88,7 +184,7 @@ export class ToastV2Service {
           // don't add again if toast with same id exists
           if (
             messageId &&
-            ToastV2Service.TOASTS[messageId]
+            ToastV2Service._TOASTS[messageId]
           ) {
             return;
           }
@@ -109,7 +205,14 @@ export class ToastV2Service {
             ToastV2Service._HISTORY.push({
               id: uuid(),
               title: messageTranslated,
-              details
+              details,
+              definition: {
+                type: ToastV2Type.ERROR,
+                err,
+                translateData,
+                messageId,
+                details
+              }
             });
 
             // push change
@@ -119,7 +222,16 @@ export class ToastV2Service {
           // add toast to list of maps to easily hide it later
           if (messageId) {
             // map
-            ToastV2Service.TOASTS[messageId] = toast.toastId;
+            ToastV2Service._TOASTS[messageId] = {
+              id: toast.toastId,
+              definition: {
+                type: ToastV2Type.ERROR,
+                err,
+                translateData,
+                messageId,
+                details
+              }
+            };
 
             // handle tap - hide toast
             toast.onTap.subscribe((function(service: ToastV2Service, localMessageId: string) {
@@ -181,7 +293,7 @@ export class ToastV2Service {
         // don't add again if toast with same id exists
         if (
           messageId &&
-          ToastV2Service.TOASTS[messageId]
+          ToastV2Service._TOASTS[messageId]
         ) {
           return;
         }
@@ -199,7 +311,15 @@ export class ToastV2Service {
         // add toast to list of maps to easily hide it later
         if (messageId) {
           // map
-          ToastV2Service.TOASTS[messageId] = toast.toastId;
+          ToastV2Service._TOASTS[messageId] = {
+            id: toast.toastId,
+            definition: {
+              type: ToastV2Type.SUCCESS,
+              message,
+              translateData,
+              messageId
+            }
+          };
 
           // handle tap - hide toast
           toast.onTap.subscribe((function(service: ToastV2Service, localMessageId: string) {
@@ -227,7 +347,7 @@ export class ToastV2Service {
         // don't add again if toast with same id exists
         if (
           messageId &&
-          ToastV2Service.TOASTS[messageId]
+          ToastV2Service._TOASTS[messageId]
         ) {
           return;
         }
@@ -245,7 +365,15 @@ export class ToastV2Service {
         // add toast to list of maps to easily hide it later
         if (messageId) {
           // map
-          ToastV2Service.TOASTS[messageId] = toast.toastId;
+          ToastV2Service._TOASTS[messageId] = {
+            id: toast.toastId,
+            definition: {
+              type: ToastV2Type.NOTICE,
+              message,
+              translateData,
+              messageId
+            }
+          };
 
           // handle tap - hide toast
           toast.onTap.subscribe((function(service: ToastV2Service, localMessageId: string) {
@@ -264,14 +392,14 @@ export class ToastV2Service {
     // do we have a toast with this id ?
     if (
       !messageId ||
-      !ToastV2Service.TOASTS[messageId]
+      !ToastV2Service._TOASTS[messageId]
     ) {
       return;
     }
 
     // hide toast
-    this.toastrService.remove(ToastV2Service.TOASTS[messageId]);
-    delete ToastV2Service.TOASTS[messageId];
+    this.toastrService.remove(ToastV2Service._TOASTS[messageId].id);
+    delete ToastV2Service._TOASTS[messageId];
   }
 
   /**

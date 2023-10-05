@@ -7,12 +7,9 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Constants } from '../../../../core/models/constants';
 import { Observable, throwError } from 'rxjs';
-import { moment } from '../../../../core/helperClasses/x-moment';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { ICreateViewModifyV2Refresh } from '../../../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { UserModel } from '../../../../core/models/user.model';
@@ -22,7 +19,11 @@ import { TeamModel } from '../../../../core/models/team.model';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contact-merge-duplicate-records',
@@ -44,6 +45,9 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
     responsibleUserId: ILabelValuePairModel[],
     dateOfReporting: ILabelValuePairModel[],
     isDateOfReportingApproximate: ILabelValuePairModel[],
+    outcomeId: ILabelValuePairModel[],
+    dateOfOutcome: ILabelValuePairModel[],
+    transferRefused: ILabelValuePairModel[],
     riskLevel: ILabelValuePairModel[],
     riskReason: ILabelValuePairModel[],
     followUpTeamId: ILabelValuePairModel[],
@@ -61,20 +65,22 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
    * Constructor
    */
   constructor(
-    private activatedRoute: ActivatedRoute,
-    private outbreakDataService: OutbreakDataService,
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected i18nService: I18nService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private outbreakDataService: OutbreakDataService
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve contacts ids
@@ -170,6 +176,18 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
               mergeRecords,
               'isDateOfReportingApproximate'
             ).options,
+            outcomeId: this.getFieldOptions(
+              mergeRecords,
+              'outcomeId'
+            ).options,
+            dateOfOutcome: this.getFieldOptions(
+              mergeRecords,
+              'dateOfOutcome'
+            ).options,
+            transferRefused: this.getFieldOptions(
+              mergeRecords,
+              'transferRefused'
+            ).options,
             riskLevel: this.getFieldOptions(
               mergeRecords,
               'riskLevel'
@@ -251,6 +269,15 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
           data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
             this._uniqueOptions.isDateOfReportingApproximate[0].value :
             data.isDateOfReportingApproximate;
+          data.outcomeId = this._uniqueOptions.outcomeId.length === 1 ?
+            this._uniqueOptions.outcomeId[0].value :
+            data.outcomeId;
+          data.dateOfOutcome = this._uniqueOptions.dateOfOutcome.length === 1 ?
+            this._uniqueOptions.dateOfOutcome[0].value :
+            data.dateOfOutcome;
+          data.transferRefused = this._uniqueOptions.transferRefused.length === 1 ?
+            this._uniqueOptions.transferRefused[0].value :
+            data.transferRefused;
           data.riskLevel = this._uniqueOptions.riskLevel.length === 1 ?
             this._uniqueOptions.riskLevel[0].value :
             data.riskLevel;
@@ -352,7 +379,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
                       // address is newer?
                       if (
                         !currentAddress.date ||
-                        moment(currentAddress.date).isBefore(moment(address.date))
+                        LocalizationHelper.toMoment(currentAddress.date).isBefore(LocalizationHelper.toMoment(address.date))
                       ) {
                         currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
                         data.addresses.push(currentAddress);
@@ -701,6 +728,10 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -733,6 +764,10 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
@@ -778,6 +813,42 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
               get: () => this.itemData.isDateOfReportingApproximate as any,
               set: (value) => {
                 this.itemData.isDateOfReportingApproximate = value as any;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'outcomeId',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_OUTCOME_DESCRIPTION',
+            options: this._uniqueOptions.outcomeId,
+            value: {
+              get: () => this.itemData.outcomeId,
+              set: (value) => {
+                this.itemData.outcomeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'dateOfOutcome',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
+            options: this._uniqueOptions.dateOfOutcome,
+            value: {
+              get: () => this.itemData.dateOfOutcome as any,
+              set: (value) => {
+                this.itemData.dateOfOutcome = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'transferRefused',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
+            options: this._uniqueOptions.transferRefused,
+            value: {
+              get: () => this.itemData.transferRefused as any,
+              set: (value) => {
+                this.itemData.transferRefused = value as any;
               }
             }
           }, {
@@ -947,6 +1018,10 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
@@ -1023,6 +1098,8 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
       case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'isDateOfReportingApproximate': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
+      case 'dateOfOutcome': return EntityModel.uniqueDateOptions(mergeRecords, key);
+      case 'transferRefused': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
       case 'wasCase': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
       case 'dateBecomeContact': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'responsibleUserId': {

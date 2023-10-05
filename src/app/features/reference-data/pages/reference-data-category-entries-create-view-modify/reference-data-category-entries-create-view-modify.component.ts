@@ -4,7 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -14,18 +13,20 @@ import {
   ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ITreeEditorDataCategory } from '../../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 import { IconModel } from '../../../../core/models/icon.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -46,24 +47,26 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected i18nService: I18nService,
     protected router: Router,
     protected referenceDataDataService: ReferenceDataDataService,
     protected dialogV2Service: DialogV2Service,
-    protected referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve

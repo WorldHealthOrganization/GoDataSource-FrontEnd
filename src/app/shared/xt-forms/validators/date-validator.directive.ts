@@ -2,10 +2,8 @@ import { Directive, forwardRef, Input } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS, ControlContainer, NgForm, NgModelGroup } from '@angular/forms';
 import * as _ from 'lodash';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { Constants } from '../../../core/models/constants';
-import { moment, Moment, MomentBuiltinFormat } from '../../../core/helperClasses/x-moment';
-import * as momentOriginal from 'moment';
 import { AppFormBaseV2 } from '../../forms-v2/core/app-form-base-v2';
+import { LocalizationHelper, Moment, MomentBuiltinFormat } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Handle Date compare input
@@ -14,8 +12,7 @@ export class DateValidatorFieldComparator {
   constructor(
     public compareItemValue: string | Moment | AppFormBaseV2<any>,
     public fieldLabel: string = null
-  ) {
-  }
+  ) {}
 }
 
 /**
@@ -51,10 +48,10 @@ export class DateValidatorFieldComparator {
 })
 export class DateValidatorDirective implements Validator {
   // allowed formats
-  @Input() displayFormat: string = Constants.DEFAULT_DATE_DISPLAY_FORMAT;
+  @Input() displayFormat: string = LocalizationHelper.getDateDisplayFormat();
   @Input() allowedDateFormats: (string | MomentBuiltinFormat)[] = [
-    Constants.DEFAULT_DATE_DISPLAY_FORMAT,
-    moment.ISO_8601
+    LocalizationHelper.getDateDisplayFormat(),
+    LocalizationHelper.ISO_8601
   ];
 
   // date must be bigger than
@@ -98,7 +95,7 @@ export class DateValidatorDirective implements Validator {
           );
         } else if (
           compare instanceof AppFormBaseV2 ||
-          compare instanceof momentOriginal ||
+          LocalizationHelper.isInstanceOfMoment(compare) ||
           _.isString(compare)
         ) {
           compareItem = new DateValidatorFieldComparator(
@@ -117,7 +114,7 @@ export class DateValidatorDirective implements Validator {
         // & label if necessary
         let compareWithDate: Moment;
         let fieldLabel = compareItem.fieldLabel;
-        if (compareItem.compareItemValue instanceof momentOriginal) {
+        if (LocalizationHelper.isInstanceOfMoment(compareItem.compareItemValue)) {
           compareWithDate = compareItem.compareItemValue as Moment;
         }
 
@@ -158,9 +155,7 @@ export class DateValidatorDirective implements Validator {
             );
           } else {
             // value from string
-            (moment as any).suppressDeprecationWarnings = true;
-            compareWithDate = moment(compareItem.compareItemValue as string);
-            (moment as any).suppressDeprecationWarnings = false;
+            compareWithDate = LocalizationHelper.toMoment(compareItem.compareItemValue as string);
           }
         }
 
@@ -171,7 +166,7 @@ export class DateValidatorDirective implements Validator {
           element = compareItem.compareItemValue as AppFormBaseV2<any>;
 
           // value
-          compareWithDate = element.value ? moment(element.value) : null;
+          compareWithDate = element.value ? LocalizationHelper.toMoment(element.value) : null;
 
           // label
           if (!fieldLabel) {
@@ -236,7 +231,7 @@ export class DateValidatorDirective implements Validator {
 
     // validate date
     let value: any = control.value;
-    if (control.value instanceof momentOriginal) {
+    if (LocalizationHelper .isInstanceOfMoment(control.value)) {
       value = _.isObject(value._i) ? value : value._i;
     }
 
@@ -246,7 +241,7 @@ export class DateValidatorDirective implements Validator {
       invalidDateValidator: true
     };
     this.allowedDateFormats.forEach((format) => {
-      controlDate = moment(value, format, true);
+      controlDate = LocalizationHelper.toMoment(value, format, true);
       if (controlDate.isValid()) {
         // at least one format is valid
         invalid = null;

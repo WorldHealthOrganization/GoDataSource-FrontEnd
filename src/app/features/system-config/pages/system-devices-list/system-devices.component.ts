@@ -11,14 +11,14 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-system-devices-list',
   templateUrl: './system-devices.component.html'
 })
-export class SystemDevicesComponent extends ListComponent<DeviceModel> implements OnDestroy {
+export class SystemDevicesComponent extends ListComponent<DeviceModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */
@@ -442,6 +442,7 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

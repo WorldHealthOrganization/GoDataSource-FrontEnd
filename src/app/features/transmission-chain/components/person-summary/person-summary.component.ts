@@ -7,8 +7,9 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 
 @Component({
   selector: 'app-person-summary',
@@ -17,6 +18,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
   styleUrls: ['./person-summary.component.scss']
 })
 export class PersonSummaryComponent implements OnInit {
+  @Input() selectedOutbreak: OutbreakModel;
   @Input() person: CaseModel | ContactModel | EventModel | ContactOfContactModel;
 
   // constants
@@ -44,13 +46,16 @@ export class PersonSummaryComponent implements OnInit {
    */
   constructor(
     private authDataService: AuthDataService,
-    private entityHelperService: EntityHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {}
 
   ngOnInit() {
     this.authUser = this.authDataService.getAuthenticatedUser();
 
-    this.personData = this.entityHelperService.lightEntity(this.person);
+    this.personData = this.personAndRelatedHelperService.relationship.lightEntity(
+      this.selectedOutbreak,
+      this.person
+    );
 
     this.personLink = this.getPersonLink();
     this.personChainLink = this.getPersonChainLink();

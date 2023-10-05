@@ -12,7 +12,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
 import { IconModel } from '../../../../core/models/icon.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
@@ -27,7 +27,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
   selector: 'app-reference-data-category-entries-list',
   templateUrl: './reference-data-category-entries-list.component.html'
 })
-export class ReferenceDataCategoryEntriesListComponent extends ListComponent<ReferenceDataEntryModel> implements OnDestroy {
+export class ReferenceDataCategoryEntriesListComponent extends ListComponent<ReferenceDataEntryModel, IV2Column> implements OnDestroy {
   // category
   category: ReferenceDataCategoryModel;
 
@@ -530,6 +530,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // add category id to request
     countQueryBuilder.filter.byEquality(

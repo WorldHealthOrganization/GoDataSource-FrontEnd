@@ -12,7 +12,7 @@ import { AuditLogDataService } from '../../../../core/services/data/audit-log.da
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IV2ColumnPinned, V2ColumnExpandRowType, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnExpandRowType, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
@@ -20,16 +20,15 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { Constants } from '../../../../core/models/constants';
 import { ChangeValue, ChangeValueArray, ChangeValueObject, ChangeValueType } from '../../../../shared/components-v2/app-changes-v2/models/change.model';
-import * as momentOriginal from 'moment';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-audit-logs-list',
   templateUrl: './audit-logs-list.component.html'
 })
 export class AuditLogsListComponent
-  extends ListComponent<AuditLogModel>
+  extends ListComponent<AuditLogModel, IV2Column>
   implements OnDestroy {
 
   // audit-log fields
@@ -143,12 +142,12 @@ export class AuditLogsListComponent
         filter: {
           type: V2FilterType.DATE_RANGE,
           value: {
-            startDate: moment().subtract(7, 'days').startOf('day'),
-            endDate: moment().endOf('day')
+            startDate: LocalizationHelper.now().subtract(7, 'days').startOf('day'),
+            endDate: LocalizationHelper.now().endOf('day')
           },
           defaultValue: {
-            startDate: moment().subtract(7, 'days').startOf('day'),
-            endDate: moment().endOf('day')
+            startDate: LocalizationHelper.now().subtract(7, 'days').startOf('day'),
+            endDate: LocalizationHelper.now().endOf('day')
           }
         }
       },
@@ -181,7 +180,7 @@ export class AuditLogsListComponent
         label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER',
         format: {
           type: (item) => item.userId && this.activatedRoute.snapshot.data.user.map[item.userId] ?
-            `${ this.activatedRoute.snapshot.data.user.map[item.userId].name } ( ${ this.activatedRoute.snapshot.data.user.map[item.userId].email } )` :
+            this.activatedRoute.snapshot.data.user.map[item.userId].nameAndEmail :
             ''
         },
         filter: {
@@ -390,7 +389,7 @@ export class AuditLogsListComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
-
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
@@ -430,7 +429,7 @@ export class AuditLogsListComponent
           url: '/audit-logs/export',
           async: true,
           method: ExportDataMethod.POST,
-          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
+          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ LocalizationHelper.now().format('YYYY-MM-DD HH:mm') }`,
           queryBuilder: qb,
           allow: {
             types: [

@@ -9,7 +9,7 @@ import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey, StorageService } from '../services/helper/storage.service';
 import { UserModel, UserSettings } from '../models/user.model';
 import * as LzString from 'lz-string';
-import { applyResetOnAllFilters, applySortBy } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { applyResetOnAllFilters, applySortBy, IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import {
   IV2ActionIconLabel,
@@ -32,12 +32,13 @@ import { AppListTableV2Component } from '../../shared/components-v2/app-list-tab
 import { SavedFilterData } from '../models/saved-filters.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { IV2ProcessSelectedData } from '../../shared/components-v2/app-list-table-v2/models/process-data.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 /**
  * List component
  */
 @Directive()
-export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
+export abstract class ListComponent<T, U extends (IV2Column | IV2ColumnToVisibleMandatoryConf)> extends ListAppliedFiltersComponent<U> {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
 
@@ -140,10 +141,8 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   // disable next load from cache input values ?
   private _disableNextLoadCachedInputValues: boolean = false;
   private _loadedCachedFilterPage: string;
-  private _disableFilterCaching: boolean = false;
-  get disableFilterCaching(): boolean {
-    return this._disableFilterCaching;
-  }
+  private readonly _disableFilterCaching: boolean = false;
+  private readonly _disableFilterCachingOnlyUrl: boolean = false;
 
   // timers
   private _initializeTimer: number;
@@ -225,6 +224,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     config?: {
       // optional
       disableFilterCaching?: boolean,
+      disableFilterCachingOnlyUrl?: boolean,
       disableWaitForSelectedOutbreakToRefreshList?: boolean,
       initializeTableColumnsAfterSelectedOutbreakChanged?: boolean,
       initializeTableAdvancedFiltersAfterSelectedOutbreakChanged?: boolean
@@ -337,6 +337,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
 
+        // merge default fields
+        this.listHelperService.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.selectedOutbreak);
+
         // stop previous
         this.stopOutbreakChangedTimer();
 
@@ -403,6 +406,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
     // disable filter caching ?
     this._disableFilterCaching = !!config?.disableFilterCaching;
+    this._disableFilterCachingOnlyUrl = !!config?.disableFilterCachingOnlyUrl;
 
     // check filters
     this.checkListFilters();
@@ -1067,6 +1071,12 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Save cache to url
    */
   private saveCacheToUrl(currentUserCache: ICachedFilterItems): void {
+    // disabled ?
+    if (this._disableFilterCachingOnlyUrl) {
+      return;
+    }
+
+    // update
     this.mergeQueryParamsToUrl({
       cachedListFilters: JSON.stringify(currentUserCache)
     });
@@ -1369,5 +1379,19 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         this.pageSize = this.queryBuilder.paginator.limit;
       }
     }
+  }
+
+  /**
+   * Check if a column should be visible depending on outbreak visible/mandatory settings
+   */
+  protected shouldVisibleMandatoryTableColumnBeVisible(
+    visibleMandatoryKey: string,
+    prop: string
+  ): boolean {
+    return this.listHelperService.model.shouldVisibleMandatoryTableColumnBeVisible(
+      this.selectedOutbreak,
+      visibleMandatoryKey,
+      prop
+    );
   }
 }

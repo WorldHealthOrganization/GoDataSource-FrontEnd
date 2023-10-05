@@ -1,9 +1,8 @@
 import * as _ from 'lodash';
 import { UserModel } from './user.model';
-import { Moment } from 'moment';
-import * as moment from 'moment';
 import { IPermissionBasic } from './permission.interface';
 import { PERMISSION } from './permission.model';
+import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
 
 /**
  * Saved side filter sort
@@ -152,7 +151,7 @@ implements IPermissionBasic {
     // updated at
     this.updatedAt = _.get(data, 'updatedAt');
     if (this.updatedAt) {
-      this.updatedAt = moment.utc(this.updatedAt);
+      this.updatedAt = LocalizationHelper.toMoment(this.updatedAt);
     }
 
     // updated by

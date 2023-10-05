@@ -4,22 +4,19 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { Observable, throwError } from 'rxjs';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
-import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { Constants } from '../../../../core/models/constants';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-lab-results-bulk-modify',
@@ -36,23 +33,22 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected labResultDataService: LabResultDataService,
-    protected toastV2Service: ToastV2Service,
-    protected i18nService: I18nService,
+    protected renderer2: Renderer2,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected router: Router,
     protected referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve data
@@ -91,7 +87,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
       );
 
       // retrieve lab results details
-      this.labResultDataService
+      this.personAndRelatedHelperService.labResult.labResultDataService
         .getOutbreakLabResults(
           this.selectedOutbreak.id,
           qb
@@ -271,7 +267,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
    */
   private initializeDetailTab(): ICreateViewModifyV2Tab {
     // modify ?
-    return {
+    return this.personAndRelatedHelperService.createViewModify.tabFilter({
       // Details
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'details',
@@ -280,6 +276,9 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
         {
           type: CreateViewModifyV2TabInputType.SECTION,
           label: null,
+          visibleMandatoryConf: {
+            dontFilter: true
+          },
           inputs: [
             // warnings
             {
@@ -299,12 +298,12 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
                 label: result.labName ?
                   `${
                     (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName] ?
-                      this.i18nService.instant((this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName].value) :
+                      this.personAndRelatedHelperService.i18nService.instant((this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName].value) :
                       '—'
-                  } (${result.dateSampleTaken ? moment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '—'})` :
+                  } (${result.dateSampleTaken ? LocalizationHelper.displayDate(result.dateSampleTaken) : '—'})` :
                   (
                     result.dateSampleTaken ?
-                      moment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                      LocalizationHelper.displayDate(result.dateSampleTaken) :
                       '—'
                   ),
                 action: {
@@ -484,7 +483,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
           ]
         }
       ]
-    };
+    }, this.personAndRelatedHelperService.labResult.visibleMandatoryKey, this.selectedOutbreak);
   }
 
   /**
@@ -531,7 +530,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
       // something went wrong ?
       if (selectedLabResultsIds.length < 1) {
         // show error
-        this.toastV2Service.error('LNG_PAGE_MODIFY_LAB_RESULT_LIST_ERROR_NO_LAB_RESULTS_SELECTED');
+        this.personAndRelatedHelperService.toastV2Service.error('LNG_PAGE_MODIFY_LAB_RESULT_LIST_ERROR_NO_LAB_RESULTS_SELECTED');
 
         // don't do anything
         return;
@@ -546,7 +545,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
       });
 
       // do request
-      this.labResultDataService
+      this.personAndRelatedHelperService.labResult.labResultDataService
         .bulkModifyLabResults(
           this.selectedOutbreak.id,
           data,
@@ -567,7 +566,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
         )
         .subscribe((items) => {
           // success updating event
-          this.toastV2Service.success('LNG_PAGE_MODIFY_LAB_RESULT_LIST_ACTION_MODIFY_MULTIPLE_LAB_RESULTS_SUCCESS_MESSAGE');
+          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_MODIFY_LAB_RESULT_LIST_ACTION_MODIFY_MULTIPLE_LAB_RESULTS_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, items);

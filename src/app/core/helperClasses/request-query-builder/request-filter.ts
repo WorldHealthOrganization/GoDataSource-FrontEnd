@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
-import { moment } from '../x-moment';
 import { RequestFilterGenerator } from './request-filter-generator';
+import { LocalizationHelper } from '../localization-helper';
 
 export enum RequestFilterOperator {
   AND = 'and',
@@ -313,17 +313,14 @@ export class RequestFilter {
   }
 
   /**
-     * Filter by comparing a field if it is equal to the provided value
-     * @param {string} property
-     * @param {string | number} value
-     * @param {boolean} replace
-     * @returns {RequestFilter}
-     */
+   * Filter by comparing a field if it is equal to the provided value
+   */
   byEquality(
     property: string,
     value: string | number,
     replace: boolean = true,
-    caseInsensitive: boolean = false
+    caseInsensitive: boolean = false,
+    useLike?: boolean
   ): RequestFilter {
     if (
       _.isEmpty(value) &&
@@ -339,7 +336,10 @@ export class RequestFilter {
       // use regexp for case insensitive compare
       if (caseInsensitive) {
         this.where({
-          [property]: RequestFilterGenerator.textIs(value as string)
+          [property]: RequestFilterGenerator.textIs(
+            value as string,
+            useLike
+          )
         }, replace, false);
       } else {
         // case sensitive search
@@ -614,10 +614,10 @@ export class RequestFilter {
     // convert date range to simple range
     const rangeValue: any = {};
     if (value.startDate) {
-      rangeValue.from = value.startDate.toISOString ? value.startDate.toISOString() : moment(value.startDate).toISOString();
+      rangeValue.from = value.startDate.toISOString ? value.startDate.toISOString() : LocalizationHelper.toMoment(value.startDate).toISOString();
     }
     if (value.endDate) {
-      rangeValue.to = value.endDate.toISOString ? value.endDate.toISOString() : moment(value.endDate).toISOString();
+      rangeValue.to = value.endDate.toISOString ? value.endDate.toISOString() : LocalizationHelper.toMoment(value.endDate).toISOString();
     }
 
     // filter by range
@@ -699,16 +699,15 @@ export class RequestFilter {
   }
 
   /**
-     * Filter all records that have a value on a specific field
-     * @param property
-     */
-  byHasValue(
-    property: string
-  ): RequestFilter {
+   * Filter all records that have a value on a specific field
+   */
+  byHasValue(property: string): RequestFilter {
     // filter no values
-    this.where({
-      [property]: RequestFilterGenerator.hasValue()
-    }, false, false);
+    this.where(
+      RequestFilterGenerator.hasValue(property),
+      false,
+      false
+    );
 
     // trigger change
     this.triggerChangeListener();
@@ -722,12 +721,14 @@ export class RequestFilter {
    */
   byNotHavingValue(
     property: string,
+    checkForEmptyString: boolean,
     forMongo: boolean = false
   ): RequestFilter {
     // filter no values
     this.where(
       RequestFilterGenerator.doesntHaveValue(
         property,
+        checkForEmptyString,
         forMongo
       ),
       false,

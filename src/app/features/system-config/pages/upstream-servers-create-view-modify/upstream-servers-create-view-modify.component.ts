@@ -4,18 +4,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { catchError } from 'rxjs/operators';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
@@ -35,22 +36,24 @@ export class UpstreamServersCreateViewModifyComponent extends CreateViewModifyCo
    * Constructor
    */
   constructor(
-    protected systemSettingsDataService: SystemSettingsDataService,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected i18nService: I18nService,
-    protected router: Router,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected systemSettingsDataService: SystemSettingsDataService,
+    protected router: Router
   ) {
     // parent
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // map upstream servers

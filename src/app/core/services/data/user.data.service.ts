@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { UserModel } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { PasswordChangeModel } from '../../models/password-change.model';
-import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { SecurityQuestionModel } from '../../models/securityQuestion.model';
 import * as _ from 'lodash';
 import { mergeMap } from 'rxjs/operators';
@@ -19,9 +19,8 @@ export class UserDataService {
   ) {}
 
   /**
-     * Retrieve the list of Users
-     * @returns {Observable<UserModel[]>}
-     */
+   * Retrieve the list of Users
+   */
   getUsersList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<UserModel[]> {
     // include roles and permissions in response
     const qb = new RequestQueryBuilder();
@@ -36,16 +35,15 @@ export class UserDataService {
   }
 
   /**
-     * Retrieve the list of Users sorted by firstName Asc, lastName Asc
-     * @returns {Observable<UserModel[]>}
-     */
-  getUsersListSorted(): Observable<UserModel[]> {
-    // retrieve user
-    const sortUserQb = new RequestQueryBuilder();
-    sortUserQb.sort
-      .by('firstName', RequestSortDirection.ASC)
-      .by('lastName', RequestSortDirection.ASC);
-    return this.getUsersList(sortUserQb);
+   * Retrieve the list of users with limited information
+   */
+  getUsersListForFilters(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<UserModel[]> {
+    // include roles and permissions in response
+    const where = queryBuilder.filter.generateCondition(true);
+    return this.modelHelper.mapObservableListToModel(
+      this.http.get(`users/for-filters?where=${where}`),
+      UserModel
+    );
   }
 
   /**

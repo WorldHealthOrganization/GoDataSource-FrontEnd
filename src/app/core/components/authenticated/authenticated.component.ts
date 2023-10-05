@@ -15,13 +15,12 @@ import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
 import { DebounceTimeCaller, DebounceTimeCallerType } from '../../helperClasses/debounce-time-caller';
 import { throwError } from 'rxjs';
 import { ITokenInfo } from '../../models/auth.model';
-import { Moment } from 'moment';
-import * as moment from 'moment';
 import { UserDataService } from '../../services/data/user.data.service';
 import { catchError } from 'rxjs/operators';
 import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
 
 @Component({
   selector: 'app-authenticated',
@@ -65,6 +64,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   private routerEventsSubscriptionLoad: Subscription;
   private routerEventsSubscriptionRepetitive: Subscription;
   private tokenInfoSubjectSubscription: Subscription;
+  private _determineSelectedOutbreakSubscription: Subscription;
+  private _getSelectedOutbreakSubscription: Subscription;
 
   // constants
   RenderMode = RenderMode;
@@ -95,7 +96,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
           this.tokenInfo &&
           this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS &&
           this.tokenInfo.approximatedExpireInSecondsReal < AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE &&
-          Math.floor(moment().diff(this.lastInputTime) / 1000) < AuthenticatedComponent.REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS
+          Math.floor(LocalizationHelper.now().diff(this.lastInputTime) / 1000) < AuthenticatedComponent.REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS
         ) {
           // retrieve the user instance or log out
           this.refreshUserTokenOrLogOut(true);
@@ -188,10 +189,14 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
 
     // determine the Selected Outbreak and display message if different than the active one.
     if (OutbreakModel.canView(this._authUser)) {
-      this.outbreakDataService
+      this._determineSelectedOutbreakSubscription = this.outbreakDataService
         .determineSelectedOutbreak()
         .subscribe(() => {
-          this.outbreakDataService.getSelectedOutbreakSubject()
+          // release
+          this.stopGetSelectedOutbreak();
+
+          // trigger
+          this._getSelectedOutbreakSubscription = this.outbreakDataService.getSelectedOutbreakSubject()
             .subscribe(() => {
               this.outbreakDataService.checkActiveSelectedOutbreak();
             });
@@ -267,6 +272,15 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       this.tokenCheckIfLoggedOutCaller = null;
     }
 
+    // release
+    this.stopGetSelectedOutbreak();
+
+    // release
+    if (this._determineSelectedOutbreakSubscription) {
+      this._determineSelectedOutbreakSubscription.unsubscribe();
+      this._determineSelectedOutbreakSubscription = undefined;
+    }
+
     // stop timers
     this.stopTokenExpireTimer();
 
@@ -303,13 +317,23 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop get selected outbreak
+   */
+  private stopGetSelectedOutbreak(): void {
+    if (this._getSelectedOutbreakSubscription) {
+      this._getSelectedOutbreakSubscription.unsubscribe();
+      this._getSelectedOutbreakSubscription = undefined;
+    }
+  }
+
+  /**
    * Refresh last input time
    */
   private refreshLastInputTime() {
     if (!this.lastInputTime) {
-      this.lastInputTime = moment();
-    } else if (moment().diff(this.lastInputTime) / 1000 > 3) {
-      this.lastInputTime = moment();
+      this.lastInputTime = LocalizationHelper.now();
+    } else if (LocalizationHelper.now().diff(this.lastInputTime) / 1000 > 3) {
+      this.lastInputTime = LocalizationHelper.now();
     }
   }
 
@@ -437,7 +461,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     // don't allow spam :)
     if (
       this.lastRefreshUserTokenOrLogOut &&
-      Math.floor(moment().diff(this.lastRefreshUserTokenOrLogOut) / 1000) < AuthenticatedComponent.REFRESH_DISABLE_SECONDS
+      Math.floor(LocalizationHelper.now().diff(this.lastRefreshUserTokenOrLogOut) / 1000) < AuthenticatedComponent.REFRESH_DISABLE_SECONDS
     ) {
       // check again later
       this.tokenCheckIfLoggedOutCaller.call();
@@ -450,7 +474,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     this.showLoading();
 
     // retrieve the user instance
-    this.lastRefreshUserTokenOrLogOut = moment();
+    this.lastRefreshUserTokenOrLogOut = LocalizationHelper.now();
     this.userDataService
       .getUser(this._authUser.id)
       .pipe(catchError((err) => {

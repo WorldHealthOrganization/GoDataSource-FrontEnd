@@ -4,13 +4,11 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { catchError, map, takeUntil } from 'rxjs/operators';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import * as _ from 'lodash';
-import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
-import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ActivatedRoute } from '@angular/router';
@@ -20,13 +18,10 @@ import { Location } from '@angular/common';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import * as momentOriginal from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { AddressModel } from '../../../../core/models/address.model';
@@ -34,8 +29,12 @@ import { UserModel } from '../../../../core/models/user.model';
 import {
   FollowUpCreateViewModifyComponent
 } from '../follow-up-create-view-modify/follow-up-create-view-modify.component';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { IV2ColumnToVisibleMandatoryConf, V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -44,7 +43,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
   encapsulation: ViewEncapsulation.None
 })
 export class ContactRangeFollowUpsListComponent
-  extends ListComponent<any>
+  extends ListComponent<any, IV2ColumnToVisibleMandatoryConf>
   implements OnDestroy {
 
   // filter address
@@ -55,6 +54,9 @@ export class ContactRangeFollowUpsListComponent
   // person type options
   private _personTypeOptions: ILabelValuePairModel[] = [
     {
+      label: EntityType.CONTACT_OF_CONTACT,
+      value: EntityType.CONTACT_OF_CONTACT
+    }, {
       label: EntityType.CONTACT,
       value: EntityType.CONTACT
     }, {
@@ -64,20 +66,17 @@ export class ContactRangeFollowUpsListComponent
   ];
 
   // default table columns
-  defaultTableColumns: IV2Column[];
+  defaultTableColumns: IV2ColumnToVisibleMandatoryConf[];
 
   /**
    * Constructor
    */
   constructor(
     protected listHelperService: ListHelperService,
-    private followUpsDataService: FollowUpsDataService,
     private activatedRoute: ActivatedRoute,
     private location: Location,
-    private toastV2Service: ToastV2Service,
-    private dialogV2Service: DialogV2Service,
-    private i18nService: I18nService,
-    private referenceDataHelperService: ReferenceDataHelperService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
@@ -133,19 +132,36 @@ export class ContactRangeFollowUpsListComponent
       {
         field: 'name',
         label: 'LNG_ENTITY_FIELD_LABEL_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'lastName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         format: {
           type: 'person.name'
         },
         link: (data) => {
-          return data.person.type === EntityType.CASE ?
-            (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
-            (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+          return data.person.canView(this.authUser) ? EntityModel.getPersonLink(data.person) : undefined;
         },
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH,
-          search: (column: IV2Column) => {
+          search: (column) => {
             // value
             const value: string = (column.filter as IV2FilterText).value;
 
@@ -179,13 +195,21 @@ export class ContactRangeFollowUpsListComponent
       }, {
         field: 'visualId',
         label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'visualId'
+        ),
         format: {
           type: 'person.visualId'
         },
         link: (data) => {
-          return data.person.type === EntityType.CASE ?
-            (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
-            (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+          return data.person.canView(this.authUser) ? EntityModel.getPersonLink(data.person) : undefined;
         },
         pinned: IV2ColumnPinned.LEFT,
         filter: {
@@ -196,6 +220,16 @@ export class ContactRangeFollowUpsListComponent
       }, {
         field: 'locationId',
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.locationId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.locationId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.locationId'
+        ),
         format: {
           type: 'person.mainAddress.location.name'
         },
@@ -214,6 +248,16 @@ export class ContactRangeFollowUpsListComponent
       }, {
         field: 'phoneNumber',
         label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.phoneNumber'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.phoneNumber'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.phoneNumber'
+        ),
         notVisible: true,
         format: {
           type: 'person.mainAddress.phoneNumber'
@@ -229,6 +273,16 @@ export class ContactRangeFollowUpsListComponent
       {
         field: 'emailAddress',
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.emailAddress'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.emailAddress'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.emailAddress'
+        ),
         notVisible: true,
         format: {
           type: 'person.mainAddress.emailAddress'
@@ -245,6 +299,16 @@ export class ContactRangeFollowUpsListComponent
       {
         field: 'addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.addressLine1'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.addressLine1'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.addressLine1'
+        ),
         notVisible: true,
         format: {
           type: 'person.mainAddress.addressLine1'
@@ -261,6 +325,16 @@ export class ContactRangeFollowUpsListComponent
       {
         field: 'city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.city'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.city'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.city'
+        ),
         notVisible: true,
         format: {
           type: 'person.mainAddress.city'
@@ -277,6 +351,7 @@ export class ContactRangeFollowUpsListComponent
       {
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.DATE,
           field: 'person.dateOfLastContact'
@@ -289,6 +364,7 @@ export class ContactRangeFollowUpsListComponent
       {
         field: 'followUp.endDate',
         label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.DATE,
           field: 'person.followUp.endDate'
@@ -300,7 +376,11 @@ export class ContactRangeFollowUpsListComponent
       },
       {
         field: 'followUpTeamId',
-        label: `${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.i18nService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM').toLowerCase()}`,
+        label: `${this.personAndRelatedHelperService.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.personAndRelatedHelperService.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.personAndRelatedHelperService.i18nService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM').toLowerCase()}`,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'followUpTeamId'
+        ),
         format: {
           type: (data) => {
             return data.person.followUpTeamId && (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
@@ -324,10 +404,11 @@ export class ContactRangeFollowUpsListComponent
       }, {
         field: 'type',
         label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: (data) => data.person?.type ?
-            this.i18nService.instant(data.person.type) :
+            this.personAndRelatedHelperService.i18nService.instant(data.person.type) :
             ''
         },
         filter: {
@@ -339,10 +420,20 @@ export class ContactRangeFollowUpsListComponent
       {
         field: 'occupation',
         label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_OCCUPATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'occupation'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'occupation'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'occupation'
+        ),
         notVisible: true,
         format: {
           type: (data) => data.person?.occupation ?
-            this.i18nService.instant(data.person.occupation) :
+            this.personAndRelatedHelperService.i18nService.instant(data.person.occupation) :
             ''
         },
         filter: {
@@ -358,10 +449,20 @@ export class ContactRangeFollowUpsListComponent
       {
         field: 'riskLevel',
         label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_RISK',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'riskLevel'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'riskLevel'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'riskLevel'
+        ),
         notVisible: true,
         format: {
           type: (data) => data.person?.riskLevel ?
-            this.i18nService.instant(data.person.riskLevel) :
+            this.personAndRelatedHelperService.i18nService.instant(data.person.riskLevel) :
             ''
         },
         filter: {
@@ -377,6 +478,16 @@ export class ContactRangeFollowUpsListComponent
       {
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'responsibleUserId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'responsibleUserId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'responsibleUserId'
+        ),
         notVisible: true,
         format: {
           type: (item) => item.person?.responsibleUserId && (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[item.person?.responsibleUserId] ?
@@ -422,15 +533,25 @@ export class ContactRangeFollowUpsListComponent
    */
   protected initializeTableAdvancedFilters(): void {
     // data
-    const personLabel: string = `${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')}`;
+    const personLabel: string = `${this.personAndRelatedHelperService.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.personAndRelatedHelperService.i18nService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')}`;
 
     // advanced filters
-    this.advancedFilters = [
+    const advancedFilters: V2AdvancedFilterToVisibleMandatoryConf[] = [
       // case / contact
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'firstName'
+        ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
       },
@@ -438,6 +559,16 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
         label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'lastName'
+        ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
       },
@@ -445,6 +576,16 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
         label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'visualId'
+        ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
       },
@@ -452,6 +593,16 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.LOCATION_MULTIPLE,
         field: 'addresses',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.locationId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.locationId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.locationId'
+        ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
       },
@@ -459,6 +610,16 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.phoneNumber',
         label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.phoneNumber'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.phoneNumber'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.phoneNumber'
+        ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
       },
@@ -466,6 +627,16 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.emailAddress',
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.emailAddress'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.emailAddress'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.emailAddress'
+        ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
       },
@@ -473,6 +644,16 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.addressLine1'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.addressLine1'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.addressLine1'
+        ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
       },
@@ -480,6 +661,16 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.city'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.city'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'addresses.city'
+        ),
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
       },
@@ -487,6 +678,7 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        visibleMandatoryIf: () => true,
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
       },
@@ -494,47 +686,73 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'followUp.endDate',
         label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP',
+        visibleMandatoryIf: () => true,
         childQueryBuilderKey: 'contact',
         relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'followUpTeamId',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'followUpTeamId'
+        ),
         childQueryBuilderKey: 'contact',
         options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
         relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'type',
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
+        visibleMandatoryIf: () => true,
         childQueryBuilderKey: 'contact',
         options: this._personTypeOptions,
-        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
         relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'occupation',
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_OCCUPATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'occupation'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'occupation'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'occupation'
+        ),
         childQueryBuilderKey: 'contact',
         options: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
-        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_OCCUPATION',
         relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'riskLevel',
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_RISK',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'riskLevel'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'riskLevel'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'riskLevel'
+        ),
         childQueryBuilderKey: 'contact',
         options: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
-        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_RISK',
         relationshipLabel: personLabel
       },
 
@@ -543,17 +761,29 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
+          'date'
+        ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'teamId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
+          'teamId'
+        ),
         options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'statusId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
+          'statusId'
+        ),
         options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       },
@@ -561,44 +791,74 @@ export class ContactRangeFollowUpsListComponent
         type: V2AdvancedFilterType.LOCATION_MULTIPLE,
         field: 'address',
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
+          'address.locationId'
+        ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.phoneNumber',
         label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
+          'address.phoneNumber'
+        ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.emailAddress',
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
+          'address.emailAddress'
+        ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
+          'address.addressLine1'
+        ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'address.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
+          'address.city'
+        ),
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }
     ];
 
     // restricted filters - user
     if (UserModel.canListForFilters(this.authUser)) {
-      this.advancedFilters.push(
+      advancedFilters.push(
         // person
         {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'responsibleUserId',
+          label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+          visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+            this.personAndRelatedHelperService.case.visibleMandatoryKey,
+            'responsibleUserId'
+          ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+            this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+            'responsibleUserId'
+          ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+            this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+            'responsibleUserId'
+          ),
           childQueryBuilderKey: 'contact',
           options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-          label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
           relationshipLabel: personLabel
         },
 
@@ -606,12 +866,19 @@ export class ContactRangeFollowUpsListComponent
         {
           type: V2AdvancedFilterType.MULTISELECT,
           field: 'responsibleUserId',
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+          visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+            this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
+            'responsibleUserId'
+          ),
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
           relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
         }
       );
     }
+
+    // update
+    this.advancedFilters = this.personAndRelatedHelperService.list.filterVisibleMandatoryAdvancedFilters(advancedFilters);
   }
 
   /**
@@ -632,7 +899,7 @@ export class ContactRangeFollowUpsListComponent
           },
           action: {
             click: () => {
-              this.dialogV2Service.showExportData({
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
                 title: {
                   get: () => 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_TITLE'
                 },
@@ -640,7 +907,7 @@ export class ContactRangeFollowUpsListComponent
                   url: `outbreaks/${this.selectedOutbreak.id}/contacts/range-list/export`,
                   async: false,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
                   allow: {
                     types: [
                       ExportDataExtension.PDF
@@ -762,7 +1029,7 @@ export class ContactRangeFollowUpsListComponent
       );
 
     // retrieve list
-    this.records$ = this.followUpsDataService
+    this.records$ = this.personAndRelatedHelperService.followUp.followUpsDataService
       .getRangeFollowUpsList(
         this.selectedOutbreak.id,
         this.queryBuilder
@@ -779,13 +1046,13 @@ export class ContactRangeFollowUpsListComponent
             [date: string]: true
           } = {};
           const followUpsGroupedByContact: {
-            person: ContactModel | CaseModel,
+            person: ContactOfContactModel | ContactModel | CaseModel,
             followUps: {
               [date: string]: FollowUpModel[]
             }
           }[] = (rangeData || []).map((data) => {
             // determine follow-up questionnaire alertness
-            data.followUps = FollowUpModel.determineAlertness(
+            data.followUps = this.personAndRelatedHelperService.followUp.determineAlertness(
               this.selectedOutbreak.contactFollowUpTemplate,
               data.followUps
             );
@@ -806,20 +1073,20 @@ export class ContactRangeFollowUpsListComponent
               }
 
               // process date
-              followUp.date = moment(followUp.date).startOf('day');
+              followUp.date = LocalizationHelper.toMoment(followUp.date).startOf('day');
 
               // determine min & max dates
               if (followUp.statusId) {
                 minDate = minDate ?
-                  (followUp.date.isBefore(minDate) ? moment(followUp.date) : minDate) :
-                  moment(followUp.date);
+                  (followUp.date.isBefore(minDate) ? LocalizationHelper.toMoment(followUp.date) : minDate) :
+                  LocalizationHelper.toMoment(followUp.date);
                 maxDate = maxDate ?
-                  (followUp.date.isAfter(maxDate) ? moment(followUp.date) : maxDate) :
-                  moment(followUp.date);
+                  (followUp.date.isAfter(maxDate) ? LocalizationHelper.toMoment(followUp.date) : maxDate) :
+                  LocalizationHelper.toMoment(followUp.date);
               }
 
               // init ?
-              const formattedDate: string = followUp.date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const formattedDate: string = LocalizationHelper.displayDate(followUp.date);
               if (!followUpGrouped[formattedDate]) {
                 followUpGrouped[formattedDate] = [];
               }
@@ -847,7 +1114,7 @@ export class ContactRangeFollowUpsListComponent
           });
 
           // create dates array
-          const daysColumns: IV2Column[] = [];
+          const daysColumns: IV2ColumnToVisibleMandatoryConf[] = [];
           if (
             minDate &&
             maxDate
@@ -856,11 +1123,12 @@ export class ContactRangeFollowUpsListComponent
             while (minDate.isSameOrBefore(maxDate)) {
               // add day to list
               // - exclude dates with no data
-              const formattedFieldDate: string = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const formattedFieldDate: string = LocalizationHelper.displayDate(minDate);
               if (usedDates[formattedFieldDate]) {
                 daysColumns.push({
                   field: formattedFieldDate,
                   label: minDate.format('YYYY<br />MMM D'),
+                  visibleMandatoryIf: () => true,
                   notMovable: true,
                   lockPosition: 'right',
                   width: 65,
@@ -942,9 +1210,10 @@ export class ContactRangeFollowUpsListComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // count
-    this.followUpsDataService
+    this.personAndRelatedHelperService.followUp.followUpsDataService
       .getRangeFollowUpsListCount(
         this.selectedOutbreak.id,
         countQueryBuilder
@@ -952,7 +1221,7 @@ export class ContactRangeFollowUpsListComponent
       .pipe(
         // error
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         }),
 

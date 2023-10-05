@@ -2,10 +2,8 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -18,10 +16,13 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-help-category-create-view-modify',
@@ -33,22 +34,24 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected helpDataService: HelpDataService,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    protected dialogV2Service: DialogV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected i18nService: I18nService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected router: Router,
+    protected helpDataService: HelpDataService,
+    protected dialogV2Service: DialogV2Service
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService,
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService,
       true
     );
   }

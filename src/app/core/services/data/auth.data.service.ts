@@ -8,12 +8,11 @@ import { AuthModel, IAuthTwoFactor, ITokenInfo } from '../../models/auth.model';
 import { UserModel } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { DebounceTimeCaller, DebounceTimeCallerType } from '../../helperClasses/debounce-time-caller';
 import { SystemSettingsDataService } from './system-settings.data.service';
 import { environment } from '../../../../environments/environment';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
 
 @Injectable()
 export class AuthDataService {
@@ -256,7 +255,7 @@ export class AuthDataService {
     this.tokenInfo = {
       token: authToken,
       ttl: defaultTTL,
-      lastReset: moment(),
+      lastReset: LocalizationHelper.now(),
       info: {
         ttl: defaultTTL,
         isValid: false,
@@ -305,7 +304,7 @@ export class AuthDataService {
     }
 
     // determine number of seconds passed since we last made a request to api that should've reset the token ttl
-    const passedSecondsSinceCreation: number = Math.floor(moment().diff(this.tokenInfo.lastReset) / 1000);
+    const passedSecondsSinceCreation: number = Math.floor(LocalizationHelper.now().diff(this.tokenInfo.lastReset) / 1000);
 
     // determine approximate remaining seconds
     if (this.tokenInfo.ttl > 0) {
@@ -339,7 +338,7 @@ export class AuthDataService {
     // check if the minimum number of seconds have passed since our last call
     if (
       this.lastTokenInfoCalledSubscribers &&
-            Math.floor(moment().diff(this.lastTokenInfoCalledSubscribers) / 1000) <= AuthDataService.TOKEN_INFO_CALL_FREQUENCY_SECONDS
+            Math.floor(LocalizationHelper.now().diff(this.lastTokenInfoCalledSubscribers) / 1000) <= AuthDataService.TOKEN_INFO_CALL_FREQUENCY_SECONDS
     ) {
       return;
     }
@@ -348,7 +347,7 @@ export class AuthDataService {
     this.tokenInfoSubscriberSubject.next(this.tokenInfo.info);
 
     // update last call time
-    this.lastTokenInfoCalledSubscribers = moment();
+    this.lastTokenInfoCalledSubscribers = LocalizationHelper.now();
   }
 
   /**
@@ -361,7 +360,7 @@ export class AuthDataService {
     }
 
     // reset token time
-    this.tokenInfo.lastReset = moment();
+    this.tokenInfo.lastReset = LocalizationHelper.now();
 
     // do the math
     this.determineTokenInfo();

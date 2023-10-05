@@ -1,0 +1,357 @@
+@import 'mixins';
+
+/* Visible and Mandatory */
+.gd-form-visible-mandatory-v2 {
+  height: 100%;
+
+  /* Visible and Mandatory Top Section */
+  .gd-form-visible-mandatory-v2-top {
+    border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 1.6rem;
+
+    @include breakpoint('xs') {
+      padding: 0.4rem;
+    }
+
+    button.mat-flat-button,
+    a.mat-flat-button {
+      @include breakpoint('xxs') {
+        padding: 0.8rem;
+      }
+    }
+
+    /* Search */
+    app-form-input-v2 {
+      .mat-form-field-wrapper {
+        .mat-form-field-subscript-wrapper {
+          min-height: 0;
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  /* Visible and Mandatory List */
+  .gd-form-visible-mandatory-v2-list {
+    height: calc(100% - 11.2rem);
+    min-height: 19rem;
+
+    @include breakpoint('xs') {
+      height: calc(100% - 4.9rem);
+      min-height: 10rem;
+    }
+
+    .cdk-virtual-scroll-viewport {
+      height: 100%;
+      overflow-y: overlay;
+      overflow-x: hidden;
+
+      .cdk-virtual-scroll-content-wrapper {
+        width: 100%;
+      }
+
+      .gd-form-visible-mandatory-v2-list-item {
+        border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        height: 3.1rem;
+        padding: 0.3rem 0 0.3rem 1.6rem;
+
+        @include breakpoint('xs') {
+          padding-left: 0.8rem;
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group,
+        .gd-form-visible-mandatory-v2-list-item-group-tab,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section {
+          > .mat-icon {
+            background: rgba(var(--gd-secondary-rgb), 0.35);
+            border-radius: 0.4rem;
+            color: var(--gd-text);
+            cursor: pointer;
+            font-size: 1.6rem;
+            height: 2.4rem;
+            line-height: 1;
+            margin-right: 0.8rem;
+            min-width: 2.4rem;
+            padding: 0.4rem;
+            text-align: center;
+            width: 2.4rem;
+          }
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group {
+          padding: 0 1.6rem 0 0;
+
+          @include breakpoint('xs') {
+            padding-right: 0.8rem;
+          }
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab {
+          padding: 0 1.6rem 0 3.2rem;
+
+          @include breakpoint('xs') {
+            padding-right: 0.8rem;
+          }
+
+          @include breakpoint('xxs') {
+            padding-left: 2.4rem;
+          }
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section {
+          padding: 0 1.6rem 0 6.4rem;
+
+          @include breakpoint('xs') {
+            padding-right: 0.8rem;
+          }
+
+          @include breakpoint('xxs') {
+            padding-left: 4.8rem;
+          }
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field {
+          padding: 0 1.6rem 0 9.6rem;
+
+          @include breakpoint('xs') {
+            padding-right: 0.8rem;
+          }
+
+          @include breakpoint('xxs') {
+            padding-left: 7.2rem;
+          }
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-required {
+          margin-left: auto;
+        }
+
+        .gd-form-checkbox-v2 {
+          .mat-checkbox {
+            &.mat-checkbox-disabled {
+              opacity: 0.5;
+
+              .mat-checkbox-frame {
+                border-color: var(--gd-secondary);
+              }
+
+              .mat-checkbox-label {
+                color: var(--gd-secondary);
+              }
+            }
+          }
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-default,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-required-default {
+          .gd-form-checkbox-v2 {
+            .mat-checkbox {
+              &.mat-checkbox-indeterminate,
+              &.mat-checkbox-checked {
+                &.mat-checkbox-disabled {
+                  .mat-checkbox-frame {
+                    border-color: var(--gd-primary);
+                  }
+  
+                  .mat-checkbox-background {
+                    background-color: var(--gd-primary);
+                  }
+  
+                  .mat-checkbox-label {
+                    color: var(--gd-primary);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-content,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible {
+          margin-right: 0.8rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-with-needs {
+          .mat-checkbox-label {
+            position: relative;
+            top: -0.5rem;
+          }
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs {
+          color: var(--gd-secondary);
+          font-size: 1.1rem;
+          line-height: 1rem;
+          padding-left: 2.8rem;
+          position: relative;
+          top: -0.7rem;
+          z-index: -1;
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-field-visible-needs-invalid {
+          color: var(--gd-danger);
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-buttons,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-buttons,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-buttons {
+          @include flex_align_items(center);
+          @include flex(flex);
+          @include flex_direction(row);
+          gap: 0.8rem;
+
+          @include breakpoint('xs') {
+            gap: 0.4rem;
+            padding-right: 0.4rem;
+          }
+
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            min-width: 2.4rem;
+            padding: 0.4rem;
+            width: 2.4rem;
+
+            .mat-icon {
+              font-size: 1.6rem;
+            }
+          }
+        }
+
+        .gd-form-visible-mandatory-v2-list-item-group-count,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-count,
+        .gd-form-visible-mandatory-v2-list-item-group-tab-section-count {
+          margin-right: 1.6rem;
+
+          @include breakpoint('xxs') {
+            display: none;
+          }
+
+          .visible {
+            color: var(--gd-primary);
+          }
+
+          .mandatory {
+            color: rgba(var(--gd-primary-rgb), 0.5);
+          }
+
+          .total {
+            color: var(--gd-text);
+          }
+
+          .separator {
+            color: var(--gd-secondary);
+            font-weight: normal;
+          }
+        }
+
+        &.gd-form-visible-mandatory-v2-list-item-group-expanded {
+          background: rgba(var(--gd-warning-rgb), 0.2);
+          font-weight: 700;
+
+          &:hover {
+            background: rgba(var(--gd-warning-rgb), 0.2);
+          }
+        }
+
+        &.gd-form-visible-mandatory-v2-list-item-group-tab-expanded {
+          background: rgba(var(--gd-warning-rgb), 0.1);
+          font-weight: 700;
+
+          &:hover {
+            background: rgba(var(--gd-warning-rgb), 0.1);
+          }
+        }
+
+        &:hover {
+          background: rgba(var(--gd-warning-rgb), 0.05);
+        }
+      }
+    }
+  }
+
+  /* Editor Legend Section */
+  .gd-form-visible-mandatory-v2-legend {
+    border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 0.8rem 0;
+
+    .gd-form-visible-mandatory-v2-legend-title {
+      color: var(--gd-secondary);
+      font-size: 1.2rem;
+      margin-left: 0.8rem;
+      text-transform: uppercase;
+
+      @include breakpoint('sm') {
+        position: relative;
+        top: 0.2rem;
+      }
+    }
+
+    .gd-form-visible-mandatory-v2-legend-items {
+      .gd-form-visible-mandatory-v2-legend-items-item {
+        @include flex_align_items(center);
+        @include flex(flex);
+        @include flex_direction(row);
+        font-size: 1.2rem;
+        margin-left: 0.8rem;
+
+        span {
+          color: var(--gd-secondary);
+          font-style: italic;
+        }
+
+        .mat-icon {
+          font-size: 2.4rem;
+          height: 2.2rem;
+          margin-right: 0.4rem;
+          width: 2.2rem;
+
+          + span {
+            color: var(--gd-text);
+            font-style: normal;
+            white-space: nowrap;
+          }
+        }
+      }
+    }
+  }
+
+  /* Empty */
+  .gd-form-visible-mandatory-v2-list-empty {
+    height: 100%;
+
+    .gd-form-visible-mandatory-v2-list-empty-image {
+      background-image: url(../../../../../assets/images/nothing-found.svg);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 25rem;
+      width: 25rem;
+
+      @include breakpoint('xs') {
+        height: 15rem;
+        width: 15rem;
+      }
+    }
+
+    .gd-form-visible-mandatory-v2-list-empty-text {
+      color: var(--gd-secondary);
+      font-size: 1.6rem;
+      margin-top: 2rem;
+
+      @include breakpoint('xs') {
+        font-size: 1.4rem;
+      }
+    }
+  }
+}
+
+/* Exclude legend on view */
+.gd-create-view-modify-view {
+  .gd-form-visible-mandatory-v2-list {
+    height: calc(100% - 7.3rem);
+  }
+}

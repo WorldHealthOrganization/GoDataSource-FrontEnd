@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { UserModel } from './user.model';
+import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
 
 export class BaseModel {
   createdAt: Moment;
@@ -17,7 +16,7 @@ export class BaseModel {
     // created at
     this.createdAt = _.get(data, 'createdAt');
     if (this.createdAt) {
-      this.createdAt = moment.utc(this.createdAt);
+      this.createdAt = LocalizationHelper.toMoment(this.createdAt);
     }
 
     // created by
@@ -32,7 +31,7 @@ export class BaseModel {
     // updated at
     this.updatedAt = _.get(data, 'updatedAt');
     if (this.updatedAt) {
-      this.updatedAt = moment.utc(this.updatedAt);
+      this.updatedAt = LocalizationHelper.toMoment(this.updatedAt);
     }
 
     // updated by
@@ -50,7 +49,7 @@ export class BaseModel {
     // deleted at
     this.deletedAt = _.get(data, 'deletedAt');
     if (this.deletedAt) {
-      this.deletedAt = moment.utc(this.deletedAt);
+      this.deletedAt = LocalizationHelper.toMoment(this.deletedAt);
     }
   }
 }

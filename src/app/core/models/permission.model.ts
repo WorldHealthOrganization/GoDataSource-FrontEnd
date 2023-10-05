@@ -62,6 +62,8 @@ export enum PERMISSION {
   USER_MODIFY_OWN_ACCOUNT = 'user_modify_own_account',
   USER_LIST_FOR_FILTERS = 'user_list_for_filters',
   USER_LIST_WORKLOAD = 'user_list_workload',
+  USER_EXPORT = 'user_export',
+  USER_IMPORT = 'user_import',
 
   // roles
   USER_ROLE_LIST = 'user_role_list',
@@ -70,6 +72,8 @@ export enum PERMISSION {
   USER_ROLE_MODIFY = 'user_role_modify',
   USER_ROLE_DELETE = 'user_role_delete',
   USER_ROLE_CREATE_CLONE = 'user_role_create_clone',
+  USER_ROLE_EXPORT = 'user_role_export',
+  USER_ROLE_IMPORT = 'user_role_import',
 
   // backups
   BACKUP_LIST = 'backup_list',
@@ -136,6 +140,7 @@ export enum PERMISSION {
   OUTBREAK_SEE_INCONSISTENCIES = 'outbreak_see_inconsistencies',
   OUTBREAK_MODIFY_CASE_QUESTIONNAIRE = 'outbreak_modify_case_questionnaire',
   OUTBREAK_MODIFY_CONTACT_QUESTIONNAIRE = 'outbreak_modify_contact_questionnaire',
+  OUTBREAK_MODIFY_EVENT_QUESTIONNAIRE = 'outbreak_modify_event_questionnaire',
   OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_modify_contact_follow_up_questionnaire',
   OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_modify_case_lab_result_questionnaire',
   OUTBREAK_CREATE_CLONE = 'outbreak_create_clone',
@@ -150,6 +155,7 @@ export enum PERMISSION {
   OUTBREAK_TEMPLATE_DELETE = 'outbreak_template_delete',
   OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE = 'outbreak_template_modify_case_questionnaire',
   OUTBREAK_TEMPLATE_MODIFY_CONTACT_QUESTIONNAIRE = 'outbreak_template_modify_contact_questionnaire',
+  OUTBREAK_TEMPLATE_MODIFY_EVENT_QUESTIONNAIRE = 'outbreak_template_modify_event_questionnaire',
   OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_template_modify_contact_follow_up_questionnaire',
   OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_template_modify_case_lab_result_questionnaire',
   OUTBREAK_TEMPLATE_GENERATE_OUTBREAK = 'outbreak_template_generate_outbreak',
@@ -160,6 +166,8 @@ export enum PERMISSION {
   TEAM_CREATE = 'team_create',
   TEAM_MODIFY = 'team_modify',
   TEAM_DELETE = 'team_delete',
+  TEAM_EXPORT = 'team_export',
+  TEAM_IMPORT = 'team_import',
   TEAM_LIST_WORKLOAD = 'team_list_workload',
 
   // clusters
@@ -294,6 +302,12 @@ export enum PERMISSION {
   CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART = 'contact_of_contact_view_chronology_chart',
   CONTACT_OF_CONTACT_EXPORT_DOSSIER = 'contact_of_contact_export_dossier',
   CONTACT_OF_CONTACT_CONVERT_TO_CONTACT = 'contact_of_contact_convert_to_contact',
+  CONTACT_OF_CONTACT_LIST_LAB_RESULT = 'contact_of_contact_list_lab_result',
+  CONTACT_OF_CONTACT_VIEW_LAB_RESULT = 'contact_of_contact_view_lab_result',
+  CONTACT_OF_CONTACT_MODIFY_LAB_RESULT = 'contact_of_contact_modify_lab_result',
+  CONTACT_OF_CONTACT_DELETE_LAB_RESULT = 'contact_of_contact_delete_lab_result',
+  CONTACT_OF_CONTACT_RESTORE_LAB_RESULT = 'contact_of_contact_restore_lab_result',
+  CONTACT_OF_CONTACT_EXPORT_LAB_RESULT = 'contact_of_contact_export_lab_result',
 
   // case
   CASE_LIST = 'case_list',

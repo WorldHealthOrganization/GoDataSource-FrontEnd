@@ -5,7 +5,6 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import { UserModel } from './user.model';
@@ -22,14 +21,9 @@ import {
   IPermissionRelatedRelationship,
   IPermissionRestorable
 } from './permission.interface';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { SafeHtml } from '@angular/platform-browser';
-import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
-import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
-import { ReferenceDataEntryModel } from './reference-data.model';
-import { I18nService } from '../services/helper/i18n.service';
 import { IAnswerData } from './question.model';
+import { Moment } from '../helperClasses/localization-helper';
 
 export interface IContactOfContactIsolated {
   id: string,
@@ -83,6 +77,15 @@ export class ContactOfContactModel
   numberOfContacts: number;
   numberOfExposures: number;
 
+  // these properties were added to handle the legacy follow-ups (if the contact of a contact was a contact)
+  followUp: {
+    originalStartDate: string,
+    startDate: string,
+    endDate: string,
+    status: string
+  };
+  followUpTeamId: string;
+
   dob: string | Moment;
   age: AgeModel;
 
@@ -99,180 +102,12 @@ export class ContactOfContactModel
 
   // used by ui
   uiStatusForms: SafeHtml;
+  uiDocuments: string;
+  uiVaccines: string;
 
   /**
-   * Advanced filters
+   * Static Permissions - IPermissionBasic
    */
-  static generateAdvancedFilters(data: {
-    authUser: UserModel,
-    options: {
-      occupation: ILabelValuePairModel[],
-      user: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[]
-    }
-  }): V2AdvancedFilter[] {
-    // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
-      // Contact of contact
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'firstName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'middleName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'lastName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'occupation',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
-        options: data.options.occupation,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_AGE,
-        field: 'age',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfReporting',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dob',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'visualId',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'addresses',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
-        field: 'addresses',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfLastContact',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'wasCase',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CASE',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'wasContact',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_WAS_CONTACT',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfContacts',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfExposures',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        sortable: true
-      }
-    ];
-
-    // allowed to filter by responsible user ?
-    if (UserModel.canListForFilters(data.authUser)) {
-      advancedFilters.push({
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user
-      });
-    }
-
-    // finished
-    return advancedFilters;
-  }
-
-  /**
-   * Retrieve statuses forms
-   */
-  static getStatusForms(
-    info: {
-      // required
-      item: ContactOfContactModel,
-      i18nService: I18nService,
-      risk: IResolverV2ResponseModel<ReferenceDataEntryModel>
-    }
-  ): V2ColumnStatusForm[] {
-    // construct list of forms that we need to display
-    const forms: V2ColumnStatusForm[] = [];
-
-    // risk
-    if (
-      info.item.riskLevel &&
-      info.risk.map[info.item.riskLevel]
-    ) {
-      forms.push({
-        type: IV2ColumnStatusFormType.TRIANGLE,
-        color: info.risk.map[info.item.riskLevel].getColorCode(),
-        tooltip: info.i18nService.instant(info.item.riskLevel)
-      });
-    }
-
-    // finished
-    return forms;
-  }
-
-  /**
-   * Return contact id mask with data replaced
-   */
-  static generateContactOfContactIDMask(contactOfContactIdMask: string): string {
-    // validate
-    if (_.isEmpty(contactOfContactIdMask)) {
-      return '';
-    }
-
-    // !!!!!!!!!!!!!!!
-    // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-    // !!!!!!!!!!!!!!!
-    return contactOfContactIdMask
-      .replace(/YYYY/g, moment().format('YYYY'))
-      .replace(/\*/g, '');
-  }
-
-  /**
-     * Static Permissions - IPermissionBasic
-     */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE) : false); }
@@ -280,13 +115,13 @@ export class ContactOfContactModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_IMPORT) : false); }
 
   /**
@@ -298,13 +133,13 @@ export class ContactOfContactModel
   static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedRelationship
-     */
+   * Static Permissions - IPermissionRelatedRelationship
+   */
   static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_RELATIONSHIP_CONTACTS) : false); }
   static canViewRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_CONTACTS) : false); }
   static canCreateRelationshipContacts(): boolean { return false; }
@@ -324,26 +159,36 @@ export class ContactOfContactModel
   static canBulkDeleteRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_DELETE_RELATIONSHIP_EXPOSURES) : false); }
 
   /**
-     * Static Permissions - IPermissionMovement
-     */
+   * Static Permissions - IPermissionMovement
+   */
   static canViewMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_MOVEMENT_MAP) : false); }
   static canExportMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_MOVEMENT_MAP) : false); }
 
   /**
-     * Static Permissions - IPermissionChronology
-     */
+   * Static Permissions - IPermissionChronology
+   */
   static canViewChronologyChart(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART) : false); }
 
   /**
-     * Static Permissions - IPermissionContactOfContacts
-     */
+   * Static Permissions - IPermissionContactOfContacts
+   */
   static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_GENERATE_VISUAL_ID) : false); }
   static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_DOSSIER) : false); }
   static canConvertToContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT) : false); }
 
   /**
-     * Constructor
-     */
+   * Static Permissions - IPermissionRelatedLabResult
+   */
+  static canViewLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_LAB_RESULT) : false); }
+  static canListLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_LAB_RESULT) : false); }
+  static canModifyLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_MODIFY_LAB_RESULT) : false); }
+  static canDeleteLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE_LAB_RESULT) : false); }
+  static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_RESTORE_LAB_RESULT) : false); }
+  static canExportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_LAB_RESULT) : false); }
+
+  /**
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 
@@ -388,6 +233,9 @@ export class ContactOfContactModel
 
     this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
+
+    this.followUp = _.get(data, 'followUp');
+    this.followUpTeamId = _.get(data, 'followUpTeamId');
 
     // vaccines received
     const vaccinesReceived = _.get(data, 'vaccinesReceived');
@@ -504,6 +352,16 @@ export class ContactOfContactModel
   canConvertToContact(user: UserModel): boolean { return ContactOfContactModel.canConvertToContact(user); }
 
   /**
+   * Permissions - IPermissionRelatedLabResult
+   */
+  canViewLabResult(user: UserModel): boolean { return ContactOfContactModel.canViewLabResult(user); }
+  canListLabResult(user: UserModel): boolean { return ContactOfContactModel.canListLabResult(user); }
+  canModifyLabResult(user: UserModel): boolean { return ContactOfContactModel.canModifyLabResult(user); }
+  canDeleteLabResult(user: UserModel): boolean { return ContactOfContactModel.canDeleteLabResult(user); }
+  canRestoreLabResult(user: UserModel): boolean { return ContactOfContactModel.canRestoreLabResult(user); }
+  canExportLabResult(user: UserModel): boolean { return ContactOfContactModel.canExportLabResult(user); }
+
+  /**
    * Contact Of Contact Name
    */
   get name(): string {
@@ -552,17 +410,5 @@ export class ContactOfContactModel
       // replace address
       this.addresses.splice(existingAddressIndex, 1, mainAddress);
     }
-  }
-
-  /**
-   * Get phone numbers
-   */
-  get phoneNumbers(): string[] {
-    return this.addresses.reduce((acc: string[], address) => {
-      if (!_.isEmpty(address.phoneNumber)) {
-        acc.push(address.phoneNumber);
-      }
-      return acc;
-    }, []);
   }
 }

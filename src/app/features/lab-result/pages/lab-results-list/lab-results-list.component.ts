@@ -5,7 +5,6 @@ import { throwError } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -15,29 +14,26 @@ import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-f
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { Constants } from '../../../../core/models/constants';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
-import { Moment } from 'moment';
-import * as momentOriginal from 'moment';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-lab-results',
   templateUrl: './lab-results-list.component.html'
 })
-export class LabResultsListComponent extends ListComponent<LabResultModel> implements OnDestroy {
+export class LabResultsListComponent extends ListComponent<LabResultModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
 
   // lab fields
   private labFields: ILabelValuePairModel[] = [
@@ -73,13 +69,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
   */
   constructor(
     protected listHelperService: ListHelperService,
-    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private labResultDataService: LabResultDataService,
-    private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service,
-    private referenceDataHelperService: ReferenceDataHelperService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       listHelperService, {
@@ -142,6 +135,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                 ) || (
                   item.personType === EntityType.CONTACT &&
                   ContactModel.canViewLabResult(this.authUser)
+                ) || (
+                  item.personType === EntityType.CONTACT_OF_CONTACT &&
+                  ContactOfContactModel.canViewLabResult(this.authUser)
                 )
               );
           }
@@ -173,6 +169,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                 ) || (
                   item.personType === EntityType.CONTACT &&
                   ContactModel.canModifyLabResult(this.authUser)
+                ) || (
+                  item.personType === EntityType.CONTACT_OF_CONTACT &&
+                  ContactOfContactModel.canModifyLabResult(this.authUser)
                 )
               );
           }
@@ -192,12 +191,12 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
               action: {
                 click: (item: LabResultModel): void => {
                   // confirm
-                  this.dialogV2Service.showConfirmDialog({
+                  this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
                         data: () => ({
-                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
+                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? LocalizationHelper.displayDate(item.dateSampleTaken) : ''}`
                         })
                       },
                       message: {
@@ -212,15 +211,15 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                     // delete lab result
-                    this.labResultDataService
+                    this.personAndRelatedHelperService.labResult.labResultDataService
                       .deleteLabResult(this.selectedOutbreak.id, item.id)
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -231,7 +230,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
+                        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -253,6 +252,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                     ) || (
                       item.personType === EntityType.CONTACT &&
                       ContactModel.canDeleteLabResult(this.authUser)
+                    ) || (
+                      item.personType === EntityType.CONTACT_OF_CONTACT &&
+                      ContactOfContactModel.canDeleteLabResult(this.authUser)
                     )
                   );
               }
@@ -267,12 +269,12 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
               action: {
                 click: (item: LabResultModel) => {
                   // show confirm dialog to confirm the action
-                  this.dialogV2Service.showConfirmDialog({
+                  this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
                         data: () => ({
-                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
+                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? LocalizationHelper.displayDate(item.dateSampleTaken) : ''}`
                         })
                       },
                       message: {
@@ -287,10 +289,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                     // restore lab result
-                    this.labResultDataService
+                    this.personAndRelatedHelperService.labResult.labResultDataService
                       .restoreLabResult(
                         this.selectedOutbreak.id,
                         EntityModel.getLinkForEntityType(item.personType),
@@ -300,7 +302,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -311,7 +313,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
+                        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -333,6 +335,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                     ) || (
                       item.personType === EntityType.CONTACT &&
                       ContactModel.canRestoreLabResult(this.authUser)
+                    ) || (
+                      item.personType === EntityType.CONTACT_OF_CONTACT &&
+                      ContactOfContactModel.canRestoreLabResult(this.authUser)
                     )
                   );
               }
@@ -355,6 +360,16 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           type: 'person.visualId'
         },
         label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'visualId'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'visualId'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -363,16 +378,23 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           relationshipKey: 'person'
         },
         link: (data) => {
-          return data.person.type === EntityType.CASE ?
-            (
-              CaseModel.canView(this.authUser) && !data.person.deleted ?
-                `/cases/${data.person.id}/view` :
-                undefined
-            ) : (
-              data.person.type === EntityType.CONTACT && ContactModel.canView(this.authUser) && !data.person.deleted ?
-                `/contacts/${data.person.id}/view` :
-                undefined
-            );
+          return (
+            data.person && (
+              (
+                data.person.type === EntityType.CASE &&
+                CaseModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT &&
+                ContactModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT_OF_CONTACT &&
+                ContactOfContactModel.canView(this.authUser)
+              )
+            ) &&
+            !data.person.deleted
+          ) ?
+            EntityModel.getPersonLink(data.person) :
+            undefined;
         }
       },
       {
@@ -381,6 +403,16 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           type: 'person.lastName'
         },
         label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'lastName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'lastName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -389,16 +421,23 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           relationshipKey: 'person'
         },
         link: (data) => {
-          return data.person.type === EntityType.CASE ?
-            (
-              CaseModel.canView(this.authUser) && !data.person.deleted ?
-                `/cases/${data.person.id}/view` :
-                undefined
-            ) : (
-              data.person.type === EntityType.CONTACT && ContactModel.canView(this.authUser) && !data.person.deleted ?
-                `/contacts/${data.person.id}/view` :
-                undefined
-            );
+          return (
+            data.person && (
+              (
+                data.person.type === EntityType.CASE &&
+                CaseModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT &&
+                ContactModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT_OF_CONTACT &&
+                ContactOfContactModel.canView(this.authUser)
+              )
+            ) &&
+            !data.person.deleted
+          ) ?
+            EntityModel.getPersonLink(data.person) :
+            undefined;
         }
       },
       {
@@ -407,6 +446,16 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           type: 'person.firstName'
         },
         label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'firstName'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
+          'firstName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -415,21 +464,29 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           relationshipKey: 'person'
         },
         link: (data) => {
-          return data.person.type === EntityType.CASE ?
-            (
-              CaseModel.canView(this.authUser) && !data.person.deleted ?
-                `/cases/${data.person.id}/view` :
-                undefined
-            ) : (
-              data.person.type === EntityType.CONTACT && ContactModel.canView(this.authUser) && !data.person.deleted ?
-                `/contacts/${data.person.id}/view` :
-                undefined
-            );
+          return (
+            data.person && (
+              (
+                data.person.type === EntityType.CASE &&
+                CaseModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT &&
+                ContactModel.canView(this.authUser)
+              ) || (
+                data.person.type === EntityType.CONTACT_OF_CONTACT &&
+                ContactOfContactModel.canView(this.authUser)
+              )
+            ) &&
+            !data.person.deleted
+          ) ?
+            EntityModel.getPersonLink(data.person) :
+            undefined;
         }
       },
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
@@ -449,19 +506,22 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
             }]
           }
         ],
-        forms: (_column, data: LabResultModel): V2ColumnStatusForm[] => LabResultModel.getStatusForms({
-          item: data,
-          i18nService: this.i18nService
+        forms: (_column, data: LabResultModel): V2ColumnStatusForm[] => this.personAndRelatedHelperService.labResult.getStatusForms({
+          item: data
         })
       },
       {
         field: 'classification',
         format: {
           type: (item) => item.person && item.person.classification ?
-            this.i18nService.instant(item.person.classification) :
+            this.personAndRelatedHelperService.i18nService.instant(item.person.classification) :
             ''
         },
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'classification'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -476,6 +536,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'sampleIdentifier',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'sampleIdentifier'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -485,6 +549,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'dateSampleTaken',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'dateSampleTaken'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -496,6 +564,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'dateSampleDelivered',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'dateSampleDelivered'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -507,6 +579,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'dateOfResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'dateOfResult'
+        ),
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -518,6 +594,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'labName',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'labName'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -531,6 +611,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'sampleType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'sampleType'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -544,6 +628,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'testType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'testType'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -557,6 +645,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'result',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'result'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -570,6 +662,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'status',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'status'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -579,6 +675,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'testedFor',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'testedFor'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -588,6 +688,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'sequence.hasSequence',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'sequence[hasSequence]'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -603,6 +707,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'sequence.dateSampleSent',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'sequence[dateSampleSent]'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -616,6 +724,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'sequence.labId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'sequence[labId]'
+        ),
         notVisible: true,
         sortable: true,
         filter: {
@@ -630,6 +742,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'sequence.dateResult',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'sequence[dateResult]'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -643,6 +759,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'sequence.resultId',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'sequence[resultId]'
+        ),
         notVisible: true,
         sortable: true,
         filter: {
@@ -657,6 +777,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'sequence.noSequenceReason',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'sequence[noSequenceReason]'
+        ),
         notVisible: true,
         sortable: true,
         filter: {
@@ -666,8 +790,50 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         }
       },
       {
+        field: 'dateTesting',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'dateTesting'
+        ),
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'quantitativeResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'quantitativeResult'
+        ),
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'notes',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.labResult.visibleMandatoryKey,
+          'notes'
+        ),
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'deleted',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -680,8 +846,22 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         }
       },
       {
+        field: 'deletedAt',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
@@ -705,6 +885,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'createdAt',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -717,6 +898,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'updatedBy',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
@@ -740,6 +922,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       {
         field: 'updatedAt',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         format: {
@@ -756,6 +939,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       this.tableColumns.push({
         field: 'personType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         sortable: true,
         filter: {
@@ -840,8 +1024,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = LabResultModel.generateAdvancedFilters({
-      selectedOutbreak: () => this.selectedOutbreak,
+    this.advancedFilters = this.personAndRelatedHelperService.labResult.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
       options: {
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -861,6 +1044,25 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         )
       }
@@ -886,7 +1088,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         ) || (
           LabResultModel.canExport(this.authUser) && (
             CaseModel.canExportLabResult(this.authUser) ||
-            ContactModel.canExportLabResult(this.authUser)
+            ContactModel.canExportLabResult(this.authUser) ||
+            ContactOfContactModel.canExportLabResult(this.authUser)
           )
         );
       },
@@ -903,7 +1106,11 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
             }
           },
           visible: (): boolean => {
-            return LabResultModel.canExport(this.authUser) && (CaseModel.canExportLabResult(this.authUser) || ContactModel.canExportLabResult(this.authUser));
+            return LabResultModel.canExport(this.authUser) && (
+              CaseModel.canExportLabResult(this.authUser) ||
+              ContactModel.canExportLabResult(this.authUser) ||
+              ContactOfContactModel.canExportLabResult(this.authUser)
+            );
           }
         },
 
@@ -952,7 +1159,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       ) || (
         LabResultModel.canExport(this.authUser) && (
           CaseModel.canExportLabResult(this.authUser) ||
-          ContactModel.canExportLabResult(this.authUser)
+          ContactModel.canExportLabResult(this.authUser) ||
+          ContactOfContactModel.canExportLabResult(this.authUser)
         )
       ) || (
         LabResultModel.canBulkDelete(this.authUser) &&
@@ -1015,7 +1223,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           visible: (): boolean => {
             return LabResultModel.canExport(this.authUser) && (
               CaseModel.canExportLabResult(this.authUser) ||
-              ContactModel.canExportLabResult(this.authUser)
+              ContactModel.canExportLabResult(this.authUser) ||
+              ContactOfContactModel.canExportLabResult(this.authUser)
             );
           },
           disable: (selected: string[]): boolean => {
@@ -1032,7 +1241,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
             ) || (
               LabResultModel.canExport(this.authUser) && (
                 CaseModel.canExportLabResult(this.authUser) ||
-                ContactModel.canExportLabResult(this.authUser)
+                ContactModel.canExportLabResult(this.authUser) ||
+                ContactOfContactModel.canExportLabResult(this.authUser)
               )
             )
           ) && (
@@ -1051,12 +1261,12 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
           tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
-            this.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_DELETE_SELECTED_LAB_RESULTS_DESCRIPTION') :
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_DELETE_SELECTED_LAB_RESULTS_DESCRIPTION') :
             undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -1075,7 +1285,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
                   loading.message({
                     message: 'LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SELECTED_LAB_RESULTS_WAIT_MESSAGE',
                     messageData: {
@@ -1091,14 +1301,14 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                   const nextDelete = () => {
                     // finished ?
                     if (selectedShallowClone.length < 1) {
-                      this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SELECTED_LAB_RESULTS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SELECTED_LAB_RESULTS_SUCCESS_MESSAGE');
                       loading.close();
                       this.needsRefreshList(true);
                       return;
                     }
 
                     // delete
-                    this.labResultDataService
+                    this.personAndRelatedHelperService.labResult.labResultDataService
                       .deleteLabResult(
                         this.selectedOutbreak.id,
                         selectedShallowClone.shift()
@@ -1109,7 +1319,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                           loading.close();
 
                           // error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
                           return throwError(err);
                         })
                       )
@@ -1119,17 +1329,17 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
 
                         // initialize start time if necessary
                         if (!startTime) {
-                          startTime = momentOriginal();
+                          startTime = LocalizationHelper.now();
                         }
 
                         // determine estimated time
                         const processed: number = selected.length - selectedShallowClone.length;
                         const total: number = selected.length;
                         if (processed > 0) {
-                          const processedSoFarTimeMs: number = momentOriginal().diff(startTime);
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                           const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                           const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                          estimatedEndDate = momentOriginal().add(remainingTimeMs, 'ms');
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                         }
 
                         // update progress
@@ -1138,7 +1348,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                           messageData: {
                             no: processed.toLocaleString('en'),
                             total: total.toLocaleString('en'),
-                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
                           }
                         });
 
@@ -1169,12 +1379,12 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
           tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allDeleted ?
-            this.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_RESTORE_SELECTED_LAB_RESULTS_DESCRIPTION') :
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_RESTORE_SELECTED_LAB_RESULTS_DESCRIPTION') :
             undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -1201,7 +1411,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                   });
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
                   loading.message({
                     message: 'LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_SELECTED_LAB_RESULTS_WAIT_MESSAGE',
                     messageData: {
@@ -1217,7 +1427,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                   const nextRestore = () => {
                     // finished ?
                     if (selectedShallowClone.length < 1) {
-                      this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_SELECTED_LAB_RESULTS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_SELECTED_LAB_RESULTS_SUCCESS_MESSAGE');
                       loading.close();
                       this.needsRefreshList(true);
                       return;
@@ -1225,7 +1435,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
 
                     // restore
                     const labResultId: string = selectedShallowClone.shift();
-                    this.labResultDataService
+                    this.personAndRelatedHelperService.labResult.labResultDataService
                       .restoreLabResult(
                         this.selectedOutbreak.id,
                         EntityModel.getLinkForEntityType(labResultsMap[labResultId].personType),
@@ -1238,7 +1448,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                           loading.close();
 
                           // error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
                           return throwError(err);
                         })
                       )
@@ -1248,17 +1458,17 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
 
                         // initialize start time if necessary
                         if (!startTime) {
-                          startTime = momentOriginal();
+                          startTime = LocalizationHelper.now();
                         }
 
                         // determine estimated time
                         const processed: number = selected.length - selectedShallowClone.length;
                         const total: number = selected.length;
                         if (processed > 0) {
-                          const processedSoFarTimeMs: number = momentOriginal().diff(startTime);
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                           const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                           const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                          estimatedEndDate = momentOriginal().add(remainingTimeMs, 'ms');
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                         }
 
                         // update progress
@@ -1267,7 +1477,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                           messageData: {
                             no: processed.toLocaleString('en'),
                             total: total.toLocaleString('en'),
-                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
                           }
                         });
 
@@ -1338,18 +1548,22 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       'dateOfResult',
       'labName',
       'sampleType',
+      'dateTesting',
       'testType',
       'result',
       'status',
       'testedFor',
       'sequence',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdAt',
       'updatedBy',
       'updatedAt',
       'personType',
-      'questionnaireAnswers'
+      'questionnaireAnswers',
+      'quantitativeResult',
+      'notes'
     ];
   }
 
@@ -1357,48 +1571,20 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
    * Re(load) the Lab Results list
    */
   refreshList(): void {
-    // retrieve only case lab results ?
-    if (
-      CaseModel.canListLabResult(this.authUser) && (
-        !this.selectedOutbreak.isContactLabResultsActive ||
-        !ContactModel.canListLabResult(this.authUser)
-      )
-    ) {
-      // force filter by cases
-      this.queryBuilder.filter.byEquality(
-        'personType',
-        EntityType.CASE
-      );
-    } else if (
-      ContactModel.canListLabResult(this.authUser) &&
-      !CaseModel.canListLabResult(this.authUser)
-    ) {
-      // outbreak allows this case ?
-      if (this.selectedOutbreak.isContactLabResultsActive) {
-        // force filter by cases
-        this.queryBuilder.filter.byEquality(
-          'personType',
-          EntityType.CONTACT
-        );
-      } else {
-        // can't see any labs :)
-        // force filter by cases
-        this.queryBuilder.filter.byEquality(
-          'personType',
-          '—'
-        );
-      }
-    } else {
-      // NOT POSSIBLE TO ACCESS THIS PAGE WITHOUT HAVING AT LEAST ONE OF THE TWO PERMISSIONS ( case / contact list lab results )
-    }
+    // add person type conditions
+    const queryBuilder = _.cloneDeep(this.queryBuilder);
+    this.addPersonTypeConditions(queryBuilder);
 
     // retrieve the list of lab results
-    this.records$ = this.labResultDataService
-      .getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
+    this.records$ = this.personAndRelatedHelperService.labResult.labResultDataService
+      .getOutbreakLabResults(
+        this.selectedOutbreak.id,
+        queryBuilder
+      )
       .pipe(
         // determine alertness
         map((data: LabResultModel[]) => {
-          return LabResultModel.determineAlertness(
+          return this.personAndRelatedHelperService.labResult.determineAlertness(
             this.selectedOutbreak.labResultsTemplate,
             data
           );
@@ -1425,6 +1611,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
+
+    // add person type conditions
+    this.addPersonTypeConditions(countQueryBuilder);
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
@@ -1435,11 +1625,11 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
     }
 
     // count
-    this.labResultDataService
+    this.personAndRelatedHelperService.labResult.labResultDataService
       .getOutbreakLabResultsCount(this.selectedOutbreak.id, countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         }),
 
@@ -1455,7 +1645,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
    * Export lab results
    */
   private exportLabResults(qb: RequestQueryBuilder) {
-    this.dialogV2Service.showExportDataAfterLoadingData({
+    this.personAndRelatedHelperService.dialogV2Service.showExportDataAfterLoadingData({
       title: {
         get: () => 'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_TITLE'
       },
@@ -1467,7 +1657,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
             // handle errors
             catchError((err) => {
               // show error
-              this.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
 
               // send error further
               return throwError(err);
@@ -1495,7 +1685,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                 url: `/outbreaks/${ this.selectedOutbreak.id }/lab-results/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
+                fileName: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_TITLE') } - ${ LocalizationHelper.now().format('YYYY-MM-DD') }`,
                 queryBuilder: qb,
                 allow: {
                   types: [
@@ -1527,5 +1717,42 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           });
       }
     });
+  }
+
+  /**
+   * Person type conditions
+   */
+  private addPersonTypeConditions(qb: RequestQueryBuilder) {
+    // check person types permissions
+    const personTypes: string[] = [];
+    if (CaseModel.canListLabResult(this.authUser)) {
+      personTypes.push(EntityType.CASE);
+    }
+    if (
+      ContactModel.canListLabResult(this.authUser) &&
+      this.selectedOutbreak.isContactLabResultsActive
+    ) {
+      personTypes.push(EntityType.CONTACT);
+    }
+    if (ContactOfContactModel.canListLabResult(this.authUser)) {
+      personTypes.push(EntityType.CONTACT_OF_CONTACT);
+    }
+
+    // force filtering ?
+    if (personTypes.length < 1) {
+      // can't see any labs :)
+      qb.filter.byEquality(
+        'personType',
+        '-'
+      );
+    } else {
+      // force filter by specific person types
+      qb.filter.bySelect(
+        'personType',
+        personTypes,
+        false,
+        null
+      );
+    }
   }
 }

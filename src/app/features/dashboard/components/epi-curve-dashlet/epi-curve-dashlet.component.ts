@@ -11,11 +11,11 @@ import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-epi-curve-dashlet',
@@ -129,8 +129,8 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
     this.outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
-        // reset
-        this.outbreakSubscriber = null;
+        // stop ref data
+        this.stopRefDataSubscriber();
 
         // nothing to do
         if (!selectedOutbreak?.id) {
@@ -139,9 +139,6 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
 
         // set outbreak
         this._selectedOutbreak = selectedOutbreak;
-
-        // stop ref data
-        this.stopRefDataSubscriber();
 
         // retrieve ref data
         this.displayLoading = true;
@@ -221,7 +218,7 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
     // build chart data
     _.forEach(metricData, (metric: MetricCasesCountStratified) => {
       // create the array with categories ( dates displayed on x axis )
-      this.chartDataCategories.push(metric.start.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+      this.chartDataCategories.push(LocalizationHelper.displayDate(metric.start));
 
       // create an array with data for each classification
       _.each(metric.classification, (data, key) => {
@@ -308,12 +305,12 @@ export class EpiCurveDashletComponent implements OnInit, OnDestroy {
       if (this.globalFilterDate) {
         qb.filter.byEquality(
           'endDate',
-          moment(this.globalFilterDate).clone().endOf('day').toISOString()
+          LocalizationHelper.toMoment(this.globalFilterDate).clone().endOf('day').toISOString()
         );
       } else {
         qb.filter.byEquality(
           'endDate',
-          moment().endOf('day').toISOString()
+          LocalizationHelper.now().endOf('day').toISOString()
         );
       }
 

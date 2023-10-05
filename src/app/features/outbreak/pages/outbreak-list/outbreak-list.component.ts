@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel } from '../../../../core/models/user.model';
 import * as _ from 'lodash';
@@ -26,12 +26,17 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, V2SideDial
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { LocationModel } from '../../../../core/models/location.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
   selector: 'app-outbreak-list',
   templateUrl: './outbreak-list.component.html'
 })
-export class OutbreakListComponent extends ListComponent<OutbreakModel> implements OnDestroy {
+export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */
@@ -44,10 +49,14 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
     private i18nService: I18nService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private locationDataService: LocationDataService,
+    private outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService
   ) {
     super(
       listHelperService, {
+        // required to allow big filters that are bigger than the size allowed by the browser
+        disableFilterCachingOnlyUrl: true,
         disableWaitForSelectedOutbreakToRefreshList: true
       }
     );
@@ -263,6 +272,8 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
                         })
                       )
                       .subscribe(() => {
+                        // refresh list of top nav outbreaks
+                        TopnavComponent.REFRESH_OUTBREAK_LIST();
 
                         // reload user data to get the updated data regarding active outbreak
                         this.authDataService
@@ -439,6 +450,11 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
                         translateQuestionnaire(outbreakToClone.contactInvestigationTemplate);
                       }
 
+                      // translate questionnaire questions - Event Form
+                      if (!_.isEmpty(outbreakToClone.eventInvestigationTemplate)) {
+                        translateQuestionnaire(outbreakToClone.eventInvestigationTemplate);
+                      }
+
                       // translate questionnaire questions - Lab Results Form
                       if (!_.isEmpty(outbreakToClone.labResultsTemplate)) {
                         translateQuestionnaire(outbreakToClone.labResultsTemplate);
@@ -447,6 +463,14 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
                       // translate questionnaire questions - Contact Follow-up
                       if (!_.isEmpty(outbreakToClone.contactFollowUpTemplate)) {
                         translateQuestionnaire(outbreakToClone.contactFollowUpTemplate);
+                      }
+
+                      // replace . from property names since it is a restricted mongodb character that shouldn't be used in property names
+                      if (
+                        outbreakToClone.visibleAndMandatoryFields &&
+                        Object.keys(outbreakToClone.visibleAndMandatoryFields).length > 0
+                      ) {
+                        outbreakToClone.visibleAndMandatoryFields = JSON.parse(JSON.stringify(outbreakToClone.visibleAndMandatoryFields).replace(/\./g, Constants.DEFAULT_DB_DOT_REPLACER));
                       }
 
                       // hide side dialog
@@ -751,20 +775,6 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
-        field: 'isDateOfOnsetRequired',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
-        sortable: true,
-        notVisible: true,
-        format: {
-          type: V2ColumnFormat.BOOLEAN
-        },
-        filter: {
-          type: V2FilterType.BOOLEAN,
-          value: '',
-          defaultValue: ''
-        }
-      },
-      {
         field: 'checkLastContactDateAgainstDateOnSet',
         label: 'LNG_OUTBREAK_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET',
         sortable: true,
@@ -807,6 +817,205 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
+        field: 'generateFollowUpsWhenCreatingContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CONTACTS',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'locationIds',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATIONS',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: OutbreakModel) => item.locations?.length > 0 ?
+          item.locations.map((location) => {
+            return {
+              label: location.name,
+              href: LocationModel.canView(this.authUser) ?
+                `/locations/${location.id}/view` :
+                null
+            };
+          }) :
+          [],
+        width: 700,
+        filter: {
+          type: V2FilterType.MULTIPLE_LOCATION,
+          useOutbreakLocations: true,
+          field: 'locationIds.parentLocationIdFilter'
+        }
+      },
+      {
+        field: 'description',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DESCRIPTION',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'eventIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_EVENT_ID_MASK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'caseIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'contactIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CONTACT_ID_MASK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'contactOfContactIdMask',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CONTACT_OF_CONTACT_ID_MASK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'applyGeographicRestrictions',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'isContactsOfContactsActive',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'periodOfFollowup',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'frequencyOfFollowUpPerDay',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'intervalOfFollowUp',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'noDaysAmongContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noDaysInChains',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noDaysNotSeen',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noLessContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'longPeriodsBetweenCaseOnset',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noDaysNewContacts',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
         field: 'deleted',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
         sortable: true,
@@ -821,11 +1030,24 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
+        field: 'deletedAt',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_BY',
         notVisible: true,
+        sortable: true,
         format: {
-          type: 'createdByUser.name'
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -857,8 +1079,9 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         field: 'updatedBy',
         label: 'LNG_OUTBREAK_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
+        sortable: true,
         format: {
-          type: 'updatedByUser.name'
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -904,13 +1127,15 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
    */
   protected initializeTableAdvancedFilters(): void {
     // Outbreak
-    this.advancedFilters = OutbreakModel.generateAdvancedFilters({
+    this.advancedFilters = this.outbreakAndOutbreakTemplateHelperService.generateOutbreakAdvancedFilters({
       options: {
         disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         country: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         geographicalLevel: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }
@@ -989,9 +1214,27 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'generateFollowUpsOverwriteExisting',
       'generateFollowUpsKeepTeamAssignment',
       'isContactLabResultsActive',
-      'isDateOfOnsetRequired',
       'generateFollowUpsDateOfLastContact',
+      'generateFollowUpsWhenCreatingContacts',
+      'locationIds',
+      'description',
+      'eventIdMask',
+      'caseIdMask',
+      'contactIdMask',
+      'contactOfContactIdMask',
+      'applyGeographicRestrictions',
+      'isContactsOfContactsActive',
+      'periodOfFollowup',
+      'frequencyOfFollowUpPerDay',
+      'intervalOfFollowUp',
+      'noDaysAmongContacts',
+      'noDaysInChains',
+      'noDaysNotSeen',
+      'noLessContacts',
+      'longPeriodsBetweenCaseOnset',
+      'noDaysNewContacts',
       'deleted',
+      'deletedAt',
       'createdBy',
       'createdAt',
       'updatedBy',
@@ -1009,7 +1252,72 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
 
     // retrieve the list of Outbreaks
     this.records$ = this.outbreakDataService
-      .getOutbreaksList(this.queryBuilder)
+      .getOutbreaksList(
+        this.queryBuilder,
+        true,
+        true
+      )
+      .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true;
+          } = {};
+          data.forEach((item) => {
+            (item.locationIds || []).forEach((locationId) => {
+              // nothing to add ?
+              if (!locationId) {
+                return;
+              }
+
+              // add location to list
+              locationsIdsMap[locationId] = true;
+            });
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect('id', locationIds, false, null);
+
+          // retrieve locations
+          return this.locationDataService.getLocationsList(qb).pipe(
+            map((locations) => {
+              // map locations
+              const locationsMap: {
+                [locationId: string]: LocationModel;
+              } = {};
+              locations.forEach((location) => {
+                locationsMap[location.id] = location;
+              });
+
+              // set locations
+              data.forEach((item) => {
+                item.locations = [];
+                (item.locationIds || []).forEach((locationId) => {
+                  // not found ?
+                  if (!locationsMap[locationId]) {
+                    return;
+                  }
+
+                  // add to list
+                  item.locations.push(locationsMap[locationId]);
+                });
+              });
+
+              // finished
+              return data;
+            })
+          );
+        })
+      )
       .pipe(
         // should be the last pipe
         takeUntil(this.destroyed$)
@@ -1019,33 +1327,27 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
   /**
    * Get total number of items, based on the applied filters
    */
-  refreshListCount(applyHasMoreLimit?: boolean) {
+  refreshListCount() {
     // reset
     this.pageCount = undefined;
-
-    // set apply value
-    if (applyHasMoreLimit !== undefined) {
-      this.applyHasMoreLimit = applyHasMoreLimit;
-    }
 
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // add includeDeletedRecords if deleted is enabled
     if (this.queryBuilder.isDeletedEnabled()) {
       countQueryBuilder.filter.includeDeletedRecordsWhereField();
     }
 
-    // apply has more limit
-    if (this.applyHasMoreLimit) {
-      countQueryBuilder.flag('applyHasMoreLimit', true);
-    }
-
     // count
     this.outbreakDataService
-      .getOutbreaksCount(countQueryBuilder)
+      .getOutbreaksCount(
+        countQueryBuilder,
+        true
+      )
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);

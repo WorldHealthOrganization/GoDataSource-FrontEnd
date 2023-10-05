@@ -2,9 +2,7 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -24,7 +22,6 @@ import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { QuestionModel } from '../../../../core/models/question.model';
 import {
@@ -36,6 +33,12 @@ import {
   IV2BottomDialogConfigButtonType
 } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import * as _ from 'lodash';
+import { UserModel } from '../../../../core/models/user.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { Constants } from '../../../../core/models/constants';
 
 /**
  * Component
@@ -55,23 +58,25 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     private outbreakTemplateDataService: OutbreakTemplateDataService,
-    private activatedRoute: ActivatedRoute,
-    private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     private router: Router,
-    protected referenceDataHelperService: ReferenceDataHelperService,
-    authDataService: AuthDataService,
-    toastV2Service: ToastV2Service,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected referenceDataHelperService: ReferenceDataHelperService
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService,
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService,
       true
     );
   }
@@ -109,6 +114,9 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   protected initializedData(): void {
     // format reference data per disease to expected tree format
     this._diseaseSpecificReferenceData = this.referenceDataHelperService.convertRefCategoriesToTreeCategories(this.activatedRoute.snapshot.data.diseaseSpecificCategories.list);
+
+    // merge default fields
+    this.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.itemData);
   }
 
   /**
@@ -202,12 +210,16 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         // Details
         this.initializeTabsDetails(),
 
+        // Visible and required fields
+        this.initializeTabsVisibleAndRequiredFields(),
+
         // Reference Data Per Outbreak Template
         this.initializeTabsReferenceDataPerOutbreakTemplate(),
 
         // Questionnaires
         this.initializeTabsQuestionnaireCase(),
         this.initializeTabsQuestionnaireContact(),
+        this.initializeTabsQuestionnaireEvent(),
         this.initializeTabsQuestionnaireFollowUp(),
         this.initializeTabsQuestionnaireLabResult()
       ],
@@ -386,17 +398,6 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
               }
             }, {
               type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: 'isDateOfOnsetRequired',
-              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
-              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED_DESCRIPTION',
-              value: {
-                get: () => this.itemData.isDateOfOnsetRequired,
-                set: (value) => {
-                  this.itemData.isDateOfOnsetRequired = value;
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
               name: 'isContactsOfContactsActive',
               placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE',
               description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION',
@@ -528,6 +529,17 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                   this.itemData.generateFollowUpsDateOfLastContact = value;
                 }
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'generateFollowUpsWhenCreatingContacts',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CONTACTS',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CONTACTS_DESCRIPTION',
+              value: {
+                get: () => this.itemData.generateFollowUpsWhenCreatingContacts,
+                set: (value) => {
+                  this.itemData.generateFollowUpsWhenCreatingContacts = value;
+                }
+              }
             }
           ]
         },
@@ -620,6 +632,37 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
           ]
         }
       ]
+    };
+  }
+
+
+  /**
+   * Initialize tabs - Visible and required fields
+   */
+  private initializeTabsVisibleAndRequiredFields(): ICreateViewModifyV2TabTable {
+    // init tab
+    let errors: string = '';
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'visible_mandatory_fields',
+      label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_VISIBLE_AND_MANDATORY_FIELDS',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY,
+        name: 'visibleAndMandatoryFields',
+        value: {
+          get: () => this.itemData.visibleAndMandatoryFields,
+          set: (value) => {
+            this.itemData.visibleAndMandatoryFields = value;
+          }
+        },
+        options: this.outbreakAndOutbreakTemplateHelperService.generateVisibleMandatoryOptions(),
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
+      }
     };
   }
 
@@ -724,6 +767,31 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       visible: () => this.isView ?
         true :
         OutbreakTemplateModel.canModifyContactQuestionnaire(this.authUser)
+    };
+  }
+
+  /**
+   * Initialize tabs - Event Questionnaire
+   */
+  private initializeTabsQuestionnaireEvent(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'event_investigation_template',
+      label: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_EVENT_QUESTIONNAIRE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
+        name: 'eventInvestigationTemplate',
+        outbreak: this.itemData,
+        value: {
+          get: () => this.itemData.eventInvestigationTemplate,
+          set: (value) => {
+            this.itemData.eventInvestigationTemplate = value;
+          }
+        }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakTemplateModel.canModifyEventQuestionnaire(this.authUser)
     };
   }
 
@@ -871,6 +939,12 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         data.contactInvestigationTemplate = (data.contactInvestigationTemplate || []).map((question) => new QuestionModel(question));
       }
 
+      // sanitize questionnaire - event
+      // - remove fields used by ui (e.g. collapsed...)
+      if (data.eventInvestigationTemplate) {
+        data.eventInvestigationTemplate = (data.eventInvestigationTemplate || []).map((question) => new QuestionModel(question));
+      }
+
       // sanitize questionnaire - follow-up
       // - remove fields used by ui (e.g. collapsed...)
       if (data.contactFollowUpTemplate) {
@@ -881,6 +955,14 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       // - remove fields used by ui (e.g. collapsed...)
       if (data.labResultsTemplate) {
         data.labResultsTemplate = (data.labResultsTemplate || []).map((question) => new QuestionModel(question));
+      }
+
+      // replace . from property names since it is a restricted mongodb character that shouldn't be used in property names
+      if (
+        data.visibleAndMandatoryFields &&
+        Object.keys(data.visibleAndMandatoryFields).length > 0
+      ) {
+        data.visibleAndMandatoryFields = JSON.parse(JSON.stringify(data.visibleAndMandatoryFields).replace(/\./g, Constants.DEFAULT_DB_DOT_REPLACER));
       }
 
       // create / modify
@@ -904,6 +986,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         if (
           !data.caseInvestigationTemplate &&
           !data.contactInvestigationTemplate &&
+          !data.eventInvestigationTemplate &&
           !data.contactFollowUpTemplate &&
           !data.labResultsTemplate
         ) {
@@ -977,11 +1060,12 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = OutbreakTemplateModel.generateAdvancedFilters({
+    this.expandListAdvancedFilters = this.outbreakAndOutbreakTemplateHelperService.generateOutbreakTemplateAdvancedFilters({
       options: {
         disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }

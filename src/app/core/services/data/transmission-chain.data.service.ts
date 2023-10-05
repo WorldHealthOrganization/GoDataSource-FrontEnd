@@ -14,7 +14,6 @@ import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 import { catchError, map } from 'rxjs/operators';
-import { moment } from '../../helperClasses/x-moment';
 import { ContactModel } from '../../models/contact.model';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { EventModel } from '../../models/event.model';
@@ -25,6 +24,7 @@ import { FileSize } from '../../helperClasses/file-size';
 import { EntityModel } from '../../models/entity-and-relationship.model';
 import { IV2DateRange } from '../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { IV2NumberRange } from '../../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
+import { LocalizationHelper } from '../../helperClasses/localization-helper';
 
 export interface IConvertChainToGraphElements {
   nodes: {
@@ -391,14 +391,14 @@ export class TransmissionChainDataService {
             nodeData.model.dateOfReporting && (
               (
                 !snapshotFiltersDate.startDate &&
-                moment(nodeData.model.dateOfReporting).isSameOrBefore(snapshotFiltersDate.endDate)
+                LocalizationHelper.toMoment(nodeData.model.dateOfReporting).isSameOrBefore(snapshotFiltersDate.endDate)
               ) || (
                 !snapshotFiltersDate.endDate &&
-                moment(nodeData.model.dateOfReporting).isSameOrAfter(snapshotFiltersDate.startDate)
+                LocalizationHelper.toMoment(nodeData.model.dateOfReporting).isSameOrAfter(snapshotFiltersDate.startDate)
               ) || (
                 snapshotFiltersDate.startDate &&
                 snapshotFiltersDate.endDate &&
-                moment(nodeData.model.dateOfReporting).isBetween(snapshotFiltersDate.startDate, snapshotFiltersDate.endDate, undefined, '[]')
+                LocalizationHelper.toMoment(nodeData.model.dateOfReporting).isBetween(snapshotFiltersDate.startDate, snapshotFiltersDate.endDate, undefined, '[]')
               )
             )
           )
@@ -898,14 +898,14 @@ export class TransmissionChainDataService {
               node.model instanceof EventModel &&
               node.model.date
             ) {
-              nodeData.label = moment(node.model.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              nodeData.label = LocalizationHelper.displayDate(node.model.date);
             }
             if (
               node.type === EntityType.CASE &&
               node.model instanceof CaseModel &&
               node.model.dateOfOnset
             ) {
-              nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              nodeData.label = LocalizationHelper.displayDate(node.model.dateOfOnset);
             }
             // gender
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
@@ -1007,7 +1007,7 @@ export class TransmissionChainDataService {
               let onset = '';
               if (node.model instanceof CaseModel) {
                 onset = node.model.dateOfOnset ?
-                  '\n' + onsetLabel + ' ' + moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + (node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '') :
+                  '\n' + onsetLabel + ' ' + LocalizationHelper.displayDate(node.model.dateOfOnset) + (node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '') :
                   '';
               }
               // concatenate results
@@ -1019,10 +1019,10 @@ export class TransmissionChainDataService {
 
           // check min / max dates
           if (nodeData.dateTimeline) {
-            if (moment(nodeData.dateTimeline).isAfter(maxTimelineDate) || !maxTimelineDate) {
+            if (LocalizationHelper.toMoment(nodeData.dateTimeline).isAfter(maxTimelineDate) || !maxTimelineDate) {
               maxTimelineDate = nodeData.dateTimeline;
             }
-            if (moment(nodeData.dateTimeline).isBefore(minTimelineDate) || !minTimelineDate) {
+            if (LocalizationHelper.toMoment(nodeData.dateTimeline).isBefore(minTimelineDate) || !minTimelineDate) {
               minTimelineDate = nodeData.dateTimeline;
             }
           }
@@ -1032,12 +1032,12 @@ export class TransmissionChainDataService {
       });
 
       // generate checkpoint nodes
-      const counterDate = moment(minTimelineDate);
+      const counterDate = LocalizationHelper.toMoment(minTimelineDate);
       counterDate.subtract(1, 'days');
-      const momentMaxTimelineDate = moment(maxTimelineDate);
+      const momentMaxTimelineDate = LocalizationHelper.toMoment(maxTimelineDate);
       while (counterDate.isBefore(momentMaxTimelineDate)) {
         counterDate.add(1, 'days');
-        const counterDateFormatted = counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        const counterDateFormatted = LocalizationHelper.displayDate(counterDate);
         // generate node
         const checkpointNode = new GraphNodeModel({
           dateTimeline: counterDateFormatted,
@@ -1145,9 +1145,9 @@ export class TransmissionChainDataService {
           sourceDate &&
           targetDate
         ) {
-          const momentTargetDate = moment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-          const momentSourceDate = moment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-          noDays = Math.round(moment.duration(momentTargetDate.diff(momentSourceDate)).asDays());
+          const momentTargetDate = LocalizationHelper.toMoment(targetDate, LocalizationHelper.getDateDisplayFormat());
+          const momentSourceDate = LocalizationHelper.toMoment(sourceDate, LocalizationHelper.getDateDisplayFormat());
+          noDays = Math.round(LocalizationHelper.duration(momentTargetDate.diff(momentSourceDate)).asDays());
           graphEdge.label = String(noDays);
         }
       }

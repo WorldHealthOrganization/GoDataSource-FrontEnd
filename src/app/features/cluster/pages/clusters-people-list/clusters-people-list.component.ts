@@ -33,7 +33,7 @@ import { ReferenceDataHelperService } from '../../../../core/services/helper/ref
   selector: 'app-clusters-people-list',
   templateUrl: './clusters-people-list.component.html'
 })
-export class ClustersPeopleListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+export class ClustersPeopleListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel, IV2Column> implements OnDestroy {
   // present cluster
   private _selectedCluster: ClusterModel;
 
@@ -297,6 +297,10 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
               color: (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type].getColorCode(),
               tooltip: this.i18nService.instant(data.type)
             });
+          } else {
+            forms.push({
+              type: IV2ColumnStatusFormType.EMPTY
+            });
           }
 
           // finished
@@ -508,6 +512,7 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

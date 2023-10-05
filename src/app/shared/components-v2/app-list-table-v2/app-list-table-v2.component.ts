@@ -4,10 +4,9 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { GridReadyEvent, IsFullWidthRowParams, RowHeightParams, RowNode, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import * as _ from 'lodash';
-import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
-import { Params, Router } from '@angular/router';
+import { Params } from '@angular/router';
 import {
   IV2Column,
   IV2ColumnAction,
@@ -59,6 +58,8 @@ import { AppListTableV2DetailColumnComponent } from './components/detail/app-lis
 import { IV2RowExpandRow, V2RowType } from './models/row.model';
 import { determineIfTouchDevice } from '../../../core/methods/touch-device';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { RedirectService } from '../../../core/services/helper/redirect.service';
+import { LocalizationHelper } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -527,52 +528,52 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     form: V2ColumnStatusForm,
     addGap: boolean
   ): string {
-    let statusHtml: string = '';
+    let statusHtml: string = `<svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">`;
     switch (form.type) {
       case IV2ColumnStatusFormType.CIRCLE:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <circle fill="${form.color}" cx="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" cy="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" r="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" />
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <circle fill="${form.color}" cx="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" cy="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" r="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" />`;
 
         // finished
         break;
 
       case IV2ColumnStatusFormType.SQUARE:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <rect fill="${form.color}" width="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <rect fill="${form.color}" width="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />`;
 
         // finished
         break;
 
       case IV2ColumnStatusFormType.TRIANGLE:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} 0, 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}"/>
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} 0, 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}"/>`;
 
         // finished
         break;
 
       case IV2ColumnStatusFormType.STAR:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2},0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.2},${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.95},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2},0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.2},${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.95},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />`;
 
         // finished
         break;
+
+      case IV2ColumnStatusFormType.HEXAGON:
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.93} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.25},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.93} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.25},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.06} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.75},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.06}" />`;
+
+        // finished
+        break;
+
+      default:
+      // case IV2ColumnStatusFormType.EMPTY:
+        // nothing to do, empty svg is enough
+        // finished
+        break;
     }
+
+    // close svg
+    statusHtml += '</svg>';
 
     // finished
     return statusHtml;
@@ -619,10 +620,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     protected location: Location,
     protected renderer2: Renderer2,
     protected elementRef: ElementRef,
-    protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected authDataService: AuthDataService,
-    protected toastV2Service: ToastV2Service
+    protected toastV2Service: ToastV2Service,
+    private redirectService: RedirectService
   ) {
     // update bottom section collapse / expand
     this.loadBottomSectionConfig();
@@ -669,10 +670,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         }
 
         // redirect
-        this.router.navigate(
-          [url], {
-            queryParams: params
-          }
+        // - redirect service needed to reload current component if necessary since we're not always listening to url changes to trigger updates
+        this.redirectService.to(
+          [url],
+          params
         );
       }
     );
@@ -848,9 +849,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // already called
     delete this._callWhenReady.updateColumnDefinitions;
-
-    // reset data
-    this.legends = [];
 
     // nothing to do ?
     if (!this._columns) {
@@ -1078,7 +1076,47 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         lockPosition: column.lockPosition,
         headerComponent: AppListTableV2ColumnHeaderComponent
       });
+    };
 
+    // keep order of columns
+    if (
+      visibleColumns &&
+      visibleColumns.length > 0
+    ) {
+      // render column in order of visibility
+      // - order changed by user
+      visibleColumns.forEach((field) => {
+        // not found in definitions ?
+        if (!visibleColumnsMap[field]) {
+          // don't render it
+          // - it might've been removed from definitions
+          return;
+        }
+
+        // render column
+        renderColumn(visibleColumnsMap[field]);
+      });
+
+      // render always visible columns too
+      this._columns.forEach((column) => {
+        // no always visible ?
+        if (!column.alwaysVisible) {
+          return;
+        }
+
+        // render column
+        renderColumn(column);
+      });
+    } else {
+      // process columns in default order
+      this._columns.forEach((column) => {
+        renderColumn(column);
+      });
+    }
+
+    // legends should always be visible no matter if the column is visible because legends might contain information from other columns too and not only from the one that isn't visible
+    this.legends = [];
+    this._columns.forEach((column) => {
       // update legends
       if (column.format?.type === V2ColumnFormat.STATUS) {
         // get column def
@@ -1129,43 +1167,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           });
         });
       }
-    };
-
-    // keep order of columns
-    if (
-      visibleColumns &&
-      visibleColumns.length > 0
-    ) {
-      // render column in order of visibility
-      // - order changed by user
-      visibleColumns.forEach((field) => {
-        // not found in definitions ?
-        if (!visibleColumnsMap[field]) {
-          // don't render it
-          // - it might've been removed from definitions
-          return;
-        }
-
-        // render column
-        renderColumn(visibleColumnsMap[field]);
-      });
-
-      // render always visible columns too
-      this._columns.forEach((column) => {
-        // no always visible ?
-        if (!column.alwaysVisible) {
-          return;
-        }
-
-        // render column
-        renderColumn(column);
-      });
-    } else {
-      // process columns in default order
-      this._columns.forEach((column) => {
-        renderColumn(column);
-      });
-    }
+    });
 
     // attach actions column to the start or to the end depending on if small or big screen
     if (this.columnActions) {
@@ -1301,15 +1303,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
           // DATE
           case V2ColumnFormat.DATE:
-            return fieldValue ?
-              moment(fieldValue).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-              '';
+            return LocalizationHelper.displayDate(fieldValue);
 
           // DATETIME
           case V2ColumnFormat.DATETIME:
-            return fieldValue ?
-              moment(fieldValue).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
-              '';
+            return LocalizationHelper.displayDateTime(fieldValue);
 
           // BOOLEAN
           case V2ColumnFormat.BOOLEAN:
@@ -1619,9 +1617,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // set column width
         this._agTable.columnApi.setColumnWidth(
           column,
-          (maxForms - 1) * (AppListTableV2Component.STANDARD_SHAPE_SIZE + AppListTableV2Component.STANDARD_SHAPE_GAP) +
-          AppListTableV2Component.STANDARD_SHAPE_SIZE +
-          AppListTableV2Component.STANDARD_SHAPE_PADDING * 2
+          maxForms * (AppListTableV2Component.STANDARD_SHAPE_SIZE + AppListTableV2Component.STANDARD_SHAPE_PADDING) +
+            (maxForms < 2 ? AppListTableV2Component.STANDARD_SHAPE_PADDING : 0)
         );
       } else if (colDef.headerComponent === AppListTableV2SelectionHeaderComponent) {
         this._agTable.columnApi.setColumnWidth(
@@ -1690,6 +1687,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
         // inputs
         inputs: checkboxInputs,
+        width: '50rem',
 
         // buttons
         bottomButtons: [{

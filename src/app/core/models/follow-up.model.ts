@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { ContactModel } from './contact.model';
-import { IAnswerData, QuestionModel } from './question.model';
+import { IAnswerData } from './question.model';
 import { BaseModel } from './base.model';
 import { FillLocationModel } from './fill-location.model';
 import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermissionFollowUp, IPermissionRestorable } from './permission.interface';
@@ -10,12 +10,9 @@ import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { EntityType } from './entity-type';
 import { CaseModel } from './case.model';
-import { Moment } from '../helperClasses/x-moment';
-import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { SafeHtml } from '@angular/platform-browser';
-import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
-import { ReferenceDataEntryModel } from './reference-data.model';
-import { I18nService } from '../services/helper/i18n.service';
+import { ContactOfContactModel } from './contact-of-contact.model';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class FollowUpModel
   extends BaseModel
@@ -29,7 +26,7 @@ export class FollowUpModel
   date: string | Moment;
   address: AddressModel;
   personId: string;
-  person: ContactModel | CaseModel;
+  person: ContactOfContactModel | ContactModel | CaseModel;
   targeted: boolean;
   questionnaireAnswers: {
     [variable: string]: IAnswerData[];
@@ -48,124 +45,6 @@ export class FollowUpModel
 
   // used by ui
   uiStatusForms: SafeHtml;
-
-  /**
-   * Determine alertness
-   */
-  static determineAlertness(
-    template: QuestionModel[],
-    entities: FollowUpModel[]
-  ): FollowUpModel[] {
-    // map alert question answers to object for easy find
-    const alertQuestionAnswers: {
-      [question_variable: string]: {
-        [answer_value: string]: true
-      }
-    } = QuestionModel.determineAlertAnswers(template);
-
-    // map alert value to follow-ups
-    entities.forEach((followUpData: FollowUpModel) => {
-      // check if we need to mark follow-up as alerted because of questionnaire answers
-      followUpData.alerted = false;
-      if (followUpData.questionnaireAnswers) {
-        const props: string[] = Object.keys(followUpData.questionnaireAnswers);
-        for (let propIndex: number = 0; propIndex < props.length; propIndex++) {
-          // get answer data
-          const questionVariable: string = props[propIndex];
-          const answers: IAnswerData[] = followUpData.questionnaireAnswers[questionVariable];
-
-          // retrieve answer value
-          // only the newest one is of interest, the old ones shouldn't trigger an alert
-          // the first item should be the newest
-          const answerKey = answers?.length > 0 ?
-            answers[0].value :
-            undefined;
-
-          // there is no point in checking the value if there isn't one
-          if (
-            !answerKey &&
-            typeof answerKey !== 'number'
-          ) {
-            continue;
-          }
-
-          // at least one alerted ?
-          if (Array.isArray(answerKey)) {
-            // go through all answers
-            for (let answerKeyIndex: number = 0; answerKeyIndex < answerKey.length; answerKeyIndex++) {
-              if (
-                alertQuestionAnswers[questionVariable] &&
-                alertQuestionAnswers[questionVariable][answerKey[answerKeyIndex]]
-              ) {
-                // alerted
-                followUpData.alerted = true;
-
-                // stop
-                break;
-              }
-            }
-
-            // stop ?
-            if (followUpData.alerted) {
-              // stop
-              break;
-            }
-          } else if (
-            alertQuestionAnswers[questionVariable] &&
-            alertQuestionAnswers[questionVariable][answerKey]
-          ) {
-            // alerted
-            followUpData.alerted = true;
-
-            // stop
-            break;
-          }
-        }
-      }
-    });
-
-    // finished
-    return entities;
-  }
-
-  /**
-   * Retrieve statuses forms
-   */
-  static getStatusForms(
-    info: {
-      // required
-      item: FollowUpModel,
-      i18nService: I18nService,
-      dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>
-    }
-  ): V2ColumnStatusForm[] {
-    // construct list of forms that we need to display
-    const forms: V2ColumnStatusForm[] = [];
-
-    // status
-    if (
-      info.item.statusId &&
-      info.dailyFollowUpStatus.map[info.item.statusId]
-    ) {
-      forms.push({
-        type: IV2ColumnStatusFormType.CIRCLE,
-        color: info.dailyFollowUpStatus.map[info.item.statusId].getColorCode(),
-        tooltip: info.i18nService.instant(info.item.statusId)
-      });
-    }
-
-    // alerted
-    if (info.item.alerted) {
-      forms.push({
-        type: IV2ColumnStatusFormType.STAR,
-        color: 'var(--gd-danger)',
-        tooltip: info.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
-      });
-    }
-
-    // finished
-    return forms;
-  }
 
   /**
    * Static Permissions - IPermissionBasic
@@ -231,10 +110,17 @@ export class FollowUpModel
         {}
       );
 
-      if (person.type === EntityType.CASE) {
-        this.person = new CaseModel(person);
-      } else {
-        this.person = new ContactModel(person);
+      switch (person.type) {
+        case EntityType.CASE:
+          this.person = new CaseModel(person);
+          break;
+        case EntityType.CONTACT_OF_CONTACT:
+          this.person = new ContactOfContactModel(person);
+          break;
+        // case EntityType.CONTACT:
+        default:
+          this.person = new ContactModel(person);
+          break;
       }
     }
 

@@ -1,18 +1,19 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { Observable } from 'rxjs';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { ActivatedRoute } from '@angular/router';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-my-profile',
@@ -23,21 +24,23 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    protected userDataService: UserDataService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected i18nService: I18nService,
-    protected dialogV2Service: DialogV2Service,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected userDataService: UserDataService,
+    protected dialogV2Service: DialogV2Service
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 

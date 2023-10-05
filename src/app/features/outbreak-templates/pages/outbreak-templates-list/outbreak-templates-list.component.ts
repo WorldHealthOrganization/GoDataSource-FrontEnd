@@ -13,7 +13,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -21,13 +21,16 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { V2SideDialogConfigInputType, IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
   selector: 'app-outbreak-templates-list',
   templateUrl: './outbreak-templates-list.component.html'
 })
 export class OutbreakTemplatesListComponent
-  extends ListComponent<OutbreakTemplateModel>
+  extends ListComponent<OutbreakTemplateModel, IV2Column>
   implements OnDestroy {
   /**
    * Constructor
@@ -40,7 +43,8 @@ export class OutbreakTemplatesListComponent
     private outbreakTemplateDataService: OutbreakTemplateDataService,
     private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService
   ) {
     super(
       listHelperService, {
@@ -304,6 +308,14 @@ export class OutbreakTemplatesListComponent
                       // set the name for the cloned outbreak template
                       outbreakTemplateToClone.name = (response.handler.data.map.cloneData as IV2SideDialogConfigInputText).value;
 
+                      // replace . from property names since it is a restricted mongodb character that shouldn't be used in property names
+                      if (
+                        outbreakTemplateToClone.visibleAndMandatoryFields &&
+                        Object.keys(outbreakTemplateToClone.visibleAndMandatoryFields).length > 0
+                      ) {
+                        outbreakTemplateToClone.visibleAndMandatoryFields = JSON.parse(JSON.stringify(outbreakTemplateToClone.visibleAndMandatoryFields).replace(/\./g, Constants.DEFAULT_DB_DOT_REPLACER));
+                      }
+
                       // close side dialog
                       response.handler.hide();
 
@@ -483,6 +495,212 @@ export class OutbreakTemplatesListComponent
           value: '',
           defaultValue: ''
         }
+      },
+      {
+        field: 'generateFollowUpsWhenCreatingContacts',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CONTACTS',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'applyGeographicRestrictions',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'isContactLabResultsActive',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_LAB_RESULTS_ACTIVE',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'isContactsOfContactsActive',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'periodOfFollowup',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'frequencyOfFollowUpPerDay',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FRECQUENCY_PER_DAY',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'intervalOfFollowUp',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'noDaysAmongContacts',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noDaysInChains',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noDaysNotSeen',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NOT_SEEN',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noLessContacts',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_LESS_THAN_X_CONTACTS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'longPeriodsBetweenCaseOnset',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_LONG_PERIODS',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'noDaysNewContacts',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        link: (data) => {
+          return data.createdBy && UserModel.canView(this.authUser) ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_CREATED_AT',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        link: (data) => {
+          return data.updatedBy && UserModel.canView(this.authUser) ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_UPDATED_AT',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
       }
     ];
   }
@@ -502,11 +720,12 @@ export class OutbreakTemplatesListComponent
    */
   protected initializeTableAdvancedFilters(): void {
     // Outbreak template
-    this.advancedFilters = OutbreakTemplateModel.generateAdvancedFilters({
+    this.advancedFilters = this.outbreakAndOutbreakTemplateHelperService.generateOutbreakTemplateAdvancedFilters({
       options: {
         disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }
@@ -577,7 +796,24 @@ export class OutbreakTemplatesListComponent
       'generateFollowUpsTeamAssignmentAlgorithm',
       'generateFollowUpsOverwriteExisting',
       'generateFollowUpsKeepTeamAssignment',
-      'generateFollowUpsDateOfLastContact'
+      'generateFollowUpsDateOfLastContact',
+      'generateFollowUpsWhenCreatingContacts',
+      'applyGeographicRestrictions',
+      'isContactLabResultsActive',
+      'isContactsOfContactsActive',
+      'periodOfFollowup',
+      'frequencyOfFollowUpPerDay',
+      'intervalOfFollowUp',
+      'noDaysAmongContacts',
+      'noDaysInChains',
+      'noDaysNotSeen',
+      'noLessContacts',
+      'longPeriodsBetweenCaseOnset',
+      'noDaysNewContacts',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
     ];
   }
 
@@ -585,6 +821,10 @@ export class OutbreakTemplatesListComponent
    * Re(load) the Outbreak Templates list
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
     // retrieve the list of outbreak templates
     this.records$ = this.outbreakTemplateDataService
       .getOutbreakTemplatesList(this.queryBuilder)
@@ -610,6 +850,7 @@ export class OutbreakTemplatesListComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     this.outbreakTemplateDataService
       .getOutbreakTemplatesCount(countQueryBuilder)

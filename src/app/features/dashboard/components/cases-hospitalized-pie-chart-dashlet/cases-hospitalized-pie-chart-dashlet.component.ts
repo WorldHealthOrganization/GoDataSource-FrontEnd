@@ -9,14 +9,14 @@ import { catchError, map } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { PieDonutChartComponent, PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-cases-hospitalized-pie-chart-dashlet',
@@ -64,7 +64,7 @@ implements OnInit, OnDestroy {
   @Output() detectChanges = new EventEmitter<void>();
 
   // outbreak
-  private _outbreakId: string;
+  private _selectedOutbreak: OutbreakModel;
 
   // subscribers
   private _outbreakSubscriber: Subscription;
@@ -103,7 +103,7 @@ implements OnInit, OnDestroy {
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
         if (selectedOutbreak) {
-          this._outbreakId = selectedOutbreak.id;
+          this._selectedOutbreak = selectedOutbreak;
           this.refreshDataCaller.call();
         }
       });
@@ -173,7 +173,7 @@ implements OnInit, OnDestroy {
      * Refresh Data
      */
   refreshData() {
-    if (!this._outbreakId) {
+    if (!this._selectedOutbreak?.id) {
       return;
     }
 
@@ -184,7 +184,7 @@ implements OnInit, OnDestroy {
     if (this.globalFilterDate) {
       qb.filter.byDateRange(
         'dateOfReporting', {
-          endDate: moment(this.globalFilterDate).endOf('day').format()
+          endDate: LocalizationHelper.toMoment(this.globalFilterDate).endOf('day').format()
         }
       );
     }
@@ -223,7 +223,7 @@ implements OnInit, OnDestroy {
     // make the request to count hospitalized, isolated ...
     this.getData$ = this.caseDataService
       .getCasesHospitalized(
-        this._outbreakId,
+        this._selectedOutbreak.id,
         qb
       )
       .pipe(
@@ -237,14 +237,22 @@ implements OnInit, OnDestroy {
         delete response.total;
 
         // create data
-        const data: PieDonutChartData[] = Object.keys(response).map((key) => new PieDonutChartData({
-          key,
-          color: (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[key] ?
-            (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[key].getColorCode() :
-            null,
-          label: key,
-          value: response[key]
-        }));
+        const allVisible: boolean = !this._selectedOutbreak.allowedRefDataItems ||
+          !this._selectedOutbreak.allowedRefDataItems[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE] ||
+          Object.keys(this._selectedOutbreak.allowedRefDataItems[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE]).length < 1;
+        const data: PieDonutChartData[] = Object.keys(response)
+          .filter((key) => {
+            return allVisible ||
+              this._selectedOutbreak.allowedRefDataItems[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE][key];
+          })
+          .map((key) => new PieDonutChartData({
+            key,
+            color: (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[key] ?
+              (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[key].getColorCode() :
+              null,
+            label: key,
+            value: response[key]
+          }));
 
         // finished
         return data;

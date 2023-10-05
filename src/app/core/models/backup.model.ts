@@ -3,7 +3,7 @@ import { UserModel } from './user.model';
 import { IPermissionBackup, IPermissionBasic, IPermissionRestorable } from './permission.interface';
 import { PERMISSION } from './permission.model';
 import { FileSize } from '../helperClasses/file-size';
-import { Moment, moment } from '../helperClasses/x-moment';
+import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
 
 export class BackupModel
 implements
@@ -113,11 +113,11 @@ implements
 
     // startedAt
     const startedAt = _.get(data, 'startedAt');
-    this.startedAt = startedAt ? moment(startedAt) : undefined;
+    this.startedAt = startedAt ? LocalizationHelper.toMoment(startedAt) : undefined;
 
     // endedAt
     const endedAt = _.get(data, 'endedAt');
-    this.endedAt = endedAt ? moment(endedAt) : undefined;
+    this.endedAt = endedAt ? LocalizationHelper.toMoment(endedAt) : undefined;
 
     this.user = _.get(data, 'user');
     if (!_.isEmpty(this.user)) {
@@ -149,7 +149,7 @@ implements
      * Update and Set Duration in friendly form
      */
   private updateDuration(): void {
-    this._duration = moment.humanizeDurationBetweenTwoDates(this._endedAt, this._startedAt);
+    this._duration = LocalizationHelper.humanizeDurationBetweenTwoDates(this._endedAt, this._startedAt);
     this._duration = this._duration || '—';
   }
 }

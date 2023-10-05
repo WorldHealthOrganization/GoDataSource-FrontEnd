@@ -22,12 +22,12 @@ import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterCo
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ConvertHtmlToPDFStep, DomService } from '../../../../core/services/helper/dom.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-transmission-chain-bars',
@@ -382,8 +382,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         filter
       ) => {
         // determine operator & value
-        const fromValue = filter.value.startDate ? moment(filter.value.startDate).toISOString() : null;
-        const toValue = filter.value.endDate ? moment(filter.value.endDate).toISOString() : null;
+        const fromValue = filter.value.startDate ? LocalizationHelper.toMoment(filter.value.startDate).toISOString() : null;
+        const toValue = filter.value.endDate ? LocalizationHelper.toMoment(filter.value.endDate).toISOString() : null;
         let operator: string;
         let valueToCompare: any;
         if (filter.comparator.value === V2AdvancedFilterComparatorType.BETWEEN) {
@@ -454,8 +454,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         filter
       ) => {
         // determine operator & value
-        const startDate = filter.value.startDate ? moment(filter.value.startDate).toISOString() : null;
-        const endDate = filter.value.endDate ? moment(filter.value.endDate).toISOString() : null;
+        const startDate = filter.value.startDate ? LocalizationHelper.toMoment(filter.value.startDate).toISOString() : null;
+        const endDate = filter.value.endDate ? LocalizationHelper.toMoment(filter.value.endDate).toISOString() : null;
 
         // must have isolation start date or end date
         qb.filter

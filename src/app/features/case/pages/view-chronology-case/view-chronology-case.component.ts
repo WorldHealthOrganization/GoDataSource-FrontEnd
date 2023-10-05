@@ -18,6 +18,8 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { forkJoin } from 'rxjs';
+import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
 
 @Component({
   selector: 'app-view-chronology-case',
@@ -45,7 +47,8 @@ export class ViewChronologyCaseComponent implements OnInit {
     private labResultDataService: LabResultDataService,
     private i18nService: I18nService,
     private relationshipDataService: RelationshipDataService,
-    private authDataService: AuthDataService
+    private authDataService: AuthDataService,
+    private followUpsDataService: FollowUpsDataService
   ) {}
 
   /**
@@ -69,8 +72,16 @@ export class ViewChronologyCaseComponent implements OnInit {
               // initialize page breadcrumbs
               this.initializeBreadcrumbs();
 
-              const qb = new RequestQueryBuilder();
-              qb.include('people', true);
+              // build query to get the followUps for specified contact
+              const qb = new RequestQueryBuilder;
+              qb.filter.byEquality(
+                'personId',
+                this.caseData.id
+              );
+
+              // build query to get the people for all relationships
+              const qqb = new RequestQueryBuilder();
+              qqb.include('people', true);
 
               forkJoin([
                 // get relationships
@@ -79,8 +90,11 @@ export class ViewChronologyCaseComponent implements OnInit {
                     selectedOutbreak.id,
                     this.caseData.type,
                     this.caseData.id,
-                    qb
+                    qqb
                   ),
+
+                // get follow-ups
+                this.followUpsDataService.getFollowUpsList(selectedOutbreak.id, qb),
 
                 // lab sample taken and lab result dates
                 this.labResultDataService
@@ -91,15 +105,18 @@ export class ViewChronologyCaseComponent implements OnInit {
                   )
               ]).subscribe(([
                 relationshipData,
+                followUps,
                 labResults
               ]: [
                 RelationshipModel[],
+                FollowUpModel[],
                 LabResultModel[]
               ]) => {
                 // set data
                 this.chronologyEntries = CaseChronology.getChronologyEntries(
                   this.i18nService,
                   this.caseData,
+                  followUps,
                   labResults,
                   relationshipData
                 );

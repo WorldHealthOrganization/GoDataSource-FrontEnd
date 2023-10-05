@@ -2,7 +2,6 @@ import { Component, OnDestroy } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -14,44 +13,39 @@ import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ContactModel, IContactIsolated } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
-import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ExportButtonKey, ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
-import * as moment from 'moment';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { Location } from '@angular/common';
-import { Moment } from 'moment';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-cases-list',
   templateUrl: './cases-list.component.html'
 })
-export class CasesListComponent extends ListComponent<CaseModel> implements OnDestroy {
+export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
   // case fields
   private caseFields: ILabelValuePairModel[] = [
     { label: 'LNG_CASE_FIELD_LABEL_ID', value: 'id' },
@@ -138,17 +132,11 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
   constructor(
     protected listHelperService: ListHelperService,
     private activatedRoute: ActivatedRoute,
-    private caseDataService: CaseDataService,
-    private locationDataService: LocationDataService,
-    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private dialogV2Service: DialogV2Service,
-    private i18nService: I18nService,
-    private entityHelperService: EntityHelperService,
-    private redirectService: RedirectService,
     private clusterDataService: ClusterDataService,
     private referenceDataHelperService: ReferenceDataHelperService,
-    private location: Location
+    private location: Location,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
       listHelperService, {
@@ -244,7 +232,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   };
 
                   // determine what we need to delete
-                  this.dialogV2Service.showConfirmDialog({
+                  this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
@@ -263,12 +251,12 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       handler.loading.show();
 
                       // determine if case has exposed contacts
-                      this.caseDataService
+                      this.personAndRelatedHelperService.case.caseDataService
                         .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
                         .pipe(
                           catchError((err) => {
                             // show error
-                            this.toastV2Service.error(err);
+                            this.personAndRelatedHelperService.toastV2Service.error(err);
 
                             // hide loading
                             handler.loading.hide();
@@ -301,10 +289,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                     // delete
-                    this.caseDataService
+                    this.personAndRelatedHelperService.case.caseDataService
                       .deleteCase(
                         this.selectedOutbreak.id,
                         item.id
@@ -312,7 +300,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -323,7 +311,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
+                        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -360,15 +348,15 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               action: {
                 click: (item: CaseModel): void => {
                   // show loading
-                  let loading = this.dialogV2Service.showLoadingDialog();
+                  let loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                   // determine if case has isolated contacts
-                  this.caseDataService
+                  this.personAndRelatedHelperService.case.caseDataService
                     .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
                     .pipe(
                       catchError((err) => {
                         // show error
-                        this.toastV2Service.error(err);
+                        this.personAndRelatedHelperService.toastV2Service.error(err);
 
                         // hide loading
                         loading.close();
@@ -385,7 +373,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       let isolatedContactLinks: string = '';
                       if (isolatedContacts?.count) {
                         // get the isolated contacts
-                        isolatedContactLinks = this.i18nService.instant('LNG_PAGE_LIST_CASES_ACTION_ISOLATED_CONTACTS') +
+                        isolatedContactLinks = this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_ACTION_ISOLATED_CONTACTS') +
                           isolatedContacts.contacts
                             .map((entity) => {
                               // create contact full name
@@ -395,7 +383,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
 
                               // check rights
                               if (!ContactModel.canView(this.authUser)) {
-                                return `${fullName} (${this.i18nService.instant(EntityType.CONTACT)})`;
+                                return `${fullName} (${this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)})`;
                               }
 
                               // create url
@@ -408,13 +396,13 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       }
 
                       // show confirm dialog to confirm the action
-                      this.dialogV2Service.showConfirmDialog({
+                      this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                         config: {
                           title: {
                             get: () => 'LNG_COMMON_LABEL_CONVERT',
                             data: () => ({
                               name: item.name,
-                              type: this.i18nService.instant(EntityType.CONTACT)
+                              type: this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)
                             })
                           },
                           message: {
@@ -433,10 +421,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                         }
 
                         // show loading
-                        loading = this.dialogV2Service.showLoadingDialog();
+                        loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                         // convert
-                        this.caseDataService
+                        this.personAndRelatedHelperService.case.caseDataService
                           .convertToContact(
                             this.selectedOutbreak.id,
                             item.id
@@ -444,7 +432,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                           .pipe(
                             catchError((err) => {
                               // show error
-                              this.toastV2Service.error(err);
+                              this.personAndRelatedHelperService.toastV2Service.error(err);
 
                               // hide loading
                               loading.close();
@@ -455,7 +443,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                           )
                           .subscribe(() => {
                             // success
-                            this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+                            this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();
@@ -630,10 +618,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               }
             },
 
-            // See contacts follow-us belonging to this case
+            // See follow-ups for related contacts
             {
               label: {
-                get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS'
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS_FOR_RELATED_CONTACTS'
               },
               action: {
                 link: (item: CaseModel): string[] => {
@@ -642,6 +630,23 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               },
               visible: (item: CaseModel): boolean => {
                 return !item.deleted &&
+                  FollowUpModel.canList(this.authUser);
+              }
+            },
+
+            // See follow-ups registered as a contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS'
+              },
+              action: {
+                link: (item: CaseModel): string[] => {
+                  return ['/contacts', 'case-follow-ups', item.id];
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  item.wasContact &&
                   FollowUpModel.canList(this.authUser);
               }
             },
@@ -707,7 +712,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               action: {
                 click: (item: CaseModel) => {
                   // export
-                  this.dialogV2Service.showExportData({
+                  this.personAndRelatedHelperService.dialogV2Service.showExportData({
                     title: {
                       get: () => 'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE'
                     },
@@ -718,7 +723,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       url: `outbreaks/${this.selectedOutbreak.id}/cases/${item.id}/export-empty-case-investigation`,
                       async: false,
                       method: ExportDataMethod.GET,
-                      fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                      fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD')}`,
                       allow: {
                         types: [
                           ExportDataExtension.ZIP
@@ -743,7 +748,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               action: {
                 click: (item: CaseModel) => {
                   // show confirm dialog to confirm the action
-                  this.dialogV2Service.showConfirmDialog({
+                  this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
                     config: {
                       title: {
                         get: () => 'LNG_COMMON_LABEL_RESTORE',
@@ -763,10 +768,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                     }
 
                     // show loading
-                    const loading = this.dialogV2Service.showLoadingDialog();
+                    const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                     // convert
-                    this.caseDataService
+                    this.personAndRelatedHelperService.case.caseDataService
                       .restoreCase(
                         this.selectedOutbreak.id,
                         item.id
@@ -774,7 +779,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       .pipe(
                         catchError((err) => {
                           // show error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
 
                           // hide loading
                           loading.close();
@@ -785,7 +790,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       )
                       .subscribe(() => {
                         // success
-                        this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
+                        this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                         // hide loading
                         loading.close();
@@ -822,6 +827,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'lastName',
         label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -832,6 +841,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'firstName',
         label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -842,6 +855,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'middleName',
         label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'middleName'
+        ),
         notVisible: true,
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -853,6 +870,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'visualId',
         label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'visualId'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -863,6 +884,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
@@ -896,7 +918,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             ).map((item) => {
               return {
                 form: {
-                  type: IV2ColumnStatusFormType.TRIANGLE,
+                  type: IV2ColumnStatusFormType.HEXAGON,
                   color: item.getColorCode()
                 },
                 label: item.id,
@@ -918,9 +940,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             }]
           }
         ],
-        forms: (_column, data: CaseModel): V2ColumnStatusForm[] => CaseModel.getStatusForms({
+        forms: (_column, data: CaseModel): V2ColumnStatusForm[] => this.personAndRelatedHelperService.case.getStatusForms({
           item: data,
-          i18nService: this.i18nService,
           classification: this.activatedRoute.snapshot.data.classification,
           outcome: this.activatedRoute.snapshot.data.outcome
         })
@@ -928,6 +949,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'classification',
         label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'classification'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -936,7 +961,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             undefined
           ),
-          search: (column: IV2Column) => {
+          search: (column) => {
             // create condition
             const values: string[] = (column.filter as IV2FilterMultipleSelect).value;
             const condition = {
@@ -967,6 +992,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'pregnancyStatus',
         label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'pregnancyStatus'
+        ),
         notVisible: true,
         sortable: true,
         filter: {
@@ -978,6 +1007,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'investigationStatus',
         label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'investigationStatus'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -988,6 +1021,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'dateInvestigationCompleted',
         label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateInvestigationCompleted'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1000,6 +1037,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'outcomeId',
         label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'outcomeId'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1014,6 +1055,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'dateOfOutcome',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateOfOutcome'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1026,6 +1071,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'dateBecomeCase',
         label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateBecomeCase'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1038,6 +1087,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'dateOfInfection',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateOfInfection'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1050,6 +1103,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'deathLocationId',
         label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'deathLocationId'
+        ),
         format: {
           type: 'deathLocation.name'
         },
@@ -1067,6 +1124,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'dob',
         label: 'LNG_CASE_FIELD_LABEL_DOB',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'ageDob'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1079,6 +1140,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'age',
         label: 'LNG_CASE_FIELD_LABEL_AGE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'ageDob'
+        ),
         format: {
           type: V2ColumnFormat.AGE
         },
@@ -1092,6 +1157,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'gender'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1101,6 +1170,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'riskLevel',
         label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'riskLevel'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1114,6 +1187,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'riskReason',
         label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'riskReason'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -1123,6 +1200,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'occupation',
         label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'occupation'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1136,6 +1217,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'phoneNumber',
         label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.phoneNumber'
+        ),
         format: {
           type: 'mainAddress.phoneNumber'
         },
@@ -1150,6 +1235,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'location',
         label: 'LNG_CASE_FIELD_LABEL_ADDRESS_LOCATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.locationId'
+        ),
         format: {
           type: 'mainAddress.location.name'
         },
@@ -1168,6 +1257,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'addresses.emailAddress',
         label: 'LNG_CASE_FIELD_LABEL_EMAIL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.emailAddress'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.emailAddress'
@@ -1184,6 +1277,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'addresses.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.addressLine1'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
@@ -1200,6 +1297,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.city'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.city'
@@ -1216,6 +1317,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'addresses.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.geoLocation'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
@@ -1224,6 +1329,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'addresses.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.geoLocation'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
@@ -1232,6 +1341,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.postalCode'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
@@ -1248,6 +1361,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'addresses.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'addresses.geoLocationAccurate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -1266,6 +1383,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'dateOfOnset',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateOfOnset'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -1277,6 +1398,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'isDateOfOnsetApproximate',
         label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'isDateOfOnsetApproximate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1291,6 +1416,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'transferRefused',
         label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'transferRefused'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1305,6 +1434,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'dateOfReporting',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateOfReporting'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -1317,6 +1450,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'isDateOfReportingApproximate',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'isDateOfReportingApproximate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1331,6 +1468,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'dateOfBurial',
         label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateOfBurial'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -1343,6 +1484,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'burialLocationId',
         label: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'burialLocationId'
+        ),
         format: {
           type: 'burialLocation.name'
         },
@@ -1360,6 +1505,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'burialPlaceName',
         label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'burialPlaceName'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -1369,6 +1518,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'safeBurial',
         label: 'LNG_CASE_FIELD_LABEL_SAFE_BURIAL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'safeBurial'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1383,6 +1536,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'notACase',
         label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -1406,6 +1560,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'wasContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1420,6 +1575,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'wasContactOfContact',
         label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1434,9 +1590,13 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'responsibleUserId',
         label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'responsibleUserId'
+        ),
         notVisible: true,
         format: {
-          type: 'responsibleUser.name'
+          type: 'responsibleUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1455,12 +1615,19 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'documents',
         label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'documents.type'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'documents.number'
+        ),
         format: {
           type: (item: CaseModel): string => {
             // must format ?
             if (!item.uiDocuments) {
               item.uiDocuments = DocumentModel.arrayToString(
-                this.i18nService,
+                this.personAndRelatedHelperService.i18nService,
                 item.documents
               );
             }
@@ -1474,12 +1641,22 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'vaccinesReceived',
         label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'vaccinesReceived.vaccine'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'vaccinesReceived.date'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'vaccinesReceived.status'
+        ),
         format: {
           type: (item: CaseModel): string => {
             // must format ?
             if (!item.uiVaccines) {
               item.uiVaccines = VaccineModel.arrayToString(
-                this.i18nService,
+                this.personAndRelatedHelperService.i18nService,
                 item.vaccinesReceived
               );
             }
@@ -1493,12 +1670,16 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'dateRanges',
         label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateRanges.typeId'
+        ),
         format: {
           type: (item: CaseModel): string => {
             // must format ?
             if (!item.uiDateRanges) {
               item.uiDateRanges = CaseCenterDateRangeModel.arrayToString(
-                this.i18nService,
+                this.personAndRelatedHelperService.i18nService,
                 item.dateRanges
               );
             }
@@ -1518,6 +1699,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         {
           field: 'numberOfContacts',
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
+          visibleMandatoryIf: () => true,
           format: {
             type: V2ColumnFormat.BUTTON
           },
@@ -1527,7 +1709,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
-          buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
+          buttonLabel: (item) => item.numberOfContacts === 0 ?
+            item.numberOfContacts.toLocaleString('en') :
+            (item.numberOfContacts || '').toLocaleString('en'),
           color: 'text',
           click: (item) => {
             // if we do not have contacts return
@@ -1536,7 +1720,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             }
 
             // display dialog
-            this.entityHelperService.contacts(
+            this.personAndRelatedHelperService.relationship.contacts(
               this.selectedOutbreak,
               item
             );
@@ -1546,6 +1730,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         {
           field: 'numberOfExposures',
           label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+          visibleMandatoryIf: () => true,
           format: {
             type: V2ColumnFormat.BUTTON
           },
@@ -1555,7 +1740,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
-          buttonLabel: (item) => (item.numberOfExposures || '').toLocaleString('en'),
+          buttonLabel: (item) => item.numberOfExposures === 0 ?
+            item.numberOfExposures.toLocaleString('en') :
+            (item.numberOfExposures || '').toLocaleString('en'),
           color: 'text',
           click: (item) => {
             // if we do not have exposures return
@@ -1564,7 +1751,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             }
 
             // display dialog
-            this.entityHelperService.exposures(
+            this.personAndRelatedHelperService.relationship.exposures(
               this.selectedOutbreak,
               item
             );
@@ -1579,6 +1766,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'deleted',
         label: 'LNG_CASE_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1593,6 +1781,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'deletedAt',
         label: 'LNG_CASE_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1605,9 +1794,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'createdBy',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: 'createdByUser.name'
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1626,6 +1816,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'createdAt',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1638,9 +1829,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'updatedBy',
         label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: 'updatedByUser.name'
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1659,6 +1851,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       {
         field: 'updatedAt',
         label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1750,8 +1943,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = CaseModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.advancedFilters = this.personAndRelatedHelperService.case.generateAdvancedFilters(this.selectedOutbreak, {
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
         gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1786,7 +1978,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               // handle error
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // not found
                 finished(null);
@@ -1853,7 +2045,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           label: {
             get: () => 'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON'
           },
-          action: this.redirectService.linkAndQueryParams(
+          action: this.personAndRelatedHelperService.redirectService.linkAndQueryParams(
             ['/cases'],
             {
               applyListFilter: Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS
@@ -1951,7 +2143,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           },
           action: {
             click: () => {
-              this.dialogV2Service.showExportData({
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
                 title: {
                   get: () => 'LNG_PAGE_LIST_CASES_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS_TITLE'
                 },
@@ -1959,7 +2151,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `outbreaks/${this.selectedOutbreak.id}/cases/export-investigation-template`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD')}`,
                   allow: {
                     types: [
                       ExportDataExtension.ZIP
@@ -2115,7 +2307,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               });
 
               // export dossier
-              this.dialogV2Service.showExportData({
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
                 title: {
                   get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE'
                 },
@@ -2123,7 +2315,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
                   async: false,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
                   extraFormData: {
                     append: {
                       cases: selected
@@ -2212,12 +2404,12 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
           tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
-            this.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_DELETE_SELECTED_CASES_DESCRIPTION') :
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_DELETE_SELECTED_CASES_DESCRIPTION') :
             undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -2236,7 +2428,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
                   loading.message({
                     message: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_SELECTED_CASES_WAIT_MESSAGE',
                     messageData: {
@@ -2252,14 +2444,14 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   const nextDelete = () => {
                     // finished ?
                     if (selectedShallowClone.length < 1) {
-                      this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SELECTED_CASES_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SELECTED_CASES_SUCCESS_MESSAGE');
                       loading.close();
                       this.needsRefreshList(true);
                       return;
                     }
 
                     // delete
-                    this.caseDataService
+                    this.personAndRelatedHelperService.case.caseDataService
                       .deleteCase(
                         this.selectedOutbreak.id,
                         selectedShallowClone.shift()
@@ -2270,7 +2462,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                           loading.close();
 
                           // error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
                           return throwError(err);
                         })
                       )
@@ -2280,17 +2472,17 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
 
                         // initialize start time if necessary
                         if (!startTime) {
-                          startTime = moment();
+                          startTime = LocalizationHelper.now();
                         }
 
                         // determine estimated time
                         const processed: number = selected.length - selectedShallowClone.length;
                         const total: number = selected.length;
                         if (processed > 0) {
-                          const processedSoFarTimeMs: number = moment().diff(startTime);
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                           const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                           const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                          estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                         }
 
                         // update progress
@@ -2299,7 +2491,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                           messageData: {
                             no: processed.toLocaleString('en'),
                             total: total.toLocaleString('en'),
-                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
                           }
                         });
 
@@ -2330,12 +2522,12 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
           tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allDeleted ?
-            this.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_RESTORE_SELECTED_CASES_DESCRIPTION') :
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_GROUP_ACTION_RESTORE_SELECTED_CASES_DESCRIPTION') :
             undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -2354,7 +2546,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
                   loading.message({
                     message: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_SELECTED_CASES_WAIT_MESSAGE',
                     messageData: {
@@ -2370,14 +2562,14 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   const nextRestore = () => {
                     // finished ?
                     if (selectedShallowClone.length < 1) {
-                      this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SELECTED_CASES_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SELECTED_CASES_SUCCESS_MESSAGE');
                       loading.close();
                       this.needsRefreshList(true);
                       return;
                     }
 
                     // restore
-                    this.caseDataService
+                    this.personAndRelatedHelperService.case.caseDataService
                       .restoreCase(
                         this.selectedOutbreak.id,
                         selectedShallowClone.shift()
@@ -2388,7 +2580,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                           loading.close();
 
                           // error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
                           return throwError(err);
                         })
                       )
@@ -2398,17 +2590,17 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
 
                         // initialize start time if necessary
                         if (!startTime) {
-                          startTime = moment();
+                          startTime = LocalizationHelper.now();
                         }
 
                         // determine estimated time
                         const processed: number = selected.length - selectedShallowClone.length;
                         const total: number = selected.length;
                         if (processed > 0) {
-                          const processedSoFarTimeMs: number = moment().diff(startTime);
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                           const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                           const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                          estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                         }
 
                         // update progress
@@ -2417,7 +2609,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                           messageData: {
                             no: processed.toLocaleString('en'),
                             total: total.toLocaleString('en'),
-                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
                           }
                         });
 
@@ -2487,7 +2679,10 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           );
         } else if (item.label === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED') {
           // clear
-          this.queryBuilder.filter.byNotHavingValue('classification');
+          this.queryBuilder.filter.byNotHavingValue(
+            'classification',
+            true
+          );
         } else {
           // search
           this.queryBuilder.filter.byEquality(
@@ -2520,7 +2715,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           clonedQueryBuilder.filter.removePathCondition('or.classification');
 
           // load data
-          return this.caseDataService
+          return this.personAndRelatedHelperService.case.caseDataService
             .getCasesGroupedByClassification(
               this.selectedOutbreak.id,
               clonedQueryBuilder
@@ -2553,7 +2748,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               values = values.sort((item1, item2) => {
                 // if same order, compare labels
                 if (item1.order === item2.order) {
-                  return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
+                  return this.personAndRelatedHelperService.i18nService.instant(item1.label).localeCompare(this.personAndRelatedHelperService.i18nService.instant(item2.label));
                 }
 
                 // format order
@@ -2597,7 +2792,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
    * Export case data
    */
   private exportCases(qb: RequestQueryBuilder): void {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showExportDataAfterLoadingData({
         title: {
           get: () => 'LNG_PAGE_LIST_CASES_EXPORT_TITLE'
@@ -2610,7 +2805,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               // handle errors
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // send error further
                 return throwError(err);
@@ -2638,7 +2833,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `/outbreaks/${this.selectedOutbreak.id}/cases/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -2694,7 +2889,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
    * Export case relationships
    */
   private exportCaseRelationships(qb: RequestQueryBuilder): void {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showExportDataAfterLoadingData({
         title: {
           get: () => 'LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIPS_TITLE'
@@ -2707,7 +2902,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               // handle errors
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // send error further
                 return throwError(err);
@@ -2735,7 +2930,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${LocalizationHelper.now().format('YYYY-MM-DD')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -2811,7 +3006,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     // if we have an applied filter then we need to add breadcrumb
     if (this.appliedListFilter === ApplyListFilter.CASES_WITHOUT_RELATIONSHIPS) {
       // since we need to send user to the same page we need to do some hacks...
-      const redirect = this.redirectService.linkAndQueryParams(
+      const redirect = this.personAndRelatedHelperService.redirectService.linkAndQueryParams(
         ['/cases']
       );
       casesAction = {
@@ -2917,7 +3112,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     }
 
     // retrieve the list of Cases
-    this.records$ = this.caseDataService
+    this.records$ = this.personAndRelatedHelperService.case.caseDataService
       .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         switchMap((data) => {
@@ -2966,7 +3161,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           );
 
           // retrieve locations
-          return this.locationDataService
+          return this.personAndRelatedHelperService.locationDataService
             .getLocationsList(qb)
             .pipe(
               map((locations) => {
@@ -3037,6 +3232,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
@@ -3047,12 +3243,12 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     }
 
     // count
-    this.caseDataService
+    this.personAndRelatedHelperService.case.caseDataService
       .getCasesCount(this.selectedOutbreak.id, countQueryBuilder)
       .pipe(
         // error
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         }),
 

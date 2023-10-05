@@ -7,8 +7,8 @@ import * as _ from 'lodash';
 import { localLanguages } from '../../../i18n';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { map } from 'rxjs/operators';
-import { moment, Moment } from '../../helperClasses/x-moment';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
 
 @Injectable()
 export class LanguageDataService {
@@ -82,7 +82,7 @@ export class LanguageDataService {
 
     // retrieve only tokens for updating list
     if (updatedSince) {
-      qb.filter.flag('updatedSince', moment(updatedSince).toISOString());
+      qb.filter.flag('updatedSince', LocalizationHelper.toMoment(updatedSince).toISOString());
     }
 
     const filter = qb.buildQuery();

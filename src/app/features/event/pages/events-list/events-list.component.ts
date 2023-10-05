@@ -1,7 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -10,39 +9,42 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import {
+  RelationshipModel,
+  EntityModel
+} from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { EventModel } from '../../../../core/models/event.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { EventDataService } from '../../../../core/services/data/event.data.service';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import {
+  IV2ColumnPinned,
+  V2ColumnFormat,
+  IV2ColumnStatusFormType,
+  V2ColumnStatusForm
+} from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { Moment } from 'moment';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-events-list',
   templateUrl: './events-list.component.html'
 })
 export class EventsListComponent
-  extends ListComponent<EventModel>
+  extends ListComponent<EventModel, IV2ColumnToVisibleMandatoryConf>
   implements OnDestroy {
 
   // event fields
@@ -67,7 +69,8 @@ export class EventsListComponent
     { label: 'LNG_EVENT_FIELD_LABEL_END_DATE', value: 'endDate' },
     { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY', value: 'eventCategory' },
-    { label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID', value: 'visualId' }
+    { label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
+    { label: 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' }
   ];
 
   // relationship fields
@@ -100,17 +103,16 @@ export class EventsListComponent
    */
   constructor(
     protected listHelperService: ListHelperService,
-    private eventDataService: EventDataService,
     private outbreakDataService: OutbreakDataService,
-    private toastV2Service: ToastV2Service,
-    private i18nService: I18nService,
-    private redirectService: RedirectService,
-    private entityHelperService: EntityHelperService,
-    private dialogV2Service: DialogV2Service,
-    private locationDataService: LocationDataService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
+    );
   }
 
   /**
@@ -188,8 +190,19 @@ export class EventsListComponent
               cssClasses: () => 'gd-list-table-actions-action-menu-warning',
               action: {
                 click: (item: EventModel): void => {
+                  // data
+                  const message: {
+                    get: string,
+                    data?: {
+                      name: string,
+                      numberOfContacts: string
+                    }
+                  } = {
+                    get: ''
+                  };
+
                   // determine what we need to delete
-                  this.dialogV2Service
+                  this.personAndRelatedHelperService.dialogV2Service
                     .showConfirmDialog({
                       config: {
                         title: {
@@ -199,36 +212,71 @@ export class EventsListComponent
                           })
                         },
                         message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_EVENT',
-                          data: () => ({
-                            name: item.name
-                          })
+                          get: () => message.get,
+                          data: () => message.data
                         }
                       },
-                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK',
+                      initialized: (handler) => {
+                        // display loading
+                        handler.loading.show();
+
+                        // determine if event has exposed contacts
+                        this.personAndRelatedHelperService.event.eventDataService
+                          .getExposedContactsForEvent(this.selectedOutbreak.id, item.id)
+                          .pipe(
+                            catchError((err) => {
+                              // show error
+                              this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                              // hide loading
+                              handler.loading.hide();
+
+                              // send error down the road
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe((exposedContacts: { count: number }) => {
+                            // set message data
+                            message.data = {
+                              name: item.name,
+                              numberOfContacts: exposedContacts?.count.toLocaleString('en')
+                            };
+
+                            // determine message label
+                            message.get = !exposedContacts?.count ?
+                              'LNG_DIALOG_CONFIRM_DELETE_EVENT' :
+                              'LNG_DIALOG_CONFIRM_DELETE_EVENT_WITH_EXPOSED_CONTACTS';
+
+                            // hide loading
+                            handler.loading.hide();
+                          });
+                      }
                     })
                     .subscribe((response) => {
                       // canceled ?
-                      if ( response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
                         // finished
                         return;
                       }
 
                       // show loading
-                      const loading =
-                        this.dialogV2Service.showLoadingDialog();
+                      const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                       // delete event
-                      this.eventDataService
-                        .deleteEvent(this.selectedOutbreak.id, item.id)
+                      this.personAndRelatedHelperService.event.eventDataService
+                        .deleteEvent(
+                          this.selectedOutbreak.id,
+                          item.id
+                        )
                         .pipe(
                           catchError((err) => {
-                            this.toastV2Service.error(err);
+                            this.personAndRelatedHelperService.toastV2Service.error(err);
                             return throwError(err);
                           })
                         )
                         .subscribe(() => {
-                          this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
+                          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                           // hide loading
                           loading.close();
@@ -384,7 +432,7 @@ export class EventsListComponent
               action: {
                 click: (item: EventModel) => {
                   // show confirm dialog to confirm the action
-                  this.dialogV2Service
+                  this.personAndRelatedHelperService.dialogV2Service
                     .showConfirmDialog({
                       config: {
                         title: {
@@ -410,15 +458,15 @@ export class EventsListComponent
 
                       // show loading
                       const loading =
-                        this.dialogV2Service.showLoadingDialog();
+                        this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                       // convert
-                      this.eventDataService
+                      this.personAndRelatedHelperService.event.eventDataService
                         .restoreEvent(this.selectedOutbreak.id, item.id)
                         .pipe(
                           catchError((err) => {
                             // show error
-                            this.toastV2Service.error(err);
+                            this.personAndRelatedHelperService.toastV2Service.error(err);
 
                             // hide loading
                             loading.close();
@@ -429,7 +477,7 @@ export class EventsListComponent
                         )
                         .subscribe(() => {
                           // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+                          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                           // hide loading
                           loading.close();
@@ -468,6 +516,10 @@ export class EventsListComponent
       {
         field: 'name',
         label: 'LNG_EVENT_FIELD_LABEL_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'name'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -478,6 +530,10 @@ export class EventsListComponent
       {
         field: 'visualId',
         label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'visualId'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -488,6 +544,10 @@ export class EventsListComponent
       {
         field: 'date',
         label: 'LNG_EVENT_FIELD_LABEL_DATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'date'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -499,6 +559,10 @@ export class EventsListComponent
       {
         field: 'eventCategory',
         label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'eventCategory'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -509,6 +573,10 @@ export class EventsListComponent
       {
         field: 'endDate',
         label: 'LNG_EVENT_FIELD_LABEL_END_DATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'endDate'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -520,6 +588,10 @@ export class EventsListComponent
       {
         field: 'description',
         label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'description'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -529,6 +601,10 @@ export class EventsListComponent
       {
         field: 'phoneNumber',
         label: 'LNG_EVENT_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.phoneNumber'
+        ),
         notVisible: true,
         sortable: true,
         format: {
@@ -544,6 +620,10 @@ export class EventsListComponent
       {
         field: 'address.emailAddress',
         label: 'LNG_EVENT_FIELD_LABEL_EMAIL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.emailAddress'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.emailAddress'
@@ -561,9 +641,13 @@ export class EventsListComponent
       {
         field: 'responsibleUserId',
         label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'responsibleUserId'
+        ),
         notVisible: true,
         format: {
-          type: 'responsibleUser.name'
+          type: 'responsibleUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -582,6 +666,10 @@ export class EventsListComponent
       {
         field: 'dateOfReporting',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'dateOfReporting'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -594,6 +682,10 @@ export class EventsListComponent
       {
         field: 'isDateOfReportingApproximate',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'isDateOfReportingApproximate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -604,6 +696,34 @@ export class EventsListComponent
           defaultValue: ''
         },
         sortable: true
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' ',
+              order: undefined
+            }]
+          }
+        ],
+        forms: (_column, data: EventModel): V2ColumnStatusForm[] => this.personAndRelatedHelperService.event.getStatusForms({
+          item: data
+        })
       }
     ];
 
@@ -614,6 +734,7 @@ export class EventsListComponent
         {
           field: 'numberOfContacts',
           label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+          visibleMandatoryIf: () => true,
           format: {
             type: V2ColumnFormat.BUTTON
           },
@@ -623,7 +744,8 @@ export class EventsListComponent
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
-          buttonLabel: (item) =>
+          buttonLabel: (item) => item.numberOfContacts === 0 ?
+            item.numberOfContacts.toLocaleString('en') :
             (item.numberOfContacts || '').toLocaleString('en'),
           color: 'text',
           click: (item) => {
@@ -633,13 +755,14 @@ export class EventsListComponent
             }
 
             // display dialog
-            this.entityHelperService.contacts(this.selectedOutbreak, item);
+            this.personAndRelatedHelperService.relationship.contacts(this.selectedOutbreak, item);
           },
           disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipContacts(this.authUser)
         },
         {
           field: 'numberOfExposures',
           label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+          visibleMandatoryIf: () => true,
           format: {
             type: V2ColumnFormat.BUTTON
           },
@@ -649,7 +772,8 @@ export class EventsListComponent
           },
           sortable: true,
           cssCellClass: 'gd-cell-button',
-          buttonLabel: (item) =>
+          buttonLabel: (item) => item.numberOfExposures === 0 ?
+            item.numberOfExposures.toLocaleString('en') :
             (item.numberOfExposures || '').toLocaleString('en'),
           color: 'text',
           click: (item) => {
@@ -659,7 +783,7 @@ export class EventsListComponent
             }
 
             // display dialog
-            this.entityHelperService.exposures(this.selectedOutbreak, item);
+            this.personAndRelatedHelperService.relationship.exposures(this.selectedOutbreak, item);
           },
           disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipExposures(this.authUser)
         }
@@ -671,6 +795,7 @@ export class EventsListComponent
       {
         field: 'deleted',
         label: 'LNG_EVENT_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.BOOLEAN
         },
@@ -684,6 +809,7 @@ export class EventsListComponent
       {
         field: 'deletedAt',
         label: 'LNG_EVENT_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -696,9 +822,10 @@ export class EventsListComponent
       {
         field: 'createdBy',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: 'createdByUser.name'
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -717,6 +844,7 @@ export class EventsListComponent
       {
         field: 'createdAt',
         label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -729,9 +857,10 @@ export class EventsListComponent
       {
         field: 'updatedBy',
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: 'updatedByUser.name'
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -750,6 +879,7 @@ export class EventsListComponent
       {
         field: 'updatedAt',
         label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         filter: {
           type: V2FilterType.DATE_RANGE
@@ -762,6 +892,10 @@ export class EventsListComponent
       {
         field: 'location',
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.locationId'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.location.name'
@@ -781,6 +915,10 @@ export class EventsListComponent
       {
         field: 'address.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.addressLine1'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
@@ -798,6 +936,10 @@ export class EventsListComponent
       {
         field: 'address.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.city'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.city'
@@ -815,6 +957,10 @@ export class EventsListComponent
       {
         field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.geoLocation'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
@@ -823,6 +969,10 @@ export class EventsListComponent
       {
         field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.geoLocation'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
@@ -831,6 +981,10 @@ export class EventsListComponent
       {
         field: 'address.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.postalCode'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
@@ -848,6 +1002,10 @@ export class EventsListComponent
       {
         field: 'address.geoLocationAccurate',
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.event.visibleMandatoryKey,
+          'address.geoLocationAccurate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -940,8 +1098,8 @@ export class EventsListComponent
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = EventModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.advancedFilters = this.personAndRelatedHelperService.event.generateAdvancedFilters(this.selectedOutbreak, {
+      eventInvestigationTemplate: () => this.selectedOutbreak.eventInvestigationTemplate,
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -973,7 +1131,7 @@ export class EventsListComponent
           label: {
             get: () => 'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON'
           },
-          action: this.redirectService.linkAndQueryParams(['/events'], {
+          action: this.personAndRelatedHelperService.redirectService.linkAndQueryParams(['/events'], {
             applyListFilter:
               Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS
           }),
@@ -1208,12 +1366,12 @@ export class EventsListComponent
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
           tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
-            this.i18nService.instant('LNG_PAGE_LIST_EVENTS_GROUP_ACTION_DELETE_SELECTED_EVENTS_DESCRIPTION') :
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_EVENTS_GROUP_ACTION_DELETE_SELECTED_EVENTS_DESCRIPTION') :
             undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -1232,7 +1390,7 @@ export class EventsListComponent
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
                   loading.message({
                     message: 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SELECTED_EVENTS_WAIT_MESSAGE',
                     messageData: {
@@ -1248,14 +1406,14 @@ export class EventsListComponent
                   const nextDelete = () => {
                     // finished ?
                     if (selectedShallowClone.length < 1) {
-                      this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SELECTED_EVENTS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SELECTED_EVENTS_SUCCESS_MESSAGE');
                       loading.close();
                       this.needsRefreshList(true);
                       return;
                     }
 
                     // delete
-                    this.eventDataService
+                    this.personAndRelatedHelperService.event.eventDataService
                       .deleteEvent(
                         this.selectedOutbreak.id,
                         selectedShallowClone.shift()
@@ -1266,7 +1424,7 @@ export class EventsListComponent
                           loading.close();
 
                           // error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
                           return throwError(err);
                         })
                       )
@@ -1276,17 +1434,17 @@ export class EventsListComponent
 
                         // initialize start time if necessary
                         if (!startTime) {
-                          startTime = moment();
+                          startTime = LocalizationHelper.now();
                         }
 
                         // determine estimated time
                         const processed: number = selected.length - selectedShallowClone.length;
                         const total: number = selected.length;
                         if (processed > 0) {
-                          const processedSoFarTimeMs: number = moment().diff(startTime);
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                           const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                           const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                          estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                         }
 
                         // update progress
@@ -1295,7 +1453,7 @@ export class EventsListComponent
                           messageData: {
                             no: processed.toLocaleString('en'),
                             total: total.toLocaleString('en'),
-                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
                           }
                         });
 
@@ -1326,12 +1484,12 @@ export class EventsListComponent
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
           tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allDeleted ?
-            this.i18nService.instant('LNG_PAGE_LIST_EVENTS_GROUP_ACTION_RESTORE_SELECTED_EVENTS_DESCRIPTION') :
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_EVENTS_GROUP_ACTION_RESTORE_SELECTED_EVENTS_DESCRIPTION') :
             undefined,
           action: {
             click: (selected: string[]) => {
               // ask for confirmation
-              this.dialogV2Service
+              this.personAndRelatedHelperService.dialogV2Service
                 .showConfirmDialog({
                   config: {
                     title: {
@@ -1350,7 +1508,7 @@ export class EventsListComponent
                   }
 
                   // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
                   loading.message({
                     message: 'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SELECTED_EVENTS_WAIT_MESSAGE',
                     messageData: {
@@ -1366,14 +1524,14 @@ export class EventsListComponent
                   const nextRestore = () => {
                     // finished ?
                     if (selectedShallowClone.length < 1) {
-                      this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SELECTED_EVENTS_SUCCESS_MESSAGE');
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SELECTED_EVENTS_SUCCESS_MESSAGE');
                       loading.close();
                       this.needsRefreshList(true);
                       return;
                     }
 
                     // restore
-                    this.eventDataService
+                    this.personAndRelatedHelperService.event.eventDataService
                       .restoreEvent(
                         this.selectedOutbreak.id,
                         selectedShallowClone.shift()
@@ -1384,7 +1542,7 @@ export class EventsListComponent
                           loading.close();
 
                           // error
-                          this.toastV2Service.error(err);
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
                           return throwError(err);
                         })
                       )
@@ -1394,17 +1552,17 @@ export class EventsListComponent
 
                         // initialize start time if necessary
                         if (!startTime) {
-                          startTime = moment();
+                          startTime = LocalizationHelper.now();
                         }
 
                         // determine estimated time
                         const processed: number = selected.length - selectedShallowClone.length;
                         const total: number = selected.length;
                         if (processed > 0) {
-                          const processedSoFarTimeMs: number = moment().diff(startTime);
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                           const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                           const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                          estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                         }
 
                         // update progress
@@ -1413,7 +1571,7 @@ export class EventsListComponent
                           messageData: {
                             no: processed.toLocaleString('en'),
                             total: total.toLocaleString('en'),
-                            date: estimatedEndDate ? estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) : '—'
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
                           }
                         });
 
@@ -1467,7 +1625,7 @@ export class EventsListComponent
    * Export event data
    */
   private exportEvents(qb: RequestQueryBuilder): void {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showExportDataAfterLoadingData({
         title: {
           get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_TITLE'
@@ -1480,7 +1638,7 @@ export class EventsListComponent
               // handle errors
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // send error further
                 return throwError(err);
@@ -1508,7 +1666,7 @@ export class EventsListComponent
                   url: `/outbreaks/${this.selectedOutbreak.id}/events/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_EVENTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_EVENTS_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -1532,7 +1690,8 @@ export class EventsListComponent
                     },
                     dbColumns: true,
                     dbValues: true,
-                    jsonReplaceUndefinedWithNull: true
+                    jsonReplaceUndefinedWithNull: true,
+                    questionnaireVariables: true
                   }
                 }
               });
@@ -1545,7 +1704,7 @@ export class EventsListComponent
    * Export event relationships
    */
   private exportEventRelationships(qb: RequestQueryBuilder): void {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showExportDataAfterLoadingData({
         title: {
           get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIPS_TITLE'
@@ -1558,7 +1717,7 @@ export class EventsListComponent
               // handle errors
               catchError((err) => {
                 // show error
-                this.toastV2Service.error(err);
+                this.personAndRelatedHelperService.toastV2Service.error(err);
 
                 // send error further
                 return throwError(err);
@@ -1586,7 +1745,7 @@ export class EventsListComponent
                   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_EVENTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${LocalizationHelper.now().format('YYYY-MM-DD')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -1631,7 +1790,7 @@ export class EventsListComponent
       this.appliedListFilter === ApplyListFilter.EVENTS_WITHOUT_RELATIONSHIPS
     ) {
       // since we need to send user to the same page we need to do some hacks...
-      const redirect = this.redirectService.linkAndQueryParams(['/events']);
+      const redirect = this.personAndRelatedHelperService.redirectService.linkAndQueryParams(['/events']);
       eventsAction = {
         link: redirect.link(),
         linkQueryParams: redirect.linkQueryParams()
@@ -1681,6 +1840,7 @@ export class EventsListComponent
       'dateOfReporting',
       'isDateOfReportingApproximate',
       'responsibleUserId',
+      'questionnaireAnswers',
       'numberOfContacts',
       'numberOfExposures',
       'deleted',
@@ -1709,7 +1869,7 @@ export class EventsListComponent
     }
 
     // retrieve the list of Events
-    this.records$ = this.eventDataService
+    this.records$ = this.personAndRelatedHelperService.event.eventDataService
       .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         switchMap((data) => {
@@ -1745,7 +1905,7 @@ export class EventsListComponent
           );
 
           // retrieve locations
-          return this.locationDataService
+          return this.personAndRelatedHelperService.locationDataService
             .getLocationsList(qb)
             .pipe(
               map((locations) => {
@@ -1771,6 +1931,14 @@ export class EventsListComponent
         })
       )
       .pipe(
+        // process data
+        map((events: EventModel[]) => {
+          return EntityModel.determineAlertness<EventModel>(
+            this.selectedOutbreak.eventInvestigationTemplate,
+            events
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
@@ -1792,6 +1960,7 @@ export class EventsListComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
@@ -1799,11 +1968,11 @@ export class EventsListComponent
     }
 
     // count
-    this.eventDataService
+    this.personAndRelatedHelperService.event.eventDataService
       .getEventsCount(this.selectedOutbreak.id, countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         }),
 
