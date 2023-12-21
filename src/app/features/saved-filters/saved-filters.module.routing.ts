@@ -6,6 +6,7 @@ import { PermissionExpression } from '../../core/models/user.model';
 import { ModuleWithProviders } from '@angular/core';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
 
 const routes: Routes = [
   {
@@ -32,6 +33,7 @@ const routes: Routes = [
       })
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
       user: UserDataResolver
     }

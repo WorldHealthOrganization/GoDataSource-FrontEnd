@@ -2,11 +2,12 @@ import * as _ from 'lodash';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
 import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
-import { IPermissionBasic, IPermissionCloneable, IPermissionUser } from './permission.interface';
+import { IPermissionBasic, IPermissionBasicBulk, IPermissionCloneable, IPermissionUser } from './permission.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { TeamModel } from './team.model';
 import { BaseModel } from './base.model';
+import { Moment } from '../helperClasses/localization-helper';
 
 export enum UserSettings {
   // fields
@@ -184,6 +185,7 @@ export class UserRoleModel
    */
   static generateAdvancedFilters(data: {
     options: {
+      createdOn: ILabelValuePairModel[],
       user: ILabelValuePairModel[],
       permission: PermissionModel[]
     }
@@ -228,6 +230,13 @@ export class UserRoleModel
         groupPartialTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION',
         groupOptionHiddenKey: 'hidden',
         defaultValues: PermissionModel.HIDDEN_PERMISSIONS
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_ON',
+        options: data.options.createdOn,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
@@ -334,6 +343,7 @@ export class UserModel
   extends BaseModel
   implements
     IPermissionBasic,
+    IPermissionBasicBulk,
     IPermissionUser {
   id: string;
   firstName: string;
@@ -347,6 +357,7 @@ export class UserModel
   roleIds: string[];
   roles: UserRoleModel[] = [];
   disregardGeographicRestrictions: boolean;
+  lastLogin: string | Moment;
 
   // no saved filters to be used by this user ?
   dontCacheFilters: boolean;
@@ -399,6 +410,7 @@ export class UserModel
   static generateAdvancedFilters(data: {
     authUser: UserModel,
     options: {
+      createdOn: ILabelValuePairModel[],
       institution: ILabelValuePairModel[],
       userRole: ILabelValuePairModel[],
       outbreak: ILabelValuePairModel[],
@@ -484,6 +496,19 @@ export class UserModel
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'lastLogin',
+        label: 'LNG_USER_FIELD_LABEL_LAST_LOGIN',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_ON',
+        options: data.options.createdOn,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
         field: 'createdAt',
         label: 'LNG_USER_FIELD_LABEL_CREATED_AT',
         sortable: true
@@ -525,13 +550,21 @@ export class UserModel
   }
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Static Permissions - IPermissionBasic
+   */
   static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_VIEW) : false; }
   static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_LIST) : false; }
   static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_CREATE) : false; }
   static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_VIEW, PERMISSION.USER_MODIFY) : false; }
   static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_DELETE) : false; }
+
+  /**
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
+  static canBulkModify(): boolean { return false; }
+  static canBulkDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_BULK_DELETE) : false; }
+  static canBulkRestore(): boolean { return false; }
 
   /**
    * Static Permissions - IPermissionExportable
@@ -573,6 +606,7 @@ export class UserModel
     this.telephoneNumbers = _.get(data, 'telephoneNumbers', {});
     this.disregardGeographicRestrictions = _.get(data, 'disregardGeographicRestrictions', false);
     this.dontCacheFilters = _.get(data, 'dontCacheFilters', false);
+    this.lastLogin = _.get(data, 'lastLogin');
 
     // initialize settings
     _.each(data?.settings, (settings, property) => {
@@ -591,13 +625,21 @@ export class UserModel
   }
 
   /**
-     * Permissions - IPermissionBasic
-     */
+   * Permissions - IPermissionBasic
+   */
   canView(user: UserModel): boolean { return UserModel.canView(user); }
   canList(user: UserModel): boolean { return UserModel.canList(user); }
   canCreate(user: UserModel): boolean { return UserModel.canCreate(user); }
   canModify(user: UserModel): boolean { return UserModel.canModify(user); }
   canDelete(user: UserModel): boolean { return UserModel.canDelete(user); }
+
+  /**
+   * Permissions - IPermissionBasicBulk
+   */
+  canBulkCreate(): boolean { return UserModel.canBulkCreate(); }
+  canBulkModify(): boolean { return UserModel.canBulkModify(); }
+  canBulkDelete(user: UserModel): boolean { return UserModel.canBulkDelete(user); }
+  canBulkRestore(): boolean { return UserModel.canBulkRestore(); }
 
   /**
    * Permissions - IPermissionExportable

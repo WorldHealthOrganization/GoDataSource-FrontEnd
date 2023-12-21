@@ -24,12 +24,15 @@ import {
   ReferenceDataDiseaseSpecificCategoriesResolver
 } from '../../core/services/resolvers/data/reference-data-disease-specific-categories.resolver';
 import { IconDataResolver } from '../../core/services/resolvers/data/icon.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
   component: fromPages.OutbreakCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     disease: DiseaseDataResolver,
     country: CountryDataResolver,
     geographicalLevel: LocationGeographicalLevelDataResolver,
@@ -38,6 +41,7 @@ const createViewModifyFoundation: Route = {
     yesNo: YesNoDataResolver,
     mapVectorType: MapVectorTypeDataResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     outbreakTemplate: OutbreakTemplateDataResolver,
     questionnaireAnswerType: QuestionnaireAnswerTypeDataResolver,
     questionnaireQuestionCategory: QuestionnaireQuestionCategoryDataResolver,
@@ -60,6 +64,7 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       disease: DiseaseDataResolver,
       country: CountryDataResolver,
       geographicalLevel: LocationGeographicalLevelDataResolver,

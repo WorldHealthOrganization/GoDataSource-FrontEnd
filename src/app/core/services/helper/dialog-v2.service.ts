@@ -92,8 +92,8 @@ import { LocalizationHelper, Moment } from '../../helperClasses/localization-hel
 @Injectable()
 export class DialogV2Service {
   // export dialog width
-  private static readonly EXPORT_DIALOG_WIDTH: string = '50rem';
-  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '50rem';
+  private static readonly EXPORT_DIALOG_WIDTH: string = '60rem';
+  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '60rem';
 
   // used to show and update side dialog
   private _sideDialogSubject$: Subject<IV2SideDialog> = new Subject<IV2SideDialog>();
@@ -2559,27 +2559,38 @@ export class DialogV2Service {
    * Show record details dialog
    */
   showRecordDetailsDialog(
+    authUser: UserModel,
     title: string,
     record: BaseModel,
     users: IResolverV2ResponseModel<UserModel>,
+    deletedUsers: IResolverV2ResponseModel<UserModel>,
     suffixInputs?: V2SideDialogConfigInput[]
   ): void {
     // construct list of details
     const detailsInputs: V2SideDialogConfigInput[] = [];
 
     // created by
-    let createdByName: string = '—';
-    if (
-      record.createdBy &&
-      users.map[record.createdBy]
-    ) {
-      createdByName = users.map[record.createdBy].nameAndEmail;
+    let createdBy: UserModel;
+    if (record.createdBy) {
+      createdBy = users.map[record.createdBy] ?
+        users.map[record.createdBy] : (
+          deletedUsers.map[record.createdBy] ?
+            deletedUsers.map[record.createdBy] :
+            undefined
+        );
     }
     detailsInputs.push({
-      type: V2SideDialogConfigInputType.KEY_VALUE,
+      type: V2SideDialogConfigInputType.KEY_LINK_VALUE,
       name: 'createdBy',
       placeholder: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY',
-      value: createdByName
+      link: {
+        label: createdBy ?
+          createdBy.nameAndEmail :
+          '—',
+        src: createdBy && UserModel.canView(authUser) && !createdBy.deleted ?
+          [`/users/${createdBy.id}/view`] :
+          undefined
+      }
     });
 
     // created at
@@ -2594,19 +2605,42 @@ export class DialogV2Service {
       value: createdAt
     });
 
-    // updated by
-    let updatedByName: string = '—';
-    if (
-      record.updatedBy &&
-      users.map[record.updatedBy]
-    ) {
-      updatedByName = users.map[record.updatedBy].nameAndEmail;
+    // created on
+    let createdOn: string = '—';
+    if (record.createdOn) {
+      createdOn = record.createdOn ?
+        `LNG_PLATFORM_LABEL_${record.createdOn}` :
+        record.createdOn;
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
+      name: 'createdOn',
+      placeholder: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON',
+      value: createdOn
+    });
+
+    // updated by
+    let updatedBy: UserModel;
+    if (record.updatedBy) {
+      updatedBy = users.map[record.updatedBy] ?
+        users.map[record.updatedBy] : (
+          deletedUsers.map[record.updatedBy] ?
+            deletedUsers.map[record.updatedBy] :
+            undefined
+        );
+    }
+    detailsInputs.push({
+      type: V2SideDialogConfigInputType.KEY_LINK_VALUE,
       name: 'updatedBy',
       placeholder: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY',
-      value: updatedByName
+      link: {
+        label: updatedBy ?
+          updatedBy.nameAndEmail :
+          '—',
+        src: updatedBy && UserModel.canView(authUser) && !updatedBy.deleted ?
+          [`/users/${updatedBy.id}/view`] :
+          undefined
+      }
     });
 
     // updated at

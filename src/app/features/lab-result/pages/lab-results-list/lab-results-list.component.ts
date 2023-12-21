@@ -55,13 +55,13 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE', value:  'sequence' },
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value:  'questionnaireAnswers' },
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON', value:  'person' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value:  'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value:  'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value:  'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value:  'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value:  'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value:  'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value:  'createdOn' }
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT', value:  'createdAt' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY', value:  'createdBy' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT', value:  'updatedAt' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY', value:  'updatedBy' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED', value:  'deleted' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT', value:  'deletedAt' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_ON', value:  'createdOn' }
   ];
 
   /**
@@ -864,9 +864,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
         visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.createdBy].name :
-            ''
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -877,10 +875,27 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy && UserModel.canView(this.authUser) ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.personAndRelatedHelperService.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -901,9 +916,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
         visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.updatedBy].name :
-            ''
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -914,7 +927,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy && UserModel.canView(this.authUser) ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }
@@ -1026,6 +1039,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = this.personAndRelatedHelperService.labResult.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1186,12 +1200,16 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
               };
             }
           },
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_DELETE_SELECTED_LAB_RESULTS_DESCRIPTION') :
+            undefined,
           visible: (): boolean => {
             return this.selectedOutbreakIsActive &&
               LabResultModel.canBulkModify(this.authUser);
           },
           disable: (selected: string[]): boolean => {
-            return selected.length < 1;
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
           }
         },
 
@@ -1557,6 +1575,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
       'deleted',
       'deletedAt',
       'createdBy',
+      'createdOn',
       'createdAt',
       'updatedBy',
       'updatedAt',
@@ -1574,6 +1593,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel, IV2Co
     // add person type conditions
     const queryBuilder = _.cloneDeep(this.queryBuilder);
     this.addPersonTypeConditions(queryBuilder);
+
+    // retrieve created user & modified user information
+    queryBuilder.include('createdByUser', true);
+    queryBuilder.include('updatedByUser', true);
 
     // retrieve the list of lab results
     this.records$ = this.personAndRelatedHelperService.labResult.labResultDataService

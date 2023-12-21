@@ -1,7 +1,6 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { AddressModel } from '../../../../core/models/address.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
@@ -32,6 +31,7 @@ import {
   IVisibleMandatoryDataValue
 } from '../../../forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { Moment } from '../../../../core/helperClasses/localization-helper';
+import { IGeneralAsyncValidatorResponse } from '../../../forms-v2/validators/general-async-validator.directive';
 
 /**
  * Input type
@@ -300,6 +300,7 @@ interface ICreateViewModifyV2TabInputMultipleSelect extends Omit<ICreateViewModi
   validators?: {
     required?: () => boolean
   };
+  visible?: () => boolean;
 }
 
 /**

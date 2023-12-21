@@ -27,6 +27,8 @@ import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/servi
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -521,9 +523,18 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_COMMON_LABEL_DETAILS',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser, [{
+                    type: V2SideDialogConfigInputType.KEY_VALUE,
+                    name: 'lastLogin',
+                    placeholder: 'LNG_USER_FIELD_LABEL_LAST_LOGIN',
+                    value: this.itemData.lastLogin ?
+                      LocalizationHelper.displayDateTime(this.itemData.lastLogin) :
+                      '—'
+                  }]
                 );
               }
             }
@@ -610,6 +621,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
     this.expandListAdvancedFilters = UserModel.generateAdvancedFilters({
       authUser: this.authUser,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

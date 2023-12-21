@@ -1,8 +1,8 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { Observable } from 'rxjs';
-import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { IAppFormIconButtonV2 } from '../../../forms-v2/core/app-form-icon-button-v2';
 import { Moment } from '../../../../core/helperClasses/localization-helper';
+import { IGeneralAsyncValidatorResponse } from '../../../forms-v2/validators/general-async-validator.directive';
 
 /**
  * Required validator

@@ -50,13 +50,13 @@ export class UserListComponent extends ListComponent<UserModel, IV2Column> imple
     { label: 'LNG_USER_FIELD_LABEL_SECURITY_QUESTIONS', value: 'securityQuestions' },
     { label: 'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS', value: 'disregardGeographicRestrictions' },
     { label: 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS', value: 'dontCacheFilters' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+    { label: 'LNG_USER_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_USER_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_USER_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_USER_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_USER_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_USER_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_USER_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   // list of existing teams mapped by user
@@ -425,6 +425,18 @@ export class UserListComponent extends ListComponent<UserModel, IV2Column> imple
         sortable: true
       },
       {
+        field: 'lastLogin',
+        label: 'LNG_USER_FIELD_LABEL_LAST_LOGIN',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_USER_FIELD_LABEL_CREATED_BY',
         notVisible: true,
@@ -437,10 +449,26 @@ export class UserListComponent extends ListComponent<UserModel, IV2Column> imple
           includeNoValue: true
         },
         link: (data) => {
-          return data.createdBy && UserModel.canView(this.authUser) ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -467,7 +495,7 @@ export class UserListComponent extends ListComponent<UserModel, IV2Column> imple
           includeNoValue: true
         },
         link: (data) => {
-          return data.updatedBy && UserModel.canView(this.authUser) ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }
@@ -555,7 +583,41 @@ export class UserListComponent extends ListComponent<UserModel, IV2Column> imple
   /**
    * Initialize process data
    */
-  protected initializeProcessSelectedData(): void {}
+  protected initializeProcessSelectedData(): void {
+    this.processSelectedData = [
+      // all selected records are not deleted and current user not selected ?
+      {
+        key: 'allNotDeletedAndCurrentUserNotSelected',
+        shouldProcess: () => UserModel.canBulkDelete(this.authUser),
+        process: (
+          dataMap: {
+            [id: string]: UserModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allNotDeletedAndCurrentUserNotSelected: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (
+              dataMap[selected[index]]?.deleted ||
+              dataMap[selected[index]]?.id === this.authUser.id ||
+              dataMap[selected[index]]?.id === 'sys_admin'
+            ) {
+              // at least one not deleted
+              allNotDeletedAndCurrentUserNotSelected = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allNotDeletedAndCurrentUserNotSelected;
+        }
+      }
+    ];
+  }
 
   /**
    * Initialize table infos
@@ -569,6 +631,7 @@ export class UserListComponent extends ListComponent<UserModel, IV2Column> imple
     this.advancedFilters = UserModel.generateAdvancedFilters({
       authUser: this.authUser,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options,
         outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options.filter((item) => !item.data.deleted),
@@ -653,7 +716,8 @@ export class UserListComponent extends ListComponent<UserModel, IV2Column> imple
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
-      visible: () => UserModel.canExport(this.authUser),
+      visible: () => UserModel.canExport(this.authUser) ||
+        UserModel.canBulkDelete(this.authUser),
       actions: [
         {
           label: {
@@ -684,6 +748,108 @@ export class UserListComponent extends ListComponent<UserModel, IV2Column> imple
           },
           disable: (selected: string[]): boolean => {
             return selected.length < 1;
+          }
+        },
+
+        // Divider
+        {
+          visible: () => UserModel.canExport(this.authUser) &&
+            UserModel.canBulkDelete(this.authUser)
+        },
+
+        // bulk delete
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USERS_GROUP_ACTION_DELETE_SELECTED_USERS'
+          },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeletedAndCurrentUserNotSelected ?
+            this.i18nService.instant('LNG_PAGE_LIST_USERS_GROUP_ACTION_DELETE_SELECTED_USERS_DESCRIPTION') :
+            undefined,
+          action: {
+            click: (selected: string[]) => {
+              // ask for confirmation
+              this.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_DELETE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_USERS'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // show loading
+                  const loading = this.dialogV2Service.showLoadingDialog();
+                  loading.message({
+                    message: 'LNG_PAGE_LIST_USERS_ACTION_DELETE_SELECTED_USERS_WAIT_MESSAGE',
+                    messageData: {
+                      no: '1',
+                      total: selected.length.toLocaleString('en')
+                    }
+                  });
+
+                  // delete - we can't use bulk here since deleting users triggers many hooks, this is why we delete them one by one
+                  const selectedShallowClone: string[] = [...selected];
+                  const nextDelete = () => {
+                    // finished ?
+                    if (selectedShallowClone.length < 1) {
+                      this.toastV2Service.success('LNG_PAGE_LIST_USERS_ACTION_DELETE_SELECTED_USERS_SUCCESS_MESSAGE');
+                      loading.close();
+                      this.needsRefreshList(true);
+                      return;
+                    }
+
+                    // delete
+                    this.userDataService
+                      .deleteUser(selectedShallowClone.shift())
+                      .pipe(
+                        catchError((err) => {
+                          // hide loading
+                          loading.close();
+
+                          // error
+                          this.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // determine estimated time
+                        const processed: number = selected.length - selectedShallowClone.length;
+
+                        // update progress
+                        loading.message({
+                          message: 'LNG_PAGE_LIST_USERS_ACTION_DELETE_SELECTED_USERS_WAIT_MESSAGE',
+                          messageData: {
+                            no: processed.toLocaleString('en'),
+                            total: selected.length.toLocaleString('en')
+                          }
+                        });
+
+                        // next
+                        nextDelete();
+                      });
+                  };
+
+                  // start delete
+                  nextDelete();
+                });
+            }
+          },
+          visible: (): boolean => {
+            return UserModel.canBulkDelete(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeletedAndCurrentUserNotSelected;
           }
         }
       ]
@@ -750,7 +916,9 @@ export class UserListComponent extends ListComponent<UserModel, IV2Column> imple
       'languageId',
       'disregardGeographicRestrictions',
       'dontCacheFilters',
+      'lastLogin',
       'createdBy',
+      'createdOn',
       'createdAt',
       'updatedBy',
       'updatedAt'

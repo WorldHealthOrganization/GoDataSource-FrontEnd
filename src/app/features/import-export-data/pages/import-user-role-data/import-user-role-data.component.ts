@@ -35,7 +35,7 @@ export class ImportUserRoleDataComponent implements OnInit {
     ImportDataExtension.ZIP
   ];
 
-  requiredDestinationFields = [
+  requiredDestinationFields: string[] = [
     'name',
     'permissionIds[]'
   ];

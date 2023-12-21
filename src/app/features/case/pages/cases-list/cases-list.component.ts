@@ -25,7 +25,12 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputText,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ExportButtonKey, ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
@@ -40,6 +45,8 @@ import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-da
 import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
+import { TeamModel } from '../../../../core/models/team.model';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 
 @Component({
   selector: 'app-cases-list',
@@ -74,13 +81,13 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
     { label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused' },
     { label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID', value: 'deathLocationId' },
     { label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
+    { label: 'LNG_CASE_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_CASE_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_CASE_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_CASE_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_CASE_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_CASE_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
     { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT', value: 'wasContact' },
     { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase' },
     { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT_OF_CONTACT', value: 'wasContactOfContact' },
@@ -95,7 +102,8 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
     { label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME', value: 'burialPlaceName' },
     { label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
     { label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
-    { label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' }
+    { label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
+    { label: 'LNG_CASE_FIELD_LABEL_FOLLOW_UP_TEAM_ID', value: 'followUpTeamId' }
   ];
 
   // relationship fields
@@ -114,13 +122,13 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', value: 'socialRelationshipDetail' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', value: 'clusterId' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', value: 'comment' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   // used to filter cases
@@ -136,7 +144,8 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
     private clusterDataService: ClusterDataService,
     private referenceDataHelperService: ReferenceDataHelperService,
     private location: Location,
-    private personAndRelatedHelperService: PersonAndRelatedHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService,
+    private genericDataService: GenericDataService
   ) {
     super(
       listHelperService, {
@@ -539,6 +548,35 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               }
             },
 
+            // Add Follow-up to Case
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_ADD_FOLLOW_UP'
+              },
+              action: {
+                link: (item: CaseModel): string[] => {
+                  return ['/contacts', item.id, 'follow-ups', 'create'];
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  this.selectedOutbreak.allowCasesFollowUp &&
+                  CaseModel.canCreateFollowUp(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: ContactModel): boolean => {
+                // visible only if at least one of the previous two items is visible
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  this.selectedOutbreak.allowCasesFollowUp &&
+                  CaseModel.canCreateFollowUp(this.authUser);
+              }
+            },
+
             // See case contacts..
             {
               label: {
@@ -634,7 +672,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               }
             },
 
-            // See follow-ups registered as a contact
+            // See case follow-ups
             {
               label: {
                 get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS'
@@ -646,7 +684,6 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
               },
               visible: (item: CaseModel): boolean => {
                 return !item.deleted &&
-                  item.wasContact &&
                   FollowUpModel.canList(this.authUser);
               }
             },
@@ -882,6 +919,49 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         }
       },
       {
+        field: 'followUpTeamId',
+        label: 'LNG_CASE_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'followUpTeamId'
+        ),
+        notVisible: true,
+        format: {
+          type: (record) => {
+            return record.followUpTeamId &&
+            (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[record.followUpTeamId] ?
+              (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[record.followUpTeamId].name :
+              '';
+          }
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !TeamModel.canList(this.authUser);
+        },
+        link: (data) => {
+          return data.followUpTeamId && TeamModel.canView(this.authUser) ?
+            `/teams/${data.followUpTeamId}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'followUp.endDate',
+        label: 'LNG_CASE_FIELD_LABEL_FOLLOW_UP_END_DATE',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
         visibleMandatoryIf: () => true,
@@ -945,6 +1025,19 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           classification: this.activatedRoute.snapshot.data.classification,
           outcome: this.activatedRoute.snapshot.data.outcome
         })
+      },
+      {
+        field: 'followUp.status',
+        label: 'LNG_CASE_FIELD_LABEL_FOLLOW_UP_STATUS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'followUp[status]'
+        ),
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
       },
       {
         field: 'classification',
@@ -1360,7 +1453,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
       },
       {
         field: 'addresses.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        label: 'LNG_CASE_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.case.visibleMandatoryKey,
           'addresses.geoLocationAccurate'
@@ -1607,7 +1700,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId && UserModel.canView(this.authUser) ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) && !data.responsibleUser?.deleted ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -1792,6 +1885,23 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
         sortable: true
       },
       {
+        field: 'createdOn',
+        label: 'LNG_CASE_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.personAndRelatedHelperService.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_BY',
         visibleMandatoryIf: () => true,
@@ -1808,7 +1918,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy && UserModel.canView(this.authUser) ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -1843,7 +1953,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy && UserModel.canView(this.authUser) ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }
@@ -1946,6 +2056,7 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
     this.advancedFilters = this.personAndRelatedHelperService.case.generateAdvancedFilters(this.selectedOutbreak, {
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
@@ -1957,6 +2068,8 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
         ),
+        followUpStatus: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         classification: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -2040,6 +2153,28 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           CaseModel.canExportRelationships(this.authUser);
       },
       menuOptions: [
+        // Change case final follow up status
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_ACTION_CHANGE_CASE_FINAL_FOLLOW_UP_STATUS'
+          },
+          action: {
+            click: () => {
+              this.changeCaseFinalFollowUpStatus();
+            }
+          },
+          visible: (): boolean => {
+            return this.selectedOutbreakIsActive && CaseModel.canBulkModify(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return true;
+          }
+        },
+
         // No relationships
         {
           label: {
@@ -2236,6 +2371,112 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
           visible: (): boolean => {
             return OutbreakModel.canImportRelationship(this.authUser) &&
               this.selectedOutbreakIsActive;
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return (
+              CaseModel.canExportDailyFollowUpList(this.authUser) ||
+              CaseModel.canExportDailyFollowUpsForm(this.authUser)
+            );
+          }
+        },
+
+        // Export follow up list
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
+                title: {
+                  get: () =>
+                    'LNG_PAGE_LIST_CASES_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE'
+                },
+                initialized: (handler) => {
+                  // display loading
+                  handler.loading.show();
+
+                  // dialog fields for daily follow-ups print
+                  this.genericDataService
+                    .getRangeFollowUpGroupByOptions([Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.CASE.value, Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.RISK.value])
+                    .subscribe((options) => {
+                      // options should be assigned to groupBy
+                      (handler.data.map.groupBy as IV2SideDialogConfigInputSingleDropdown).options = options.map((option) => {
+                        return {
+                          label: option.label,
+                          value: option.value
+                        };
+                      });
+
+                      // hide loading
+                      handler.loading.hide();
+                    });
+                },
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/cases/daily-list/export`,
+                  async: false,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD')}`,
+                  queryBuilder: this.queryBuilder,
+                  allow: {
+                    types: [ExportDataExtension.PDF]
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                        placeholder:
+                          'LNG_PAGE_LIST_CASES_EXPORT_FOLLOW_UPS_GROUP_BY_BUTTON',
+                        name: 'groupBy',
+                        options: [],
+                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE
+                          .value as string,
+                        validators: {
+                          required: () => true
+                        }
+                      }
+                    ]
+                  }
+                }
+              });
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canExportDailyFollowUpList(this.authUser);
+          }
+        },
+
+        // Export daily follow up form
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
+                title: {
+                  get: () =>
+                    'LNG_PAGE_LIST_CASES_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE'
+                },
+                export: {
+                  url: `/outbreaks/${this.selectedOutbreak.id}/cases/export-daily-follow-up-form`,
+                  async: false,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD')}`,
+                  queryBuilder: this.queryBuilder,
+                  allow: {
+                    types: [ExportDataExtension.PDF]
+                  }
+                }
+              });
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canExportDailyFollowUpsForm(this.authUser);
           }
         }
       ]
@@ -3083,13 +3324,129 @@ export class CasesListComponent extends ListComponent<CaseModel, IV2ColumnToVisi
       'numberOfContacts',
       'numberOfExposures',
       'questionnaireAnswers',
+      'followUpTeamId',
+      'followUp',
       'deleted',
       'deletedAt',
+      'createdOn',
       'createdBy',
       'createdAt',
       'updatedBy',
       'updatedAt'
     ];
+  }
+
+  /**
+   * Change case Followup status for all records matching this.queryBuilder
+   */
+  private changeCaseFinalFollowUpStatus() {
+    this.personAndRelatedHelperService.dialogV2Service
+      .showSideDialog({
+        // title
+        title: {
+          get: () => 'LNG_PAGE_LIST_CASES_ACTION_CHANGE_CASE_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE',
+          data: () => {
+            return { count: '?' };
+          }
+        },
+
+        // inputs
+        inputs: [
+          {
+            type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+            placeholder: 'LNG_CASE_FIELD_LABEL_FOLLOW_UP_STATUS',
+            options: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: undefined,
+            name: 'statusesList',
+            validators: {
+              required: () => true
+            }
+          }
+        ],
+
+        // buttons
+        bottomButtons: [
+          {
+            label: 'LNG_COMMON_BUTTON_UPDATE',
+            type: IV2SideDialogConfigButtonType.OTHER,
+            color: 'primary',
+            key: 'save',
+            disabled: (_data, handler): boolean => {
+              return !handler.form || handler.form.invalid;
+            }
+          }, {
+            type: IV2SideDialogConfigButtonType.CANCEL,
+            label: 'LNG_COMMON_BUTTON_CANCEL',
+            color: 'text'
+          }
+        ],
+        initialized: (handler) => {
+          // display loading
+          handler.loading.show();
+
+          // construct query for saved filter
+          const qb = _.cloneDeep(this.queryBuilder);
+
+          qb.sort.clear();
+          qb.paginator.clear();
+          qb.fields('id', 'followUp');
+
+          // count cases
+          this.personAndRelatedHelperService.case.caseDataService.getCasesList(this.selectedOutbreak.id, qb).subscribe(
+            (records: CaseModel[]) => {
+
+              handler.update.changeTitle('LNG_PAGE_LIST_CASES_ACTION_CHANGE_CASE_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE', { count: records.length.toLocaleString() });
+
+              handler.data.echo.recordsList = records;
+
+              handler.loading.hide();
+            }
+          );
+        }
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          return;
+        }
+
+        // update cases
+        const putRecordsData = response.data.echo.recordsList.map((record: CaseModel) => ({
+          id: record.id,
+          followUp: Object.assign(
+            record.followUp, {
+              status: (response.handler.data.map.statusesList as IV2SideDialogConfigInputText).value
+            }
+          )
+        }));
+
+        // update statuses
+        this.personAndRelatedHelperService.case.caseDataService
+          .bulkModifyCases(
+            this.selectedOutbreak.id,
+            putRecordsData
+          )
+          .pipe(
+            catchError((err) => {
+              this.personAndRelatedHelperService.toastV2Service.error(err);
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            // success message
+            this.personAndRelatedHelperService.toastV2Service.success(
+              'LNG_PAGE_BULK_MODIFY_CASES_ACTION_MODIFY_CASES_SUCCESS_MESSAGE', {
+                count: response.data.echo.recordsList.length.toLocaleString('en')
+              }
+            );
+
+            // close popup
+            response.handler.hide();
+
+            // refresh list
+            this.needsRefreshList(true);
+          });
+      });
   }
 
   /**

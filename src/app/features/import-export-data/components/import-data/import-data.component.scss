@@ -145,8 +145,10 @@ app-import-data {
     --hover-index: 1000;
     --hover-bg-color: var(--gd-background);
 
-    .gd-form-select-single-v2 {
-      min-width: 30rem;
+    > div:first-child {
+      .gd-form-select-single-v2 {
+        min-width: 30rem;
+      }
     }
 
     .import-data-map-fields-counters {
@@ -254,10 +256,11 @@ app-import-data {
         }
 
         .import-data-body-row-extra-details {
-          margin: 0 10rem 2rem;
+          background: rgba(var(--gd-secondary-rgb), 0.15);
+          padding: 0 1.6rem;
 
           .import-data-body-row-extra-details-vscroll {
-
+            
             .import-data-body-row-extra-details-row-basic {
               .import-data-body-row-extra-details-row {
                 border-top: 0.1rem solid #CCC;
@@ -310,6 +313,39 @@ app-import-data {
               padding-right: 10rem;
             }
           }
+        }
+
+        .gd-form-select-single-v2 {
+          .mat-form-field {
+            .mat-form-field-wrapper {
+              .mat-form-field-flex {
+                .mat-form-field-infix {
+                  width: 4.2rem;
+                }
+              }
+            }
+          }
+        }
+
+        .import-data-map-fields-actions-action-icon {
+          font-size: 1.6rem;
+          height: 2.4rem;
+          min-width: 2.4rem;
+          padding: 0.4rem;
+          width: 2.4rem;
+
+          .mat-icon {
+            font-size: 1.6rem;
+          }
+
+          + .import-data-map-fields-actions-action-icon {
+            margin-left: 0.8rem;
+          }
+        }
+
+        .import-data-map-fields-actions-action-icon-warning {
+          background-color: var(--gd-danger);
+          color: var(--gd-background);
         }
       }
     }

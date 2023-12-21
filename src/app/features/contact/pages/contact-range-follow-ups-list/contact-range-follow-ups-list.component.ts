@@ -892,16 +892,16 @@ export class ContactRangeFollowUpsListComponent
         return FollowUpModel.canExportRange(this.authUser);
       },
       menuOptions: [
-        // Export follow-up dashboard
+        // Export follow-up dashboard for contacts
         {
           label: {
-            get: () => 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_BUTTON'
+            get: () => 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_FOR_CONTACTS_BUTTON'
           },
           action: {
             click: () => {
               this.personAndRelatedHelperService.dialogV2Service.showExportData({
                 title: {
-                  get: () => 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_TITLE'
+                  get: () => 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_FOR_CONTACTS_TITLE'
                 },
                 export: {
                   url: `outbreaks/${this.selectedOutbreak.id}/contacts/range-list/export`,
@@ -913,6 +913,11 @@ export class ContactRangeFollowUpsListComponent
                       ExportDataExtension.PDF
                     ]
                   },
+                  extraFormData: {
+                    append: {
+                      personType: EntityType.CONTACT
+                    }
+                  },
                   inputs: {
                     append: [
                       {
@@ -920,6 +925,73 @@ export class ContactRangeFollowUpsListComponent
                         placeholder: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
                         name: 'groupBy',
                         options: (this.activatedRoute.snapshot.data.followUpGroupBy as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                        validators: {
+                          required: () => true
+                        }
+                      }, {
+                        type: V2SideDialogConfigInputType.DATE,
+                        placeholder: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_START_DATE',
+                        name: 'startDate',
+                        value: undefined,
+                        validators: {
+                          required: () => true
+                        }
+                      }, {
+                        type: V2SideDialogConfigInputType.DATE,
+                        placeholder: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_END_DATE',
+                        name: 'endDate',
+                        value: undefined,
+                        validators: {
+                          required: () => true
+                        }
+                      }
+                    ]
+                  }
+                }
+              });
+            }
+          },
+          visible: (): boolean => {
+            return FollowUpModel.canExportRange(this.authUser);
+          }
+        },
+        // Export follow-up dashboard for cases
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_FOR_CASES_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_FOR_CASES_TITLE'
+                },
+                export: {
+                  url: `outbreaks/${this.selectedOutbreak.id}/contacts/range-list/export`,
+                  async: false,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
+                  allow: {
+                    types: [
+                      ExportDataExtension.PDF
+                    ]
+                  },
+                  extraFormData: {
+                    append: {
+                      personType: EntityType.CASE
+                    }
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                        placeholder: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
+                        name: 'groupBy',
+                        options: [
+                          (Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE) as any,
+                          (Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.RISK) as any
+                        ],
                         value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
                         validators: {
                           required: () => true

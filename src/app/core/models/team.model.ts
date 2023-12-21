@@ -23,7 +23,9 @@ export class TeamModel
    * Advanced filters
    */
   static generateAdvancedFilters(data: {
+    authUser: UserModel,
     options: {
+      createdOn: ILabelValuePairModel[],
       user: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
@@ -39,8 +41,44 @@ export class TeamModel
         field: 'userIds',
         label: 'LNG_TEAM_FIELD_LABEL_USERS',
         options: data.options.user
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_TEAM_FIELD_LABEL_CREATED_ON',
+        options: data.options.createdOn,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_TEAM_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_TEAM_FIELD_LABEL_UPDATED_AT',
+        sortable: true
       }
     ];
+
+    // allowed to filter by user ?
+    if (UserModel.canListForFilters(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_TEAM_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_TEAM_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
+      });
+    }
 
     // finished
     return advancedFilters;

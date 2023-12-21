@@ -561,10 +561,9 @@ export const applyFilterBy = (
     case V2FilterType.ADDRESS_FIELD:
     case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
       // remove the previous conditions
-      query.filter.removePathCondition('address');
-      query.filter.removePathCondition('addresses');
-      query.filter.removePathCondition('and.address');
-      query.filter.removePathCondition('and.addresses');
+      // IMPORTANT: and => and => and => is required to make it unique, so it doesn't interfere with advanced by address filters
+      query.filter.removePathCondition('and.and.and.and.address');
+      query.filter.removePathCondition('and.and.and.and.addresses');
 
       // create a query builder
       const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(

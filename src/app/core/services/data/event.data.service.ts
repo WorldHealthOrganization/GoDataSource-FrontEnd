@@ -17,7 +17,7 @@ import {
   catchError,
   map
 } from 'rxjs/operators';
-import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/forms-v2/validators/general-async-validator.directive';
 
 @Injectable()
 export class EventDataService {

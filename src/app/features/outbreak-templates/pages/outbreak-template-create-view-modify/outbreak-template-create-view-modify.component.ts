@@ -220,7 +220,8 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         this.initializeTabsQuestionnaireCase(),
         this.initializeTabsQuestionnaireContact(),
         this.initializeTabsQuestionnaireEvent(),
-        this.initializeTabsQuestionnaireFollowUp(),
+        this.initializeTabsQuestionnaireCaseFollowUp(),
+        this.initializeTabsQuestionnaireContactFollowUp(),
         this.initializeTabsQuestionnaireLabResult()
       ],
 
@@ -429,9 +430,22 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                   this.itemData.disableModifyingLegacyQuestionnaire = value;
                 }
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'allowCasesFollowUp',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_ALLOW_CASES_FOLLOW_UP',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_ALLOW_CASES_FOLLOW_UP_DESCRIPTION',
+              value: {
+                get: () => this.itemData.allowCasesFollowUp,
+                set: (value) => {
+                  this.itemData.allowCasesFollowUp = value;
+                }
+              }
             }
           ]
         },
+
+        // Generate follow-ups for contacts
         {
           type: CreateViewModifyV2TabInputType.SECTION,
           label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOW_UP',
@@ -543,6 +557,145 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
             }
           ]
         },
+
+        // Generate follow-ups for cases
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOW_UP_CASES',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'generateFollowUpsTeamAssignmentAlgorithmCases',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_CASES',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_DESCRIPTION_CASES',
+              options: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => this.itemData.generateFollowUpsTeamAssignmentAlgorithmCases,
+                set: (value) => {
+                  this.itemData.generateFollowUpsTeamAssignmentAlgorithmCases = value;
+                }
+              },
+              disabled: () => {
+                return !this.itemData.allowCasesFollowUp;
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'generateFollowUpsOverwriteExistingCases',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING_CASES',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING_DESCRIPTION_CASES',
+              value: {
+                get: () => this.itemData.generateFollowUpsOverwriteExistingCases,
+                set: (value) => {
+                  this.itemData.generateFollowUpsOverwriteExistingCases = value;
+                }
+              },
+              disabled: () => {
+                return !this.itemData.allowCasesFollowUp;
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'generateFollowUpsKeepTeamAssignmentCases',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT_CASES',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT_DESCRIPTION_CASES',
+              value: {
+                get: () => this.itemData.generateFollowUpsKeepTeamAssignmentCases,
+                set: (value) => {
+                  this.itemData.generateFollowUpsKeepTeamAssignmentCases = value;
+                }
+              },
+              disabled: () => {
+                return !this.itemData.allowCasesFollowUp;
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'periodOfFollowupCases',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS_CASES',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS_DESCRIPTION_CASES',
+              value: {
+                get: () => this.itemData.periodOfFollowupCases,
+                set: (value) => {
+                  this.itemData.periodOfFollowupCases = value;
+                }
+              },
+              disabled: () => {
+                return !this.itemData.allowCasesFollowUp;
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'frequencyOfFollowUpPerDayCases',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY_PER_DAY_CASES',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_FREQUENCY_PER_DAY_DESCRIPTION_CASES',
+              value: {
+                get: () => this.itemData.frequencyOfFollowUpPerDayCases,
+                set: (value) => {
+                  this.itemData.frequencyOfFollowUpPerDayCases = value;
+                }
+              },
+              disabled: () => {
+                return !this.itemData.allowCasesFollowUp;
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'intervalOfFollowUpCases',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_CASES',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_DESCRIPTION_CASES',
+              value: {
+                get: () => this.itemData.intervalOfFollowUpCases,
+                set: (value) => {
+                  this.itemData.intervalOfFollowUpCases = value;
+                }
+              },
+              disabled: () => {
+                return !this.itemData.allowCasesFollowUp;
+              },
+              validators: {
+                regex: () => ({
+                  expression: '^\\s*([1-9][0-9]*)(\\s*,\\s*([1-9][0-9]*))*$',
+                  msg: 'LNG_FORM_VALIDATION_ERROR_PATTERN'
+                })
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'generateFollowUpsDateOfOnset',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_ONSET',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_ONSET_DESCRIPTION',
+              value: {
+                get: () => this.itemData.generateFollowUpsDateOfOnset,
+                set: (value) => {
+                  this.itemData.generateFollowUpsDateOfOnset = value;
+                }
+              },
+              disabled: () => {
+                return !this.itemData.allowCasesFollowUp;
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'generateFollowUpsWhenCreatingCases',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CASES',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CASES_DESCRIPTION',
+              value: {
+                get: () => this.itemData.generateFollowUpsWhenCreatingCases,
+                set: (value) => {
+                  this.itemData.generateFollowUpsWhenCreatingCases = value;
+                }
+              },
+              disabled: () => {
+                return !this.itemData.allowCasesFollowUp;
+              }
+            }
+          ]
+        },
+
+        // Reports
         {
           type: CreateViewModifyV2TabInputType.SECTION,
           label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_REPORT',
@@ -796,12 +949,37 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   }
 
   /**
-   * Initialize tabs - Follow Up Questionnaire
+   * Initialize tabs - Case Follow Up Questionnaire
    */
-  private initializeTabsQuestionnaireFollowUp(): ICreateViewModifyV2TabTable {
+  private initializeTabsQuestionnaireCaseFollowUp(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'follow_up_template',
+      name: 'case_follow_up_template',
+      label: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_FOLLOW_UP_QUESTIONNAIRE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
+        name: 'caseFollowUpTemplate',
+        outbreak: this.itemData,
+        value: {
+          get: () => this.itemData.caseFollowUpTemplate,
+          set: (value) => {
+            this.itemData.caseFollowUpTemplate = value;
+          }
+        }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakTemplateModel.canModifyContactFollowUpQuestionnaire(this.authUser)
+    };
+  }
+
+  /**
+   * Initialize tabs - Contact Follow Up Questionnaire
+   */
+  private initializeTabsQuestionnaireContactFollowUp(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'contact_follow_up_template',
       label: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
@@ -886,9 +1064,11 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_COMMON_LABEL_DETAILS',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }
@@ -943,6 +1123,12 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       // - remove fields used by ui (e.g. collapsed...)
       if (data.eventInvestigationTemplate) {
         data.eventInvestigationTemplate = (data.eventInvestigationTemplate || []).map((question) => new QuestionModel(question));
+      }
+
+      // sanitize questionnaire - follow-up
+      // - remove fields used by ui (e.g. collapsed...)
+      if (data.caseFollowUpTemplate) {
+        data.caseFollowUpTemplate = (data.caseFollowUpTemplate || []).map((question) => new QuestionModel(question));
       }
 
       // sanitize questionnaire - follow-up
@@ -1062,6 +1248,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = this.outbreakAndOutbreakTemplateHelperService.generateOutbreakTemplateAdvancedFilters({
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,

@@ -54,13 +54,13 @@ export class EventsListComponent
     { label: 'LNG_EVENT_FIELD_LABEL_DATE', value: 'date' },
     { label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION', value: 'description' },
     { label: 'LNG_EVENT_FIELD_LABEL_ADDRESS', value: 'address' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
+    { label: 'LNG_EVENT_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_EVENT_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_EVENT_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_EVENT_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_EVENT_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_EVENT_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_EVENT_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
     { label: 'LNG_ENTITY_FIELD_LABEL_TYPE', value: 'type' },
     { label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
     { label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
@@ -89,13 +89,13 @@ export class EventsListComponent
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', value: 'socialRelationshipDetail' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', value: 'clusterId' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', value: 'comment' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   /**
@@ -658,7 +658,7 @@ export class EventsListComponent
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId && UserModel.canView(this.authUser) ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) && !data.responsibleUser?.deleted ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -836,10 +836,27 @@ export class EventsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy && UserModel.canView(this.authUser) ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_EVENT_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.personAndRelatedHelperService.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -871,7 +888,7 @@ export class EventsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy && UserModel.canView(this.authUser) ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }
@@ -1001,7 +1018,7 @@ export class EventsListComponent
       },
       {
         field: 'address.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        label: 'LNG_EVENT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.event.visibleMandatoryKey,
           'address.geoLocationAccurate'
@@ -1101,6 +1118,7 @@ export class EventsListComponent
     this.advancedFilters = this.personAndRelatedHelperService.event.generateAdvancedFilters(this.selectedOutbreak, {
       eventInvestigationTemplate: () => this.selectedOutbreak.eventInvestigationTemplate,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1846,6 +1864,7 @@ export class EventsListComponent
       'deleted',
       'deletedAt',
       'createdBy',
+      'createdOn',
       'createdAt',
       'updatedBy',
       'updatedAt'

@@ -53,6 +53,12 @@
         .gd-top-right-user-menu-option-user-email {
           color: var(--gd-secondary);
         }
+
+        .gd-top-right-user-menu-option-user-timezone {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
       }
 
       .gd-top-right-user-menu-option-active {

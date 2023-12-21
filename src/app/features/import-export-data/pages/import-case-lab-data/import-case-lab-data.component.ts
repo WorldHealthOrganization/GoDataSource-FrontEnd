@@ -50,10 +50,7 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
     sequence: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE'
   };
 
-  requiredDestinationFields = [
-    'personId',
-    'dateSampleTaken'
-  ];
+  requiredDestinationFields: string[] = [];
 
   formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 

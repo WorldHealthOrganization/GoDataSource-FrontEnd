@@ -59,6 +59,7 @@ export enum PERMISSION {
   USER_CREATE = 'user_create',
   USER_MODIFY = 'user_modify',
   USER_DELETE = 'user_delete',
+  USER_BULK_DELETE = 'user_bulk_delete',
   USER_MODIFY_OWN_ACCOUNT = 'user_modify_own_account',
   USER_LIST_FOR_FILTERS = 'user_list_for_filters',
   USER_LIST_WORKLOAD = 'user_list_workload',
@@ -104,7 +105,9 @@ export enum PERMISSION {
 
   // client applications
   CLIENT_APPLICATION_LIST = 'client_application_list',
+  CLIENT_APPLICATION_VIEW = 'client_application_view',
   CLIENT_APPLICATION_CREATE = 'client_application_create',
+  CLIENT_APPLICATION_MODIFY = 'client_application_modify',
   CLIENT_APPLICATION_DELETE = 'client_application_delete',
   CLIENT_APPLICATION_DOWNLOAD_CONF_FILE = 'client_application_download_conf_file',
   CLIENT_APPLICATION_ENABLE = 'client_application_enable',
@@ -141,6 +144,7 @@ export enum PERMISSION {
   OUTBREAK_MODIFY_CASE_QUESTIONNAIRE = 'outbreak_modify_case_questionnaire',
   OUTBREAK_MODIFY_CONTACT_QUESTIONNAIRE = 'outbreak_modify_contact_questionnaire',
   OUTBREAK_MODIFY_EVENT_QUESTIONNAIRE = 'outbreak_modify_event_questionnaire',
+  OUTBREAK_MODIFY_CASE_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_modify_case_follow_up_questionnaire',
   OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_modify_contact_follow_up_questionnaire',
   OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_modify_case_lab_result_questionnaire',
   OUTBREAK_CREATE_CLONE = 'outbreak_create_clone',
@@ -156,6 +160,7 @@ export enum PERMISSION {
   OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE = 'outbreak_template_modify_case_questionnaire',
   OUTBREAK_TEMPLATE_MODIFY_CONTACT_QUESTIONNAIRE = 'outbreak_template_modify_contact_questionnaire',
   OUTBREAK_TEMPLATE_MODIFY_EVENT_QUESTIONNAIRE = 'outbreak_template_modify_event_questionnaire',
+  OUTBREAK_TEMPLATE_MODIFY_CASE_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_template_modify_case_follow_up_questionnaire',
   OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE = 'outbreak_template_modify_contact_follow_up_questionnaire',
   OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE = 'outbreak_template_modify_case_lab_result_questionnaire',
   OUTBREAK_TEMPLATE_GENERATE_OUTBREAK = 'outbreak_template_generate_outbreak',
@@ -247,6 +252,7 @@ export enum PERMISSION {
   CONTACT_VIEW_CHRONOLOGY_CHART = 'contact_view_chronology_chart',
   CONTACT_CONVERT_TO_CASE = 'contact_convert_to_case',
   CONTACT_CONVERT_TO_CONTACT_OF_CONTACT = 'contact_convert_to_contact_of_contact',
+  CONTACT_FOLLOW_UP_CREATE = 'contact_follow_up_create',
   CONTACT_EXPORT_DAILY_FOLLOW_UP_LIST = 'contact_export_daily_follow_up_list',
   CONTACT_EXPORT_DAILY_FOLLOW_UP_FORM = 'contact_export_daily_follow_up_form',
   CONTACT_EXPORT_DOSSIER = 'contact_export_dossier',
@@ -316,6 +322,7 @@ export enum PERMISSION {
   CASE_MODIFY = 'case_modify',
   CASE_DELETE = 'case_delete',
   CASE_RESTORE = 'case_restore',
+  CASE_BULK_MODIFY = 'case_bulk_modify',
   CASE_BULK_DELETE = 'case_bulk_delete',
   CASE_BULK_RESTORE = 'case_bulk_restore',
   CASE_IMPORT = 'case_import',
@@ -370,6 +377,10 @@ export enum PERMISSION {
   CASE_RESTORE_LAB_RESULT = 'case_restore_lab_result',
   CASE_IMPORT_LAB_RESULT = 'case_import_lab_result',
   CASE_EXPORT_LAB_RESULT = 'case_export_lab_result',
+  CASE_FOLLOW_UP_CREATE = 'case_follow_up_create',
+  CASE_EXPORT_FOLLOW_UP_SUCCESS_RATE_REPORT = 'case_export_follow_up_success_rate_report',
+  CASE_EXPORT_DAILY_FOLLOW_UP_LIST = 'case_export_daily_follow_up_list',
+  CASE_EXPORT_DAILY_FOLLOW_UP_FORM = 'case_export_daily_follow_up_form',
 
   // relationships
   RELATIONSHIP_LIST = 'relationship_list',
@@ -477,7 +488,13 @@ export enum PERMISSION {
   DASHBOARD_EXPORT_CASE_CLASSIFICATION_PER_LOCATION_REPORT = 'dashboard_export_case_classification_per_location_report',
   DASHBOARD_EXPORT_CONTACT_FOLLOW_UP_SUCCESS_RATE_REPORT = 'dashboard_export_contact_follow_up_success_rate_report',
   DASHBOARD_EXPORT_EPI_CURVE = 'dashboard_export_epi_curve',
-  DASHBOARD_EXPORT_KPI = 'dashboard_export_kpi'
+  DASHBOARD_EXPORT_KPI = 'dashboard_export_kpi',
+  DASHBOARD_EXPORT_CASE_FOLLOW_UP_SUCCESS_RATE_REPORT = 'dashboard_export_case_follow_up_success_rate_report',
+  DASHBOARD_VIEW_CASES_FROM_FOLLOW_UP_DASHLET = 'dashboard_view_case_from_follow_up_dashlet',
+  DASHBOARD_VIEW_CASES_LOST_TO_FOLLOW_UP_DASHLET = 'dashboard_view_case_lost_to_follow_up_dashlet',
+  DASHBOARD_VIEW_CASES_NOT_SEEN_IN_X_DAYS_DASHLET = 'dashboard_view_case_not_seen_in_x_days_dashlet',
+  DASHBOARD_VIEW_CASES_SEEN_DASHLET = 'dashboard_view_case_seen_dashlet',
+  DASHBOARD_VIEW_CASES_SUCCESSFUL_FOLLOW_UPS_DASHLET = 'dashboard_view_case_successful_follow_ups_dashlet'
 }
 
 export interface IPermissionChildModel {

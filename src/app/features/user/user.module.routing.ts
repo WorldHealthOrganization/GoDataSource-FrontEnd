@@ -14,17 +14,21 @@ import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
   component: UserCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     institution: InstitutionDataResolver,
     userRole: UserRoleDataResolver,
     outbreak: OutbreakDataResolver,
     team: TeamDataResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     language: LanguageDataResolver,
     yesNo: YesNoDataResolver
   }
@@ -44,6 +48,7 @@ const routes: Routes = [
       outbreakIncludeDeleted: true
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       team: TeamDataResolver,
       yesNoAll: YesNoAllDataResolver,
       yesNo: YesNoDataResolver,

@@ -31,6 +31,12 @@ export class AppFormPasswordV2Component
   // right - icon buttons
   @Input() suffixIconButtons: IAppFormIconButtonV2[];
 
+  // view only
+  @Input() viewOnly: boolean;
+
+  // no value string
+  @Input() noValueLabel: string = '—';
+
   // tooltip
   tooltipButton: IAppFormIconButtonV2;
   private _tooltip: string;

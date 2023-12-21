@@ -650,9 +650,11 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
               click: () => {
                 // show record details dialog
                 this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_PAGE_MODIFY_LAB_RESULT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }
@@ -791,6 +793,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = this.personAndRelatedHelperService.labResult.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

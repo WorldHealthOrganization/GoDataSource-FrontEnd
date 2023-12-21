@@ -130,7 +130,7 @@ export class BackupsRestoresComponent extends ListComponent<RestoreLogModel, IV2
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy && UserModel.canView(this.authUser) ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${data.createdBy}/view` :
             undefined;
         }

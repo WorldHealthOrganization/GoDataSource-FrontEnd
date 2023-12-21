@@ -59,12 +59,9 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
     'addresses[].locationId': true
   };
 
-  requiredDestinationFields = [
+  requiredDestinationFields: string[] = [
     'firstName',
-    'dateOfReporting',
-    'relationship.persons[].id',
-    'relationship.contactDate',
-    'relationship.certaintyLevelId'
+    'relationship.persons[].id'
   ];
 
   /**

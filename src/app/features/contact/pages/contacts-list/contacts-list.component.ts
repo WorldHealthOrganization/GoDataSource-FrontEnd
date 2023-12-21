@@ -79,13 +79,13 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_TYPE', value: 'type' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
     { label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
     { label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION', value: 'classification' },
     { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase' },
@@ -125,13 +125,13 @@ export class ContactsListComponent
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', value: 'socialRelationshipDetail' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', value: 'clusterId' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', value: 'comment' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   /**
@@ -724,7 +724,7 @@ export class ContactsListComponent
               visible: (item: ContactModel): boolean => {
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
-                  FollowUpModel.canCreate(this.authUser);
+                  ContactModel.canCreateFollowUp(this.authUser);
               }
             },
 
@@ -734,7 +734,7 @@ export class ContactsListComponent
                 // visible only if at least one of the previous two items is visible
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
-                  FollowUpModel.canCreate(this.authUser);
+                  ContactModel.canCreateFollowUp(this.authUser);
               }
             },
 
@@ -1157,7 +1157,7 @@ export class ContactsListComponent
       },
       {
         field: 'addresses.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           'addresses.geoLocationAccurate'
@@ -1643,7 +1643,7 @@ export class ContactsListComponent
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId && UserModel.canView(this.authUser) ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) && !data.responsibleUser?.deleted ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -1739,6 +1739,23 @@ export class ContactsListComponent
         sortable: true
       },
       {
+        field: 'createdOn',
+        label: 'LNG_CONTACT_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.personAndRelatedHelperService.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY',
         visibleMandatoryIf: () => true,
@@ -1755,7 +1772,7 @@ export class ContactsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy && UserModel.canView(this.authUser) ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -1790,7 +1807,7 @@ export class ContactsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy && UserModel.canView(this.authUser) ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }
@@ -1890,6 +1907,7 @@ export class ContactsListComponent
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -2157,7 +2175,7 @@ export class ContactsListComponent
 
                   // dialog fields for daily follow-ups print
                   this.genericDataService
-                    .getRangeFollowUpGroupByOptions(true)
+                    .getRangeFollowUpGroupByOptions([Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.RISK.value])
                     .subscribe((options) => {
                       // options should be assigned to groupBy
                       (handler.data.map.groupBy as IV2SideDialogConfigInputSingleDropdown).options = options.map((option) => {
@@ -2391,7 +2409,8 @@ export class ContactsListComponent
               this.selectedOutbreakIsActive;
           },
           disable: (selected: string[]): boolean => {
-            return selected.length < 1;
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
           }
         },
 
@@ -2851,6 +2870,7 @@ export class ContactsListComponent
       'questionnaireAnswers',
       'deleted',
       'deletedAt',
+      'createdOn',
       'createdBy',
       'createdAt',
       'updatedBy',

@@ -280,18 +280,37 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY',
         notVisible: true,
         format: {
-          type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.createdBy].name :
-            ''
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -306,15 +325,18 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
         format: {
-          type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.updatedBy].name :
-            ''
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }
@@ -489,6 +511,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       'isSystemWide',
       'readOnly',
       'createdBy',
+      'createdOn',
       'createdAt',
       'updatedBy',
       'updatedAt'

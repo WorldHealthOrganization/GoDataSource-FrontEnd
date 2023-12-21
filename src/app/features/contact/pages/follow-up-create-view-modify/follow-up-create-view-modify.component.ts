@@ -91,23 +91,6 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     this.isHistory = !!activatedRoute.snapshot.data.isHistory;
     this.origin = activatedRoute.snapshot.queryParams.origin;
 
-    // display history follow-ups ?
-    if (
-      this._entityData?.type === EntityType.CASE ||
-      this._entityData?.type === EntityType.CONTACT_OF_CONTACT
-    ) {
-      this.personAndRelatedHelperService.toastV2Service.notice(
-        this.isHistory ?
-          'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE' :
-          'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO',
-        {
-          personName: this._entityData.name,
-          personType: this.personAndRelatedHelperService.i18nService.instant(this._entityData.type).toLowerCase()
-        },
-        AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS
-      );
-    }
-
     // do we have tabs options already saved ?
     const generalSettings: {
       [key: string]: any
@@ -195,7 +178,31 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   /**
    * Data initialized
    */
-  protected initializedData(): void {}
+  protected initializedData(): void {
+    // display history follow-ups ?
+    // isHistory is true only for contact of contact
+    const createdAs = this.itemData.createdAs ?
+      this.itemData.createdAs :
+      EntityType.CONTACT;
+    if (
+      !this.isCreate && (
+        this.isHistory ||
+        this._entityData.type !== createdAs
+      )
+    ) {
+      this.personAndRelatedHelperService.toastV2Service.notice(
+        this.isHistory ?
+          'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE' :
+          'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO',
+        {
+          personName: this._entityData.name,
+          personType: this.personAndRelatedHelperService.i18nService.instant(this._entityData.type).toLowerCase(),
+          createdAs: this.personAndRelatedHelperService.i18nService.instant(createdAs).toLowerCase()
+        },
+        AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS
+      );
+    }
+  }
 
   /**
    * Initialize page title
@@ -506,8 +513,10 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       options: {
         dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        deletedUser: (this.activatedRoute.snapshot.data.deletedUser as IResolverV2ResponseModel<UserModel>).options,
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<UserModel>).options,
-        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        followUpCreatedAs: (this.activatedRoute.snapshot.data.followUpCreatedAs as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }
@@ -524,7 +533,9 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswers',
-        questionnaire: this.selectedOutbreak.contactFollowUpTemplate,
+        questionnaire: this.itemData.createdAs === EntityType.CASE ?
+          this.selectedOutbreak.caseFollowUpTemplate :
+          this.selectedOutbreak.contactFollowUpTemplate,
         value: {
           get: () => this.itemData.questionnaireAnswers,
           set: (value) => {
@@ -586,9 +597,11 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
               click: () => {
                 // show record details dialog
                 this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser,
                   this.isCreate ?
                     undefined :
                     [
@@ -635,13 +648,13 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       (type === CreateViewModifyV2ActionType.CREATE ?
         this.personAndRelatedHelperService.followUp.followUpsDataService.createFollowUp(
           this.selectedOutbreak.id,
-          this._entityData.id,
+          this._entityData,
           data
         ) :
         this.personAndRelatedHelperService.followUp.followUpsDataService
           .modifyFollowUp(
             this.selectedOutbreak.id,
-            this._entityData.id,
+            this._entityData,
             this.itemData.id,
             data
           )
@@ -735,12 +748,14 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     this.expandListAdvancedFilters = this.personAndRelatedHelperService.followUp.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        followUpCreatedAs: (this.activatedRoute.snapshot.data.followUpCreatedAs as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }

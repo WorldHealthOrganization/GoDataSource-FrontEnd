@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber, throwError } from 'rxjs';
-import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { ReferenceDataDataService } from '../data/reference-data.data.service';
 import { DialogV2Service } from './dialog-v2.service';
 import {
@@ -22,6 +21,7 @@ import {
 } from '../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 import { OutbreakModel } from '../../models/outbreak.model';
 import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/forms-v2/validators/general-async-validator.directive';
 
 @Injectable()
 export class ReferenceDataHelperService {

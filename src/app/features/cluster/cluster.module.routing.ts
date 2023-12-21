@@ -12,13 +12,17 @@ import { UserDataResolver } from '../../core/services/resolvers/data/user.resolv
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { SelectedClusterDataResolver } from '../../core/services/resolvers/data/selected-cluster.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // create / view / modify
 const createViewModifyFoundation: Route = {
   component: fromPages.ClusterCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     outbreak: SelectedOutbreakDataResolver
   }
 };
@@ -36,6 +40,7 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
       user: UserDataResolver
     }

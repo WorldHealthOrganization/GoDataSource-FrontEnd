@@ -34,17 +34,22 @@ import { LabTestResultDataResolver } from '../../core/services/resolvers/data/la
 import { LabProgressDataResolver } from '../../core/services/resolvers/data/lab-progress.resolver';
 import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers/data/lab-sequence-laboratory.resolver';
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
+import { FollowUpCreatedAsDataResolver } from '../../core/services/resolvers/data/follow-up-created-as.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
   component: fromPages.ContactsOfContactsCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     outbreak: SelectedOutbreakDataResolver,
     gender: GenderDataResolver,
     pregnancy: PregnancyStatusDataResolver,
     occupation: OccupationDataResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     documentType: DocumentTypeDataResolver,
     addressType: AddressTypeDataResolver,
     risk: RiskDataResolver,
@@ -68,7 +73,8 @@ const createViewModifyFoundation: Route = {
     labSequenceResult: LabSequenceResultDataResolver,
     entity: RelationshipPersonDataResolver,
     team: TeamDataResolver,
-    dailyFollowUpStatus: DailyFollowUpStatusDataResolver
+    dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
+    followUpCreatedAs: FollowUpCreatedAsDataResolver
   }
 };
 
@@ -79,6 +85,7 @@ const routes: Routes = [
     path: '',
     component: fromPages.ContactsOfContactsListComponent,
     resolve: {
+      createdOn: CreatedOnResolver,
       risk: RiskDataResolver,
       user: UserDataResolver,
       gender: GenderDataResolver,

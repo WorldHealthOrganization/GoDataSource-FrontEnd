@@ -507,6 +507,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           this.itemData.occupation
         ),
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        deletedUser: (this.activatedRoute.snapshot.data.deletedUser as IResolverV2ResponseModel<UserModel>).options,
         documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
@@ -691,6 +692,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
+            createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
               this.selectedOutbreak,
@@ -844,6 +846,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
+            createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
               this.selectedOutbreak,
@@ -994,8 +997,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           }
         }),
         tableColumns: this.personAndRelatedHelperService.labResult.retrieveTableColumns(this.selectedOutbreak, {
-          user: this.activatedRoute.snapshot.data.user,
           options: {
+            createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             labName: this.referenceDataHelperService.filterPerOutbreakOptions(
               this.selectedOutbreak,
               (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1026,12 +1029,14 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               this.selectedOutbreak,
               (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               undefined
-            )
+            ),
+            user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
           }
         }),
         advancedFilters: this.personAndRelatedHelperService.labResult.generateAdvancedFiltersPerson(this.selectedOutbreak, {
           labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
           options: {
+            createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             labName: this.referenceDataHelperService.filterPerOutbreakOptions(
               this.selectedOutbreak,
               (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1078,6 +1083,10 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             localTab.queryBuilder.clearFields();
             localTab.queryBuilder.fields(...fields);
           }
+
+          // retrieve created user & modified user information
+          localTab.queryBuilder.include('createdByUser', true);
+          localTab.queryBuilder.include('updatedByUser', true);
 
           // refresh data
           localTab.records$ = this.personAndRelatedHelperService.labResult
@@ -1175,21 +1184,25 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         }),
         tableColumns: this.personAndRelatedHelperService.followUp.retrieveTableColumns(this.selectedOutbreak, {
           team: this.activatedRoute.snapshot.data.team,
-          user: this.activatedRoute.snapshot.data.user,
           dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,
           options: {
-            yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
+            yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+            createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+            user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+            followUpCreatedAs: (this.activatedRoute.snapshot.data.followUpCreatedAs as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
           }
         }),
         advancedFilters: this.personAndRelatedHelperService.followUp.generateAdvancedFiltersPerson(this.selectedOutbreak, {
           contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
           options: {
+            createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
             yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-            addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+            addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            followUpCreatedAs: (this.activatedRoute.snapshot.data.followUpCreatedAs as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
           }
         }),
         queryBuilder: new RequestQueryBuilder(),
@@ -1202,6 +1215,13 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             localTab.queryBuilder.clearFields();
             localTab.queryBuilder.fields(...fields);
           }
+
+          // retrieve created user & modified user information
+          localTab.queryBuilder.include('createdByUser', true);
+          localTab.queryBuilder.include('updatedByUser', true);
+
+          // retrieve responsible user information
+          localTab.queryBuilder.include('responsibleUser', true);
 
           // add contact id
           localTab.queryBuilder.filter.byEquality(
@@ -1323,9 +1343,11 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               click: () => {
                 // show record details dialog
                 this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser,
                   this.isCreate ?
                     undefined :
                     [
@@ -1546,6 +1568,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               .generateFollowUps(
                 this.selectedOutbreak.id,
                 {
+                  personType: EntityType.CONTACT,
                   contactIds: [contact.id]
                 }
               ).pipe(
@@ -1910,6 +1933,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

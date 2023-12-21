@@ -242,7 +242,11 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
     this.uploader = new FileUploader({
       allowedMimeType: this.allowedMimeTypes,
       authToken: this.authDataService.getAuthToken(),
-      url: `${environment.apiUrl}/icons`
+      url: `${environment.apiUrl}/icons`,
+      headers: [{
+        name: 'platform',
+        value: 'WEB'
+      }]
     });
 
     // don't allow multiple files to be added

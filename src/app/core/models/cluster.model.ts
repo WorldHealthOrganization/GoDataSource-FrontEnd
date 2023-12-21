@@ -23,6 +23,7 @@ export class ClusterModel extends BaseModel
   static generateAdvancedFilters(data: {
     authUser: UserModel,
     options: {
+      createdOn: ILabelValuePairModel[],
       user: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
@@ -44,6 +45,13 @@ export class ClusterModel extends BaseModel
         type: V2AdvancedFilterType.TEXT,
         field: 'colorCode',
         label: 'LNG_CLUSTER_FIELD_LABEL_COLOR',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_ON',
+        options: data.options.createdOn,
         sortable: true
       },
       {

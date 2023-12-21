@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
 import { FileUploadModule } from 'ng2-file-upload';
 import { NgxWigModule } from 'ngx-wig';
@@ -13,7 +12,6 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import * as fromSharedComponents from './components';
-import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
 import * as formV2Components from './forms-v2/components';
 import * as v2Components from './components-v2';
@@ -23,6 +21,8 @@ import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { CdkMenuModule } from '@angular/cdk/menu';
 import { ClipboardModule } from '@angular/cdk/clipboard';
+import { validatorDirectives } from './forms-v2/validators';
+import { NgxPopperjsModule } from 'ngx-popperjs';
 
 @NgModule({
   imports: [
@@ -35,13 +35,13 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
     RouterModule,
     FormsModule,
     FlexLayoutModule,
-    XtFormsModule,
     AngularMaterialModule,
     TranslateModule,
     FileUploadModule,
     NgxWigModule,
     NgxMatTimepickerModule,
     NgxMatSelectSearchModule,
+    NgxPopperjsModule,
     ScrollingModule,
     ExperimentalScrollingModule,
     ToastrModule.forRoot({
@@ -56,8 +56,8 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
     })
   ],
   declarations: [
+    ...validatorDirectives,
     ...fromSharedComponents.components,
-    ...fromSharedDirectives.directives,
     ...fromSharedPipes.pipes,
     ...formV2Components.components,
     ...v2Components.components
@@ -71,12 +71,12 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
     FormsModule,
     FlexLayoutModule,
     TranslateModule,
-    XtFormsModule,
     AngularMaterialModule,
+    NgxPopperjsModule,
     ScrollingModule,
     ExperimentalScrollingModule,
     ToastrModule,
-    ...fromSharedDirectives.directives,
+    ...validatorDirectives,
     ...fromSharedPipes.pipes,
     ...fromSharedComponents.components,
     ...formV2Components.components,

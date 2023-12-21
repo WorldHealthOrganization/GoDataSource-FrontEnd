@@ -87,7 +87,7 @@ export class AddressModel {
     let fullAddress = _.isEmpty(this.addressLine1) ? '' : this.addressLine1;
     fullAddress += _.isEmpty(this.city) ? '' : (
       (_.isEmpty(fullAddress) ? '' : ', ') +
-            this.city
+      this.city
     );
 
     // finished
@@ -111,7 +111,7 @@ export class AddressModel {
     const matches: string[] = address.match(/\w+/gi);
     if (
       !matches ||
-            matches.length < 1
+      matches.length < 1
     ) {
       return null;
     }
@@ -223,9 +223,6 @@ export class AddressModel {
     addressParentLocationIds: string[],
     useLike: boolean = false
   ): RequestQueryBuilder {
-    // initialize query builder
-    const qb = new RequestQueryBuilder();
-
     // create a query that collects the address inputs
     const query: { [key: string]: {} } = {};
 
@@ -364,6 +361,7 @@ export class AddressModel {
     }
 
     // check if there are conditions to add
+    const qb = new RequestQueryBuilder();
     if (Object.keys(query).length > 0) {
       // add the conditions for the current address only
       if (isArray) {
@@ -371,13 +369,27 @@ export class AddressModel {
         query.typeId = AddressType.CURRENT_ADDRESS;
 
         // add the conditions
+        // IMPORTANT: and => and => and => is required to make it unique, so it doesn't interfere with advanced by address filters
         qb.filter.where({
-          [property]: {
-            elemMatch: query
-          }
+          and: [{
+            and: [{
+              and: [{
+                [property]: {
+                  elemMatch: query
+                }
+              }]
+            }]
+          }]
         });
       } else {
-        qb.filter.where(query);
+        // IMPORTANT: and => and => and => is required to make it unique, so it doesn't interfere with advanced by address filters
+        qb.filter.where({
+          and: [{
+            and: [{
+              and: [query]
+            }]
+          }]
+        });
       }
     }
 

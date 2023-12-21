@@ -52,13 +52,13 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_COMMENT', value: 'comment' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   // constants
@@ -70,7 +70,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
   constructor(
     protected listHelperService: ListHelperService,
     protected outbreakDataService: OutbreakDataService,
-    private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
@@ -86,17 +86,21 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
 
     // data
-    this.entityData = this.route.snapshot.data.entityData;
+    this.entityData = this.activatedRoute.snapshot.data.entityData;
 
     // additional information
     this.suffixLegends = [
       {
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        value: this.entityData.dateOfLastContact ? LocalizationHelper.displayDate(this.entityData.dateOfLastContact) : this.entityData.dateOfLastContact
+        value: this.entityData.dateOfLastContact ?
+          LocalizationHelper.displayDate(this.entityData.dateOfLastContact) :
+          '—'
       },
       {
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP',
-        value: this.entityData.followUp.endDate ? LocalizationHelper.displayDate(this.entityData.followUp.endDate) : this.entityData.followUp.endDate
+        value: this.entityData.followUp.endDate ?
+          LocalizationHelper.displayDate(this.entityData.followUp.endDate) :
+          '—'
       }
     ];
   }
@@ -131,7 +135,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
       entityData: this.entityData,
       selectedOutbreak: () => this.selectedOutbreak,
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
-      team: this.route.snapshot.data.team,
+      team: this.activatedRoute.snapshot.data.team,
       refreshList: () => {
         // reload data
         this.needsRefreshList(true);
@@ -144,11 +148,13 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    */
   protected initializeTableColumns(): void {
     this.tableColumns = this.personAndRelatedHelperService.followUp.retrieveTableColumns(this.selectedOutbreak, {
-      team: this.route.snapshot.data.team,
-      user: this.route.snapshot.data.user,
-      dailyFollowUpStatus: this.route.snapshot.data.dailyFollowUpStatus,
+      team: this.activatedRoute.snapshot.data.team,
+      dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus,
       options: {
-        yesNoAll: (this.route.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        followUpCreatedAs: (this.activatedRoute.snapshot.data.followUpCreatedAs as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }
@@ -230,12 +236,14 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
     this.advancedFilters = this.personAndRelatedHelperService.followUp.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       options: {
-        team: (this.route.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
-        yesNoAll: (this.route.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        yesNo: (this.route.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        dailyFollowUpStatus: (this.route.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        user: (this.route.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-        addressType: (this.route.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        followUpCreatedAs: (this.activatedRoute.snapshot.data.followUpCreatedAs as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }
@@ -358,6 +366,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
           label: {
             get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS'
           },
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION') :
+            undefined,
           action: {
             link: () => {
               return ['/contacts/follow-ups/modify-list'];
@@ -374,7 +385,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
               this.selectedOutbreakIsActive;
           },
           disable: (selected: string[]): boolean => {
-            return selected.length < 1;
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
           }
         },
 
@@ -439,6 +451,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
             get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS'
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION') :
+            undefined,
           action: {
             click: (selected: string[]) => {
               // create query
@@ -592,9 +607,15 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
         link: (): string[] => ['/contacts', this.entityData.id, 'follow-ups', 'create']
       },
       visible: (): boolean => {
-        return this.entityData.type === EntityType.CONTACT &&
-          FollowUpModel.canCreate(this.authUser) &&
-          this.selectedOutbreakIsActive;
+        return ((
+          this.entityData.type === EntityType.CASE &&
+          this.selectedOutbreak?.allowCasesFollowUp &&
+          CaseModel.canCreateFollowUp(this.authUser)
+        ) || (
+          this.entityData.type === EntityType.CONTACT &&
+          ContactModel.canCreateFollowUp(this.authUser))
+        ) &&
+        this.selectedOutbreakIsActive;
       }
     };
   }
@@ -677,7 +698,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
 
     // add follow-ups breadcrumbs
     this.breadcrumbs.push({
-      label: this.entityData.type === EntityType.CONTACT ? 'LNG_PAGE_LIST_FOLLOW_UPS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
+      label: 'LNG_PAGE_LIST_FOLLOW_UPS_VIEW_FOLLOW_UPS',
       action: null
     });
   }
@@ -693,6 +714,13 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Refresh list
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
+
     // add contact id
     this.queryBuilder.filter.byEquality(
       'personId',
@@ -805,9 +833,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
               const followUpFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
 
               // show export
-              const fileName: string = this.entityData.type === EntityType.CONTACT ?
-                'LNG_PAGE_LIST_FOLLOW_UPS_CONTACT_TITLE' :
-                'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE';
+              const fileName: string = 'LNG_PAGE_LIST_FOLLOW_UPS_VIEW_FOLLOW_UPS';
               finished({
                 title: {
                   get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE'

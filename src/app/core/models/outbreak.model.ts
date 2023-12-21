@@ -39,6 +39,7 @@ export class OutbreakModel
   caseInvestigationTemplate: QuestionModel[];
   contactInvestigationTemplate: QuestionModel[];
   eventInvestigationTemplate: QuestionModel[];
+  caseFollowUpTemplate: QuestionModel[];
   contactFollowUpTemplate: QuestionModel[];
   labResultsTemplate: QuestionModel[];
   eventIdMask: string;
@@ -84,6 +85,17 @@ export class OutbreakModel
   generateFollowUpsDateOfLastContact: boolean;
   generateFollowUpsWhenCreatingContacts: boolean;
 
+  // case follow-ups
+  allowCasesFollowUp: boolean;
+  periodOfFollowupCases: number;
+  frequencyOfFollowUpPerDayCases: number;
+  intervalOfFollowUpCases: string;
+  generateFollowUpsOverwriteExistingCases: boolean;
+  generateFollowUpsKeepTeamAssignmentCases: boolean;
+  generateFollowUpsTeamAssignmentAlgorithmCases: string;
+  generateFollowUpsDateOfOnset: boolean;
+  generateFollowUpsWhenCreatingCases: boolean;
+
   // used for displaying information when hovering an outbreak from topnav component
   // no need to save this one in the database
   details: string;
@@ -121,6 +133,7 @@ export class OutbreakModel
   static canModifyCaseQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE) : false; }
   static canModifyContactQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CONTACT_QUESTIONNAIRE) : false; }
   static canModifyEventQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_EVENT_QUESTIONNAIRE) : false; }
+  static canModifyCaseFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_FOLLOW_UP_QUESTIONNAIRE) : false; }
   static canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE) : false; }
   static canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE) : false; }
 
@@ -170,6 +183,17 @@ export class OutbreakModel
     this.generateFollowUpsWhenCreatingContacts = _.get(data, 'generateFollowUpsWhenCreatingContacts', false);
     this.allowedRefDataItems = _.get(data, 'allowedRefDataItems');
 
+    // case follow-ups
+    this.allowCasesFollowUp = _.get(data, 'allowCasesFollowUp', false);
+    this.periodOfFollowupCases = _.get(data, 'periodOfFollowupCases');
+    this.frequencyOfFollowUpPerDayCases = _.get(data, 'frequencyOfFollowUpPerDayCases');
+    this.intervalOfFollowUpCases = _.get(data, 'intervalOfFollowUpCases');
+    this.generateFollowUpsOverwriteExistingCases = _.get(data, 'generateFollowUpsOverwriteExistingCases', false);
+    this.generateFollowUpsKeepTeamAssignmentCases = _.get(data, 'generateFollowUpsKeepTeamAssignmentCases', true);
+    this.generateFollowUpsTeamAssignmentAlgorithmCases = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithmCases', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
+    this.generateFollowUpsDateOfOnset = _.get(data, 'generateFollowUpsDateOfOnset', false);
+    this.generateFollowUpsWhenCreatingCases = _.get(data, 'generateFollowUpsWhenCreatingCases', false);
+
     // CASE INVESTIGATION TEMPLATE
     this.caseInvestigationTemplate = _.map(
       _.get(data, 'caseInvestigationTemplate', []),
@@ -185,6 +209,12 @@ export class OutbreakModel
     // EVENT TEMPLATE
     this.eventInvestigationTemplate = _.map(
       _.get(data, 'eventInvestigationTemplate', []),
+      (lData: any) => {
+        return new QuestionModel(lData);
+      });
+    // CASE FOLLOW_UP INVESTIGATIONS TEMPLATE
+    this.caseFollowUpTemplate = _.map(
+      _.get(data, 'caseFollowUpTemplate', []),
       (lData: any) => {
         return new QuestionModel(lData);
       });
@@ -247,6 +277,7 @@ export class OutbreakModel
    */
   canModifyCaseQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseQuestionnaire(user); }
   canModifyContactQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyContactQuestionnaire(user); }
+  canModifyCaseFollowUpQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseFollowUpQuestionnaire(user); }
   canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyContactFollowUpQuestionnaire(user); }
   canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return OutbreakModel.canModifyCaseLabResultQuestionnaire(user); }
 

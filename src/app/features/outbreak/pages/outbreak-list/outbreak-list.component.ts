@@ -24,13 +24,13 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { Constants } from '../../../../core/models/constants';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/forms-v2/validators/general-async-validator.directive';
 
 @Component({
   selector: 'app-outbreak-list',
@@ -458,6 +458,11 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
                       // translate questionnaire questions - Lab Results Form
                       if (!_.isEmpty(outbreakToClone.labResultsTemplate)) {
                         translateQuestionnaire(outbreakToClone.labResultsTemplate);
+                      }
+
+                      // translate questionnaire questions - Case Follow-up
+                      if (!_.isEmpty(outbreakToClone.caseFollowUpTemplate)) {
+                        translateQuestionnaire(outbreakToClone.caseFollowUpTemplate);
                       }
 
                       // translate questionnaire questions - Contact Follow-up
@@ -1016,6 +1021,112 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
         notVisible: true
       },
       {
+        field: 'allowCasesFollowUp',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_ALLOW_CASES_FOLLOW_UP',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'generateFollowUpsTeamAssignmentAlgorithmCases',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM_CASES',
+        notVisible: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'generateFollowUpsOverwriteExistingCases',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING_CASES',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'generateFollowUpsKeepTeamAssignmentCases',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT_CASES',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'periodOfFollowupCases',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DURATION_FOLLOWUP_DAYS_CASES',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'frequencyOfFollowUpPerDayCases',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_FREQUENCY_PER_DAY_CASES',
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        },
+        sortable: true,
+        notVisible: true
+      },
+      {
+        field: 'intervalOfFollowUpCases',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_CASES',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'generateFollowUpsDateOfOnset',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_ONSET',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'generateFollowUpsWhenCreatingCases',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CASES',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
         field: 'deleted',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DELETED',
         sortable: true,
@@ -1058,10 +1169,26 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
           return !OutbreakModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy && UserModel.canView(this.authUser) ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -1092,7 +1219,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
           return !OutbreakModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy && UserModel.canView(this.authUser) ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }
@@ -1129,6 +1256,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
     // Outbreak
     this.advancedFilters = this.outbreakAndOutbreakTemplateHelperService.generateOutbreakAdvancedFilters({
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         country: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         geographicalLevel: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1216,6 +1344,15 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
       'isContactLabResultsActive',
       'generateFollowUpsDateOfLastContact',
       'generateFollowUpsWhenCreatingContacts',
+      'allowCasesFollowUp',
+      'generateFollowUpsTeamAssignmentAlgorithmCases',
+      'generateFollowUpsOverwriteExistingCases',
+      'generateFollowUpsKeepTeamAssignmentCases',
+      'periodOfFollowupCases',
+      'frequencyOfFollowUpPerDayCases',
+      'intervalOfFollowUpCases',
+      'generateFollowUpsDateOfOnset',
+      'generateFollowUpsWhenCreatingCases',
       'locationIds',
       'description',
       'eventIdMask',
@@ -1236,6 +1373,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel, IV2Colum
       'deleted',
       'deletedAt',
       'createdBy',
+      'createdOn',
       'createdAt',
       'updatedBy',
       'updatedAt'

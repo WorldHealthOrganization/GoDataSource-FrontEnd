@@ -3,8 +3,8 @@ import { IV2SpreadsheetEditorEventDataLocation, V2SpreadsheetEditorColumn } from
 import { CreateViewModifyV2Action } from '../../app-create-view-modify-v2/models/action.model';
 import { AppFormBaseErrorMsgV2Type } from '../../../forms-v2/core/app-form-base-error-msg-v2';
 import { Subscription } from 'rxjs';
-import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { Moment } from '../../../../core/helperClasses/localization-helper';
+import { IGeneralAsyncValidatorResponse } from '../../../forms-v2/validators/general-async-validator.directive';
 
 /**
  Extended AG-Grid column definition - selection range collecting

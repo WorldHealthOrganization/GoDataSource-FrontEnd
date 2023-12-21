@@ -57,7 +57,9 @@ export class ImportEventDataComponent implements OnInit, OnDestroy {
     'address.locationId': true
   };
 
-  requiredDestinationFields;
+  requiredDestinationFields: string[] = [
+    'name'
+  ];
 
   formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
@@ -87,13 +89,6 @@ export class ImportEventDataComponent implements OnInit, OnDestroy {
         if (selectedOutbreak && selectedOutbreak.id) {
           // outbreak
           this.selectedOutbreak = selectedOutbreak;
-
-          // set default required fields
-          this.requiredDestinationFields = [
-            'name',
-            'date',
-            'dateOfReporting'
-          ];
 
           // set URLs
           this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;

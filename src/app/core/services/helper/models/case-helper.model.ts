@@ -7,7 +7,6 @@ import { Constants } from '../../../models/constants';
 import { AgeModel } from '../../../models/age.model';
 import { Observable } from 'rxjs';
 import { TimerCache } from '../../../helperClasses/timer-cache';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { UserModel } from '../../../models/user.model';
 import { DocumentModel } from '../../../models/document.model';
 import { AddressModel } from '../../../models/address.model';
@@ -22,6 +21,8 @@ import { ReferenceDataEntryModel } from '../../../models/reference-data.model';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
 import { LocalizationHelper, Moment } from '../../../helperClasses/localization-helper';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/forms-v2/validators/general-async-validator.directive';
+import { TeamModel } from '../../../models/team.model';
 
 export class CaseHelperModel {
   // data
@@ -53,6 +54,7 @@ export class CaseHelperModel {
         pregnancy: ILabelValuePairModel[],
         occupation: ILabelValuePairModel[],
         user: ILabelValuePairModel[],
+        deletedUser: ILabelValuePairModel[],
         documentType: ILabelValuePairModel[],
         addressType: ILabelValuePairModel[]
       }
@@ -311,7 +313,7 @@ export class CaseHelperModel {
                 name: 'responsibleUserId',
                 placeholder: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
                 description: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-                options: data.options.user,
+                options: data.options.user.concat(data.options.deletedUser),
                 value: {
                   get: () => data.itemData.responsibleUserId,
                   set: (value) => {
@@ -424,6 +426,8 @@ export class CaseHelperModel {
         investigationStatus: ILabelValuePairModel[],
         outcome: ILabelValuePairModel[],
         risk: ILabelValuePairModel[],
+        team: ILabelValuePairModel[],
+        followUpStatus: ILabelValuePairModel[],
         vaccine: ILabelValuePairModel[],
         vaccineStatus: ILabelValuePairModel[],
         dateRangeType: ILabelValuePairModel[],
@@ -775,6 +779,43 @@ export class CaseHelperModel {
                   data.itemData.riskReason = value;
                 }
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'followUpTeamId',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+              description: () => 'LNG_CASE_FIELD_LABEL_FOLLOW_UP_TEAM_ID_DESCRIPTION',
+              options: data.options.team,
+              value: {
+                get: () => data.itemData.followUpTeamId,
+                set: (value) => {
+                  data.itemData.followUpTeamId = value;
+                }
+              },
+              replace: {
+                condition: () => !TeamModel.canList(this.parent.authUser),
+                html: this.parent.i18nService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'followUp[status]',
+              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+              description: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
+              options: data.options.followUpStatus,
+              value: {
+                get: () => data.itemData.followUp?.status,
+                set: (value) => {
+                  // initialize
+                  if (!data.itemData.followUp) {
+                    data.itemData.followUp = {} as any;
+                  }
+
+                  // set data
+                  data.itemData.followUp.status = value;
+                }
+              },
+              visibleMandatoryConf: {
+                visible: true
+              }
             }]
           },
 
@@ -872,9 +913,12 @@ export class CaseHelperModel {
     data: {
       caseInvestigationTemplate: () => QuestionModel[],
       options: {
+        createdOn: ILabelValuePairModel[],
         gender: ILabelValuePairModel[],
         occupation: ILabelValuePairModel[],
         risk: ILabelValuePairModel[],
+        team: ILabelValuePairModel[],
+        followUpStatus: ILabelValuePairModel[],
         classification: ILabelValuePairModel[],
         yesNoAll: ILabelValuePairModel[],
         yesNo: ILabelValuePairModel[],
@@ -1495,6 +1539,14 @@ export class CaseHelperModel {
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_CASE_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        options: data.options.createdOn,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'createdAt',
         label: 'LNG_CASE_FIELD_LABEL_CREATED_AT',
@@ -1543,6 +1595,22 @@ export class CaseHelperModel {
         label: 'LNG_CASE_FIELD_LABEL_UPDATED_BY',
         visibleMandatoryIf: () => true,
         options: data.options.user,
+        sortable: true
+      });
+    }
+
+    // allowed to filter by follow-up team ?
+    if (TeamModel.canList(this.parent.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'followUpTeamId',
+        label: 'LNG_CASE_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+        visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
+          selectedOutbreak,
+          this.visibleMandatoryKey,
+          'followUpTeamId'
+        ),
+        options: data.options.team,
         sortable: true
       });
     }

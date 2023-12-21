@@ -10,7 +10,6 @@ import { AgeModel } from '../../../models/age.model';
 import { Observable } from 'rxjs';
 import { TimerCache } from '../../../helperClasses/timer-cache';
 import { ContactDataService } from '../../data/contact.data.service';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { UserModel } from '../../../models/user.model';
 import { DocumentModel } from '../../../models/document.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -28,6 +27,7 @@ import { ReferenceDataEntryModel } from '../../../models/reference-data.model';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
 import { LocalizationHelper, Moment } from '../../../helperClasses/localization-helper';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/forms-v2/validators/general-async-validator.directive';
 
 export class ContactHelperModel {
   // data
@@ -61,6 +61,7 @@ export class ContactHelperModel {
         pregnancy: ILabelValuePairModel[],
         occupation: ILabelValuePairModel[],
         user: ILabelValuePairModel[],
+        deletedUser: ILabelValuePairModel[],
         documentType: ILabelValuePairModel[],
         addressType: ILabelValuePairModel[]
       }
@@ -319,7 +320,7 @@ export class ContactHelperModel {
                 name: 'responsibleUserId',
                 placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
                 description: () => 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-                options: data.options.user,
+                options: data.options.user.concat(data.options.deletedUser),
                 value: {
                   get: () => data.itemData.responsibleUserId,
                   set: (value) => {
@@ -680,6 +681,7 @@ export class ContactHelperModel {
       contactFollowUpTemplate: () => QuestionModel[],
       caseInvestigationTemplate: () => QuestionModel[],
       options: {
+        createdOn: ILabelValuePairModel[],
         occupation: ILabelValuePairModel[],
         followUpStatus: ILabelValuePairModel[],
         pregnancy: ILabelValuePairModel[],
@@ -1142,6 +1144,14 @@ export class ContactHelperModel {
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_CONTACT_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        options: data.options.createdOn,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'createdAt',
         label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT',
@@ -1303,6 +1313,15 @@ export class ContactHelperModel {
           label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED',
           visibleMandatoryIf: () => true,
           yesNoAllOptions: data.options.yesNoAll,
+          relationshipPath: ['relationships'],
+          relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'createdOn',
+          label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_ON',
+          visibleMandatoryIf: () => true,
+          options: data.options.createdOn,
           relationshipPath: ['relationships'],
           relationshipLabel: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP'
         },
@@ -1477,6 +1496,15 @@ export class ContactHelperModel {
           label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
           visibleMandatoryIf: () => true,
           yesNoAllOptions: data.options.yesNoAll,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'createdOn',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_ON',
+          visibleMandatoryIf: () => true,
+          options: data.options.createdOn,
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         },
@@ -2255,6 +2283,16 @@ export class ContactHelperModel {
           label: 'LNG_CASE_FIELD_LABEL_DELETED',
           visibleMandatoryIf: () => true,
           yesNoAllOptions: data.options.yesNoAll,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'createdOn',
+          label: 'LNG_CASE_FIELD_LABEL_CREATED_ON',
+          visibleMandatoryIf: () => true,
+          options: data.options.createdOn,
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition

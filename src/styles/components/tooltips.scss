@@ -35,4 +35,8 @@ div.ngxp__container {
       display: none;
     }
   }
+
+  &.ngxp__animation {
+    animation: none;
+  }
 }

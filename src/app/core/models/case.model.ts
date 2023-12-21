@@ -176,7 +176,7 @@ export class CaseModel
    * Static Permissions - IPermissionBasicBulk
    */
   static canBulkCreate(): boolean { return false; }
-  static canBulkModify(): boolean { return false; }
+  static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_MODIFY) : false); }
   static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_DELETE) : false); }
   static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_RESTORE) : false); }
 
@@ -223,6 +223,8 @@ export class CaseModel
   static canListLongPeriodBetweenOnsetDatesReport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_LONG_PERIOD_BETWEEN_DATES_REPORT) : false); }
   static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_DOSSIER) : false); }
   static canListIsolatedCases(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_ISOLATED_CASES) : false); }
+  static canExportDailyFollowUpList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_DAILY_FOLLOW_UP_LIST) : false); }
+  static canExportDailyFollowUpsForm(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_DAILY_FOLLOW_UP_FORM) : false); }
 
   /**
    * Static Permissions - IPermissionRelatedLabResult
@@ -235,6 +237,11 @@ export class CaseModel
   static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_RESTORE_LAB_RESULT) : false); }
   static canImportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_IMPORT_LAB_RESULT) : false); }
   static canExportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_LAB_RESULT) : false); }
+
+  /**
+   * Static Permissions - IPermissionRelatedFollowUp
+   */
+  static canCreateFollowUp(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_FOLLOW_UP_CREATE) : false); }
 
   /**
    * Constructor
@@ -391,7 +398,7 @@ export class CaseModel
    * Permissions - IPermissionBasicBulk
    */
   canBulkCreate(): boolean { return CaseModel.canBulkCreate(); }
-  canBulkModify(): boolean { return CaseModel.canBulkModify(); }
+  canBulkModify(user: UserModel): boolean { return CaseModel.canBulkModify(user); }
   canBulkDelete(user: UserModel): boolean { return CaseModel.canBulkDelete(user); }
   canBulkRestore(user: UserModel): boolean { return CaseModel.canBulkRestore(user); }
 
@@ -438,6 +445,8 @@ export class CaseModel
   canListLongPeriodBetweenOnsetDatesReport(user: UserModel): boolean { return CaseModel.canListLongPeriodBetweenOnsetDatesReport(user); }
   canExportDossier(user: UserModel): boolean { return CaseModel.canExportDossier(user); }
   canListIsolatedCases(user: UserModel): boolean { return CaseModel.canListIsolatedCases(user); }
+  canExportDailyFollowUpList(user: UserModel): boolean { return CaseModel.canExportDailyFollowUpList(user); }
+  canExportDailyFollowUpsForm(user: UserModel): boolean { return CaseModel.canExportDailyFollowUpsForm(user); }
 
   /**
      * Permissions - IPermissionRelatedLabResult
@@ -450,6 +459,11 @@ export class CaseModel
   canRestoreLabResult(user: UserModel): boolean { return CaseModel.canRestoreLabResult(user); }
   canImportLabResult(user: UserModel): boolean { return CaseModel.canImportLabResult(user); }
   canExportLabResult(user: UserModel): boolean { return CaseModel.canExportLabResult(user); }
+
+  /**
+   * Permissions - IPermissionRelatedFollowUp
+   */
+  canCreateFollowUp(user: UserModel): boolean { return CaseModel.canCreateFollowUp(user); }
 
   /**
      * Case Name

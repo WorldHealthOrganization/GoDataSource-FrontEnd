@@ -288,7 +288,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         DashboardModel.canViewCasesRefusingTreatmentDashlet(this._authUser) ||
         DashboardModel.canViewNewCasesFromKnownCOTDashlet(this._authUser) ||
         DashboardModel.canViewCasesWithPendingLabResultsDashlet(this._authUser) ||
-        DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(this._authUser),
+        DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(this._authUser) ||
+        DashboardModel.canViewCasesFromFollowUpsDashlet(this._authUser) ||
+        DashboardModel.canViewCasesLostToFollowUpsDashlet(this._authUser) ||
+        DashboardModel.canViewCasesNotSeenInXDaysDashlet(this._authUser) ||
+        DashboardModel.canViewCasesSeenDashlet(this._authUser) ||
+        DashboardModel.canViewCasesWithSuccessfulFollowUpsDashlet(this._authUser),
 
       // KPI - contacts
       KPIContacts: DashboardModel.canViewContactsPerCaseMeanDashlet(this._authUser) ||
@@ -373,6 +378,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       type: V2ActionType.MENU,
       label: 'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL',
       visible: () => DashboardModel.canExportCaseClassificationPerLocationReport(this._authUser) ||
+        DashboardModel.canExportCaseFollowUpSuccessRateReport(this._authUser) ||
         DashboardModel.canExportContactFollowUpSuccessRateReport(this._authUser) ||
         DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser) ||
         DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser) ||
@@ -445,6 +451,63 @@ export class DashboardComponent implements OnInit, OnDestroy {
             }
           },
           visible: () => DashboardModel.canExportCaseClassificationPerLocationReport(this._authUser)
+        },
+
+        // Export case follow-up success rate
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_CASES_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL'
+          },
+          action: {
+            click: () => {
+              // initialization
+              const qb = new RequestQueryBuilder();
+
+              // date filters
+              if (this.globalFilterDate) {
+                // pdf report
+                qb.filter.flag(
+                  'dateOfFollowUp',
+                  LocalizationHelper.toMoment(this.globalFilterDate).startOf('day').format()
+                );
+
+                // same as list view
+                qb.filter.byDateRange(
+                  'dateOfReporting', {
+                    endDate: LocalizationHelper.toMoment(this.globalFilterDate).endOf('day').format()
+                  }
+                );
+              }
+
+              // location
+              if (this.globalFilterLocationId) {
+                qb.filter.byEquality(
+                  'addresses.parentLocationIdFilter',
+                  this.globalFilterLocationId
+                );
+              }
+
+              // export
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_DASHBOARD_CASES_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL'
+                },
+                export: {
+                  url: `/outbreaks/${this._selectedOutbreak.id}/cases/per-location-level-tracing-report/download/`,
+                  async: false,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_DASHBOARD_CASES_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.PDF
+                    ]
+                  }
+                }
+              });
+            }
+          },
+          visible: () => DashboardModel.canExportCaseFollowUpSuccessRateReport(this._authUser)
         },
 
         // Export contact follow-up success rate

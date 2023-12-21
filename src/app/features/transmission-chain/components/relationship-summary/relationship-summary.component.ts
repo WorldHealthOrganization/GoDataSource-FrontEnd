@@ -95,6 +95,9 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.relationship) {
+      // update "view resource" link
+      this.relationshipLink = this.getRelationshipLink();
+
       // reset reversing action if the relationship was changed
       this.canReverseRelation = true;
       const relationship: SimpleChange = changes.relationship;

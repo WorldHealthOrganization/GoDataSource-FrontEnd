@@ -420,6 +420,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     this.expandListAdvancedFilters = this.personAndRelatedHelperService.event.generateAdvancedFilters(this.selectedOutbreak, {
       eventInvestigationTemplate: () => this.selectedOutbreak.eventInvestigationTemplate,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -440,6 +441,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       eventVisualIDMask: this._eventVisualIDMask,
       options: {
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        deletedUser: (this.activatedRoute.snapshot.data.deletedUser as IResolverV2ResponseModel<UserModel>).options,
         eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
@@ -476,6 +478,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
+            createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
               this.selectedOutbreak,
@@ -629,6 +632,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
+            createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
               this.selectedOutbreak,
@@ -826,9 +830,11 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
               click: () => {
                 // show record details dialog
                 this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_PAGE_MODIFY_EVENT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }

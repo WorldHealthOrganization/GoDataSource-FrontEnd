@@ -14,6 +14,11 @@ export enum DashboardDashlet {
   NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS = 'new-cases-in-the-previous-x-days-outside-the-transmission-chains',
   SUSPECT_CASES_WITH_PENDING_LAB_RESULT = 'suspect-cases-with-pending-lab-result',
   CASES_NOT_IDENTIFIED_THROUGH_CONTACTS = 'cases-not-identified-through-contacts',
+  CASES_ON_THE_FOLLOW_UP_LIST = 'cases-on-the-follow-up-list',
+  CASES_LOST_TO_FOLLOW_UP = 'cases-lost-to-follow-up',
+  CASES_NOT_SEEN_IN_X_DAYS = 'cases-not-seen-in-x-days',
+  CASES_SEEN_EACH_DAY = 'cases-seen-each-day',
+  CASES_WITH_SUCCESSFUL_FOLLOW_UP = 'cases-with-successful-follow-up',
 
   // contacts
   CONTACTS_PER_CASE_MEAN = 'contacts-per-case-mean',

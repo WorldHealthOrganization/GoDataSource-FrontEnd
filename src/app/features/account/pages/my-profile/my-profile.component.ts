@@ -191,7 +191,8 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
               },
               validators: {
                 required: () => true
-              }
+              },
+              visible: () => UserRoleModel.canList(this.authUser)
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_MULTIPLE,
               name: 'outbreakIds',

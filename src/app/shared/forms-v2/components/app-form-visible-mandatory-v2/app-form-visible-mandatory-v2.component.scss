@@ -351,7 +351,14 @@
 
 /* Exclude legend on view */
 .gd-create-view-modify-view {
-  .gd-form-visible-mandatory-v2-list {
-    height: calc(100% - 7.3rem);
+  .gd-form-visible-mandatory-v2 {
+    .gd-form-visible-mandatory-v2-list {
+      height: calc(100% - 7.3rem);
+
+      @include breakpoint('xs') {
+        height: calc(100% - 4.9rem);
+        min-height: 10rem;
+      }
+    }
   }
 }

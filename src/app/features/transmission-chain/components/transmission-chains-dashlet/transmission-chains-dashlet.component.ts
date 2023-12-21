@@ -53,7 +53,10 @@ import {
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { TransmissionChainFilters } from '../../classes/filter';
+import {
+  TransmissionChainFilters,
+  TransmissionChainFiltersFrom
+} from '../../classes/filter';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import * as FileSaver from 'file-saver';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -64,6 +67,7 @@ import { IV2NumberRange } from '../../../../shared/forms-v2/components/app-form-
 import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -80,7 +84,28 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
 
-  @Input() sizeOfChainsFilter: string | number = null;
+  private _sizeOfChainsFilter: string | number = null;
+  @Input() set sizeOfChainsFilter(value: string | number) {
+    // set
+    this._sizeOfChainsFilter = value;
+
+    // snapshot ?
+    if (!this._sizeOfChainsFilter) {
+      return;
+    }
+
+    // disable outbreak change
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+
+    // no snapshot
+    this.getChainsOfTransmission(
+      false,
+      null
+    );
+  }
+  get sizeOfChainsFilter(): string | number {
+    return this._sizeOfChainsFilter;
+  }
   @Input() snapshotId: string = null;
   @Input() showPersonContacts: boolean = false;
   @Input() showPersonContactsOfContacts: boolean = false;
@@ -713,6 +738,21 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                   });
                 });
 
+              // must load size chain ?
+              if (this.sizeOfChainsFilter) {
+                // hide loading
+                loadingDialog.close();
+
+                // specific size
+                this.getChainsOfTransmission(
+                  false,
+                  null
+                );
+
+                // finished
+                return;
+              }
+
               // load snapshot if selected
               if (this.snapshotId) {
                 // hide the snapshot list
@@ -858,6 +898,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // not full screen anymore
     AuthenticatedComponent.FULL_SCREEN = false;
 
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
+
     // stop any update snapshot request we might have pending
     this.stopUpdateSnapshotsInProgress();
 
@@ -902,11 +945,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   /**
    * Display chains of transmission
    */
-  private generateChainsOfTransmission(snapshotName: string) {
+  private getChainsOfTransmission(
+    generate: boolean,
+    snapshotName: string
+  ) {
     // if there is no outbreak then we can't continue
     if (
-      !this.selectedOutbreak ||
-      !this.selectedOutbreak.id ||
+      !this.selectedOutbreak?.id ||
       !this.transmissionChainViewType
     ) {
       return;
@@ -991,7 +1036,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     }
 
     // add flags
-    if (this.filters.showContacts) {
+    if (
+      generate &&
+      this.filters.showContacts
+    ) {
       // we need contact chains as well
       requestQueryBuilder.filter.flag('includeContacts', 1);
       requestQueryBuilder.filter.flag('noContactChains', false);
@@ -1013,7 +1061,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     if (!_.isEmpty(this.filters)) {
       // include custom person builder that will handle these filters
       const filterObject = new TransmissionChainFilters(this.filters);
-      filterObject.attachConditionsToRequestQueryBuilder(personQuery);
+      filterObject.attachConditionsToRequestQueryBuilder(
+        personQuery,
+        {
+          from: TransmissionChainFiltersFrom.COT
+        }
+      );
 
       // attach classification conditions to parent qb as well ( besides personQuery )
       // isolated classification
@@ -1046,6 +1099,46 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // display loading
     const loadingDialog = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+
+    // must get new chain ?
+    if (!generate) {
+      // retrieve chain
+      this.transmissionChainDataService
+        .getIndependentTransmissionChainData(
+          this.selectedOutbreak.id,
+          requestQueryBuilder
+        )
+        .pipe(
+          catchError((err) => {
+            // display error message
+            this.personAndRelatedHelperService.toastV2Service.error(err);
+
+            // finished
+            loadingDialog.close();
+            return throwError(err);
+          })
+        )
+        .subscribe((chainGroup) => {
+          // remove the unrelated data if a person id is provided
+          this.chainsOfTransmissionGetPersonChain(chainGroup);
+
+          // keep original chains
+          this.chainGroupId = this.selectedSnapshot;
+          this.chainGroup = chainGroup;
+
+          // load
+          this.loadChainsOfTransmission(
+            undefined,
+            0
+          );
+
+          // finished
+          loadingDialog.close();
+        });
+
+      // finished
+      return;
+    }
 
     // get chain data and convert to graph nodes
     this.transmissionChainDataService
@@ -3028,7 +3121,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
         },
         hideInputFilter: true,
-        width: '50rem',
+        width: '60rem',
         inputs: [
           {
             type: V2SideDialogConfigInputType.TEXT,
@@ -3222,7 +3315,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           response.handler.hide();
 
           // generate graph
-          this.generateChainsOfTransmission((response.data.map.snapshotName as IV2SideDialogConfigInputText).value);
+          this.getChainsOfTransmission(
+            true,
+            (response.data.map.snapshotName as IV2SideDialogConfigInputText).value
+          );
         };
 
         // do we need to delete previous first ?
@@ -3475,7 +3571,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH'
       },
       hideInputFilter: true,
-      width: '50rem',
+      width: '60rem',
       inputs: [
         {
           type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,

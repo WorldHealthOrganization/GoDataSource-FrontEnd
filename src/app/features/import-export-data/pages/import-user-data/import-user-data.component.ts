@@ -52,7 +52,7 @@ export class ImportUserDataComponent implements OnInit, OnDestroy {
     'languageId': true
   };
 
-  requiredDestinationFields = [
+  requiredDestinationFields: string[] = [
     'firstName',
     'lastName',
     'email',

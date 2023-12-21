@@ -515,7 +515,7 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
         }
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
-        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
         visibleMandatory: {
           key: this.personAndRelatedHelperService.contactOfContact.visibleMandatoryKey,
           field: 'addresses.geoLocationAccurate'
