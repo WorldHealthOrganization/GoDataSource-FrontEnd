@@ -64,7 +64,12 @@ export class ResponseInterceptor implements HttpInterceptor {
           }
 
           // for 0 response status, ask user to restart the app (the server is unreachable)
-          if (error.status === 0) {
+          if (
+            error.status === 0 && (
+              !request.headers.get('ignore-error') ||
+              !request.headers.get('ignore-error').includes('unresponsive')
+            )
+          ) {
             // we have to display a hardcoded message in this situation because we are not able to load the language
             this.toastV2Service.error(
               'The application has become unresponsive. Please do a hard reload or restart Go.Data.',
@@ -82,6 +87,7 @@ export class ResponseInterceptor implements HttpInterceptor {
             this.router.navigate(['/auth/login']);
           }
 
+          // send error further
           return throwError(_.get(error, 'error.error', error.error));
         })
       );

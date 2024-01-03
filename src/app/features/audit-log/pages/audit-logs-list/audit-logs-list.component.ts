@@ -62,6 +62,7 @@ export class AuditLogsListComponent
   ) {
     super(
       listHelperService, {
+        disableFilterCaching: true,
         disableWaitForSelectedOutbreakToRefreshList: true
       }
     );

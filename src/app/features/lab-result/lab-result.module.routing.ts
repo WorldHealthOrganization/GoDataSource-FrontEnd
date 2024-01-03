@@ -23,12 +23,15 @@ import { GanttChartTypeDataResolver } from '../../core/services/resolvers/data/g
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
   component: fromPages.LabResultsCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     yesNoAll: YesNoAllDataResolver,
     yesNo: YesNoDataResolver,
     labName: LabNameDataResolver,
@@ -39,6 +42,7 @@ const createViewModifyFoundation: Route = {
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     entityData: PersonDataResolver,
     outbreak: SelectedOutbreakDataResolver,
     classification: ClassificationDataResolver
@@ -50,6 +54,7 @@ const entityLabResultsFoundation = {
   component: fromPages.EntityLabResultsListComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     yesNoAll: YesNoAllDataResolver,
     yesNo: YesNoDataResolver,
     labName: LabNameDataResolver,
@@ -84,6 +89,7 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
       yesNo: YesNoDataResolver,
       classification: ClassificationDataResolver,

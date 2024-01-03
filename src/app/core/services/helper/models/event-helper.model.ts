@@ -6,13 +6,13 @@ import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../..
 import { Observable } from 'rxjs';
 import { TimerCache } from '../../../helperClasses/timer-cache';
 import { EventDataService } from '../../data/event.data.service';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { UserModel } from '../../../models/user.model';
 import { QuestionModel } from '../../../models/question.model';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { V2AdvancedFilterToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { LocalizationHelper } from '../../../helperClasses/localization-helper';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/forms-v2/validators/general-async-validator.directive';
 
 export class EventHelperModel {
   // data
@@ -40,6 +40,7 @@ export class EventHelperModel {
       },
       options: {
         user: ILabelValuePairModel[],
+        deletedUser: ILabelValuePairModel[],
         eventCategory: ILabelValuePairModel[],
         addressType: ILabelValuePairModel[]
       }
@@ -183,7 +184,7 @@ export class EventHelperModel {
               name: 'responsibleUserId',
               placeholder: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
               description: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-              options: data.options.user,
+              options: data.options.user.concat(data.options.deletedUser),
               value: {
                 get: () => data.itemData.responsibleUserId,
                 set: (value) => {
@@ -260,6 +261,7 @@ export class EventHelperModel {
     data: {
       eventInvestigationTemplate: () => QuestionModel[],
       options: {
+        createdOn: ILabelValuePairModel[],
         user: ILabelValuePairModel[],
         eventCategory: ILabelValuePairModel[],
         addressType: ILabelValuePairModel[],
@@ -484,6 +486,14 @@ export class EventHelperModel {
         label: 'LNG_EVENT_FIELD_LABEL_DELETED',
         visibleMandatoryIf: () => true,
         yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_EVENT_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        options: data.options.createdOn,
         sortable: true
       },
       {

@@ -736,7 +736,11 @@ export class AppFormFillQuestionnaireV2Component
                 // configure
                 authToken: this.authDataService.getAuthToken(),
                 url: `${environment.apiUrl}/outbreaks/${this._selectedOutbreak.id}/attachments`,
-                autoUpload: true
+                autoUpload: true,
+                headers: [{
+                  name: 'platform',
+                  value: 'WEB'
+                }]
               });
 
               // don't allow multiple files to be uploaded

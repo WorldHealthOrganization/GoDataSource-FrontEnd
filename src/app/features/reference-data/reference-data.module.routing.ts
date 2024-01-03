@@ -10,6 +10,8 @@ import { ReferenceDataCategoryDataResolver } from '../../core/services/resolvers
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { IconDataResolver } from '../../core/services/resolvers/data/icon.resolver';
 import { ReferenceDataDiseaseSpecificCategoriesResolver } from '../../core/services/resolvers/data/reference-data-disease-specific-categories.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -19,6 +21,7 @@ const createViewModifyFoundation: Route = {
     category: ReferenceDataCategoryDataResolver,
     diseaseSpecificCategories: ReferenceDataDiseaseSpecificCategoriesResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     icon: IconDataResolver
   }
 };
@@ -57,6 +60,7 @@ const routes: Routes = [
       }
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
       user: UserDataResolver,
       category: ReferenceDataCategoryDataResolver,
@@ -114,8 +118,10 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
-      category: ReferenceDataCategoryDataResolver
+      category: ReferenceDataCategoryDataResolver,
+      user: UserDataResolver
     }
   },
   // Manage Icons - Create

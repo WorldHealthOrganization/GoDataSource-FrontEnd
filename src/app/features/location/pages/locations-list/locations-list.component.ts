@@ -24,6 +24,7 @@ import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../share
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleLocation, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-locations-list',
@@ -386,9 +387,7 @@ export class LocationsListComponent extends ListComponent<LocationModel, IV2Colu
         label: 'LNG_LOCATION_FIELD_LABEL_CREATED_BY',
         notVisible: true,
         format: {
-          type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.createdBy].name :
-            ''
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -399,10 +398,26 @@ export class LocationsListComponent extends ListComponent<LocationModel, IV2Colu
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy && UserModel.canView(this.authUser) ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_LOCATION_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -421,9 +436,7 @@ export class LocationsListComponent extends ListComponent<LocationModel, IV2Colu
         label: 'LNG_LOCATION_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
         format: {
-          type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.updatedBy].name :
-            ''
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -434,7 +447,7 @@ export class LocationsListComponent extends ListComponent<LocationModel, IV2Colu
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy && UserModel.canView(this.authUser) ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }
@@ -734,11 +747,16 @@ export class LocationsListComponent extends ListComponent<LocationModel, IV2Colu
    * Re(load) the list of Locations
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
     // refresh
     this.records$ = this.locationDataService
       .getLocationsListByParent(
         this._parentId,
-        this.queryBuilder
+        this.queryBuilder,
+        true
       )
       .pipe(
         // should be the last pipe

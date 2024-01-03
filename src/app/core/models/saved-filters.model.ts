@@ -2,7 +2,8 @@ import * as _ from 'lodash';
 import { UserModel } from './user.model';
 import { IPermissionBasic } from './permission.interface';
 import { PERMISSION } from './permission.model';
-import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
+import { Moment } from '../helperClasses/localization-helper';
+import { BaseModel } from './base.model';
 
 /**
  * Saved side filter sort
@@ -97,7 +98,7 @@ export class SavedFilterData {
  * Saved side filter model
  */
 export class SavedFilterModel
-implements IPermissionBasic {
+  extends BaseModel implements IPermissionBasic {
 
   // data
   id: string;
@@ -132,36 +133,14 @@ implements IPermissionBasic {
     filterKey?: string,
     filterData?: SavedFilterData
   }) {
+    super(data);
+
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
     this.isPublic = _.get(data, 'isPublic');
     this.readOnly = _.get(data, 'readOnly');
     this.filterKey = _.get(data, 'filterKey');
     this.filterData = new SavedFilterData(_.get(data, 'filterData', {}));
-
-    // created by
-    this.createdBy = _.get(data, 'createdBy');
-
-    // created by user
-    this.createdByUser = _.get(data, 'createdByUser');
-    if (this.createdByUser) {
-      this.createdByUser = new UserModel(this.createdByUser);
-    }
-
-    // updated at
-    this.updatedAt = _.get(data, 'updatedAt');
-    if (this.updatedAt) {
-      this.updatedAt = LocalizationHelper.toMoment(this.updatedAt);
-    }
-
-    // updated by
-    this.updatedBy = _.get(data, 'updatedBy');
-
-    // updated by user
-    this.updatedByUser = _.get(data, 'updatedByUser');
-    if (this.updatedByUser) {
-      this.updatedByUser = new UserModel(this.updatedByUser);
-    }
   }
 
   /**

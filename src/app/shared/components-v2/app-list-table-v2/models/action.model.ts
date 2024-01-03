@@ -63,6 +63,7 @@ export interface IV2ActionIcon {
   visible?: (data: any) => boolean;
   disable?: (data: any) => boolean;
   cssClasses?: (data: any) => string;
+  loading?: (data: any) => boolean;
 
   // never
   label?: never;

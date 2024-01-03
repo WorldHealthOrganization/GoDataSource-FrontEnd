@@ -20,8 +20,19 @@
         [queryParams]="action.action.linkQueryParams ? action.action.linkQueryParams(data) : undefined"
         [matTooltip]="action.iconTooltip | translate"
         [disabled]="action.disable && action.disable(data)"
-        (click)="action.action.click && (!action.disable || !action.disable(data)) ? action.action.click(data) : undefined">
-        <mat-icon>{{action.icon}}</mat-icon>
+        (click)="action.action.click && (!action.disable || !action.disable(data)) && (!action.loading || !action.loading(data)) ? action.action.click(data) : undefined">
+        <!-- Icon -->
+        <mat-icon
+          *ngIf="!action.loading || !action.loading(data); else menuActionLoad">{{action.icon}}</mat-icon>
+
+        <!-- Loading -->
+        <ng-template
+          #menuActionLoad>
+          <mat-progress-spinner
+            diameter="16"
+            mode="indeterminate">
+          </mat-progress-spinner>
+        </ng-template>
       </a>
 
       <!-- Not icon - Menu -->

@@ -23,6 +23,8 @@ import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 import { SelectedEntitiesDataResolver } from '../../core/services/resolvers/data/selected-entities.resolver';
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // create - view - modify relationship
 const createViewModifyRelationship: Route = {
@@ -38,6 +40,7 @@ const createViewModifyRelationship: Route = {
     contextOfTransmission: ContextOfTransmissionDataResolver,
     cluster: ClusterDataResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     selectedEntities: SelectedEntitiesDataResolver,
     yesNo: YesNoDataResolver
   }
@@ -57,6 +60,7 @@ const relationshipTypeChildrenRoutes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
       yesNo: YesNoDataResolver,
       certaintyLevel: CertaintyLevelDataResolver,

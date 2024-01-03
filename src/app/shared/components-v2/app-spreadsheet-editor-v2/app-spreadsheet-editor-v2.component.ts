@@ -32,7 +32,6 @@ import * as _ from 'lodash';
 import { CreateViewModifyV2Action } from '../app-create-view-modify-v2/models/action.model';
 import { AppFormBaseErrorMsgV2, AppFormBaseErrorMsgV2Type } from '../../forms-v2/core/app-form-base-error-msg-v2';
 import { AppBasicPageV2Component } from '../app-basic-page-v2/app-basic-page-v2.component';
-import { Constants } from '../../../core/models/constants';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2SpreadsheetEditorEventSave } from './models/event.model';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
@@ -51,6 +50,7 @@ import { AppSpreadsheetEditorV2CellBasicHeaderModel } from './models/app-spreads
 import { AppSpreadsheetEditorV2CellBasicHeaderPivotComponent } from './components/header-pivot/app-spreadsheet-editor-v2-cell-basic-header-pivot.component';
 import { AppMessages } from '../../../core/enums/app-messages.enum';
 import { LocalizationHelper, Moment } from '../../../core/helperClasses/localization-helper';
+import { EmailValidatorDirective } from '../../forms-v2/validators/email-validator.directive';
 
 /**
  * Component
@@ -2123,7 +2123,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         cellData &&
         (column.validators as IV2SpreadsheetEditorColumnValidatorEmail)?.email &&
         (column.validators as IV2SpreadsheetEditorColumnValidatorEmail).email(rowData) &&
-        !Constants.REGEX_EMAIL_VALIDATOR.test(cellData)
+        !EmailValidatorDirective.REGEX_EMAIL_VALIDATOR.test(cellData)
       ) {
         isValid = false;
         error = {

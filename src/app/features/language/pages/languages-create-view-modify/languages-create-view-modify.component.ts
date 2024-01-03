@@ -18,7 +18,6 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
-import { ClusterModel } from '../../../../core/models/cluster.model';
 import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -296,9 +295,11 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_COMMON_LABEL_DETAILS',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }
@@ -340,8 +341,8 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
 
         // should be the last pipe
         takeUntil(this.destroyed$)
-      ).subscribe((item: ClusterModel) => {
-        // success creating / updating cluster
+      ).subscribe((item: LanguageModel) => {
+        // success creating / updating
         this.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE' :

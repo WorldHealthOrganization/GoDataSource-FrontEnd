@@ -67,13 +67,13 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE', value: 'sequence' },
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON', value: 'person' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   /**
@@ -145,8 +145,8 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
    */
   protected initializeTableColumns(): void {
     this.tableColumns = this.personAndRelatedHelperService.labResult.retrieveTableColumns(this.selectedOutbreak, {
-      user: this.activatedRoute.snapshot.data.user,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -177,7 +177,8 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           undefined
-        )
+        ),
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }
@@ -259,6 +260,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
     this.advancedFilters = this.personAndRelatedHelperService.labResult.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         labName: this.referenceDataHelperService.filterPerOutbreakOptions(
           this.selectedOutbreak,
           (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -392,6 +394,9 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
           label: {
             get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_MODIFY_SELECTED_LAB_RESULTS'
           },
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_DELETE_SELECTED_LAB_RESULTS_DESCRIPTION') :
+            undefined,
           action: {
             link: () => {
               return ['/lab-results/modify-list'];
@@ -409,7 +414,8 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
               LabResultModel.canBulkModify(this.authUser);
           },
           disable: (selected: string[]): boolean => {
-            return selected.length < 1;
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
           }
         },
 
@@ -871,6 +877,10 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel,
       if (!triggeredByPageChange) {
         this.initializeGroupedData();
       }
+
+      // retrieve created user & modified user information
+      this.queryBuilder.include('createdByUser', true);
+      this.queryBuilder.include('updatedByUser', true);
 
       // retrieve the list of lab results
       this.records$ = this.personAndRelatedHelperService.labResult

@@ -576,7 +576,9 @@ export class UserRoleHelper {
       if (allUncheckedPermissionIds.length > 0) {
         // determine required by permissions
         const requiredByPermissions: string[] = [];
-        const requiredPermissions: string[] = [];
+        const requiredPermissionsMap: {
+          [permission: string]: boolean
+        } = {};
         allUncheckedPermissionIds.forEach((permissionId: string) => {
           // required by
           const tempRequiredBY = UserRoleHelper.determineRequiredBy(
@@ -586,7 +588,7 @@ export class UserRoleHelper {
 
           // add to list only permissions that are actually required
           if (tempRequiredBY.length > 0) {
-            requiredPermissions.push(permissionId);
+            requiredPermissionsMap[permissionId] = true;
           }
 
           // add unique values to required by list
@@ -597,6 +599,31 @@ export class UserRoleHelper {
           });
         });
 
+        // get the missing permissions for unchecked required permissions
+        let requiredPermissions: string[] = Object.keys(requiredPermissionsMap);
+        requiredPermissions.forEach((permissionId: string) => {
+          const checkedPermission: {
+            [permission: string]: boolean
+          } = {};
+          const missingPermissions: string[] = [];
+          if (data.optionsMap[permissionId]) {
+            UserRoleHelper.determineMissingPermissions(
+              data,
+              data.optionsMap[permissionId].option,
+              checkedPermission,
+              missingPermissions
+            );
+
+            // map missing permissions
+            missingPermissions.forEach((missingPermission: string) => {
+              requiredPermissionsMap[missingPermission] = true;
+            });
+          }
+        });
+
+        // get required permissions
+        requiredPermissions = Object.keys(requiredPermissionsMap);
+
         // do we need to display revert back popup ?
         if (requiredByPermissions.length > 0) {
           UserRoleHelper.displayRequiredByPopup(
@@ -606,7 +633,7 @@ export class UserRoleHelper {
             requiredByPermissions,
             uncheckedPermissionIds,
             undefined,
-            _.isEqual(uncheckedPermissionIds, requiredPermissions) ? undefined : {
+            _.isEqual(uncheckedPermissionIds.sort(), requiredPermissions.sort()) ? undefined : {
               label: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_YES_ONLY_REQUIRED_LABEL',
               requiredPermissions: requiredPermissions,
               action: () => {

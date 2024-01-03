@@ -561,7 +561,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         }
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
-        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
         visibleMandatory: {
           key: this.personAndRelatedHelperService.contact.visibleMandatoryKey,
           field: 'addresses.geoLocationAccurate'
@@ -1174,6 +1174,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         .generateFollowUps(
           this.selectedOutbreak.id,
           {
+            personType: EntityType.CONTACT,
             contactIds
           }
         )

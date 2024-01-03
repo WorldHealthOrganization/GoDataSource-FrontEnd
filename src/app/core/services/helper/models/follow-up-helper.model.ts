@@ -55,8 +55,10 @@ export class FollowUpHelperModel {
       options: {
         dailyFollowUpStatus: ILabelValuePairModel[],
         user: ILabelValuePairModel[],
+        deletedUser: ILabelValuePairModel[],
         team: ILabelValuePairModel[],
-        addressType: ILabelValuePairModel[]
+        addressType: ILabelValuePairModel[],
+        followUpCreatedAs: ILabelValuePairModel[]
       }
     }
   ): ICreateViewModifyV2Tab {
@@ -125,7 +127,7 @@ export class FollowUpHelperModel {
                 name: 'responsibleUserId',
                 placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
                 description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-                options: data.options.user,
+                options: data.options.user.concat(data.options.deletedUser),
                 value: {
                   get: () => data.itemData.responsibleUserId,
                   set: (value) => {
@@ -329,11 +331,9 @@ export class FollowUpHelperModel {
                 item.personId,
                 'follow-ups',
                 item.id,
-                definitions.entityData.type === EntityType.CONTACT ?
-                  'view' :
-                  definitions.entityData.type === EntityType.CASE ?
-                    'case-history' :
-                    'contactOfContact-history'
+                definitions.entityData.type === EntityType.CONTACT_OF_CONTACT ?
+                  'contactOfContact-history' :
+                  'view'
               ];
             }
           },
@@ -355,7 +355,10 @@ export class FollowUpHelperModel {
           },
           visible: (item: FollowUpModel): boolean => {
             return !item.deleted &&
-              definitions.entityData.type === EntityType.CONTACT &&
+              (
+                definitions.entityData.type === EntityType.CONTACT ||
+                definitions.entityData.type === EntityType.CASE
+              ) &&
               definitions.selectedOutbreakIsActive() &&
               FollowUpModel.canModify(this.parent.authUser);
           }
@@ -438,7 +441,10 @@ export class FollowUpHelperModel {
               },
               visible: (item: FollowUpModel): boolean => {
                 return !item.deleted &&
-                  definitions.entityData.type === EntityType.CONTACT &&
+                  (
+                    definitions.entityData.type === EntityType.CONTACT ||
+                    definitions.entityData.type === EntityType.CASE
+                  ) &&
                   definitions.selectedOutbreakIsActive() &&
                   FollowUpModel.canDelete(this.parent.authUser);
               }
@@ -604,7 +610,7 @@ export class FollowUpHelperModel {
                       this.followUpsDataService
                         .modifyFollowUp(
                           definitions.selectedOutbreak().id,
-                          item.personId,
+                          item.person,
                           item.id,
                           {
                             targeted: (response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value
@@ -697,7 +703,7 @@ export class FollowUpHelperModel {
                       this.followUpsDataService
                         .modifyFollowUp(
                           definitions.selectedOutbreak().id,
-                          item.personId,
+                          item.person,
                           item.id,
                           {
                             teamId: (response.handler.data.map.teamId as IV2SideDialogConfigInputSingleDropdown).value
@@ -742,10 +748,12 @@ export class FollowUpHelperModel {
     selectedOutbreak: OutbreakModel,
     definitions: {
       team: IResolverV2ResponseModel<TeamModel>,
-      user: IResolverV2ResponseModel<UserModel>,
       dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>,
       options: {
-        yesNoAll: ILabelValuePairModel[]
+        yesNoAll: ILabelValuePairModel[],
+        createdOn: ILabelValuePairModel[],
+        user: ILabelValuePairModel[],
+        followUpCreatedAs: ILabelValuePairModel[]
       }
     }
   ): IV2ColumnToVisibleMandatoryConf[] {
@@ -799,6 +807,16 @@ export class FollowUpHelperModel {
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: definitions.team.options
+        }
+      },
+      {
+        field: 'createdAs',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AS',
+        visibleMandatoryIf: () => true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.options.followUpCreatedAs
         }
       },
       {
@@ -1043,7 +1061,7 @@ export class FollowUpHelperModel {
       },
       {
         field: 'address.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.parent.list.shouldVisibleMandatoryTableColumnBeVisible(
           selectedOutbreak,
           this.visibleMandatoryKey,
@@ -1074,20 +1092,18 @@ export class FollowUpHelperModel {
         ),
         notVisible: true,
         format: {
-          type: (item) => item.responsibleUserId && definitions.user.map[item.responsibleUserId] ?
-            definitions.user.map[item.responsibleUserId].name :
-            ''
+          type: 'responsibleUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: definitions.user.options,
+          options: definitions.options.user,
           includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canListForFilters(this.parent.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.parent.authUser) && !data.responsibleUser?.deleted ?
             `/users/${ data.responsibleUserId }/view` :
             undefined;
         }
@@ -1126,23 +1142,38 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: (item) => item.createdBy && definitions.user.map[item.createdBy] ?
-            definitions.user.map[item.createdBy].name :
-            ''
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: definitions.user.options,
+          options: definitions.options.user,
           includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.parent.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.parent.authUser) && !data.createdByUser?.deleted ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.parent.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.options.createdOn,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -1163,20 +1194,18 @@ export class FollowUpHelperModel {
         visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: (item) => item.updatedBy && definitions.user.map[item.updatedBy] ?
-            definitions.user.map[item.updatedBy].name :
-            ''
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: definitions.user.options,
+          options: definitions.options.user,
           includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.parent.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.parent.authUser) && !data.updatedByUser?.deleted ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }
@@ -1208,12 +1237,14 @@ export class FollowUpHelperModel {
     data: {
       contactFollowUpTemplate: () => QuestionModel[],
       options: {
+        createdOn: ILabelValuePairModel[],
         team: ILabelValuePairModel[],
         yesNoAll: ILabelValuePairModel[],
         yesNo: ILabelValuePairModel[],
         dailyFollowUpStatus: ILabelValuePairModel[],
         user: ILabelValuePairModel[],
-        addressType: ILabelValuePairModel[]
+        addressType: ILabelValuePairModel[],
+        followUpCreatedAs: ILabelValuePairModel[]
       }
     }
   ): V2AdvancedFilter[] {
@@ -1340,6 +1371,14 @@ export class FollowUpHelperModel {
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdAs',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AS',
+        visibleMandatoryIf: () => true,
+        options: data.options.followUpCreatedAs,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.SELECT,
         field: 'targeted',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
@@ -1374,16 +1413,6 @@ export class FollowUpHelperModel {
         flagIt: true
       },
       {
-        type: V2AdvancedFilterType.DATE,
-        field: 'timeLastSeen',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER',
-        visibleMandatoryIf: () => true,
-        allowedComparators: [
-          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.DATE], { value: V2AdvancedFilterComparatorType.DATE })
-        ],
-        flagIt: true
-      },
-      {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'index',
         label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
@@ -1403,6 +1432,14 @@ export class FollowUpHelperModel {
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
         visibleMandatoryIf: () => true,
         yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        options: data.options.createdOn,
         sortable: true
       },
       {
@@ -1471,6 +1508,7 @@ export class FollowUpHelperModel {
     selectedOutbreak: OutbreakModel,
     data: {
       options: {
+        createdOn: ILabelValuePairModel[],
         team: ILabelValuePairModel[],
         yesNoAll: ILabelValuePairModel[],
         yesNo: ILabelValuePairModel[],
@@ -1481,7 +1519,8 @@ export class FollowUpHelperModel {
         risk: ILabelValuePairModel[],
         occupation: ILabelValuePairModel[],
         classification: ILabelValuePairModel[],
-        outcome: ILabelValuePairModel[]
+        outcome: ILabelValuePairModel[],
+        followUpCreatedAs: ILabelValuePairModel[]
       }
     }
   ): V2AdvancedFilter[] {
@@ -1524,6 +1563,13 @@ export class FollowUpHelperModel {
           'teamId'
         ),
         options: data.options.team
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdAs',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AS',
+        visibleMandatoryIf: () => true,
+        options: data.options.followUpCreatedAs
       },
       {
         type: V2AdvancedFilterType.SELECT,
@@ -1666,6 +1712,14 @@ export class FollowUpHelperModel {
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
         visibleMandatoryIf: () => true,
         yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        options: data.options.createdOn,
         sortable: true
       },
       {
@@ -2281,6 +2335,7 @@ export class FollowUpHelperModel {
       'id',
       'date',
       'teamId',
+      'createdAs',
       'statusId',
       'targeted',
       'index',
@@ -2291,6 +2346,7 @@ export class FollowUpHelperModel {
       'deletedAt',
       'createdBy',
       'createdByUser',
+      'createdOn',
       'createdAt',
       'updatedBy',
       'updatedByUser',

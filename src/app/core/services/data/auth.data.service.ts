@@ -13,6 +13,7 @@ import { DebounceTimeCaller, DebounceTimeCallerType } from '../../helperClasses/
 import { SystemSettingsDataService } from './system-settings.data.service';
 import { environment } from '../../../../environments/environment';
 import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
+import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
 
 @Injectable()
 export class AuthDataService {
@@ -85,15 +86,27 @@ export class AuthDataService {
           // get user info
           return this.userDataService.getUser(auth.userId)
             .pipe(
-              map((userInstance: UserModel) => {
+              switchMap((userInstance) => {
+                return this.systemSettingsDataService.getAPIVersionNoCache()
+                  .pipe(map((conf) => {
+                    return {
+                      user: userInstance,
+                      conf
+                    };
+                  }));
+              }),
+              map((data: {
+                user: UserModel,
+                conf: SystemSettingsVersionModel
+              }) => {
                 // keep user info
-                auth.user = userInstance;
+                auth.user = data.user;
 
                 // cache auth data with authenticated user information
                 this.storageService.set(StorageKey.AUTH_DATA, auth);
 
                 // initialize auth info
-                this.initializeTokenInfo();
+                this.initializeTokenInfo(data.conf.tokenTTL);
 
                 // finished
                 return auth;
@@ -114,15 +127,27 @@ export class AuthDataService {
     // get user info
     return this.userDataService.getUser(userId)
       .pipe(
-        map((userInstance: UserModel) => {
+        switchMap((userInstance) => {
+          return this.systemSettingsDataService.getAPIVersionNoCache()
+            .pipe(map((conf) => {
+              return {
+                user: userInstance,
+                conf
+              };
+            }));
+        }),
+        map((data: {
+          user: UserModel,
+          conf: SystemSettingsVersionModel
+        }) => {
           // keep user info
-          authData.user = userInstance;
+          authData.user = data.user;
 
           // cache auth data with authenticated user information
           this.storageService.set(StorageKey.AUTH_DATA, authData);
 
           // initialize auth info
-          this.updateTokenInfo();
+          this.updateTokenInfo(data.conf.tokenTTL);
 
           // finished
           return authData;
@@ -223,9 +248,9 @@ export class AuthDataService {
   }
 
   /**
-     * Initialize token information - time to live etc
-     */
-  private initializeTokenInfo(defaultTTL: number = -1) {
+   * Initialize token information - time to live etc
+   */
+  private initializeTokenInfo(tokenTTL: number) {
     // release previous
     this.destroyTokenInfo();
 
@@ -235,29 +260,13 @@ export class AuthDataService {
       return;
     }
 
-    // check if we have ttl time, otherwise retrieve it
-    if (defaultTTL === -1) {
-      this.systemSettingsDataService
-        .getAPIVersionNoCache()
-        .subscribe((data) => {
-          // update token info
-          if (this.tokenInfo) {
-            // update default time to live
-            this.tokenInfo.ttl = data.tokenTTL;
-
-            // determine info
-            this.resetTokenInfo();
-          }
-        });
-    }
-
     // initialize token into
     this.tokenInfo = {
       token: authToken,
-      ttl: defaultTTL,
+      ttl: tokenTTL,
       lastReset: LocalizationHelper.now(),
       info: {
-        ttl: defaultTTL,
+        ttl: tokenTTL,
         isValid: false,
         approximatedExpireInSeconds: -1,
         approximatedExpireInSecondsReal: -1
@@ -269,12 +278,12 @@ export class AuthDataService {
   }
 
   /**
-     * Update token information
-     */
-  private updateTokenInfo() {
+   * Update token information
+   */
+  private updateTokenInfo(tokenTTL: number) {
     // initialize token info if we need to
     if (!this.tokenInfo) {
-      this.initializeTokenInfo();
+      this.initializeTokenInfo(tokenTTL);
     }
 
     // we must be authenticated to update

@@ -284,7 +284,11 @@ export class GenericDataService {
      * Retrieve the list of sync package export types
      * @returns {Observable<any[]>}
      */
-  getSyncPackageExportTypeOptions(): Observable<any[]> {
+  getSyncPackageExportTypeOptions(): Observable<{
+    label: string,
+    value: string,
+    description: string
+  }[]> {
     return of(Object.values(Constants.SYNC_PACKAGE_EXPORT_TYPES));
   }
 
@@ -292,11 +296,15 @@ export class GenericDataService {
      * Retrieve the list of range follow-up export group by values
      * @returns {Observable<any[]>}
      */
-  getRangeFollowUpGroupByOptions(removeRisk: boolean = false): Observable<any[]> {
+  getRangeFollowUpGroupByOptions(removeOptions: string[] = []): Observable<any[]> {
     const options = _.cloneDeep(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY);
-    if (removeRisk) {
-      delete options.RISK;
-    }
+
+    // remove options
+    removeOptions.forEach((optionName: string) => {
+      const groupByName: string = (Object.keys(options).find((key: string) => options[key].value === optionName));
+      delete options[groupByName];
+    });
+
     return of(Object.values(options));
   }
 

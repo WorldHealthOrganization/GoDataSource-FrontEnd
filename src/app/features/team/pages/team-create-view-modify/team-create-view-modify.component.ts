@@ -29,6 +29,7 @@ import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/servi
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 /**
  * Component
@@ -348,9 +349,11 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_COMMON_LABEL_DETAILS',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }
@@ -373,6 +376,10 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     ) => {
       // check if there are existing teams in the same locations
       const qb = new RequestQueryBuilder();
+      qb.fields(
+        'id',
+        'name'
+      );
       qb.filter.where({
         locationIds: {
           'inq': this.itemData.locationIds
@@ -390,7 +397,10 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
 
       // check
       this.teamDataService
-        .getTeamsList(qb)
+        .getTeamsList(
+          qb,
+          true
+        )
         .pipe(
           catchError((err) => {
             // show error
@@ -502,7 +512,9 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
    */
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = TeamModel.generateAdvancedFilters({
+      authUser: this.authUser,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
@@ -549,6 +561,11 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
 
     // construct query
     const qb = new RequestQueryBuilder();
+    qb.fields(
+      'id',
+      'name',
+      'userIds'
+    );
     qb.filter.where({
       userIds: {
         inq: this.itemData.userIds
@@ -580,7 +597,10 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
 
     // check
     this._previousCheckForMultipleTeams = this.teamDataService
-      .getTeamsList(qb)
+      .getTeamsList(
+        qb,
+        true
+      )
       .pipe(
         // should be the last pipe
         takeUntil(this.destroyed$)

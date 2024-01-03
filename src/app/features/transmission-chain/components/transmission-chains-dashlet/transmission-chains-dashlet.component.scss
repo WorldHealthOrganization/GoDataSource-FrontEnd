@@ -77,11 +77,8 @@ app-transmission-chains-dashlet {
 
   /* Page content */
   .gd-basic-content {
-    overflow: hidden;
-
     @include breakpoint('xs') {
       height: auto !important;
-      overflow: hidden;
     }
 
     /* No data */
@@ -494,6 +491,12 @@ app-transmission-chains-dashlet {
           }
         }
       }
+    }
+  }
+
+  .gd-cot-message {
+    @include breakpoint('xs') {
+      padding: 0 0 0.8rem 4rem;
     }
   }
 }

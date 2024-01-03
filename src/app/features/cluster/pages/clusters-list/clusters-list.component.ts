@@ -17,6 +17,8 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { ActivatedRoute } from '@angular/router';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-clusters-list',
@@ -31,7 +33,8 @@ export class ClustersListComponent extends ListComponent<ClusterModel, IV2Column
     private clusterDataService: ClusterDataService,
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private i18nService: I18nService
   ) {
     super(listHelperService);
   }
@@ -244,6 +247,22 @@ export class ClustersListComponent extends ListComponent<ClusterModel, IV2Column
         }
       },
       {
+        field: 'createdOn',
+        label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_BY',
         notVisible: true,
@@ -256,7 +275,7 @@ export class ClustersListComponent extends ListComponent<ClusterModel, IV2Column
           includeNoValue: true
         },
         link: (data) => {
-          return data.createdBy && UserModel.canView(this.authUser) ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -286,7 +305,7 @@ export class ClustersListComponent extends ListComponent<ClusterModel, IV2Column
           includeNoValue: true
         },
         link: (data) => {
-          return data.updatedBy && UserModel.canView(this.authUser) ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }
@@ -324,6 +343,7 @@ export class ClustersListComponent extends ListComponent<ClusterModel, IV2Column
     this.advancedFilters = ClusterModel.generateAdvancedFilters({
       authUser: this.authUser,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
@@ -392,6 +412,7 @@ export class ClustersListComponent extends ListComponent<ClusterModel, IV2Column
       'description',
       'colorCode',
       'icon',
+      'createdOn',
       'createdBy',
       'createdAt',
       'updatedBy',

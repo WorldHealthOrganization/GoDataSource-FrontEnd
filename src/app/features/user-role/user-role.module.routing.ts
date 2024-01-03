@@ -10,13 +10,17 @@ import { PermissionDataResolver } from '../../core/services/resolvers/data/permi
 import { RolesCreateViewModifyComponent } from './pages';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { SelectedUserRoleDataResolver } from '../../core/services/resolvers/data/selected-user-role.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
   component: RolesCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     permission: PermissionDataResolver,
     userRole: SelectedUserRoleDataResolver
   }
@@ -35,6 +39,7 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
       user: UserDataResolver,
       permission: PermissionDataResolver

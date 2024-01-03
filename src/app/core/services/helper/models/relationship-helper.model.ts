@@ -1333,6 +1333,7 @@ export class RelationshipHelperModel {
       personType: IResolverV2ResponseModel<ReferenceDataEntryModel>,
       cluster: IResolverV2ResponseModel<ClusterModel>,
       options: {
+        createdOn: ILabelValuePairModel[],
         certaintyLevel: ILabelValuePairModel[],
         exposureType: ILabelValuePairModel[],
         exposureFrequency: ILabelValuePairModel[],
@@ -1724,9 +1725,26 @@ export class RelationshipHelperModel {
           return !UserModel.canView(this.parent.authUser);
         },
         link: (data) => {
-          return data.relationship?.createdBy ?
+          return data.relationship?.createdBy && UserModel.canView(this.parent.authUser) && !data.relationship?.createdByUser?.deleted ?
             `/users/${data.relationship.createdBy}/view` :
             undefined;
+        }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: (item) => item.relationship?.createdOn ?
+            this.parent.i18nService.instant(`LNG_PLATFORM_LABEL_${item.relationship.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.options.createdOn,
+          includeNoValue: true,
+          childQueryBuilderKey: 'relationship'
         }
       },
       {
@@ -1759,7 +1777,7 @@ export class RelationshipHelperModel {
           return !UserModel.canView(this.parent.authUser);
         },
         link: (data) => {
-          return data.relationship?.updatedBy ?
+          return data.relationship?.updatedBy && UserModel.canView(this.parent.authUser) && !data.relationship?.updatedByUser?.deleted ?
             `/users/${data.relationship.updatedBy}/view` :
             undefined;
         }

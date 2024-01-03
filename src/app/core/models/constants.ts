@@ -58,7 +58,12 @@ export enum ApplyListFilter {
   EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN = 'events_without_date_of_reporting_chain',
   CONTEXT_SENSITIVE_HELP_ITEMS = 'context_sensitive_help_items',
   CASE_SUMMARY = 'case-summary',
-  CASES_BY_LOCATION = 'cases-by-location'
+  CASES_BY_LOCATION = 'cases-by-location',
+  CASES_FOLLOWUP_LIST = 'cases_followup_list',
+  CASES_LOST_TO_FOLLOW_UP = 'cases_lost_to_follow_up',
+  CASES_NOT_SEEN = 'cases_not_seen',
+  CASES_SEEN = 'cases_seen',
+  CASES_FOLLOWED_UP = 'cases_followed_up'
 }
 
 export class Constants {
@@ -336,6 +341,10 @@ export class Constants {
     SYSTEM_DEVICES: {
       label: 'LNG_APP_PAGE_SYSTEM_DEVICES',
       value: 'LNG_APP_PAGE_SYSTEM_DEVICES'
+    },
+    SYSTEM_CLIENT_APPLICATIONS: {
+      label: 'LNG_APP_PAGE_SYSTEM_CLIENT_APPLICATIONS',
+      value: 'LNG_APP_PAGE_SYSTEM_CLIENT_APPLICATIONS'
     }
   };
 
@@ -994,6 +1003,10 @@ export class Constants {
     IMPORT_MAPPING: {
       label: 'LNG_MODULE_LABEL_IMPORT_MAPPING',
       value: 'importMapping'
+    },
+    CLIENT_APPLICATION: {
+      label: 'LNG_MODULE_LABEL_CLIENT_APPLICATION',
+      value: 'clientApplication'
     }
   };
 
@@ -1090,28 +1103,42 @@ export class Constants {
     IMPORT_MAPPING: {
       label: 'LNG_MODULE_LABEL_IMPORT_MAPPING',
       value: 'importMapping'
+    },
+    CLIENT_APPLICATION: {
+      label: 'LNG_MODULE_LABEL_CLIENT_APPLICATION',
+      value: 'clientApplication'
     }
   };
 
   // possible export types for export sync package
-  static SYNC_PACKAGE_EXPORT_TYPES = {
-    MOBILE: {
-      label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE',
-      value: 'mobile'
-    },
-    SYSTEM: {
-      label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM',
-      value: 'system'
-    },
-    OUTBREAK: {
-      label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK',
-      value: 'outbreak'
-    },
-    FULL: {
-      label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL',
-      value: 'full'
+  static SYNC_PACKAGE_EXPORT_TYPES: {
+    [key: string]: {
+      label: string,
+      value: string,
+      description: string
     }
-  };
+  } = {
+      SYSTEM: {
+        label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM',
+        value: 'system',
+        description: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM_DESCRIPTION'
+      },
+      OUTBREAK: {
+        label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK',
+        value: 'outbreak',
+        description: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK_DESCRIPTION'
+      },
+      FULL: {
+        label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL',
+        value: 'full',
+        description: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL_DESCRIPTION'
+      },
+      MOBILE: {
+        label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE',
+        value: 'mobile',
+        description: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE_DESCRIPTION'
+      }
+    };
 
 
   static EPI_CURVE_VIEW_TYPE = {
@@ -1210,9 +1237,6 @@ export class Constants {
 
   // go data who link
   static readonly GO_DATA_WHO_LINK: string = 'https://godata.who.int';
-
-  // regex email
-  static readonly REGEX_EMAIL_VALIDATOR = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
   /**
      * Generate random string

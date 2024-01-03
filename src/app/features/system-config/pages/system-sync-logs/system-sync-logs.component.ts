@@ -657,7 +657,7 @@ export class SystemSyncLogsComponent
           get: () => 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_TITLE'
         },
         hideInputFilter: true,
-        width: '50rem',
+        width: '60rem',
         inputs: [
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,

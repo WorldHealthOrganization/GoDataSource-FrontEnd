@@ -219,6 +219,11 @@ export class ContactModel
   static canExportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_EXPORT_LAB_RESULT) : false); }
 
   /**
+   * Static Permissions - IPermissionRelatedFollowUp
+   */
+  static canCreateFollowUp(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_FOLLOW_UP_CREATE) : false); }
+
+  /**
    * Static Permissions - IPermissionRelatedContactOfContact
    */
   static canCreateContactOfContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_CREATE_CONTACT_OF_CONTACT) : false); }
@@ -414,6 +419,11 @@ export class ContactModel
   canRestoreLabResult(user: UserModel): boolean { return ContactModel.canRestoreLabResult(user); }
   canImportLabResult(user: UserModel): boolean { return ContactModel.canImportLabResult(user); }
   canExportLabResult(user: UserModel): boolean { return ContactModel.canExportLabResult(user); }
+
+  /**
+   * Permissions - IPermissionRelatedFollowUp
+   */
+  canCreateFollowUp(user: UserModel): boolean { return ContactModel.canCreateFollowUp(user); }
 
   /**
      * Permissions - IPermissionRelatedContactOfContact

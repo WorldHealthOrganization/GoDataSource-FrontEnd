@@ -9,13 +9,16 @@ import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { SelectedHelpCategoryDataResolver } from '../../core/services/resolvers/data/selected-help-category.resolver';
 import { HelpCategoryDataResolver } from '../../core/services/resolvers/data/help-category.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
 
 // create / view / modify
 const createViewModifyFoundationHelpCategory: Route = {
   component: fromPages.HelpCategoryCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
-    user: UserDataResolver
+    user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver
   }
 };
 
@@ -24,6 +27,7 @@ const createViewModifyFoundationHelpItem: Route = {
   canActivate: [AuthGuard],
   resolve: {
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     category: SelectedHelpCategoryDataResolver,
     helpCategories: HelpCategoryDataResolver
   }
@@ -67,7 +71,9 @@ const routes: Routes = [
       ]
     },
     resolve: {
-      yesNoAll: YesNoAllDataResolver
+      createdOn: CreatedOnResolver,
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver
     }
   },
   // Create Help Category
@@ -120,6 +126,7 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
       user: UserDataResolver,
       selectedCategory: SelectedHelpCategoryDataResolver

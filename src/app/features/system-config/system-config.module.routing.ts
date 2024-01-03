@@ -19,13 +19,27 @@ import { UpstreamServersDataResolver } from '../../core/services/resolvers/data/
 import {
   SyncPackageStatusStepBackupRestoreResolver
 } from '../../core/services/resolvers/data/sync-package-status-step-backup-restore.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
 
 // common base - create / view / modify
-const createViewModifyFoundation: Route = {
+const deviceCreateViewModifyFoundation: Route = {
   component: fromPages.SystemDevicesCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
-    user: UserDataResolver
+    user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver
+  }
+};
+
+// common base - create / view / modify
+const clientApplicationCreateViewModifyFoundation: Route = {
+  component: fromPages.ClientApplicationsCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    outbreak: OutbreakDataResolver,
+    user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver
   }
 };
 
@@ -115,23 +129,44 @@ const routes: Routes = [
           ]
         },
         resolve: {
+          createdOn: CreatedOnResolver,
           yesNoAll: YesNoAllDataResolver,
-          outbreak: OutbreakDataResolver
+          outbreak: OutbreakDataResolver,
+          user: UserDataResolver
         }
       },
       {
         path: 'create',
-        component: fromPages.ClientApplicationsCreateViewModifyComponent,
-        canActivate: [AuthGuard],
+        ...clientApplicationCreateViewModifyFoundation,
         data: {
           permissions: [
             PERMISSION.CLIENT_APPLICATION_CREATE
           ],
           action: CreateViewModifyV2Action.CREATE
-        },
-        resolve: {
-          outbreak: OutbreakDataResolver
         }
+      },
+      {
+        path: ':clientApplicationId/view',
+        ...clientApplicationCreateViewModifyFoundation,
+        data: {
+          permissions: [
+            PERMISSION.CLIENT_APPLICATION_VIEW
+          ],
+          action: CreateViewModifyV2Action.VIEW
+        }
+      },
+      {
+        path: ':clientApplicationId/modify',
+        ...clientApplicationCreateViewModifyFoundation,
+        data: {
+          permissions: [
+            PERMISSION.CLIENT_APPLICATION_MODIFY
+          ],
+          action: CreateViewModifyV2Action.MODIFY
+        },
+        canDeactivate: [
+          PageChangeConfirmationGuard
+        ]
       }
     ]
   },
@@ -150,12 +185,14 @@ const routes: Routes = [
           ]
         },
         resolve: {
-          yesNoAll: YesNoAllDataResolver
+          createdOn: CreatedOnResolver,
+          yesNoAll: YesNoAllDataResolver,
+          user: UserDataResolver
         }
       },
       {
         path: ':deviceId/view',
-        ...createViewModifyFoundation,
+        ...deviceCreateViewModifyFoundation,
         data: {
           permissions: [
             PERMISSION.DEVICE_VIEW
@@ -165,7 +202,7 @@ const routes: Routes = [
       },
       {
         path: ':deviceId/modify',
-        ...createViewModifyFoundation,
+        ...deviceCreateViewModifyFoundation,
         data: {
           permissions: [
             PERMISSION.DEVICE_MODIFY

@@ -38,12 +38,17 @@ import { LabSequenceResultDataResolver } from '../../core/services/resolvers/dat
 import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
 import { DailyFollowUpStatusDataResolver } from '../../core/services/resolvers/data/daily-follow-up-status.resolver';
 import { InvestigationStatusDataResolver } from '../../core/services/resolvers/data/investigation-status.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
+import { FollowUpCreatedAsDataResolver } from '../../core/services/resolvers/data/follow-up-created-as.resolver';
+import { FinalFollowUpStatusDataResolver } from '../../core/services/resolvers/data/final-follow-up-status.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
   component: fromPages.CasesCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     outbreak: SelectedOutbreakDataResolver,
     gender: GenderDataResolver,
     pregnancy: PregnancyStatusDataResolver,
@@ -51,6 +56,7 @@ const createViewModifyFoundation: Route = {
     classification: ClassificationDataResolver,
     occupation: OccupationDataResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     addressType: AddressTypeDataResolver,
     outcome: OutcomeDataResolver,
     risk: RiskDataResolver,
@@ -76,7 +82,9 @@ const createViewModifyFoundation: Route = {
     labSequenceResult: LabSequenceResultDataResolver,
     team: TeamDataResolver,
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
-    investigationStatus: InvestigationStatusDataResolver
+    followUpStatus: FinalFollowUpStatusDataResolver,
+    investigationStatus: InvestigationStatusDataResolver,
+    followUpCreatedAs: FollowUpCreatedAsDataResolver
   }
 };
 
@@ -93,12 +101,15 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       classification: ClassificationDataResolver,
       gender: GenderDataResolver,
       occupation: OccupationDataResolver,
       outcome: OutcomeDataResolver,
       pregnancy: PregnancyStatusDataResolver,
       risk: RiskDataResolver,
+      team: TeamDataResolver,
+      followUpStatus: FinalFollowUpStatusDataResolver,
       yesNoAll: YesNoAllDataResolver,
       yesNo: YesNoDataResolver,
       user: UserDataResolver,

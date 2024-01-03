@@ -43,6 +43,8 @@ export class FollowUpModel
   responsibleUserId: string;
   responsibleUser: UserModel;
 
+  createdAs: string;
+
   // used by ui
   uiStatusForms: SafeHtml;
 
@@ -134,6 +136,8 @@ export class FollowUpModel
     if (this.responsibleUser) {
       this.responsibleUser = new UserModel(this.responsibleUser);
     }
+
+    this.createdAs = _.get(data, 'createdAs', 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT');
   }
 
   /**

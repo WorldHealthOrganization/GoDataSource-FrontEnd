@@ -7,10 +7,10 @@ import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { AddressModel } from '../../models/address.model';
 import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
-import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { catchError, map } from 'rxjs/operators';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/forms-v2/validators/general-async-validator.directive';
 
 @Injectable()
 export class ContactsOfContactsDataService {

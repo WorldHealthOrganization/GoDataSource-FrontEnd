@@ -26,6 +26,12 @@ implements
   static canViewNewCasesFromKnownCOTDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CASE_NEW_FROM_KNOWN_COT_DASHLET) : false; }
   static canViewCasesWithPendingLabResultsDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CASE_WITH_PENDING_LAB_RESULTS_DASHLET) : false; }
   static canViewCasesNotIdentifiedThroughContactsDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CASE_NOT_IDENTIFIED_THROUGH_CONTACTS_DASHLET) : false; }
+  static canExportCaseFollowUpSuccessRateReport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_EXPORT_CASE_FOLLOW_UP_SUCCESS_RATE_REPORT) : false; }
+  static canViewCasesFromFollowUpsDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CASES_FROM_FOLLOW_UP_DASHLET) : false; }
+  static canViewCasesLostToFollowUpsDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CASES_LOST_TO_FOLLOW_UP_DASHLET) : false; }
+  static canViewCasesSeenDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CASES_SEEN_DASHLET) : false; }
+  static canViewCasesWithSuccessfulFollowUpsDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CASES_SUCCESSFUL_FOLLOW_UPS_DASHLET) : false; }
+  static canViewCasesNotSeenInXDaysDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CASES_NOT_SEEN_IN_X_DAYS_DASHLET) : false; }
   static canViewContactsPerCaseMeanDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CONTACTS_PER_CASE_MEAN_DASHLET) : false; }
   static canViewContactsPerCaseMedianDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CONTACTS_PER_CASE_MEDIAN_DASHLET) : false; }
   static canViewContactsFromFollowUpsDashlet(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DASHBOARD_VIEW_CONTACTS_FROM_FOLLOW_UP_DASHLET) : false; }
@@ -85,6 +91,12 @@ implements
   canViewNewCasesFromKnownCOTDashlet(user: UserModel): boolean { return DashboardModel.canViewNewCasesFromKnownCOTDashlet(user); }
   canViewCasesWithPendingLabResultsDashlet(user: UserModel): boolean { return DashboardModel.canViewCasesWithPendingLabResultsDashlet(user); }
   canViewCasesNotIdentifiedThroughContactsDashlet(user: UserModel): boolean { return DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(user); }
+  canExportCaseFollowUpSuccessRateReport(user: UserModel): boolean { return DashboardModel.canExportCaseFollowUpSuccessRateReport(user); }
+  canViewCasesFromFollowUpsDashlet(user: UserModel): boolean { return DashboardModel.canViewCasesFromFollowUpsDashlet(user); }
+  canViewCasesLostToFollowUpsDashlet(user: UserModel): boolean { return DashboardModel.canViewCasesLostToFollowUpsDashlet(user); }
+  canViewCasesNotSeenInXDaysDashlet(user: UserModel): boolean { return DashboardModel.canViewCasesNotSeenInXDaysDashlet(user); }
+  canViewCasesSeenDashlet(user: UserModel): boolean { return DashboardModel.canViewCasesSeenDashlet(user); }
+  canViewCasesWithSuccessfulFollowUpsDashlet(user: UserModel): boolean { return DashboardModel.canViewCasesWithSuccessfulFollowUpsDashlet(user); }
   canViewContactsPerCaseMeanDashlet(user: UserModel): boolean { return DashboardModel.canViewContactsPerCaseMeanDashlet(user); }
   canViewContactsPerCaseMedianDashlet(user: UserModel): boolean { return DashboardModel.canViewContactsPerCaseMedianDashlet(user); }
   canViewContactsFromFollowUpsDashlet(user: UserModel): boolean { return DashboardModel.canViewContactsFromFollowUpsDashlet(user); }

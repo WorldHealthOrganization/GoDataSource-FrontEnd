@@ -9,6 +9,8 @@ import { ListQueryComponent } from './list-query-component';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 import { LocalizationHelper, Moment } from './localization-helper';
+import { MetricCasesWithSuccessfulFollowUp } from '../models/metrics/metric.cases-with-success-follow-up.model';
+import { MetricCasesSeenEachDays } from '../models/metrics/metric-cases-seen-each-days.model';
 
 /**
  * Applied filters
@@ -138,6 +140,26 @@ export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2Colu
           .subscribe((qbFilterContactsOnFollowUpLists) => {
             // merge query builder
             this.appliedListFilterQueryBuilder = qbFilterContactsOnFollowUpLists;
+            this.mergeListFilterToMainFilter();
+
+            // refresh list
+            this.refreshCallback(true);
+          });
+        break;
+
+      // Filter cases on the followup list
+      case Constants.APPLY_LIST_FILTER.CASES_FOLLOWUP_LIST:
+
+        // get the correct query builder and merge with the existing one
+        this.listHelperService.listFilterDataService
+          .filterCasesOnFollowUpLists(
+            globalFilters.date,
+            globalFilters.locationId,
+            globalFilters.classificationId
+          )
+          .subscribe((qbFilterCasesOnFollowUpLists) => {
+            // merge query builder
+            this.appliedListFilterQueryBuilder = qbFilterCasesOnFollowUpLists;
             this.mergeListFilterToMainFilter();
 
             // refresh list
@@ -327,6 +349,28 @@ export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2Colu
           });
         break;
 
+      // Filter cases not seen
+      case Constants.APPLY_LIST_FILTER.CASES_NOT_SEEN:
+        // get the number of days if it was updated
+        const noDaysNotSeenCases = _.get(queryParams, 'x', null);
+        // get the correct query builder and merge with the existing one
+        this.listHelperService.listFilterDataService
+          .filterCasesNotSeen(
+            globalFilters.date,
+            globalFilters.locationId,
+            globalFilters.classificationId,
+            noDaysNotSeenCases
+          )
+          .subscribe((qbFilterCasesNotSeen) => {
+            // merge query builder
+            this.appliedListFilterQueryBuilder = qbFilterCasesNotSeen;
+            this.mergeListFilterToMainFilter();
+
+            // refresh list
+            this.refreshCallback(true);
+          });
+        break;
+
       // filter cases with less than x contacts
       case Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS:
         // get the number of contacts if it was updated
@@ -487,6 +531,24 @@ export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2Colu
           .subscribe((qbFilterContactsLostToFollowUp) => {
             // merge query builder
             this.appliedListFilterQueryBuilder = qbFilterContactsLostToFollowUp;
+            this.mergeListFilterToMainFilter();
+
+            // refresh list
+            this.refreshCallback(true);
+          });
+        break;
+
+      // Filter cases lost to follow-up
+      case Constants.APPLY_LIST_FILTER.CASES_LOST_TO_FOLLOW_UP:
+        // get the correct query builder and merge with the existing one
+        this.listHelperService.listFilterDataService.filterCasesLostToFollowUp(
+          globalFilters.date,
+          globalFilters.locationId,
+          globalFilters.classificationId
+        )
+          .subscribe((qbFilterCasesLostToFollowUp) => {
+            // merge query builder
+            this.appliedListFilterQueryBuilder = qbFilterCasesLostToFollowUp;
             this.mergeListFilterToMainFilter();
 
             // refresh list
@@ -787,6 +849,28 @@ export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2Colu
           });
         break;
 
+      // Filter cases seen
+      case Constants.APPLY_LIST_FILTER.CASES_SEEN:
+        this.listHelperService.listFilterDataService.filterCasesSeen(
+          globalFilters.date,
+          globalFilters.locationId,
+          globalFilters.classificationId
+        )
+          .subscribe((result: MetricCasesSeenEachDays) => {
+            // merge query builder
+            this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+            this.appliedListFilterQueryBuilder.filter.where({
+              id: {
+                'inq': result.caseIDs
+              }
+            }, true);
+            this.mergeListFilterToMainFilter();
+
+            // refresh list
+            this.refreshCallback(true);
+          });
+        break;
+
       // Filter contacts witch successful follow-up
       case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
         this.listHelperService.listFilterDataService
@@ -797,6 +881,35 @@ export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2Colu
           )
           .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
             const contactIDs: string[] = _.chain(result.contacts)
+              .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
+              .map((item: ContactFollowedUp) => {
+                return item.id;
+              }).value();
+            // merge query builder
+            this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+            this.appliedListFilterQueryBuilder.filter.where({
+              id: {
+                'inq': contactIDs
+              }
+            }, true);
+
+            this.mergeListFilterToMainFilter();
+
+            // refresh list
+            this.refreshCallback(true);
+          });
+        break;
+
+      // Filter cases witch successful follow-up
+      case Constants.APPLY_LIST_FILTER.CASES_FOLLOWED_UP:
+        this.listHelperService.listFilterDataService
+          .filterCasesWithSuccessfulFollowup(
+            globalFilters.date,
+            globalFilters.locationId,
+            globalFilters.classificationId
+          )
+          .subscribe((result: MetricCasesWithSuccessfulFollowUp) => {
+            const contactIDs: string[] = _.chain(result.cases)
               .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
               .map((item: ContactFollowedUp) => {
                 return item.id;

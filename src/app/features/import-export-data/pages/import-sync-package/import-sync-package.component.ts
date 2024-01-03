@@ -15,6 +15,7 @@ import { throwError } from 'rxjs';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
+import { Headers } from 'ng2-file-upload/file-upload/file-uploader.class';
 
 @Component({
   selector: 'app-import-sync-package',
@@ -31,6 +32,10 @@ export class ImportSyncPackageComponent {
   ];
 
   importFileUrl: string = 'sync/import-database-snapshot';
+
+  // no need to specify platform since that will be set automatically to sync if empty instead of WEB which is the default when a request is run from WEB
+  // needs to be [] - empty array
+  importFileHeaders: Headers[] = [];
 
   /**
      * Constructor

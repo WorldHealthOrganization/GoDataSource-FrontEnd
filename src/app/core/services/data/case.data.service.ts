@@ -13,13 +13,13 @@ import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-
 import * as _ from 'lodash';
 import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../models/metrics/metric-cases-delay-between-onset-hospitalization.model';
 import { Constants } from '../../models/constants';
-import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { MetricCasesCountStratifiedOutcome } from '../../models/metrics/metric-cases-count-stratified-outcome.model';
 import { MetricCasesBasedOnContactStatusModel } from '../../models/metrics/metric-cases-based-on-contact-status.model';
 import { catchError, map } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ICasesHospitalizedCount } from '../../models/cases-hospitalized-count.interface';
 import { LocalizationHelper } from '../../helperClasses/localization-helper';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/forms-v2/validators/general-async-validator.directive';
 
 @Injectable()
 export class CaseDataService {
@@ -100,6 +100,19 @@ export class CaseDataService {
     return this.modelHelper.mapObservableToModel(
       this.http.put(`outbreaks/${outbreakId}/cases/${caseId}`, caseData),
       CaseModel
+    );
+  }
+
+  /**
+   * Modify multiple cases
+   */
+  bulkModifyCases(
+    outbreakId: string,
+    contactsData: any
+  ) {
+    return this.http.put(
+      `outbreaks/${outbreakId}/cases/bulk`,
+      contactsData
     );
   }
 

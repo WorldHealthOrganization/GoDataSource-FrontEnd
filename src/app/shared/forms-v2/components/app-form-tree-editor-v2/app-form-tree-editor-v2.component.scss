@@ -362,5 +362,10 @@
 .gd-create-view-modify-view {
   .gd-form-tree-editor-v2-list {
     height: calc(100% - 7.3rem);
+
+    @include breakpoint('xs') {
+      height: calc(100% - 4.9rem);
+      min-height: 10rem;
+    }
   }
 }

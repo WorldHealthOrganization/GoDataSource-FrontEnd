@@ -29,7 +29,7 @@ import {
 } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { Directive, ViewChild } from '@angular/core';
 import { AppListTableV2Component } from '../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
-import { SavedFilterData } from '../models/saved-filters.model';
+import { SavedFilterData, SavedFilterDataAppliedFilter } from '../models/saved-filters.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { IV2ProcessSelectedData } from '../../shared/components-v2/app-list-table-v2/models/process-data.model';
 import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
@@ -841,9 +841,6 @@ export abstract class ListComponent<T, U extends (IV2Column | IV2ColumnToVisible
     // add default filter criteria
     this.resetFiltersAddDefault();
 
-    // apply table column filters
-    this.applyTableColumnFilters();
-
     // retrieve Side filters
     let queryBuilder: RequestQueryBuilder;
     if (
@@ -852,6 +849,9 @@ export abstract class ListComponent<T, U extends (IV2Column | IV2ColumnToVisible
     ) {
       this.queryBuilder.merge(queryBuilder);
     }
+
+    // apply table column filters
+    this.applyTableColumnFilters();
 
     // if no side query builder then clear side filters too
     if (
@@ -1205,9 +1205,12 @@ export abstract class ListComponent<T, U extends (IV2Column | IV2ColumnToVisible
         case V2FilterType.DELETED:
 
           // side filter takes precedence, deleted column shouldn't overwrite value
-          // - LNG_COMMON_MODEL_FIELD_LABEL_DELETED is used by side filters
-          const deletedKey: string = `${column.field}LNG_COMMON_MODEL_FIELD_LABEL_DELETED`;
-          const sideFilterValue = currentUserCacheForCurrentPath.sideFilters?.appliedFilters.find((item) => item.filter?.uniqueKey === deletedKey);
+          let sideFilterValue: SavedFilterDataAppliedFilter = currentUserCacheForCurrentPath.sideFilters?.appliedFilters.find((item) => item.filter?.uniqueKey === `${column.field}${column.label}`);
+          if (!sideFilterValue) {
+            // one more try with global label
+            // - we shouldn't use this one
+            sideFilterValue = currentUserCacheForCurrentPath.sideFilters?.appliedFilters.find((item) => item.filter?.uniqueKey === `${column.field}LNG_COMMON_MODEL_FIELD_LABEL_DELETED`);
+          }
           column.filter.value = sideFilterValue?.value !== undefined ?
             sideFilterValue.value :
             value;

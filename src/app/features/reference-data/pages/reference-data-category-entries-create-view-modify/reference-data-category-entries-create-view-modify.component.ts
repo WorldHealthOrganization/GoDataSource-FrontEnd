@@ -18,7 +18,6 @@ import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryMo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ITreeEditorDataCategory } from '../../../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
 import { IconModel } from '../../../../core/models/icon.model';
@@ -27,6 +26,7 @@ import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/servi
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/forms-v2/validators/general-async-validator.directive';
 
 /**
  * Component
@@ -522,9 +522,11 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_COMMON_LABEL_DETAILS',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }

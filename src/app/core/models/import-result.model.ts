@@ -14,7 +14,10 @@ export class ImportResultModel
     code: string,
     message: string,
     statusCode: number,
-    details: any
+    details: any,
+    error?: {
+      code: string
+    }
   };
 
   // json data

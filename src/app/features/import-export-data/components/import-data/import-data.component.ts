@@ -35,9 +35,8 @@ import {
   SavedImportOption
 } from '../../../../core/models/saved-import-mapping.model';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
-import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
@@ -54,7 +53,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ImportResultDataService } from '../../../../core/services/data/import-result.data.service';
 import { ImportResultModel } from '../../../../core/models/import-result.model';
-import { HoverRowAction } from '../../../../shared/components';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
@@ -79,6 +77,8 @@ import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ActionIcon, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { Headers } from 'ng2-file-upload/file-upload/file-uploader.class';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -102,7 +102,8 @@ enum ImportServerErrorCodes {
   DUPLICATE_VISUAL_ID = 'DUPLICATE_VISUAL_ID',
   ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE = 'ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE',
   ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE = 'ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE',
-  ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE = 'ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE'
+  ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE = 'ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE',
+  PRE_VALIDATION = 'PRE_VALIDATION'
 }
 
 interface IImportErrorDetailsSimple {
@@ -119,7 +120,7 @@ interface IImportErrorDetailsSimple {
         [prop: string]: any
       }
     },
-    recordNo: number,
+    recordNo: number | string,
     message: string,
     error: {
       code: number,
@@ -282,6 +283,21 @@ export class ImportDataComponent
     return this._importFileUrl;
   }
 
+  // additional headers to attach
+  private _importFileHeaders: Headers[] = [{
+    name: 'platform',
+    value: 'WEB'
+  }];
+  @Input() set importFileHeaders(value: Headers[]) {
+    this._importFileHeaders = value;
+    if (this.uploader) {
+      this.uploader.options.headers = this._importFileHeaders;
+    }
+  }
+  get importFileHeaders(): Headers[] {
+    return this._importFileHeaders;
+  }
+
   // Tokens for properties for which we don't receive labels from the server
   @Input() fieldsWithoutTokens: {
     [property: string]: string
@@ -385,6 +401,7 @@ export class ImportDataComponent
   mappedFields: ImportableMapField[] = [];
 
   // Keep err msg details
+  failedPreValidation: boolean = false;
   errMsgDetails: {
     details: IImportErrorDetailsSimple | IImportErrorDetailsProcessedImported
   };
@@ -431,10 +448,11 @@ export class ImportDataComponent
             !this.errMsgDetails;
   }
 
-  // hover table row actions
-  recordActions: HoverRowAction[] = [
+  // row actions
+  recordActions: IV2ActionIcon[] = [
     // Add
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'add_circle_outline',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
@@ -460,30 +478,30 @@ export class ImportDataComponent
             )
           );
       },
-      click: (
-        item: ImportableMapField,
-        handler: HoverRowActionsDirective
-      ) => {
-        // not allowed if we have duplicates because it can break the logic:
-        // this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
-        if (
-          this.usedSourceFieldsForValidation &&
-                    this.usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1
-        ) {
-          // display toast
-          this.toastV2Service.error('LNG_PAGE_IMPORT_DATA_ERROR_MUST_FIX_DUPLICATE_BEFORE_ADD');
-        } else {
-          // add option
-          this.addNewOptionMap(
-            item,
-            handler
-          );
+      action: {
+        click: (data: {
+          item: ImportableMapField,
+          itemIndex: number
+        }) => {
+          // not allowed if we have duplicates because it can break the logic:
+          // this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+          if (
+            this.usedSourceFieldsForValidation &&
+            this.usedSourceFieldsForValidation.fields[data.item.sourceFieldWithSelectedIndexes] > 1
+          ) {
+            // display toast
+            this.toastV2Service.error('LNG_PAGE_IMPORT_DATA_ERROR_MUST_FIX_DUPLICATE_BEFORE_ADD');
+          } else {
+            // add option
+            this.addNewOptionMap(data.item);
+          }
         }
       }
-    }),
+    },
 
     // Expand
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'expand_more',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_EXPAND_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
@@ -508,20 +526,20 @@ export class ImportDataComponent
             this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
           );
       },
-      click: (
-        item: ImportableMapField,
-        handler: HoverRowActionsDirective
-      ) => {
-        // expand
-        item.mappedOptionsCollapsed = false;
-
-        // render row selection
-        handler.hoverRowActionsComponent.hideEverything();
+      action: {
+        click: (data: {
+          item: ImportableMapField,
+          itemIndex: number
+        }) => {
+          // expand
+          data.item.mappedOptionsCollapsed = false;
+        }
       }
-    }),
+    },
 
     // Collapse
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'expand_less',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_COLLAPSE_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
@@ -540,97 +558,96 @@ export class ImportDataComponent
           ) &&
           !item.mappedOptionsCollapsed;
       },
-      click: (
-        item: ImportableMapField,
-        handler: HoverRowActionsDirective
-      ) => {
-        // collapse
-        item.mappedOptionsCollapsed = true;
-
-        // render row selection
-        handler.hoverRowActionsComponent.hideEverything();
+      action: {
+        click: (data: {
+          item: ImportableMapField,
+          itemIndex: number
+        }) => {
+          // collapse
+          data.item.mappedOptionsCollapsed = true;
+        }
       }
-    }),
+    },
 
     // Modify
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'settings',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return this.elementInEditMode !== item;
       },
-      click: (
-        item: ImportableMapField | IMappedOption,
-        handler: HoverRowActionsDirective
-      ) => {
-        this.editItem(
-          item,
-          handler
-        );
+      action: {
+        click: (data: {
+          item: ImportableMapField | IMappedOption,
+          itemIndex: number
+        }) => {
+          this.editItem(data.item);
+        }
       }
-    }),
+    },
 
     // Cancel Modify
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'close',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CLOSE_MODIFY',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return this.elementInEditMode === item;
       },
-      click: (
-        _item: ImportableMapField | IMappedOption,
-        handler: HoverRowActionsDirective
-      ) => {
-        // clear
-        this.clearElementInEditMode();
-
-        // force hover row rerender
-        handler.hoverRowActionsComponent.hideEverything();
+      action: {
+        click: () => {
+          // clear
+          this.clearElementInEditMode();
+        }
       }
-    }),
+    },
 
     // Clone
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'content_copy',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CLONE',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return item instanceof ImportableMapField;
       },
-      click: (
-        item: ImportableMapField,
-        handler: HoverRowActionsDirective,
-        index: number
-      ) => {
-        // clone field
-        this.cloneFieldMap(
-          item,
-          handler,
-          index
-        );
+      action: {
+        click: (data: {
+          item: ImportableMapField,
+          itemIndex: number
+        }) => {
+          // clone field
+          this.cloneFieldMap(
+            data.item,
+            data.itemIndex
+          );
+        }
       }
-    }),
+    },
 
     // Remove
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'delete',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE',
-      class: 'icon-item-delete',
+      cssClasses: () => 'import-data-map-fields-actions-action-icon-warning',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return !(item instanceof ImportableMapField) ||
-                    !item.readonly;
+          !item.readonly;
       },
-      click: (
-        item: ImportableMapField | IMappedOption,
-        _handler: HoverRowActionsDirective,
-        index: number
-      ) => {
-        // remove item
-        this.removeItemMap(
-          item,
-          index
-        );
+      action: {
+        click: (data: {
+          item: ImportableMapField | IMappedOption,
+          itemIndex: number
+        }) => {
+          // remove item
+          this.removeItemMap(
+            data.item,
+            data.itemIndex
+          );
+        }
       }
-    })
+    }
   ];
 
   // display map button or start import ?
@@ -809,7 +826,8 @@ export class ImportDataComponent
       authToken: this.authDataService.getAuthToken(),
       url: `${environment.apiUrl}/${this.importFileUrl}`,
       additionalParameter: {},
-      itemAlias: this.fileUploadAlias
+      itemAlias: this.fileUploadAlias,
+      headers: this.importFileHeaders
     });
 
     // don't allow multiple files to be added
@@ -854,6 +872,34 @@ export class ImportDataComponent
         err = _.isObject(err) ? err : JSON.parse(err);
         err = err.error ? err.error : err;
         this.toastV2Service.error(err);
+
+        // display error message
+        if (err.code === 'IMPORT_PARTIAL_SUCCESS_WITH_DETAILS') {
+          // set error type
+          this.failedPreValidation = true;
+
+          // construct custom message
+          this.errMsgDetails = err;
+
+          // get only the first 100 errors
+          const errorDetails: IImportErrorDetailsSimple = this.errMsgDetails.details as IImportErrorDetailsSimple;
+          errorDetails.failed = errorDetails.failed?.length > 0 ?
+            errorDetails.failed.slice(0, 50) :
+            [];
+
+          // translate messages if necessary
+          errorDetails.failed.forEach((item) => {
+            // nothing to do ?
+            if (!item.message) {
+              return;
+            }
+
+            // translate ?
+            if (item.message.startsWith('LNG_')) {
+              item.message = this.i18nService.instant(item.message);
+            }
+          });
+        }
 
         // hide loading
         this._displayLoading = false;
@@ -1367,11 +1413,13 @@ export class ImportDataComponent
         });
       } else {
         // found the language tokens
+        // for custom objects (e.g., age), the properties are prefixed with the object name when they are exported (e.g., "age age.years")
         let mappedHeaderObj: IMappedHeader[];
         if (
           (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}`).toLowerCase()]) ||
-                    (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
-                    (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()])
+          (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
+          (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()]) ||
+          (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath} ${parentPath}.${property}`).toLowerCase()])
         ) {
           pushNewMapField(
             parentPath ?
@@ -1381,23 +1429,31 @@ export class ImportDataComponent
           );
         } else {
           // NOT FOUND
-          // check if parent key should be translated
+          // check if parent key should be translated or match by field name
           const parentPrefixIndex: number = parentPath ? parentPath.lastIndexOf('.') : -1;
           const parentPrefix = parentPrefixIndex > -1 ? parentPath.substring(0, parentPrefixIndex) : null;
+          const fieldName = parentPrefixIndex > -1 && parentPath.endsWith('[]') ?
+            parentPath.substring(parentPrefixIndex + 1, parentPath.lastIndexOf('[]')) :
+            null;
           const parentPathTranslation: string = this.fieldsWithoutTokens && this.fieldsWithoutTokens[parentPath] !== undefined ?
             (this.fieldsWithoutTokens[parentPath] ? this.i18nService.instant(this.fieldsWithoutTokens[parentPath]) : '') :
             undefined;
           if (
             parentPath &&
-                        parentPathTranslation !== undefined && (
+            parentPathTranslation !== undefined && (
               (
                 parentPathTranslation &&
-                                (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPathTranslation}[].${this.i18nService.instant(value)}`).toLowerCase()])
+                (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPathTranslation}[].${this.i18nService.instant(value)}`).toLowerCase()])
               ) || (
                 parentPrefix &&
-                                (mappedHeaderObj = mappedHeaders[_.camelCase(
-                                  `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}`
-                                ).toLowerCase()])
+                (mappedHeaderObj = mappedHeaders[_.camelCase(
+                  `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}`
+                ).toLowerCase()])
+              ) || (
+                fieldName &&
+                (mappedHeaderObj = mappedHeaders[_.camelCase(
+                  `${fieldName}.${this.i18nService.instant(value)}`
+                ).toLowerCase()])
               )
             )
           ) {
@@ -1406,16 +1462,17 @@ export class ImportDataComponent
               mappedHeaderObj
             );
 
-            // search though flat values - for arrays
+            // search though flat values - for arrays (match also by field name)
           } else if (
             mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[1]`).toLowerCase()] ||
-                        mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()] || (
+            mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()] || (
               parentPathTranslation !== undefined &&
-                            parentPrefix &&
-                            mappedHeaders[_.camelCase(
-                              `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}[1]`
-                            ).toLowerCase()]
-            )
+              parentPrefix &&
+              mappedHeaders[_.camelCase(
+                `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}[1]`
+              ).toLowerCase()]
+            ) ||
+            mappedHeaders[_.camelCase(`${parentPath}.${property}[1]`).toLowerCase()]
           ) {
             // map all determined levels
             _.each(
@@ -1423,13 +1480,14 @@ export class ImportDataComponent
               (supportedLevel: ILabelValuePairModel) => {
                 if (
                   (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) ||
-                                    (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) || (
+                  (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) || (
                     parentPathTranslation !== undefined &&
-                                        parentPrefix &&
-                                        (mappedHeaderObj = mappedHeaders[_.camelCase(
-                                          `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`
-                                        ).toLowerCase()])
-                  )
+                    parentPrefix &&
+                    (mappedHeaderObj = mappedHeaders[_.camelCase(
+                      `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`
+                    ).toLowerCase()])
+                  ) ||
+                  (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
                 ) {
                   // create object
                   pushNewMapField(
@@ -2371,7 +2429,7 @@ export class ImportDataComponent
                       // trigger error list refresh
                       if (
                         (this.errMsgDetails.details as any).imported &&
-                                                (this.errMsgDetails.details as any).imported.failedNo > 0
+                        (this.errMsgDetails.details as any).imported.failedNo > 0
                       ) {
                         this.needsRefreshList(true);
                       }
@@ -2408,6 +2466,7 @@ export class ImportDataComponent
      */
   tryAgain() {
     // reset data
+    this.failedPreValidation = false;
     this.distinctValuesCache = {};
     this.locationCache = {};
     this.locationCacheIndex = {};
@@ -2548,20 +2607,12 @@ export class ImportDataComponent
   /**
      * Edit item
      */
-  private editItem(
-    item: ImportableMapField | IMappedOption,
-    handler?: HoverRowActionsDirective
-  ): void {
+  private editItem(item: ImportableMapField | IMappedOption): void {
     // clear element in edit mode
     this.clearElementInEditMode();
 
     // remember element in edit mode
     this.elementInEditMode = item;
-
-    // render row selection
-    if (handler) {
-      handler.hoverRowActionsComponent.hideEverything();
-    }
   }
 
   /**
@@ -2607,10 +2658,7 @@ export class ImportDataComponent
   /**
      * Add new field option map
      */
-  private addNewOptionMap(
-    item: ImportableMapField,
-    handler: HoverRowActionsDirective
-  ): void {
+  private addNewOptionMap(item: ImportableMapField): void {
     // create new field option
     const fieldOption: IMappedOption = {
       id: uuid(),
@@ -2624,10 +2672,7 @@ export class ImportDataComponent
     ];
 
     // start edit
-    this.editItem(
-      fieldOption,
-      handler
-    );
+    this.editItem(fieldOption);
 
     // prepare data
     this.validateData();
@@ -2638,7 +2683,6 @@ export class ImportDataComponent
      */
   private cloneFieldMap(
     item: ImportableMapField,
-    handler: HoverRowActionsDirective,
     index: number
   ): void {
     // clone field item
@@ -2657,10 +2701,7 @@ export class ImportDataComponent
     );
 
     // start edit item
-    this.editItem(
-      clonedItem,
-      handler
-    );
+    this.editItem(clonedItem);
 
     // prepare data
     this.validateData();
@@ -3842,6 +3883,16 @@ export class ImportDataComponent
     this.importResultsList$ = this.importResultDataService
       .getImportResultsList(this.queryBuilder)
       .pipe(
+        tap((data) => {
+          data.forEach((item) => {
+            if (
+              item.error.message &&
+              item.error.error?.code === ImportServerErrorCodes.PRE_VALIDATION
+            ) {
+              item.error.message = this.i18nService.instant(item.error.message);
+            }
+          });
+        }),
         catchError((err) => {
           this.toastV2Service.error(err);
           return throwError(err);
@@ -3914,10 +3965,10 @@ export class ImportDataComponent
   /**
    * See record data
    */
-  seeRecordData(
+  seeRecordData(data: {
     file: any,
-    save: any
-  ): void {
+    save?: any
+  }): void {
     this.dialogV2Service
       .showSideDialog({
         // title
@@ -3934,7 +3985,7 @@ export class ImportDataComponent
           {
             type: V2SideDialogConfigInputType.HTML,
             name: 'message',
-            placeholder: `
+            placeholder: data.save ? `
               <div style="display: flex; flex-direction: row;">
                   <div style="flex: 1 1 0%; overflow: auto; font-weight: bold; padding-bottom: 8px;">
                       ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE')}
@@ -3947,13 +3998,26 @@ export class ImportDataComponent
               <div style="display: flex; flex-direction: row;">
                   <div style="flex: 1 1 0%; overflow: auto;">
                       <code>
-                          <pre>${JSON.stringify(file, null, 1)}</pre>
+                          <pre>${JSON.stringify(data.file, null, 1)}</pre>
                       </code>
                   </div>
                   <div style="display: flex; width: 16px;"></div>
                   <div style="flex: 1 1 0%; overflow: auto;">
                       <code>
-                          <pre>${JSON.stringify(save, null, 1)}</pre>
+                          <pre>${JSON.stringify(data.save, null, 1)}</pre>
+                      </code>
+                  </div>
+              </div>
+            ` : `
+              <div style="display: flex; flex-direction: row;">
+                  <div style="flex: 1 1 0%; overflow: auto; font-weight: bold; padding-bottom: 8px;">
+                      ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE')}
+                  </div>
+              </div>
+              <div style="display: flex; flex-direction: row;">
+                  <div style="flex: 1 1 0%; overflow: auto;">
+                      <code>
+                          <pre>${JSON.stringify(data.file, null, 1)}</pre>
                       </code>
                   </div>
               </div>

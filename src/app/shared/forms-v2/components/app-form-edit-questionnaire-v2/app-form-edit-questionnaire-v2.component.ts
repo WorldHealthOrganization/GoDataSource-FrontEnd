@@ -847,7 +847,7 @@ export class AppFormEditQuestionnaireV2Component
         },
         hideInputFilter: true,
         dontCloseOnBackdrop: true,
-        width: '50rem',
+        width: '60rem',
         bottomButtons,
         inputs
       })
@@ -1176,7 +1176,7 @@ export class AppFormEditQuestionnaireV2Component
         },
         hideInputFilter: true,
         dontCloseOnBackdrop: true,
-        width: '50rem',
+        width: '60rem',
         bottomButtons,
         inputs
       })

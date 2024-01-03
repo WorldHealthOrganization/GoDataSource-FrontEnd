@@ -78,6 +78,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUSID', value: 'statusId' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', value: 'targeted' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_COMMENT', value: 'comment' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AS', value: 'createdAs' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL', value: 'contact.riskLevel' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER', value: 'contact.gender' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION', value: 'contact.occupation' },
@@ -88,13 +89,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY_USER', value: ContactDailyFollowUpsListComponent.CREATED_BY_USER },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY_USER', value: ContactDailyFollowUpsListComponent.UPDATED_BY_USER },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   // print follow-up
@@ -465,7 +466,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       this.personAndRelatedHelperService.followUp.followUpsDataService
                         .modifyFollowUp(
                           this.selectedOutbreak.id,
-                          item.personId,
+                          item.person,
                           item.id,
                           {
                             targeted: (response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value
@@ -559,7 +560,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       this.personAndRelatedHelperService.followUp.followUpsDataService
                         .modifyFollowUp(
                           this.selectedOutbreak.id,
-                          item.personId,
+                          item.person,
                           item.id,
                           {
                             teamId: (response.handler.data.map.teamId as IV2SideDialogConfigInputSingleDropdown).value
@@ -1246,7 +1247,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       },
       {
         field: 'address.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
         visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
           this.personAndRelatedHelperService.followUp.visibleMandatoryKey,
           'address.geoLocationAccurate'
@@ -1275,9 +1276,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         ),
         notVisible: true,
         format: {
-          type: (item) => item.responsibleUserId && this.activatedRoute.snapshot.data.user.map[item.responsibleUserId] ?
-            this.activatedRoute.snapshot.data.user.map[item.responsibleUserId].name :
-            ''
+          type: 'responsibleUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1299,12 +1298,27 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             )
         },
         link: (data) => {
-          return data.responsibleUserId && UserModel.canView(this.authUser) ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) && !data.responsibleUser?.deleted ?
             `/users/${ data.responsibleUserId }/view` :
             undefined;
         },
         exclude: (): boolean => {
           return !UserModel.canListForFilters(this.authUser);
+        }
+      },
+      {
+        field: 'createdAs',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AS',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: (data) => data.createdAs ?
+            this.personAndRelatedHelperService.i18nService.instant(data.createdAs) :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.followUpCreatedAs as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         }
       },
       {
@@ -1341,9 +1355,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.createdBy].name :
-            ''
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1354,10 +1366,27 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy && UserModel.canView(this.authUser) ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.personAndRelatedHelperService.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -1378,9 +1407,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.updatedBy].name :
-            ''
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1391,7 +1418,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy && UserModel.canView(this.authUser) ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }
@@ -1488,6 +1515,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = this.personAndRelatedHelperService.followUp.generateAdvancedFiltersAggregate(this.selectedOutbreak, {
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         team: this.activatedRoute.snapshot.data.team.options,
         yesNoAll: this.activatedRoute.snapshot.data.yesNoAll.options,
         yesNo: this.activatedRoute.snapshot.data.yesNo.options,
@@ -1514,7 +1542,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           this.selectedOutbreak,
           this.activatedRoute.snapshot.data.outcome.options,
           undefined
-        )
+        ),
+        followUpCreatedAs: this.activatedRoute.snapshot.data.followUpCreatedAs.options
       }
     });
   }
@@ -1535,17 +1564,32 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           (!this.appliedListFilter && FollowUpModel.canExport(this.authUser));
       },
       menuOptions: [
-        // generate follow-ups
+        // generate follow-ups for contacts
         {
           label: {
-            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_BUTTON'
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_FOR_CONTACTS_BUTTON'
           },
           action: {
             click: () => {
-              this.generateFollowUps();
+              this.generateFollowUps(EntityType.CONTACT);
             }
           },
           visible: () => FollowUpModel.canGenerate(this.authUser) &&
+            this.selectedOutbreakIsActive
+        },
+
+        // generate follow-ups for cases
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GENERATE_FOR_CASES_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.generateFollowUps(EntityType.CASE);
+            }
+          },
+          visible: () => FollowUpModel.canGenerate(this.authUser)  &&
+            this.selectedOutbreak.allowCasesFollowUp &&
             this.selectedOutbreakIsActive
         },
 
@@ -1797,6 +1841,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           label: {
             get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS'
           },
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION') :
+            undefined,
           action: {
             link: () => {
               return ['/contacts/follow-ups/modify-list'];
@@ -1812,7 +1859,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               this.selectedOutbreakIsActive;
           },
           disable: (selected: string[]): boolean => {
-            return selected.length < 1;
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
           }
         },
 
@@ -1877,6 +1925,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS'
           },
           cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION') :
+            undefined,
           action: {
             click: (selected: string[]) => {
               // create query
@@ -2279,6 +2330,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       this.initializeGroupedData();
     }
 
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
+
     // retrieve the list of Follow Ups
     this.records$ = this.personAndRelatedHelperService.followUp.followUpsDataService
       .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
@@ -2349,9 +2407,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   }
 
   /**
-   * Generate Follow Ups
+   * Generate Follow Ups for contacts/cases
    */
-  generateFollowUps() {
+  generateFollowUps(personType: EntityType.CASE | EntityType.CONTACT) {
     // default followUpDate
     // - use "today" if contact tracing should start with the date of the last contact
     // - otherwise, use "tomorrow"
@@ -2361,7 +2419,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     this.personAndRelatedHelperService.dialogV2Service.showSideDialog({
       // title
       title: {
-        get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE'
+        get: () => personType === EntityType.CASE ?
+          'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_FOR_CASES_DIALOG_TITLE' :
+          'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_FOR_CONTACTS_DIALOG_TITLE'
       },
 
       // inputs
@@ -2390,7 +2450,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           tooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_OVERWRITE_EXISTING_LABEL_DESCRIPTION',
           options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
           clearable: false,
-          value: this.selectedOutbreak.generateFollowUpsOverwriteExisting as unknown as string,
+          value: (
+            personType === EntityType.CASE ?
+              this.selectedOutbreak.generateFollowUpsOverwriteExistingCases :
+              this.selectedOutbreak.generateFollowUpsOverwriteExisting
+          ) as unknown as string,
           validators: {
             required: () => true
           }
@@ -2402,7 +2466,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           tooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_KEEP_TEAM_ASSIGNMENT_LABEL_DESCRIPTION',
           options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
           clearable: false,
-          value: this.selectedOutbreak.generateFollowUpsKeepTeamAssignment as unknown as string,
+          value: (
+            personType === EntityType.CASE ?
+              this.selectedOutbreak.generateFollowUpsKeepTeamAssignmentCases :
+              this.selectedOutbreak.generateFollowUpsKeepTeamAssignment
+          ) as unknown as string,
           validators: {
             required: () => true
           },
@@ -2418,7 +2486,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           name: 'intervalOfFollowUp',
           placeholder: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS',
           tooltip: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_DESCRIPTION',
-          value: this.selectedOutbreak.intervalOfFollowUp,
+          value: personType === EntityType.CASE ?
+            this.selectedOutbreak.intervalOfFollowUpCases :
+            this.selectedOutbreak.intervalOfFollowUp,
           validators: {
             regex: () => ({
               expression: '^\\s*([1-9][0-9]*)(\\s*,\\s*([1-9][0-9]*))*$'
@@ -2460,6 +2530,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         .generateFollowUps(
           this.selectedOutbreak.id,
           {
+            personType: personType,
             startDate: (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.startDate,
             endDate: (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.endDate,
             targeted: (response.data.map.targeted as IV2SideDialogConfigInputToggleCheckbox).value as unknown as boolean,

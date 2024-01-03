@@ -300,6 +300,33 @@
 
             </div>
 
+            <!-- Key-Link Value -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.KEY_LINK_VALUE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              fxLayout="row" fxLayoutAlign="start" fxLayoutGap="1.6rem">
+
+              <!-- Key -->
+              <div
+                class="gd-app-side-dialog-v2-content-middle-item-input-key">{{input.placeholder | translate}}</div>
+
+              <!-- Value -->
+              <div
+                class="gd-app-side-dialog-v2-content-middle-item-input-link-value">
+                <!-- Link -->
+                <a
+                  *ngIf="input.link.src?.length; else noLink"
+                  target="_blank"
+                  [routerLink]="input.link.src"
+                  [queryParams]="input.link.params">{{input.link.label | translate}}</a>
+
+                <!-- no link ? -->
+                <ng-template
+                  #noLink>{{input.link.label | translate}}</ng-template>
+              </div>
+
+            </div>
+
             <!-- Group -->
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.GROUP"

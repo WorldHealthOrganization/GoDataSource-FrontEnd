@@ -18,6 +18,12 @@
       &.gd-list-table-actions-action-icon-active {
         background: var(--gd-primary),;
         color: var(--gd-background);
+
+        mat-progress-spinner {
+          circle {
+            stroke: var(--gd-background);
+          }
+        }
       }
     }
   }

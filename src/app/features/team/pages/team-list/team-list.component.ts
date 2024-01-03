@@ -38,13 +38,13 @@ export class TeamListComponent extends ListComponent<TeamModel, IV2Column> imple
     { label: 'LNG_TEAM_FIELD_LABEL_NAME', value: 'name' },
     { label: 'LNG_TEAM_FIELD_LABEL_USERS', value: 'userIds' },
     { label: 'LNG_TEAM_FIELD_LABEL_LOCATIONS', value: 'locationIds' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+    { label: 'LNG_TEAM_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_TEAM_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_TEAM_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_TEAM_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_TEAM_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_TEAM_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_TEAM_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   /**
@@ -306,6 +306,88 @@ export class TeamListComponent extends ListComponent<TeamModel, IV2Column> imple
           useOutbreakLocations: false,
           field: 'parentLocationIdFilter'
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_TEAM_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_TEAM_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_TEAM_FIELD_LABEL_CREATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_TEAM_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_TEAM_FIELD_LABEL_UPDATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
   }
@@ -325,7 +407,9 @@ export class TeamListComponent extends ListComponent<TeamModel, IV2Column> imple
    */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = TeamModel.generateAdvancedFilters({
+      authUser: this.authUser,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
@@ -491,7 +575,12 @@ export class TeamListComponent extends ListComponent<TeamModel, IV2Column> imple
       'id',
       'name',
       'userIds',
-      'locationIds'
+      'locationIds',
+      'createdOn',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
     ];
   }
 
@@ -499,6 +588,10 @@ export class TeamListComponent extends ListComponent<TeamModel, IV2Column> imple
    * Re(load) the Users list
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
     // get the list of existing users
     this.records$ = this.teamDataService
       .getTeamsList(this.queryBuilder)

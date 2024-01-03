@@ -54,6 +54,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
               pregnancy: [],
               occupation: [],
               user: [],
+              deletedUser: [],
               documentType: [],
               addressType: []
             }
@@ -69,6 +70,8 @@ export class OutbreakAndOutbreakTemplateHelperService {
               investigationStatus: [],
               outcome: [],
               risk: [],
+              team: [],
+              followUpStatus: [],
               vaccine: [],
               vaccineStatus: [],
               dateRangeType: [],
@@ -90,6 +93,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
             eventVisualIDMask: undefined,
             options: {
               user: [],
+              deletedUser: [],
               eventCategory: [],
               addressType: []
             }
@@ -115,6 +119,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
               pregnancy: [],
               occupation: [],
               user: [],
+              deletedUser: [],
               documentType: [],
               addressType: []
             }
@@ -152,6 +157,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
               pregnancy: [],
               occupation: [],
               user: [],
+              deletedUser: [],
               documentType: [],
               addressType: []
             }
@@ -181,8 +187,10 @@ export class OutbreakAndOutbreakTemplateHelperService {
             options: {
               dailyFollowUpStatus: [],
               user: [],
+              deletedUser: [],
               team: [],
-              addressType: []
+              addressType: [],
+              followUpCreatedAs: []
             }
           })
         ])
@@ -308,6 +316,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
    */
   generateOutbreakAdvancedFilters(data: {
     options: {
+      createdOn: ILabelValuePairModel[],
       disease: ILabelValuePairModel[],
       country: ILabelValuePairModel[],
       geographicalLevel: ILabelValuePairModel[],
@@ -343,6 +352,13 @@ export class OutbreakAndOutbreakTemplateHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'disableModifyingLegacyQuestionnaire',
         label: 'LNG_OUTBREAK_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'allowCasesFollowUp',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_ALLOW_CASES_FOLLOW_UP',
         options: data.options.yesNo,
         sortable: true
       },
@@ -406,6 +422,13 @@ export class OutbreakAndOutbreakTemplateHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'generateFollowUpsDateOfLastContact',
         label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsWhenCreatingCases',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CASES',
         options: data.options.yesNo,
         sortable: true
       },
@@ -527,6 +550,13 @@ export class OutbreakAndOutbreakTemplateHelperService {
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_ON',
+        options: data.options.createdOn,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'createdAt',
         label: 'LNG_OUTBREAK_FIELD_LABEL_CREATED_AT',
@@ -572,6 +602,7 @@ export class OutbreakAndOutbreakTemplateHelperService {
    */
   generateOutbreakTemplateAdvancedFilters(data: {
     options: {
+      createdOn: ILabelValuePairModel[],
       disease: ILabelValuePairModel[],
       followUpGenerationTeamAssignmentAlgorithm: ILabelValuePairModel[],
       yesNo: ILabelValuePairModel[],
@@ -614,6 +645,13 @@ export class OutbreakAndOutbreakTemplateHelperService {
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'allowCasesFollowUp',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_ALLOW_CASES_FOLLOW_UP',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'generateFollowUpsTeamAssignmentAlgorithm',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
@@ -638,6 +676,13 @@ export class OutbreakAndOutbreakTemplateHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'generateFollowUpsDateOfLastContact',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsWhenCreatingCases',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_WHEN_CREATING_CASES',
         options: data.options.yesNo,
         sortable: true
       },
@@ -721,6 +766,13 @@ export class OutbreakAndOutbreakTemplateHelperService {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'noDaysNewContacts',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_NEW_CONTACT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_CREATED_ON',
+        options: data.options.createdOn,
         sortable: true
       },
       {

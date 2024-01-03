@@ -21,7 +21,10 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { TransmissionChainFilters } from '../../classes/filter';
+import {
+  TransmissionChainFilters,
+  TransmissionChainFiltersFrom
+} from '../../classes/filter';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -46,7 +49,6 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
 
   // constants
   WorldMapMarkerLayer = WorldMapMarkerLayer;
-  TransmissionChainModel = TransmissionChainModel;
   Constants = Constants;
 
   // authenticated user
@@ -393,7 +395,11 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
 
       // add custom filters
       if (!_.isEmpty(this.filters)) {
-        this.filters.attachConditionsToRequestQueryBuilder(qb);
+        this.filters.attachConditionsToRequestQueryBuilder(
+          qb, {
+            from: TransmissionChainFiltersFrom.CASE_COUNT
+          }
+        );
       }
 
       // retrieve addresses

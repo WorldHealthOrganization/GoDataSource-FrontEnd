@@ -148,6 +148,11 @@ import {
 } from './resolvers/data/sync-package-status-step-backup-restore.resolver';
 import { OutbreakAndOutbreakTemplateHelperService } from './helper/outbreak-and-outbreak-template-helper.service';
 import { PersonAndRelatedHelperService } from './helper/person-and-related-helper.service';
+import { CreatedOnResolver } from './resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from './resolvers/data/deleted-user.resolver';
+import { ClientApplicationDataService } from './data/client-application.data.service';
+import { ClientApplicationHelperService } from './helper/client-application-helper.service';
+import { FollowUpCreatedAsDataResolver } from './resolvers/data/follow-up-created-as.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -172,8 +177,10 @@ export const services: any[] = [
   CotNodeShapeDataResolver,
   CotSnapshotStatusDataResolver,
   CountryDataResolver,
+  CreatedOnResolver,
   DailyFollowUpStatusDataResolver,
   DateRangeCenterDataResolver,
+  DeletedUserDataResolver,
   DiseaseDataResolver,
   DocumentTypeDataResolver,
   EpiCurveWeekTypesDataResolver,
@@ -242,9 +249,11 @@ export const services: any[] = [
   VaccineDataResolver,
   VaccineStatusDataResolver,
   VersionDataResolver,
+  FollowUpCreatedAsDataResolver,
 
   // data services
   AuthDataService,
+  ClientApplicationDataService,
   UserDataService,
   UserRoleDataService,
   OutbreakDataService,
@@ -293,6 +302,7 @@ export const services: any[] = [
 
   // helper services
   CacheService,
+  ClientApplicationHelperService,
   DialogV2Service,
   DomService,
   FormHelperService,

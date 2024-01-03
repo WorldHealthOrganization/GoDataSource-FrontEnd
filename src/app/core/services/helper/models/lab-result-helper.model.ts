@@ -18,7 +18,6 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { LabResultDataService } from '../../data/lab-result.data.service';
 import { catchError, map } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
-import { IResolverV2ResponseModel } from '../../resolvers/data/models/resolver-response.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
 import { IBasicCount } from '../../../models/basic-count.interface';
@@ -402,6 +401,7 @@ export class LabResultHelperModel {
     selectedOutbreak: OutbreakModel,
     data: {
       options: {
+        createdOn: ILabelValuePairModel[],
         labName: ILabelValuePairModel[],
         labSampleType: ILabelValuePairModel[],
         labTestType: ILabelValuePairModel[],
@@ -728,6 +728,14 @@ export class LabResultHelperModel {
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
         visibleMandatoryIf: () => true,
         yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        options: data.options.createdOn,
         sortable: true
       },
       {
@@ -1154,15 +1162,16 @@ export class LabResultHelperModel {
   retrieveTableColumns(
     selectedOutbreak: OutbreakModel,
     definitions: {
-      user: IResolverV2ResponseModel<UserModel>,
       options: {
+        createdOn: ILabelValuePairModel[],
         labName: ILabelValuePairModel[],
         labSampleType: ILabelValuePairModel[],
         labTestType: ILabelValuePairModel[],
         labTestResult: ILabelValuePairModel[],
         labResultProgress: ILabelValuePairModel[],
         labSequenceLaboratory: ILabelValuePairModel[],
-        labSequenceResult: ILabelValuePairModel[]
+        labSequenceResult: ILabelValuePairModel[],
+        user: ILabelValuePairModel[]
       }
     }
   ): IV2ColumnToVisibleMandatoryConf[] {
@@ -1509,23 +1518,38 @@ export class LabResultHelperModel {
         visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: (item) => item.createdBy && definitions.user.map[item.createdBy] ?
-            definitions.user.map[item.createdBy].name :
-            ''
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: definitions.user.options,
+          options: definitions.options.user,
           includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.parent.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.parent.authUser) && !data.createdByUser?.deleted ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.parent.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.options.createdOn,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -1546,20 +1570,18 @@ export class LabResultHelperModel {
         visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: (item) => item.updatedBy && definitions.user.map[item.updatedBy] ?
-            definitions.user.map[item.updatedBy].name :
-            ''
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: definitions.user.options,
+          options: definitions.options.user,
           includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.parent.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.parent.authUser) && !data.updatedByUser?.deleted ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }
@@ -1604,6 +1626,7 @@ export class LabResultHelperModel {
     data: {
       labResultsTemplate: () => QuestionModel[],
       options: {
+        createdOn: ILabelValuePairModel[],
         labName: ILabelValuePairModel[],
         labSampleType: ILabelValuePairModel[],
         labTestType: ILabelValuePairModel[],
@@ -1854,6 +1877,14 @@ export class LabResultHelperModel {
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        options: data.options.createdOn,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'createdAt',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
@@ -1972,6 +2003,7 @@ export class LabResultHelperModel {
       'deleted',
       'deletedAt',
       'createdBy',
+      'createdOn',
       'createdAt',
       'createdByUser',
       'updatedBy',

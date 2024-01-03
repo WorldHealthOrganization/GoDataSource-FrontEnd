@@ -53,7 +53,8 @@ export class RequestInterceptor implements HttpInterceptor {
   private getHeaders() {
     const headers = {
       'Content-Type': 'application/json',
-      'Transaction-Id': uuid()
+      'Transaction-Id': uuid(),
+      'platform': 'WEB'
     };
 
     // set Auth Header if existing

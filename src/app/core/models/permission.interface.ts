@@ -920,6 +920,36 @@ export interface IPermissionDashboard {
   canViewCasesNotIdentifiedThroughContactsDashlet(user: UserModel): boolean;
 
   /**
+   * Has export permission ?
+   */
+  canExportCaseFollowUpSuccessRateReport(user: UserModel): boolean;
+
+  /**
+   * Has view permission ?
+   */
+  canViewCasesFromFollowUpsDashlet(user: UserModel): boolean;
+
+  /**
+   * Has view permission ?
+   */
+  canViewCasesLostToFollowUpsDashlet(user: UserModel): boolean;
+
+  /**
+   * Has view permission ?
+   */
+  canViewCasesNotSeenInXDaysDashlet(user: UserModel): boolean;
+
+  /**
+   * Has view permission ?
+   */
+  canViewCasesSeenDashlet(user: UserModel): boolean;
+
+  /**
+   * Has view permission ?
+   */
+  canViewCasesWithSuccessfulFollowUpsDashlet(user: UserModel): boolean;
+
+  /**
      * Has view permission ?
      */
   canViewContactsPerCaseMeanDashlet(user: UserModel): boolean;

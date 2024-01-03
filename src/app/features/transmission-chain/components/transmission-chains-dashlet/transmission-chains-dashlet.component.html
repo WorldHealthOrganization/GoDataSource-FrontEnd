@@ -27,7 +27,7 @@
 
       <!-- Snapshots -->
       <app-form-select-single-v2
-        *ngIf="showSnapshots"
+        *ngIf="showSnapshots && !sizeOfChainsFilter"
         name="snapshotsList"
         [(ngModel)]="selectedSnapshot"
         [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
@@ -39,7 +39,7 @@
 
       <!-- Create / Load snapshot -->
       <button
-        *ngIf="showSnapshots"
+        *ngIf="showSnapshots && !sizeOfChainsFilter"
         type="button"
         mat-flat-button
         color="primary"
@@ -50,7 +50,7 @@
 
       <!-- Refresh chain -->
       <button
-        *ngIf="showSnapshots"
+        *ngIf="showSnapshots && !sizeOfChainsFilter"
         type="button"
         mat-flat-button
         color="primary"
@@ -64,7 +64,7 @@
         type="button"
         mat-flat-button
         color="secondary"
-        [disabled]="!selectedSnapshot || selectedSnapshot === selectedSnapshotCreateKey"
+        [disabled]="!sizeOfChainsFilter && (!selectedSnapshot || selectedSnapshot === selectedSnapshotCreateKey)"
         (click)="showAdvancedFilters()">
         <mat-icon>filter_alt</mat-icon>
         {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_FILTER' | translate}}
@@ -76,7 +76,7 @@
         type="button"
         mat-flat-button
         color="secondary"
-        [disabled]="!selectedSnapshot || selectedSnapshot === selectedSnapshotCreateKey"
+        [disabled]="!sizeOfChainsFilter && (!selectedSnapshot || selectedSnapshot === selectedSnapshotCreateKey)"
         (click)="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? exportGeospatialMap() : exportChainsOfTransmission()">
         <mat-icon>auto_awesome_motion</mat-icon>
         {{'LNG_COMMON_LABEL_EXPORT' | translate}}
@@ -570,16 +570,10 @@
     </div>
   </div>
 
-  <div *ngIf="sizeOfChainsFilter && !chainGroup &&
-          mustLoadChain &&
-          selectedChainPageIndex === null">
-    <div>
-      {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_SIZE' | translate}} {{sizeOfChainsFilter}}
-    </div>
-  </div>
   <div *ngIf="personId && !chainGroup &&
           mustLoadChain &&
-          selectedChainPageIndex === null">
+          selectedChainPageIndex === null"
+          class="gd-cot-message">
     <div>
       {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON' | translate}} {{personName}}
     </div>

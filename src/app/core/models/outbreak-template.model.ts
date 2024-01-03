@@ -33,6 +33,7 @@ export class OutbreakTemplateModel
   caseInvestigationTemplate: QuestionModel[];
   contactInvestigationTemplate: QuestionModel[];
   eventInvestigationTemplate: QuestionModel[];
+  caseFollowUpTemplate: QuestionModel[];
   contactFollowUpTemplate: QuestionModel[];
   labResultsTemplate: QuestionModel[];
   isContactLabResultsActive: boolean;
@@ -46,6 +47,17 @@ export class OutbreakTemplateModel
   generateFollowUpsTeamAssignmentAlgorithm: string;
   generateFollowUpsDateOfLastContact: boolean;
   generateFollowUpsWhenCreatingContacts: boolean;
+
+  // case follow-ups
+  allowCasesFollowUp: boolean;
+  periodOfFollowupCases: number;
+  frequencyOfFollowUpPerDayCases: number;
+  intervalOfFollowUpCases: string;
+  generateFollowUpsOverwriteExistingCases: boolean;
+  generateFollowUpsKeepTeamAssignmentCases: boolean;
+  generateFollowUpsTeamAssignmentAlgorithmCases: string;
+  generateFollowUpsDateOfOnset: boolean;
+  generateFollowUpsWhenCreatingCases: boolean;
 
   allowedRefDataItems: ITreeEditorDataValue;
   visibleAndMandatoryFields: IVisibleMandatoryDataValue;
@@ -65,6 +77,7 @@ export class OutbreakTemplateModel
   static canModifyCaseQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE) : false; }
   static canModifyContactQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_QUESTIONNAIRE) : false; }
   static canModifyEventQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_EVENT_QUESTIONNAIRE) : false; }
+  static canModifyCaseFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_FOLLOW_UP_QUESTIONNAIRE) : false; }
   static canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE) : false; }
   static canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE) : false; }
 
@@ -102,12 +115,25 @@ export class OutbreakTemplateModel
     this.applyGeographicRestrictions = _.get(data, 'applyGeographicRestrictions', false);
     this.checkLastContactDateAgainstDateOnSet = _.get(data, 'checkLastContactDateAgainstDateOnSet', false);
     this.disableModifyingLegacyQuestionnaire = _.get(data, 'disableModifyingLegacyQuestionnaire', false);
+    this.allowCasesFollowUp = _.get(data, 'allowCasesFollowUp', false);
     this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
     this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
     this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
     this.generateFollowUpsDateOfLastContact = _.get(data, 'generateFollowUpsDateOfLastContact', false);
+    this.generateFollowUpsWhenCreatingCases = _.get(data, 'generateFollowUpsWhenCreatingCases', false);
     this.generateFollowUpsWhenCreatingContacts = _.get(data, 'generateFollowUpsWhenCreatingContacts', false);
     this.allowedRefDataItems = _.get(data, 'allowedRefDataItems');
+
+    // case follow-ups
+    this.allowCasesFollowUp = _.get(data, 'allowCasesFollowUp', false);
+    this.periodOfFollowupCases = _.get(data, 'periodOfFollowupCases');
+    this.frequencyOfFollowUpPerDayCases = _.get(data, 'frequencyOfFollowUpPerDayCases');
+    this.intervalOfFollowUpCases = _.get(data, 'intervalOfFollowUpCases');
+    this.generateFollowUpsOverwriteExistingCases = _.get(data, 'generateFollowUpsOverwriteExistingCases', false);
+    this.generateFollowUpsKeepTeamAssignmentCases = _.get(data, 'generateFollowUpsKeepTeamAssignmentCases', true);
+    this.generateFollowUpsTeamAssignmentAlgorithmCases = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithmCases', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
+    this.generateFollowUpsDateOfOnset = _.get(data, 'generateFollowUpsDateOfOnset', false);
+    this.generateFollowUpsWhenCreatingCases = _.get(data, 'generateFollowUpsWhenCreatingCases', false);
 
     // CASE INVESTIGATION TEMPLATE
     this.caseInvestigationTemplate = _.map(
@@ -124,6 +150,12 @@ export class OutbreakTemplateModel
     // EVENT TEMPLATE
     this.eventInvestigationTemplate = _.map(
       _.get(data, 'eventInvestigationTemplate', []),
+      (lData: any) => {
+        return new QuestionModel(lData);
+      });
+    // CASE FOLLOW_UP INVESTIGATION TEMPLATE
+    this.caseFollowUpTemplate = _.map(
+      _.get(data, 'caseFollowUpTemplate', []),
       (lData: any) => {
         return new QuestionModel(lData);
       });

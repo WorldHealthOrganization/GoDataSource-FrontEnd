@@ -43,7 +43,7 @@ export class ImportTeamDataComponent implements OnInit, OnDestroy {
     'userIds[]': true
   };
 
-  requiredDestinationFields = [
+  requiredDestinationFields: string[] = [
     'name',
     'userIds[]',
     'locationIds[]'

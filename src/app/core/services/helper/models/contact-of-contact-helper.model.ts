@@ -9,7 +9,6 @@ import { AgeModel } from '../../../models/age.model';
 import { Observable } from 'rxjs';
 import { TimerCache } from '../../../helperClasses/timer-cache';
 import { ContactsOfContactsDataService } from '../../data/contacts-of-contacts.data.service';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { UserModel } from '../../../models/user.model';
 import { DocumentModel } from '../../../models/document.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -22,6 +21,7 @@ import { ReferenceDataEntryModel } from '../../../models/reference-data.model';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
 import { LocalizationHelper, Moment } from '../../../helperClasses/localization-helper';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/forms-v2/validators/general-async-validator.directive';
 
 export class ContactOfContactHelperModel {
   // data
@@ -55,6 +55,7 @@ export class ContactOfContactHelperModel {
         pregnancy: ILabelValuePairModel[],
         occupation: ILabelValuePairModel[],
         user: ILabelValuePairModel[],
+        deletedUser: ILabelValuePairModel[],
         documentType: ILabelValuePairModel[],
         addressType: ILabelValuePairModel[]
       }
@@ -310,7 +311,7 @@ export class ContactOfContactHelperModel {
                 name: 'responsibleUserId',
                 placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
                 description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-                options: data.options.user,
+                options: data.options.user.concat(data.options.deletedUser),
                 value: {
                   get: () => data.itemData.responsibleUserId,
                   set: (value) => {
@@ -582,6 +583,7 @@ export class ContactOfContactHelperModel {
     selectedOutbreak: OutbreakModel,
     data: {
       options: {
+        createdOn: ILabelValuePairModel[],
         occupation: ILabelValuePairModel[],
         user: ILabelValuePairModel[],
         yesNoAll: ILabelValuePairModel[],
@@ -948,6 +950,14 @@ export class ContactOfContactHelperModel {
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DELETED',
         visibleMandatoryIf: () => true,
         yesNoAllOptions: data.options.yesNoAll,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        options: data.options.createdOn,
         sortable: true
       },
       {

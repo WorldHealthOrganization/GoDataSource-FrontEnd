@@ -13,7 +13,6 @@ import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-import-case-data',
@@ -65,7 +64,9 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
     'burialLocationId': true
   };
 
-  requiredDestinationFields;
+  requiredDestinationFields: string[] = [
+    'firstName'
+  ];
 
   formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
@@ -78,8 +79,7 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
     private router: Router,
     private outbreakDataService: OutbreakDataService,
     private authDataService: AuthDataService,
-    private redirectService: RedirectService,
-    private personAndRelatedHelperService: PersonAndRelatedHelperService
+    private redirectService: RedirectService
   ) {}
 
   /**
@@ -96,21 +96,6 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         if (selectedOutbreak && selectedOutbreak.id) {
           // outbreak
           this.selectedOutbreak = selectedOutbreak;
-
-          // set default required fields
-          this.requiredDestinationFields = [
-            'firstName',
-            'dateOfReporting',
-            'classification'
-          ];
-
-          // is dateOfOnset required for this outbreak ?
-          if (
-            this.selectedOutbreak?.visibleAndMandatoryFields &&
-            this.selectedOutbreak.visibleAndMandatoryFields[this.personAndRelatedHelperService.case.visibleMandatoryKey]?.dateOfOnset?.mandatory
-          ) {
-            this.requiredDestinationFields.push('dateOfOnset');
-          }
 
           // set URLs
           this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;

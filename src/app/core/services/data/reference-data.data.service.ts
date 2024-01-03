@@ -8,8 +8,8 @@ import * as _ from 'lodash';
 import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
 import { map, mergeMap, share, tap } from 'rxjs/operators';
 import { I18nService } from '../helper/i18n.service';
-import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/forms-v2/validators/general-async-validator.directive';
 
 @Injectable()
 export class ReferenceDataDataService {
