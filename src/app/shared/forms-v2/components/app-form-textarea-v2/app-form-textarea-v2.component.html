@@ -21,14 +21,21 @@
       [required]="required"></textarea>
 
     <!-- Right - Icon buttons -->
-    <button
+    <ng-container
       *ngFor="let iconB of suffixIconButtons"
-      tabindex="-1"
-      type="button"
-      mat-icon-button
-      matSuffix
-      [matTooltip]="iconB.tooltip | translate"
-      (click)="iconButtonClick($event, iconB)"><mat-icon>{{iconB.icon}}</mat-icon></button>
+      matSuffix>
+      <span
+        *ngIf="!iconB.visible || iconB.visible(this)"
+        (click)="$event.stopPropagation()">
+        <button
+          tabindex="-1"
+          type="button"
+          mat-icon-button
+          [matTooltip]="iconB.tooltip | translate"
+          [disabled]="iconB.disabled && iconB.disabled(this)"
+          (click)="iconB.clickAction ? iconB.clickAction(this) : undefined"><mat-icon>{{iconB.icon}}</mat-icon></button>
+      </span>
+    </ng-container>
 
     <!-- Errors -->
     <mat-error

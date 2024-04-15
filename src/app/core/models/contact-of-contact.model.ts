@@ -5,7 +5,6 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import { UserModel } from './user.model';
@@ -22,26 +21,29 @@ import {
   IPermissionRelatedRelationship,
   IPermissionRestorable
 } from './permission.interface';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { SafeHtml } from '@angular/platform-browser';
-import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
-import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
-import { ReferenceDataEntryModel } from './reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
+import { IAnswerData } from './question.model';
+import { Moment } from '../helperClasses/localization-helper';
+
+export interface IContactOfContactIsolated {
+  id: string,
+  firstName: string,
+  middleName: string,
+  lastName: string
+}
 
 export class ContactOfContactModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionExportable,
-        IPermissionImportable,
-        IPermissionBasicBulk,
-        IPermissionRestorable,
-        IPermissionRelatedRelationship,
-        IPermissionMovement,
-        IPermissionChronology,
-        IPermissionContactOfContacts {
+    IPermissionBasic,
+    IPermissionExportable,
+    IPermissionImportable,
+    IPermissionBasicBulk,
+    IPermissionRestorable,
+    IPermissionRelatedRelationship,
+    IPermissionMovement,
+    IPermissionChronology,
+    IPermissionContactOfContacts {
   id: string;
   firstName: string;
   middleName: string;
@@ -57,10 +59,32 @@ export class ContactOfContactModel
   dateOfLastContact: string;
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
-  dateBecomeContact: string;
   visualId: string;
+  wasCase: boolean;
+  dateBecomeCase: string | Moment;
+  wasContact: boolean;
+  dateBecomeContact: string | Moment;
+  wasContactOfContact: boolean;
+  dateBecomeContactOfContact: string | Moment;
 
+  questionnaireAnswersCase: {
+    [variable: string]: IAnswerData[];
+  };
+  questionnaireAnswersContact: {
+    [variable: string]: IAnswerData[];
+  };
+
+  numberOfContacts: number;
   numberOfExposures: number;
+
+  // these properties were added to handle the legacy follow-ups (if the contact of a contact was a contact)
+  followUp: {
+    originalStartDate: string,
+    startDate: string,
+    endDate: string,
+    status: string
+  };
+  followUpTeamId: string;
 
   dob: string | Moment;
   age: AgeModel;
@@ -78,159 +102,12 @@ export class ContactOfContactModel
 
   // used by ui
   uiStatusForms: SafeHtml;
+  uiDocuments: string;
+  uiVaccines: string;
 
   /**
-   * Advanced filters
+   * Static Permissions - IPermissionBasic
    */
-  static generateAdvancedFilters(data: {
-    authUser: UserModel,
-    options: {
-      occupation: ILabelValuePairModel[],
-      user: ILabelValuePairModel[]
-    }
-  }): V2AdvancedFilter[] {
-    // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
-      // Contact of contact
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'firstName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'middleName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'lastName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'occupation',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
-        options: data.options.occupation,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_AGE,
-        field: 'age',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfReporting',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dob',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'visualId',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'addresses',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
-        field: 'addresses',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfLastContact',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfExposures',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        sortable: true
-      }
-    ];
-
-    // allowed to filter by responsible user ?
-    if (UserModel.canListForFilters(data.authUser)) {
-      advancedFilters.push({
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user
-      });
-    }
-
-    // finished
-    return advancedFilters;
-  }
-
-  /**
-   * Retrieve statuses forms
-   */
-  static getStatusForms(
-    info: {
-      // required
-      item: ContactOfContactModel,
-      translateService: TranslateService,
-      risk: IResolverV2ResponseModel<ReferenceDataEntryModel>
-    }
-  ): V2ColumnStatusForm[] {
-    // construct list of forms that we need to display
-    const forms: V2ColumnStatusForm[] = [];
-
-    // risk
-    if (
-      info.item.riskLevel &&
-      info.risk.map[info.item.riskLevel]
-    ) {
-      forms.push({
-        type: IV2ColumnStatusFormType.TRIANGLE,
-        color: info.risk.map[info.item.riskLevel].getColorCode(),
-        tooltip: info.translateService.instant(info.item.riskLevel)
-      });
-    }
-
-    // finished
-    return forms;
-  }
-
-  /**
-   * Return contact id mask with data replaced
-   */
-  static generateContactOfContactIDMask(contactOfContactIdMask: string): string {
-    // validate
-    if (_.isEmpty(contactOfContactIdMask)) {
-      return '';
-    }
-
-    // !!!!!!!!!!!!!!!
-    // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-    // !!!!!!!!!!!!!!!
-    return contactOfContactIdMask
-      .replace(/YYYY/g, moment().format('YYYY'))
-      .replace(/\*/g, '');
-  }
-
-  /**
-     * Static Permissions - IPermissionBasic
-     */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE) : false); }
@@ -238,36 +115,36 @@ export class ContactOfContactModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_IMPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionBasicBulk
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
   static canBulkCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE) : false); }
   static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY) : false); }
-  static canBulkDelete(): boolean { return false; }
-  static canBulkRestore(): boolean { return false; }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedRelationship
-     */
-  static canListRelationshipContacts(): boolean { return false; }
-  static canViewRelationshipContacts(): boolean { return false; }
+   * Static Permissions - IPermissionRelatedRelationship
+   */
+  static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_RELATIONSHIP_CONTACTS) : false); }
+  static canViewRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_CONTACTS) : false); }
   static canCreateRelationshipContacts(): boolean { return false; }
-  static canModifyRelationshipContacts(): boolean { return false; }
-  static canDeleteRelationshipContacts(): boolean { return false; }
+  static canModifyRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_MODIFY_RELATIONSHIP_CONTACTS) : false); }
+  static canDeleteRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE_RELATIONSHIP_CONTACTS) : false); }
   static canListRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_RELATIONSHIP_EXPOSURES) : false); }
   static canViewRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_RELATIONSHIP_EXPOSURES) : false); }
   static canCreateRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CREATE_RELATIONSHIP_EXPOSURES) : false); }
@@ -278,29 +155,40 @@ export class ContactOfContactModel
   static canExportRelationships(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_RELATIONSHIPS) : false); }
   static canShareRelationship(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_SHARE_RELATIONSHIPS) : false); }
   static canChangeSource(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CHANGE_SOURCE_RELATIONSHIP) : false); }
-  static canBulkDeleteRelationshipContacts(): boolean { return false; }
+  static canBulkDeleteRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_DELETE_RELATIONSHIP_CONTACTS) : false); }
   static canBulkDeleteRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_BULK_DELETE_RELATIONSHIP_EXPOSURES) : false); }
 
   /**
-     * Static Permissions - IPermissionMovement
-     */
+   * Static Permissions - IPermissionMovement
+   */
   static canViewMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_MOVEMENT_MAP) : false); }
   static canExportMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_MOVEMENT_MAP) : false); }
 
   /**
-     * Static Permissions - IPermissionChronology
-     */
+   * Static Permissions - IPermissionChronology
+   */
   static canViewChronologyChart(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART) : false); }
 
   /**
-     * Static Permissions - IPermissionContactOfContacts
-     */
+   * Static Permissions - IPermissionContactOfContacts
+   */
   static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_GENERATE_VISUAL_ID) : false); }
   static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_DOSSIER) : false); }
+  static canConvertToContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_CONVERT_TO_CONTACT) : false); }
 
   /**
-     * Constructor
-     */
+   * Static Permissions - IPermissionRelatedLabResult
+   */
+  static canViewLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_VIEW_LAB_RESULT) : false); }
+  static canListLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_LIST_LAB_RESULT) : false); }
+  static canModifyLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_MODIFY_LAB_RESULT) : false); }
+  static canDeleteLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_DELETE_LAB_RESULT) : false); }
+  static canRestoreLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_RESTORE_LAB_RESULT) : false); }
+  static canExportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CONTACT_OF_CONTACT_EXPORT_LAB_RESULT) : false); }
+
+  /**
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 
@@ -343,7 +231,11 @@ export class ContactOfContactModel
       }
     );
 
+    this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
+
+    this.followUp = _.get(data, 'followUp');
+    this.followUpTeamId = _.get(data, 'followUpTeamId');
 
     // vaccines received
     const vaccinesReceived = _.get(data, 'vaccinesReceived');
@@ -357,8 +249,17 @@ export class ContactOfContactModel
     this.dateOfReporting = _.get(data, 'dateOfReporting');
     this.dateOfLastContact = _.get(data, 'dateOfLastContact');
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
-    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
     this.visualId = _.get(data, 'visualId', '');
+
+    this.wasCase = _.get(data, 'wasCase');
+    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
+    this.wasContact = _.get(data, 'wasContact');
+    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+    this.wasContactOfContact = _.get(data, 'wasContactOfContact');
+    this.dateBecomeContactOfContact = _.get(data, 'dateBecomeContactOfContact');
+
+    this.questionnaireAnswersCase = _.get(data, 'questionnaireAnswersCase', {});
+    this.questionnaireAnswersContact = _.get(data, 'questionnaireAnswersContact', {});
 
     this.inconsistencies = _.get(data, 'inconsistencies', []);
     _.each(this.inconsistencies, (inconsistency, index) => {
@@ -403,8 +304,8 @@ export class ContactOfContactModel
      */
   canBulkCreate(user: UserModel): boolean { return ContactOfContactModel.canBulkCreate(user); }
   canBulkModify(user: UserModel): boolean { return ContactOfContactModel.canBulkModify(user); }
-  canBulkDelete(): boolean { return ContactOfContactModel.canBulkDelete(); }
-  canBulkRestore(): boolean { return ContactOfContactModel.canBulkRestore(); }
+  canBulkDelete(user: UserModel): boolean { return ContactOfContactModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return ContactOfContactModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionRestorable
@@ -414,11 +315,11 @@ export class ContactOfContactModel
   /**
      * Permissions - IPermissionRelatedRelationship
      */
-  canListRelationshipContacts(): boolean { return ContactOfContactModel.canListRelationshipContacts(); }
-  canViewRelationshipContacts(): boolean { return ContactOfContactModel.canViewRelationshipContacts(); }
+  canListRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canListRelationshipContacts(user); }
+  canViewRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canViewRelationshipContacts(user); }
   canCreateRelationshipContacts(): boolean { return ContactOfContactModel.canCreateRelationshipContacts(); }
-  canModifyRelationshipContacts(): boolean { return ContactOfContactModel.canModifyRelationshipContacts(); }
-  canDeleteRelationshipContacts(): boolean { return ContactOfContactModel.canDeleteRelationshipContacts(); }
+  canModifyRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canModifyRelationshipContacts(user); }
+  canDeleteRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canDeleteRelationshipContacts(user); }
   canListRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canListRelationshipExposures(user); }
   canViewRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canViewRelationshipExposures(user); }
   canCreateRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canCreateRelationshipExposures(user); }
@@ -429,7 +330,7 @@ export class ContactOfContactModel
   canExportRelationships(user: UserModel): boolean { return ContactOfContactModel.canExportRelationships(user); }
   canShareRelationship(user: UserModel): boolean { return ContactOfContactModel.canShareRelationship(user); }
   canChangeSource(user: UserModel): boolean { return ContactOfContactModel.canChangeSource(user); }
-  canBulkDeleteRelationshipContacts(): boolean { return ContactOfContactModel.canBulkDeleteRelationshipContacts(); }
+  canBulkDeleteRelationshipContacts(user: UserModel): boolean { return ContactOfContactModel.canBulkDeleteRelationshipContacts(user); }
   canBulkDeleteRelationshipExposures(user: UserModel): boolean { return ContactOfContactModel.canBulkDeleteRelationshipExposures(user); }
 
   /**
@@ -448,6 +349,17 @@ export class ContactOfContactModel
      */
   canGenerateVisualId(user: UserModel): boolean { return ContactOfContactModel.canGenerateVisualId(user); }
   canExportDossier(user: UserModel): boolean { return ContactOfContactModel.canExportDossier(user); }
+  canConvertToContact(user: UserModel): boolean { return ContactOfContactModel.canConvertToContact(user); }
+
+  /**
+   * Permissions - IPermissionRelatedLabResult
+   */
+  canViewLabResult(user: UserModel): boolean { return ContactOfContactModel.canViewLabResult(user); }
+  canListLabResult(user: UserModel): boolean { return ContactOfContactModel.canListLabResult(user); }
+  canModifyLabResult(user: UserModel): boolean { return ContactOfContactModel.canModifyLabResult(user); }
+  canDeleteLabResult(user: UserModel): boolean { return ContactOfContactModel.canDeleteLabResult(user); }
+  canRestoreLabResult(user: UserModel): boolean { return ContactOfContactModel.canRestoreLabResult(user); }
+  canExportLabResult(user: UserModel): boolean { return ContactOfContactModel.canExportLabResult(user); }
 
   /**
    * Contact Of Contact Name
@@ -479,18 +391,24 @@ export class ContactOfContactModel
     // finished
     return mainAddress ?
       mainAddress :
-      new AddressModel();
+      new AddressModel({
+        typeId: AddressType.CURRENT_ADDRESS
+      });
   }
-
-  /**
-   * Get phone numbers
-   */
-  get phoneNumbers(): string[] {
-    return this.addresses.reduce((acc: string[], address) => {
-      if (!_.isEmpty(address.phoneNumber)) {
-        acc.push(address.phoneNumber);
+  set mainAddress(mainAddress: AddressModel) {
+    // find address
+    const existingAddressIndex = _.findIndex(this.addresses, { 'typeId': AddressType.CURRENT_ADDRESS });
+    if (existingAddressIndex < 0) {
+      // initialize
+      if (!this.addresses) {
+        this.addresses = [];
       }
-      return acc;
-    }, []);
+
+      // put main address at the top
+      this.addresses.splice(0, 0, mainAddress);
+    } else if (mainAddress !== this.addresses[existingAddressIndex]) {
+      // replace address
+      this.addresses.splice(existingAddressIndex, 1, mainAddress);
+    }
   }
 }

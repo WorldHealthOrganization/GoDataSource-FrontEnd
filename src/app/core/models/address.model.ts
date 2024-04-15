@@ -5,7 +5,7 @@ import {
   RequestFilterGenerator,
   RequestQueryBuilder
 } from '../helperClasses/request-query-builder';
-import { Moment, moment } from '../helperClasses/x-moment';
+import { Moment } from '../helperClasses/localization-helper';
 
 // addresses types
 export enum AddressType {
@@ -30,17 +30,34 @@ export class AddressModel {
   filterLocationIds: string[];
 
   /**
-     * Search for current address
-     * @param addresses
-     * @returns {AddressModel | undefined}
-     */
+   * Search for current address
+   */
   static getCurrentAddress(addresses: AddressModel[]): AddressModel {
     return _.find(addresses, { typeId: AddressType.CURRENT_ADDRESS });
   }
 
   /**
-     * Constructor
-     */
+   * Check if address is empty
+   */
+  static isNotEmpty(address: AddressModel): boolean {
+    return address && (
+      !!address.date ||
+      !!address.emailAddress ||
+      !!address.phoneNumber ||
+      !!address.locationId ||
+      !!address.city ||
+      !!address.postalCode ||
+      !!address.addressLine1 ||
+      !!address.emailAddress || (
+        typeof address.geoLocation?.lat === 'number' &&
+        typeof address.geoLocation?.lng === 'number'
+      )
+    );
+  }
+
+  /**
+   * Constructor
+   */
   constructor(
     data = null,
     locationsMap?: {
@@ -53,9 +70,12 @@ export class AddressModel {
     this.addressLine1 = _.get(data, 'addressLine1');
     this.locationId = _.get(data, 'locationId');
     this.location = locationsMap && this.locationId ?
-      locationsMap[this.locationId] :
-      new LocationModel(_.get(data, 'location'));
-    this.date = _.get(data, 'date', moment().toISOString());
+      locationsMap[this.locationId] : (
+        _.get(data, 'location') ?
+          new LocationModel(_.get(data, 'location')) :
+          undefined
+      );
+    this.date = _.get(data, 'date');
     this.geoLocation = _.get(data, 'geoLocation', {});
     this.geoLocationAccurate = _.get(data, 'geoLocationAccurate', false);
     this.phoneNumber = _.get(data, 'phoneNumber');
@@ -67,7 +87,7 @@ export class AddressModel {
     let fullAddress = _.isEmpty(this.addressLine1) ? '' : this.addressLine1;
     fullAddress += _.isEmpty(this.city) ? '' : (
       (_.isEmpty(fullAddress) ? '' : ', ') +
-            this.city
+      this.city
     );
 
     // finished
@@ -75,8 +95,8 @@ export class AddressModel {
   }
 
   /**
-     * Create query builder that will search an address
-     */
+   * Create query builder that will search an address
+   */
   static buildSearchFilter(
     address: string,
     property: string,
@@ -91,7 +111,7 @@ export class AddressModel {
     const matches: string[] = address.match(/\w+/gi);
     if (
       !matches ||
-            matches.length < 1
+      matches.length < 1
     ) {
       return null;
     }
@@ -194,8 +214,8 @@ export class AddressModel {
   }
 
   /**
-     * Create query builder that will filter an address
-     */
+   * Create query builder that will filter an address
+   */
   static buildAddressFilter(
     property: string,
     isArray: boolean,
@@ -203,9 +223,6 @@ export class AddressModel {
     addressParentLocationIds: string[],
     useLike: boolean = false
   ): RequestQueryBuilder {
-    // initialize query builder
-    const qb = new RequestQueryBuilder();
-
     // create a query that collects the address inputs
     const query: { [key: string]: {} } = {};
 
@@ -344,6 +361,7 @@ export class AddressModel {
     }
 
     // check if there are conditions to add
+    const qb = new RequestQueryBuilder();
     if (Object.keys(query).length > 0) {
       // add the conditions for the current address only
       if (isArray) {
@@ -351,13 +369,27 @@ export class AddressModel {
         query.typeId = AddressType.CURRENT_ADDRESS;
 
         // add the conditions
+        // IMPORTANT: and => and => and => is required to make it unique, so it doesn't interfere with advanced by address filters
         qb.filter.where({
-          [property]: {
-            elemMatch: query
-          }
+          and: [{
+            and: [{
+              and: [{
+                [property]: {
+                  elemMatch: query
+                }
+              }]
+            }]
+          }]
         });
       } else {
-        qb.filter.where(query);
+        // IMPORTANT: and => and => and => is required to make it unique, so it doesn't interfere with advanced by address filters
+        qb.filter.where({
+          and: [{
+            and: [{
+              and: [query]
+            }]
+          }]
+        });
       }
     }
 
@@ -366,8 +398,8 @@ export class AddressModel {
   }
 
   /**
-     * Create query builder that will search for a phone number
-     */
+   * Create query builder that will search for a phone number
+   */
   static buildPhoneSearchFilter(
     phoneNumber: string,
     property: string,
@@ -420,8 +452,8 @@ export class AddressModel {
   }
 
   /**
-     * Clone class
-     */
+   * Clone class
+   */
   sanitize(): Object {
     // create clone
     const address = _.cloneDeep(this);

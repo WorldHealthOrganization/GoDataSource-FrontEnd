@@ -1,8 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { Observable, throwError } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -13,7 +11,10 @@ import { PasswordChangeModel } from '../../../../core/models/password-change.mod
 import { catchError } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-change-password',
@@ -27,22 +28,24 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
    * Constructor
    */
   constructor(
-    protected userDataService: UserDataService,
-    protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected userDataService: UserDataService,
     protected dialogV2Service: DialogV2Service,
-    protected router: Router,
-    redirectService: RedirectService,
-    activatedRoute: ActivatedRoute,
-    renderer2: Renderer2
+    protected router: Router
   ) {
     // parent
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // display you must change password ?
@@ -123,6 +126,11 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
       action: null
     });
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs

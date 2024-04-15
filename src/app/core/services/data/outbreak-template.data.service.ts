@@ -6,7 +6,7 @@ import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { OutbreakTemplateModel } from '../../models/outbreak-template.model';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { map } from 'rxjs/operators';
-import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/forms-v2/validators/general-async-validator.directive';
 
 @Injectable()
 export class OutbreakTemplateDataService {
@@ -49,10 +49,8 @@ export class OutbreakTemplateDataService {
   }
 
   /**
-     * Create a new OutbreakTemplate
-     * @param {OutbreakTemplateModel} outbreakTemplate
-     * @returns {Observable<any>}
-     */
+   * Create a new Outbreak Template
+   */
   createOutbreakTemplate(outbreakTemplate: OutbreakTemplateModel, outbreakTemplateId?: string): Observable<any> {
     return this. http.post(`templates${outbreakTemplateId ? `?templateId=${outbreakTemplateId}` : ''}`, outbreakTemplate);
   }

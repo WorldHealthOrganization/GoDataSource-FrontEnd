@@ -28,13 +28,12 @@
 
     <!-- Search -->
     <app-form-input-v2
-      *ngIf="renderMode !== RenderMode.SMALL"
+      *ngIf="renderMode !== RenderMode.SMALL && selectedOutbreak?.id"
       placeholder="LNG_COMMON_LABEL_SEARCH"
       [(ngModel)]="globalSearchValue"
       [suffixIconButtons]="globalSearchSuffixButtons"
       [neverFloatLabel]="true"
       tooltip="LNG_GLOBAL_ENTITY_SEARCH_ENTITY_ID_LABEL_VALUE_DESCRIPTION"
-      [disabled]="!selectedOutbreak?.id"
       (keyup.enter)="globalSearch()">
     </app-form-input-v2>
 
@@ -95,10 +94,10 @@
 
       <!-- Search -->
       <button
+        *ngIf="selectedOutbreak?.id"
         type="button"
         mat-icon-button
         [matTooltip]="'LNG_COMMON_LABEL_SEARCH' | translate"
-        [disabled]="!selectedOutbreak?.id"
         (click)="mobileGlobalSearch()">
         <mat-icon>search</mat-icon>
       </button>
@@ -166,6 +165,12 @@
           {{ authUser?.email }}
         </div>
 
+        <!-- Timezone -->
+        <div
+          class="gd-top-right-user-menu-option-user-timezone">
+          {{ versionData?.timezone }}
+        </div>
+
       </div>
 
       <!-- Almighty divider -->
@@ -190,6 +195,13 @@
         *ngIf="authUser?.hasPermissions(expressionPermissions.savedImportMappings)"
         [ngTemplateOutlet]="menuOption"
         [ngTemplateOutletContext]="{ link: '/saved-import-mapping', label: 'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL' }"></ng-template>
+
+      <!-- Language -->
+      <div
+        mat-menu-item
+        (click)="changeLanguage()">
+        {{'LNG_LAYOUT_LANGUAGE_LABEL' | translate}}
+      </div>
 
       <!-- Almighty divider -->
       <mat-divider></mat-divider>

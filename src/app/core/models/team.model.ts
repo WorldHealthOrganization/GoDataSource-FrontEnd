@@ -23,7 +23,9 @@ export class TeamModel
    * Advanced filters
    */
   static generateAdvancedFilters(data: {
+    authUser: UserModel,
     options: {
+      createdOn: ILabelValuePairModel[],
       user: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
@@ -39,8 +41,44 @@ export class TeamModel
         field: 'userIds',
         label: 'LNG_TEAM_FIELD_LABEL_USERS',
         options: data.options.user
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_TEAM_FIELD_LABEL_CREATED_ON',
+        options: data.options.createdOn,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_TEAM_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_TEAM_FIELD_LABEL_UPDATED_AT',
+        sortable: true
       }
     ];
+
+    // allowed to filter by user ?
+    if (UserModel.canListForFilters(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_TEAM_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_TEAM_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
+      });
+    }
 
     // finished
     return advancedFilters;
@@ -54,6 +92,16 @@ export class TeamModel
   static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.TEAM_CREATE) : false; }
   static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.TEAM_MODIFY) : false; }
   static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.TEAM_DELETE) : false; }
+
+  /**
+   * Static Permissions - IPermissionExportable
+   */
+  static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.TEAM_EXPORT) : false; }
+
+  /**
+   * Static Permissions - IPermissionImportable
+   */
+  static canImport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.TEAM_IMPORT) : false; }
 
   /**
      * Static Permissions - IPermissionTeam
@@ -82,6 +130,16 @@ export class TeamModel
   canCreate(user: UserModel): boolean { return TeamModel.canCreate(user); }
   canModify(user: UserModel): boolean { return TeamModel.canModify(user); }
   canDelete(user: UserModel): boolean { return TeamModel.canDelete(user); }
+
+  /**
+   * Permissions - IPermissionExportable
+   */
+  canExport(user: UserModel): boolean { return TeamModel.canExport(user); }
+
+  /**
+   * Permissions - IPermissionImportable
+   */
+  canImport(user: UserModel): boolean { return TeamModel.canImport(user); }
 
   /**
      * Permissions - IPermissionTeam

@@ -2,11 +2,12 @@ import * as _ from 'lodash';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission.model';
 import { SecurityQuestionModel } from './securityQuestion.model';
 import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
-import { IPermissionBasic, IPermissionCloneable, IPermissionUser } from './permission.interface';
+import { IPermissionBasic, IPermissionBasicBulk, IPermissionCloneable, IPermissionUser } from './permission.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { TeamModel } from './team.model';
 import { BaseModel } from './base.model';
+import { Moment } from '../helperClasses/localization-helper';
 
 export enum UserSettings {
   // fields
@@ -18,6 +19,7 @@ export enum UserSettings {
   CONTACT_LAB_FIELDS = 'contactLabFields',
   CONTACT_FIELDS = 'contactFields',
   CONTACT_OF_CONTACT_FIELDS = 'contactOfContactFields',
+  CONTACT_OF_CONTACT_LAB_FIELDS = 'contactOfContactLabFields',
   EVENT_FIELDS = 'eventFields',
   EVENT_WITHOUT_RELATIONSHIPS_FIELDS = 'eventWithoutRelationshipsFields',
   LOCATION_FIELDS = 'locationFields',
@@ -31,12 +33,14 @@ export enum UserSettings {
   CONTACT_DAILY_FOLLOW_UP_FIELDS = 'contactDailyFollowUpFields',
   CASE_RELATED_DAILY_FOLLOW_UP_FIELDS = 'caseRelatedFollowUpFields',
   CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS = 'contactRelatedFollowUpFields',
+  CONTACT_OF_CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS = 'contactOfContactRelatedFollowUpFields',
   SYNC_UPSTREAM_SERVERS_FIELDS = 'syncUpstreamServersFields',
   SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
   SYNC_LOGS_FIELDS = 'syncLogsFields',
   REF_DATA_CAT_FIELDS = 'refDataCategoriesFields',
   REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
   SHARE_RELATIONSHIPS = 'shareRelationships',
+  ADD_RELATIONSHIPS = 'addRelationships',
   SWITCH_RELATIONSHIP_FIELDS = 'switchRelationshipsFields',
   USER_ROLE_FIELDS = 'userRoleFields',
   ENTITY_NOT_DUPLICATES_FIELDS = 'entityNotDuplicatesFields',
@@ -181,6 +185,7 @@ export class UserRoleModel
    */
   static generateAdvancedFilters(data: {
     options: {
+      createdOn: ILabelValuePairModel[],
       user: ILabelValuePairModel[],
       permission: PermissionModel[]
     }
@@ -225,6 +230,39 @@ export class UserRoleModel
         groupPartialTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION',
         groupOptionHiddenKey: 'hidden',
         defaultValues: PermissionModel.HIDDEN_PERMISSIONS
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_ON',
+        options: data.options.createdOn,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
       }
     ];
 
@@ -246,6 +284,16 @@ export class UserRoleModel
      * Static Permissions - IPermissionCloneable
      */
   static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_CREATE_CLONE) : false; }
+
+  /**
+   * Static Permissions - IPermissionExportable
+   */
+  static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_EXPORT) : false; }
+
+  /**
+   * Static Permissions - IPermissionImportable
+   */
+  static canImport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_IMPORT) : false; }
 
   /**
      * Constructor
@@ -279,12 +327,23 @@ export class UserRoleModel
      * Permissions - IPermissionCloneable
      */
   canClone(user: UserModel): boolean { return UserRoleModel.canClone(user); }
+
+  /**
+   * Permissions - IPermissionExportable
+   */
+  canExport(user: UserModel): boolean { return UserRoleModel.canExport(user); }
+
+  /**
+   * Permissions - IPermissionImportable
+   */
+  canImport(user: UserModel): boolean { return UserRoleModel.canImport(user); }
 }
 
 export class UserModel
   extends BaseModel
   implements
     IPermissionBasic,
+    IPermissionBasicBulk,
     IPermissionUser {
   id: string;
   firstName: string;
@@ -298,6 +357,7 @@ export class UserModel
   roleIds: string[];
   roles: UserRoleModel[] = [];
   disregardGeographicRestrictions: boolean;
+  lastLogin: string | Moment;
 
   // no saved filters to be used by this user ?
   dontCacheFilters: boolean;
@@ -350,10 +410,14 @@ export class UserModel
   static generateAdvancedFilters(data: {
     authUser: UserModel,
     options: {
+      createdOn: ILabelValuePairModel[],
       institution: ILabelValuePairModel[],
       userRole: ILabelValuePairModel[],
       outbreak: ILabelValuePairModel[],
       team: ILabelValuePairModel[],
+      language: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -381,12 +445,14 @@ export class UserModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'institutionName',
         label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME',
-        options: data.options.institution
+        options: data.options.institution,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.PHONE_NUMBER,
         field: `telephoneNumbers.${PhoneNumberType.PRIMARY_PHONE_NUMBER}`,
-        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
+        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS',
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -398,13 +464,74 @@ export class UserModel
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'activeOutbreakId',
         label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK',
-        options: data.options.outbreak
+        options: data.options.outbreak,
+        sortable: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'outbreakIds',
         label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS',
         options: data.options.outbreak
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'languageId',
+        label: 'LNG_USER_FIELD_LABEL_LANGUAGE',
+        options: data.options.language,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'disregardGeographicRestrictions',
+        label: 'LNG_USER_FIELD_LABEL_DISREGARD_GEOGRAPHIC_RESTRICTIONS',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'dontCacheFilters',
+        label: 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'lastLogin',
+        label: 'LNG_USER_FIELD_LABEL_LAST_LOGIN',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_ON',
+        options: data.options.createdOn,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_USER_FIELD_LABEL_UPDATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_USER_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_USER_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
       }
     ];
 
@@ -423,13 +550,31 @@ export class UserModel
   }
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Static Permissions - IPermissionBasic
+   */
   static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_VIEW) : false; }
   static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_LIST) : false; }
   static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_CREATE) : false; }
   static canModify(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_VIEW, PERMISSION.USER_MODIFY) : false; }
   static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_DELETE) : false; }
+
+  /**
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
+  static canBulkModify(): boolean { return false; }
+  static canBulkDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_BULK_DELETE) : false; }
+  static canBulkRestore(): boolean { return false; }
+
+  /**
+   * Static Permissions - IPermissionExportable
+   */
+  static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_EXPORT) : false; }
+
+  /**
+   * Static Permissions - IPermissionImportable
+   */
+  static canImport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_IMPORT) : false; }
 
   /**
      * Static Permissions - IPermissionUser
@@ -461,6 +606,7 @@ export class UserModel
     this.telephoneNumbers = _.get(data, 'telephoneNumbers', {});
     this.disregardGeographicRestrictions = _.get(data, 'disregardGeographicRestrictions', false);
     this.dontCacheFilters = _.get(data, 'dontCacheFilters', false);
+    this.lastLogin = _.get(data, 'lastLogin');
 
     // initialize settings
     _.each(data?.settings, (settings, property) => {
@@ -479,13 +625,31 @@ export class UserModel
   }
 
   /**
-     * Permissions - IPermissionBasic
-     */
+   * Permissions - IPermissionBasic
+   */
   canView(user: UserModel): boolean { return UserModel.canView(user); }
   canList(user: UserModel): boolean { return UserModel.canList(user); }
   canCreate(user: UserModel): boolean { return UserModel.canCreate(user); }
   canModify(user: UserModel): boolean { return UserModel.canModify(user); }
   canDelete(user: UserModel): boolean { return UserModel.canDelete(user); }
+
+  /**
+   * Permissions - IPermissionBasicBulk
+   */
+  canBulkCreate(): boolean { return UserModel.canBulkCreate(); }
+  canBulkModify(): boolean { return UserModel.canBulkModify(); }
+  canBulkDelete(user: UserModel): boolean { return UserModel.canBulkDelete(user); }
+  canBulkRestore(): boolean { return UserModel.canBulkRestore(); }
+
+  /**
+   * Permissions - IPermissionExportable
+   */
+  canExport(user: UserModel): boolean { return UserModel.canExport(user); }
+
+  /**
+   * Permissions - IPermissionImportable
+   */
+  canImport(user: UserModel): boolean { return UserModel.canImport(user); }
 
   /**
      * Permissions - IPermissionUser
@@ -563,5 +727,12 @@ export class UserModel
     const firstName = _.get(this, 'firstName', '');
     const lastName = _.get(this, 'lastName', '');
     return _.trim(`${firstName} ${lastName}`);
+  }
+
+  /**
+   * Get user name and email
+   */
+  get nameAndEmail(): string {
+    return `${this.name} ( ${this.email} )`;
   }
 }

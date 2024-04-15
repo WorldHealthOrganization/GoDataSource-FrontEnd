@@ -4,9 +4,9 @@ import { QuestionModel } from '../../../../core/models/question.model';
 import { Constants } from '../../../../core/models/constants';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TranslateService } from '@ngx-translate/core';
 import { ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
 import { IV2SideDialogConfigInputFilterListFilter } from '../../app-side-dialog-v2/models/side-dialog-config.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Advanced filter type
@@ -27,7 +27,9 @@ export enum V2AdvancedFilterType {
   PHONE_NUMBER = 'phone_number',
   QUESTIONNAIRE_ANSWERS = 'questionnaire_answers',
   FILE = 'file',
-  SELECT_GROUPS = 'select-groups'
+  SELECT_GROUPS = 'select_groups',
+  DELETED = 'deleted',
+  DELETED_AT = 'deleted_at'
 }
 
 /**
@@ -240,6 +242,30 @@ export const V2AdvancedFilterComparatorOptions: {
   [V2AdvancedFilterType.SELECT_GROUPS]: [{
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE',
     value: V2AdvancedFilterComparatorType.NONE
+  }],
+
+  // deleted
+  [V2AdvancedFilterType.DELETED]: [{
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE',
+    value: V2AdvancedFilterComparatorType.NONE
+  }],
+
+  // deleted at
+  [V2AdvancedFilterType.DELETED_AT]: [{
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BETWEEN',
+    value: V2AdvancedFilterComparatorType.BETWEEN
+  }, {
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_BEFORE',
+    value: V2AdvancedFilterComparatorType.BEFORE
+  }, {
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_AFTER',
+    value: V2AdvancedFilterComparatorType.AFTER
+  }, {
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_HAS_VALUE',
+    value: V2AdvancedFilterComparatorType.HAS_VALUE
+  }, {
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE',
+    value: V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
   }]
 };
 
@@ -261,7 +287,7 @@ interface IV2AdvancedFilterBase {
   extraConditions?: RequestQueryBuilder;
   childQueryBuilderKey?: string;
   relationshipKey?: string;
-  sortable?: boolean;
+  sortable?: true | string;
   havingNotHavingApplyMongo?: boolean;
   filterBy?: (
     query: RequestQueryBuilder,
@@ -451,15 +477,33 @@ interface IV2AdvancedFilterGroupsSelect extends IV2AdvancedFilterBase {
   defaultValue?: string[];
   groupOptionFormatMethod?: (
     sanitized: DomSanitizer,
-    i18nService: TranslateService,
+    i18nService: I18nService,
     groupsMap: ISelectGroupMap<any>,
     optionsMap: ISelectGroupOptionMap<any>,
     option: any
   ) => ISelectGroupOptionFormatResponse;
 }
 
+/**
+ * Advanced filter - Deleted select
+ */
+interface IV2AdvancedFilterDeleted extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.DELETED;
+  yesNoAllOptions: ILabelValuePairModel[];
+}
+
+/**
+ * Advanced filter - Deleted at
+ */
+interface IV2AdvancedFilterDeletedAt extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.DELETED_AT;
+}
+
 // advanced filter
 export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterNumber | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
 | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
 | IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterDate | IV2AdvancedFilterNumberRange
-| IV2AdvancedFilterQuestionnaireAnswers | IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation | IV2AdvancedFilterGroupsSelect;
+| IV2AdvancedFilterQuestionnaireAnswers | IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation | IV2AdvancedFilterGroupsSelect
+| IV2AdvancedFilterDeleted | IV2AdvancedFilterDeletedAt;

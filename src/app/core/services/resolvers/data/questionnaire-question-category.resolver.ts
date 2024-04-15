@@ -21,7 +21,7 @@ export class QuestionnaireQuestionCategoryDataResolver implements IMapResolverV2
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.QUESTION_CATEGORY)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_QUESTION_CATEGORY)
       .pipe(
         map((data) => {
           // construct map

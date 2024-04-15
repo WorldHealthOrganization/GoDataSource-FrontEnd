@@ -1,47 +1,50 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, of, Subscriber, throwError } from 'rxjs';
-import { catchError, map, takeUntil, tap } from 'rxjs/operators';
-import { environment } from '../../../../../environments/environment';
+import { throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
-import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
-import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { ClientApplicationDataService } from '../../../../core/services/data/client-application.data.service';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { ClientApplicationHelperService } from '../../../../core/services/helper/client-application-helper.service';
 
 @Component({
   selector: 'app-client-applications-list',
   templateUrl: './client-applications-list.component.html'
 })
 export class ClientApplicationsListComponent
-  extends ListComponent<SystemClientApplicationModel>
+  extends ListComponent<SystemClientApplicationModel, IV2Column>
   implements OnDestroy {
   /**
    * Constructor
    */
   constructor(
     protected listHelperService: ListHelperService,
-    private systemSettingsDataService: SystemSettingsDataService,
+    private clientApplicationDataService: ClientApplicationDataService,
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private clientApplicationHelperService: ClientApplicationHelperService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**
@@ -72,6 +75,66 @@ export class ClientApplicationsListComponent
         type: V2ColumnFormat.ACTIONS
       },
       actions: [
+        // View Client application
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_VIEW',
+          action: {
+            link: (data: SystemClientApplicationModel): string[] => {
+              return ['/system-config/client-applications', data.id, 'view'];
+            }
+          },
+          visible: (item: SystemClientApplicationModel): boolean => {
+            return !item.deleted &&
+              SystemClientApplicationModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Client application
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_MODIFY',
+          action: {
+            link: (item: SystemClientApplicationModel): string[] => {
+              return ['/system-config/client-applications', item.id, 'modify'];
+            }
+          },
+          visible: (item: SystemClientApplicationModel): boolean => {
+            return !item.deleted &&
+              SystemClientApplicationModel.canModify(this.authUser);
+          }
+        },
+
+        // Enable / Disable client application
+        {
+          type: V2ActionType.ICON,
+          icon: 'check',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE_DISABLE',
+          action: {
+            click: (item: SystemClientApplicationModel) => {
+              // update
+              this.toggleActiveFlag(item);
+            }
+          },
+          loading: (item: SystemClientApplicationModel): boolean => !!item.loading,
+          cssClasses: (item: SystemClientApplicationModel): string => {
+            return item.active ?
+              'gd-list-table-actions-action-icon-active' :
+              '';
+          },
+          disable: (item: SystemClientApplicationModel): boolean => {
+            return (
+              item.active &&
+              !SystemClientApplicationModel.canDisable(this.authUser)
+            ) || (
+              !item.active &&
+              !SystemClientApplicationModel.canEnable(this.authUser)
+            );
+          }
+        },
+
         // Download client application config file
         {
           type: V2ActionType.ICON,
@@ -79,43 +142,14 @@ export class ClientApplicationsListComponent
           iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE',
           action: {
             click: (item: SystemClientApplicationModel) => {
-              this.downloadConfFile(item);
+              this.clientApplicationHelperService.downloadConfFile(item);
             }
           },
-          visible: (item: SystemClientApplicationModel): boolean => {
-            return SystemClientApplicationModel.canDownloadConfFile(this.authUser) && item.active;
-          }
-        },
-
-        // Disable client application
-        {
-          type: V2ActionType.ICON,
-          icon: 'visibility_off',
-          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE',
-          action: {
-            click: (item: SystemClientApplicationModel) => {
-              this.toggleActiveFlag(item, false);
-            }
+          disable: (item: SystemClientApplicationModel): boolean => {
+            return !item.active;
           },
-          visible: (item: SystemClientApplicationModel): boolean => {
-            return item.active &&
-              SystemClientApplicationModel.canDisable(this.authUser);
-          }
-        },
-
-        // Enable client application
-        {
-          type: V2ActionType.ICON,
-          icon: 'visibility',
-          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE',
-          action: {
-            click: (item: SystemClientApplicationModel) => {
-              this.toggleActiveFlag(item, true);
-            }
-          },
-          visible: (item: SystemClientApplicationModel): boolean => {
-            return !item.active &&
-              SystemClientApplicationModel.canEnable(this.authUser);
+          visible: (): boolean => {
+            return SystemClientApplicationModel.canDownloadConfFile(this.authUser);
           }
         },
 
@@ -132,8 +166,6 @@ export class ClientApplicationsListComponent
               cssClasses: () => 'gd-list-table-actions-action-menu-warning',
               action: {
                 click: (item: SystemClientApplicationModel): void => {
-                  let systemSettings: SystemSettingsModel;
-
                   // determine what we need to delete
                   this.dialogV2Service.showConfirmDialog({
                     config: {
@@ -149,32 +181,6 @@ export class ClientApplicationsListComponent
                           name: item.name
                         })
                       }
-                    },
-                    initialized: (handler) => {
-                      // display loading
-                      handler.loading.show();
-
-                      // determine if case has exposed contacts
-                      this.systemSettingsDataService
-                        .getSystemSettings()
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            handler.loading.hide();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe((settings: SystemSettingsModel) => {
-                          systemSettings = settings;
-
-                          // hide loading
-                          handler.loading.hide();
-                        });
                     }
                   }).subscribe((response) => {
                     // canceled ?
@@ -186,16 +192,9 @@ export class ClientApplicationsListComponent
                     // show loading
                     const loading = this.dialogV2Service.showLoadingDialog();
 
-                    // filter client applications and remove client application
-                    const filteredClientApplications = systemSettings.clientApplications.filter((clientApp: SystemClientApplicationModel) => {
-                      return clientApp.id !== item.id;
-                    });
-
-                    // save upstream servers
-                    this.systemSettingsDataService
-                      .modifySystemSettings({
-                        clientApplications: filteredClientApplications
-                      })
+                    // delete device
+                    this.clientApplicationDataService
+                      .deleteClientApplication(item.id)
                       .pipe(
                         catchError((err) => {
                           // show error
@@ -240,56 +239,154 @@ export class ClientApplicationsListComponent
       {
         field: 'name',
         label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME',
-        pinned: IV2ColumnPinned.LEFT
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
-        field: 'credentials',
+        field: 'credentials.clientId',
         label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS',
         format: {
           obfuscated: true,
           type: (item: SystemClientApplicationModel) => {
             return `${item.credentials?.clientId}/${item.credentials?.clientSecret}`;
           }
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH,
+          useLike: true
         }
       },
       {
         field: 'active',
         label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_ACTIVE',
+        sortable: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
+      },
+      {
+        field: 'outbreakIDs',
+        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: SystemClientApplicationModel) => item.outbreakIDs?.length > 0 ?
+          item.outbreakIDs
+            .filter((outbreakId) => !!(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId])
+            .map((outbreakId) => {
+              return {
+                label: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].name,
+                href: OutbreakModel.canView(this.authUser) ?
+                  `/outbreaks/${ outbreakId }/view` :
+                  null
+              };
+            }) :
+          [
+            {
+              label: this.i18nService.instant('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_LABEL_ALL_OUTBREAKS'),
+              href: null
+            }
+          ],
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options
+        },
+        exclude: (): boolean => !OutbreakModel.canList(this.authUser)
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_UPDATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
-
-    // outbreaks
-    if (OutbreakModel.canList(this.authUser)) {
-      this.tableColumns.push(
-        {
-          field: 'outbreaks',
-          label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_OUTBREAKS',
-          format: {
-            type: V2ColumnFormat.LINK_LIST
-          },
-          links: (item: SystemClientApplicationModel) => item.outbreakIDs?.length > 0 ?
-            item.outbreakIDs
-              .filter((outbreakId) => !!(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId])
-              .map((outbreakId) => {
-                return {
-                  label: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].name,
-                  href: OutbreakModel.canView(this.authUser) ?
-                    `/outbreaks/${ outbreakId }/view` :
-                    null
-                };
-              }) :
-            [
-              {
-                label: this.i18nService.instant('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_LABEL_ALL_OUTBREAKS'),
-                href: null
-              }
-            ]
-        }
-      );
-    }
   }
 
   /**
@@ -363,177 +460,107 @@ export class ClientApplicationsListComponent
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'name',
+      'credentials',
+      'active',
+      'outbreakIDs',
+      'createdOn',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
+    ];
   }
 
   /**
    * Refresh list
    */
-  refreshList() {
-    this.records$ = this.systemSettingsDataService.getSystemSettings()
-      .pipe(
-        // map data
-        map((systemSettings: SystemSettingsModel) => {
-          return systemSettings.clientApplications;
-        }),
+  refreshList(): void {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
 
-        // set count
-        tap((clientApplications: SystemClientApplicationModel[]) => {
-          this.pageCount = {
-            count: clientApplications.length,
-            hasMore: false
-          };
-        })
+    // retrieve the list of Cases
+    this.records$ = this.clientApplicationDataService
+      .getClientApplicationsList(this.queryBuilder)
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
    * Get total number of items
    */
-  refreshListCount() {}
+  refreshListCount() {
+    // reset
+    this.pageCount = undefined;
 
-  /**
-   * Toggle active flag
-   */
-  toggleActiveFlag(clientApplication: SystemClientApplicationModel, newValue: boolean) {
-    // save
-    this.systemSettingsDataService
-      .getSystemSettings()
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
+
+    // count
+    this.clientApplicationDataService
+      .getClientApplicationsCount(countQueryBuilder)
       .pipe(
+        // error
         catchError((err) => {
           this.toastV2Service.error(err);
           return throwError(err);
-        })
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       )
-      .subscribe((settings: SystemSettingsModel) => {
-        // map client applications and modify client application status
-        const childClientApplication: SystemClientApplicationModel = _.find(settings.clientApplications, (clientApp: SystemClientApplicationModel) => {
-          return clientApp.id === clientApplication.id;
-        });
-        if (childClientApplication) {
-          // update data
-          childClientApplication.active = newValue;
-
-          // save client applications
-          this.systemSettingsDataService
-            .modifySystemSettings({
-              clientApplications: settings.clientApplications
-            })
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              // display success message
-              this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
-
-              // finished
-              clientApplication.active = newValue;
-            });
-          // no client application found - must refresh page
-          this.needsRefreshList(false, false, true);
-        }
+      .subscribe((response) => {
+        this.pageCount = response;
       });
   }
 
   /**
-   * Download Configuration File
+   * Toggle and save active flag
    */
-  downloadConfFile(clientApplication: SystemClientApplicationModel) {
-    // construct api url if necessary
-    let apiUrl: string = environment.apiUrl;
-    apiUrl = apiUrl.indexOf('http://') === 0 || apiUrl.indexOf('https://') === 0 ?
-      apiUrl : (
-        (apiUrl.indexOf('/') === 0 ? '' : '/') +
-        window.location.origin +
-        apiUrl
-      );
+  private toggleActiveFlag(clientApplication: SystemClientApplicationModel): void {
+    // show loading
+    clientApplication.loading = true;
+    this.tableV2Component.agTable?.api.redrawRows();
 
-    // define api async check
-    let apiURL: string;
-    const apiObserver = new Observable((subscriber: Subscriber<boolean | IGeneralAsyncValidatorResponse>) => {
-      if (
-        _.isString(apiURL) &&
-        apiURL.includes('localhost')
-      ) {
-        subscriber.next({
-          isValid: false,
-          errMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
-        });
-        subscriber.complete();
-      } else {
-        this.systemSettingsDataService
-          .getAPIVersion(apiURL)
-          .pipe(
-            // throw error
-            catchError(() => {
-              // if request fails then error should be handled by subscribe (else branch)
-              return of([]);
-            }),
-
-            // should be the last pipe
-            takeUntil(this.destroyed$)
-          )
-          .subscribe((versionData: any) => {
-            // handle
-            if (versionData.version) {
-              subscriber.next(true);
-            } else {
-              subscriber.next({
-                isValid: false,
-                errMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
-              });
-            }
-
-            // finished
-            subscriber.complete();
-          });
-      }
-    });
-
-    // display export dialog
-    this.dialogV2Service.showExportData({
-      title: {
-        get: () => 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_TITLE'
-      },
-      export: {
-        url: 'system-settings/generate-file',
-        async: false,
-        method: ExportDataMethod.POST,
-        fileName: this.i18nService.instant('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_FILE_NAME') +
-          ' - ' +
-          moment().format('YYYY-MM-DD'),
-        allow: {
-          types: [
-            ExportDataExtension.QR
-          ]
-        },
-        extraFormData: {
-          append: {
-            'data[clientId]': clientApplication.credentials.clientId,
-            'data[clientSecret]': clientApplication.credentials.clientSecret
-          }
-        },
-        inputs: {
-          append: [
-            {
-              type: V2SideDialogConfigInputType.TEXT,
-              placeholder: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_URL_LABEL',
-              name: 'data[url]',
-              value: apiUrl,
-              validators: {
-                required: () => true,
-                async: (data) => {
-                  apiURL = (data.map['data[url]'] as IV2SideDialogConfigInputText).value;
-                  return apiObserver;
-                }
-              }
-            }
-          ]
+    // save
+    const newValue: boolean = !clientApplication.active;
+    this.clientApplicationDataService
+      .modifyClientApplication(
+        clientApplication.id, {
+          active: newValue
         }
-      }
-    });
+      )
+      .pipe(
+        catchError((err) => {
+          // hide loading
+          clientApplication.loading = false;
+          this.tableV2Component.agTable?.api.redrawRows();
+
+          // show error
+          this.toastV2Service.error(err);
+
+          // send error further
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished
+        clientApplication.active = newValue;
+
+        // hide loading
+        clientApplication.loading = false;
+        this.tableV2Component.agTable?.api.redrawRows();
+
+        // display success message
+        this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_TOGGLE_ENABLED_SUCCESS_MESSAGE');
+      });
   }
 }

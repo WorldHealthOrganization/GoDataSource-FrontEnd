@@ -18,7 +18,15 @@ export interface IV2Breadcrumb {
   // required
   label: string;
   action: IV2BreadcrumbAction;
+}
+
+/**
+ * Page breadcrumb info
+ */
+export interface IV2BreadcrumbInfo {
+  // required
+  label: string;
 
   // optional
-  // ...
+  tooltip?: string;
 }

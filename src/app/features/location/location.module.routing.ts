@@ -10,6 +10,8 @@ import { UserDataResolver } from '../../core/services/resolvers/data/user.resolv
 import { LocationTreeDataResolver } from '../../core/services/resolvers/data/location-tree.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // common base - create / view / modify
 const locationCreateViewModifyFoundation: Route = {
@@ -18,7 +20,8 @@ const locationCreateViewModifyFoundation: Route = {
   resolve: {
     parentLocationTree: LocationTreeDataResolver,
     geographicalLevel: LocationGeographicalLevelDataResolver,
-    user: UserDataResolver
+    user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver
   }
 };
 
@@ -27,6 +30,7 @@ const locationFoundation: Route = {
   component: fromPages.LocationsListComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     yesNoAll: YesNoAllDataResolver,
     geographicalLevel: LocationGeographicalLevelDataResolver,
     user: UserDataResolver,

@@ -48,14 +48,6 @@ export class GenericDataService {
   }
 
   /**
-     * Retrieve the list of Progress Options
-     * @returns {Observable<any[]>}
-     */
-  getProgressOptionsList(): Observable<any[]> {
-    return of(Object.values(Constants.PROGRESS_OPTIONS));
-  }
-
-  /**
      * Retrieve the list of available Entity Types that, optionally, can be related to a given type (Case, Contact or Event)
      * @param {EntityType} forType
      * @param {RelationshipType} relationshipType
@@ -202,6 +194,13 @@ export class GenericDataService {
   }
 
   /**
+   * Retrieve backup status step list
+   */
+  getSyncLogStatusStepBackupRestoreList(): Observable<any[]> {
+    return of(Object.values(Constants.SYSTEM_SYNC_LOG_STATUS_STEP_BACKUP_RESTORE));
+  }
+
+  /**
      * Retrieve the list of criteria used for node color - radio button
      * @returns {Observable<any[]>}
      */
@@ -285,7 +284,11 @@ export class GenericDataService {
      * Retrieve the list of sync package export types
      * @returns {Observable<any[]>}
      */
-  getSyncPackageExportTypeOptions(): Observable<any[]> {
+  getSyncPackageExportTypeOptions(): Observable<{
+    label: string,
+    value: string,
+    description: string
+  }[]> {
     return of(Object.values(Constants.SYNC_PACKAGE_EXPORT_TYPES));
   }
 
@@ -293,11 +296,15 @@ export class GenericDataService {
      * Retrieve the list of range follow-up export group by values
      * @returns {Observable<any[]>}
      */
-  getRangeFollowUpGroupByOptions(removeRisk: boolean = false): Observable<any[]> {
+  getRangeFollowUpGroupByOptions(removeOptions: string[] = []): Observable<any[]> {
     const options = _.cloneDeep(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY);
-    if (removeRisk) {
-      delete options.RISK;
-    }
+
+    // remove options
+    removeOptions.forEach((optionName: string) => {
+      const groupByName: string = (Object.keys(options).find((key: string) => options[key].value === optionName));
+      delete options[groupByName];
+    });
+
     return of(Object.values(options));
   }
 

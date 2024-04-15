@@ -15,13 +15,16 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-help-items-list',
   templateUrl: './help-items-list.component.html'
 })
-export class HelpItemsListComponent extends ListComponent<HelpItemModel> implements OnDestroy {
+export class HelpItemsListComponent extends ListComponent<HelpItemModel, IV2Column> implements OnDestroy {
   // category data
   private _selectedCategory: HelpCategoryModel;
 
@@ -37,8 +40,10 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
     private dialogV2Service: DialogV2Service
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
     );
 
     // Retrieve category
@@ -283,7 +288,7 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.approvedBy ?
+          return data.approvedBy && UserModel.canView(this.authUser) ?
             `/users/${ data.approvedBy }/view` :
             undefined;
         }
@@ -294,6 +299,88 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
         format: {
           type: V2ColumnFormat.DATE
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_HELP_ITEM_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_HELP_ITEM_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_HELP_ITEM_FIELD_LABEL_CREATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_HELP_ITEM_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_HELP_ITEM_FIELD_LABEL_UPDATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
   }
@@ -405,7 +492,12 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
       'comment',
       'approved',
       'approvedBy',
-      'approvedDate'
+      'approvedDate',
+      'createdOn',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
     ];
   }
 
@@ -413,6 +505,10 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
    * Re(load) the items list
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
     // retrieve the list of items
     this.records$ = this.helpDataService
       .getHelpItemsCategoryList(
@@ -441,6 +537,7 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

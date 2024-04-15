@@ -11,13 +11,13 @@ import { TransmissionChainGroupModel, TransmissionChainModel } from '../../../..
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-transmission-chains-list',
   templateUrl: './transmission-chains-list.component.html'
 })
-export class TransmissionChainsListComponent extends ListComponent<TransmissionChainModel> implements OnDestroy {
+export class TransmissionChainsListComponent extends ListComponent<TransmissionChainModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */
@@ -29,8 +29,9 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
   }
 

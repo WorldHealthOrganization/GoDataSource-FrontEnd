@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 import { UserModel } from './user.model';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { IPermissionBasic } from './permission.interface';
 import { PERMISSION } from './permission.model';
+import { Moment } from '../helperClasses/localization-helper';
+import { BaseModel } from './base.model';
 
 export class SavedImportField {
   source: string;
@@ -46,7 +46,7 @@ export interface ISavedImportMappingModel {
 }
 
 export class SavedImportMappingModel
-implements
+  extends BaseModel implements
         IPermissionBasic,
         ISavedImportMappingModel {
 
@@ -83,36 +83,14 @@ implements
     mappingKey?: string,
     mappingData?: SavedImportField[]
   }) {
+    super(data);
+
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
     this.isPublic = _.get(data, 'isPublic', false);
     this.readOnly = _.get(data, 'readOnly', false);
     this.mappingKey = _.get(data, 'mappingKey');
     this.mappingData = _.get(data, 'mappingData', []);
-
-    // created by
-    this.createdBy = _.get(data, 'createdBy');
-
-    // created by user
-    this.createdByUser = _.get(data, 'createdByUser');
-    if (this.createdByUser) {
-      this.createdByUser = new UserModel(this.createdByUser);
-    }
-
-    // updated at
-    this.updatedAt = _.get(data, 'updatedAt');
-    if (this.updatedAt) {
-      this.updatedAt = moment.utc(this.updatedAt);
-    }
-
-    // updated by
-    this.updatedBy = _.get(data, 'updatedBy');
-
-    // updated by user
-    this.updatedByUser = _.get(data, 'updatedByUser');
-    if (this.updatedByUser) {
-      this.updatedByUser = new UserModel(this.updatedByUser);
-    }
   }
 
   /**

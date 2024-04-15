@@ -16,13 +16,16 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-upstream-servers-list',
   templateUrl: './upstream-servers-list.component.html'
 })
-export class UpstreamServersListComponent extends ListComponent<SystemUpstreamServerModel> implements OnDestroy {
+export class UpstreamServersListComponent extends ListComponent<SystemUpstreamServerModel, IV2Column> implements OnDestroy {
+  // timers
+  private _syncCheckIfDoneTimer: number;
+
   /**
    * Constructor
    */
@@ -34,7 +37,11 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
     private systemSyncLogDataService: SystemSyncLogDataService,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**
@@ -54,6 +61,9 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+
+    // stop timers
+    this.stopSyncCheckIfDoneTimer();
   }
 
   /**
@@ -423,6 +433,16 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
   }
 
   /**
+   * Stop timer
+   */
+  private stopSyncCheckIfDoneTimer(): void {
+    if (this._syncCheckIfDoneTimer) {
+      clearTimeout(this._syncCheckIfDoneTimer);
+      this._syncCheckIfDoneTimer = undefined;
+    }
+  }
+
+  /**
    * Start sync
    * @param upstreamServer
    */
@@ -449,8 +469,15 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
 
       // check if sync is done
       const syncCheckIfDone = (syncLogId: string) => {
-        setTimeout(
+        // stop previous
+        this.stopSyncCheckIfDoneTimer();
+
+        // call
+        this._syncCheckIfDoneTimer = setTimeout(
           () => {
+            // reset
+            this._syncCheckIfDoneTimer = undefined;
+
             // check if backup is ready
             this.systemSyncLogDataService
               .getSyncLog(syncLogId)

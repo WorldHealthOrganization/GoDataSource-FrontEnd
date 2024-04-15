@@ -1,23 +1,50 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { environment } from '../../../../../environments/environment';
-import { IAsyncImportResponse, IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
+import {
+  IAsyncImportResponse,
+  IMappedOption,
+  IModelArrayProperties,
+  ImportableFileModel,
+  ImportableFilePropertiesModel,
+  ImportableFilePropertyValuesModel,
+  ImportableLabelValuePair,
+  ImportableMapField,
+  ImportDataExtension
+} from './model';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { v4 as uuid } from 'uuid';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
-import { ISavedImportMappingModel, SavedImportField, SavedImportMappingModel, SavedImportOption } from '../../../../core/models/saved-import-mapping.model';
+import {
+  ISavedImportMappingModel,
+  SavedImportField,
+  SavedImportMappingModel,
+  SavedImportOption
+} from '../../../../core/models/saved-import-mapping.model';
 import { Observable, throwError } from 'rxjs';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
-import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
-import { RequestFilterGenerator, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
+import {
+  RequestFilterGenerator,
+  RequestQueryBuilder,
+  RequestSortDirection
+} from '../../../../core/helperClasses/request-query-builder';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { NgModel } from '@angular/forms';
 import { ImportLogDataService } from '../../../../core/services/data/import-log.data.service';
@@ -26,17 +53,32 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ImportResultDataService } from '../../../../core/services/data/import-result.data.service';
 import { ImportResultModel } from '../../../../core/models/import-result.model';
-import { HoverRowAction } from '../../../../shared/components';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, IV2SideDialogConfigInputToggleCheckbox, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputText,
+  IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInput,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2BottomDialogConfigButtonType
+} from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import {
+  IV2LoadingDialogHandler
+} from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { ILocation } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { LanguageModel } from '../../../../core/models/language.model';
+import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ActionIcon, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { Headers } from 'ng2-file-upload/file-upload/file-uploader.class';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -48,7 +90,10 @@ export enum ImportServerModelNames {
   CASE = 'case',
   EVENT = 'event',
   CONTACT = 'contact',
-  CONTACT_OF_CONTACT = 'contactOfContact'
+  CONTACT_OF_CONTACT = 'contactOfContact',
+  USER = 'user',
+  ROLE = 'role',
+  TEAM = 'team'
 }
 
 enum ImportServerErrorCodes {
@@ -57,7 +102,8 @@ enum ImportServerErrorCodes {
   DUPLICATE_VISUAL_ID = 'DUPLICATE_VISUAL_ID',
   ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE = 'ADDRESS_MUST_HAVE_USUAL_PLACE_OF_RESIDENCE',
   ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE = 'ADDRESS_MULTIPLE_USUAL_PLACE_OF_RESIDENCE',
-  ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE = 'ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE'
+  ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE = 'ADDRESS_PREVIOUS_PLACE_OF_RESIDENCE_MUST_HAVE_DATE',
+  PRE_VALIDATION = 'PRE_VALIDATION'
 }
 
 interface IImportErrorDetailsSimple {
@@ -74,7 +120,7 @@ interface IImportErrorDetailsSimple {
         [prop: string]: any
       }
     },
-    recordNo: number,
+    recordNo: number | string,
     message: string,
     error: {
       code: number,
@@ -109,7 +155,7 @@ interface IImportErrorDetailsProcessedImported {
   styleUrls: ['./import-data.component.scss']
 })
 export class ImportDataComponent
-  extends ListComponent<any>
+  extends ListComponent<any, IV2Column>
   implements OnInit, OnDestroy {
 
   // Extension mapped to mimes
@@ -237,6 +283,21 @@ export class ImportDataComponent
     return this._importFileUrl;
   }
 
+  // additional headers to attach
+  private _importFileHeaders: Headers[] = [{
+    name: 'platform',
+    value: 'WEB'
+  }];
+  @Input() set importFileHeaders(value: Headers[]) {
+    this._importFileHeaders = value;
+    if (this.uploader) {
+      this.uploader.options.headers = this._importFileHeaders;
+    }
+  }
+  get importFileHeaders(): Headers[] {
+    return this._importFileHeaders;
+  }
+
   // Tokens for properties for which we don't receive labels from the server
   @Input() fieldsWithoutTokens: {
     [property: string]: string
@@ -247,6 +308,26 @@ export class ImportDataComponent
 
   // Address fields so we can use custom dropdowns
   @Input() addressFields: {
+    [property: string]: boolean
+  } = {};
+
+  // Role fields so we can use custom dropdowns
+  @Input() roleFields: {
+    [property: string]: boolean
+  } = {};
+
+  // Outbreak fields so we can use custom dropdowns
+  @Input() outbreakFields: {
+    [property: string]: boolean
+  } = {};
+
+  // Language fields so we can use custom dropdowns
+  @Input() languageFields: {
+    [property: string]: boolean
+  } = {};
+
+  // user fields so we can use custom dropdowns
+  @Input() userFields: {
     [property: string]: boolean
   } = {};
 
@@ -320,6 +401,7 @@ export class ImportDataComponent
   mappedFields: ImportableMapField[] = [];
 
   // Keep err msg details
+  failedPreValidation: boolean = false;
   errMsgDetails: {
     details: IImportErrorDetailsSimple | IImportErrorDetailsProcessedImported
   };
@@ -366,189 +448,206 @@ export class ImportDataComponent
             !this.errMsgDetails;
   }
 
-  // hover table row actions
-  recordActions: HoverRowAction[] = [
+  // row actions
+  recordActions: IV2ActionIcon[] = [
     // Add
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'add_circle_outline',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
-                    item.sourceFieldWithoutIndexes &&
-                    item.destinationField &&
-                    this.distinctValuesCache &&
-                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
-          !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
-                        this.addressFields[item.destinationField]
-        ) &&
-                    item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length && (
-          !this.usedSourceFieldOptionsForOptionMapping ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes || (
-            this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
-          )
-        );
-      },
-      click: (
-        item: ImportableMapField,
-        handler: HoverRowActionsDirective
-      ) => {
-        // not allowed if we have duplicates because it can break the logic:
-        // this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
-        if (
-          this.usedSourceFieldsForValidation &&
-                    this.usedSourceFieldsForValidation.fields[item.sourceFieldWithSelectedIndexes] > 1
-        ) {
-          // display toast
-          this.toastV2Service.error('LNG_PAGE_IMPORT_DATA_ERROR_MUST_FIX_DUPLICATE_BEFORE_ADD');
-        } else {
-          // add option
-          this.addNewOptionMap(
-            item,
-            handler
+          item.sourceFieldWithoutIndexes &&
+          item.destinationField &&
+          this.distinctValuesCache &&
+          this.distinctValuesCache[item.sourceFieldWithoutIndexes] &&
+          (
+            !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+            this.addressFields[item.destinationField] ||
+            this.roleFields[item.destinationField] ||
+            this.outbreakFields[item.destinationField] ||
+            this.languageFields[item.destinationField] ||
+            this.userFields[item.destinationField]
+          ) &&
+          item.mappedOptions.length < this.distinctValuesCache[item.sourceFieldWithoutIndexes].length &&
+          (
+            !this.usedSourceFieldOptionsForOptionMapping ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes || (
+              this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+            )
           );
+      },
+      action: {
+        click: (data: {
+          item: ImportableMapField,
+          itemIndex: number
+        }) => {
+          // not allowed if we have duplicates because it can break the logic:
+          // this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+          if (
+            this.usedSourceFieldsForValidation &&
+            this.usedSourceFieldsForValidation.fields[data.item.sourceFieldWithSelectedIndexes] > 1
+          ) {
+            // display toast
+            this.toastV2Service.error('LNG_PAGE_IMPORT_DATA_ERROR_MUST_FIX_DUPLICATE_BEFORE_ADD');
+          } else {
+            // add option
+            this.addNewOptionMap(data.item);
+          }
         }
       }
-    }),
+    },
 
     // Expand
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'expand_more',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_EXPAND_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
-                    item.sourceFieldWithoutIndexes &&
-                    item.destinationField &&
-                    this.distinctValuesCache &&
-                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
-          !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
-                        this.addressFields[item.destinationField]
-        ) &&
-                    item.mappedOptionsCollapsed && (
-          !this.usedSourceFieldOptionsForOptionMapping ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
-                        !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes ||
-                        this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
-        );
+          item.sourceFieldWithoutIndexes &&
+          item.destinationField &&
+          this.distinctValuesCache &&
+          this.distinctValuesCache[item.sourceFieldWithoutIndexes] &&
+          (
+            !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+            this.addressFields[item.destinationField] ||
+            this.roleFields[item.destinationField] ||
+            this.outbreakFields[item.destinationField] ||
+            this.languageFields[item.destinationField] ||
+            this.userFields[item.destinationField]
+          ) &&
+          item.mappedOptionsCollapsed &&
+          (
+            !this.usedSourceFieldOptionsForOptionMapping ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes] ||
+            !this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes ||
+            this.usedSourceFieldOptionsForOptionMapping[item.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes === item.sourceFieldWithSelectedIndexes
+          );
       },
-      click: (
-        item: ImportableMapField,
-        handler: HoverRowActionsDirective
-      ) => {
-        // expand
-        item.mappedOptionsCollapsed = false;
-
-        // render row selection
-        handler.hoverRowActionsComponent.hideEverything();
+      action: {
+        click: (data: {
+          item: ImportableMapField,
+          itemIndex: number
+        }) => {
+          // expand
+          data.item.mappedOptionsCollapsed = false;
+        }
       }
-    }),
+    },
 
     // Collapse
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'expand_less',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_COLLAPSE_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
-                    item.sourceFieldWithoutIndexes &&
-                    item.destinationField &&
-                    this.distinctValuesCache &&
-                    this.distinctValuesCache[item.sourceFieldWithoutIndexes] && (
-          !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
-                        this.addressFields[item.destinationField]
-        ) &&
-                    !item.mappedOptionsCollapsed;
+          item.sourceFieldWithoutIndexes &&
+          item.destinationField &&
+          this.distinctValuesCache &&
+          this.distinctValuesCache[item.sourceFieldWithoutIndexes] &&
+          (
+            !!this.importableObject.modelPropertyValuesMap[item.destinationField] ||
+            this.addressFields[item.destinationField] ||
+            this.roleFields[item.destinationField] ||
+            this.outbreakFields[item.destinationField] ||
+            this.languageFields[item.destinationField] ||
+            this.userFields[item.destinationField]
+          ) &&
+          !item.mappedOptionsCollapsed;
       },
-      click: (
-        item: ImportableMapField,
-        handler: HoverRowActionsDirective
-      ) => {
-        // collapse
-        item.mappedOptionsCollapsed = true;
-
-        // render row selection
-        handler.hoverRowActionsComponent.hideEverything();
+      action: {
+        click: (data: {
+          item: ImportableMapField,
+          itemIndex: number
+        }) => {
+          // collapse
+          data.item.mappedOptionsCollapsed = true;
+        }
       }
-    }),
+    },
 
     // Modify
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'settings',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_MODIFY',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return this.elementInEditMode !== item;
       },
-      click: (
-        item: ImportableMapField | IMappedOption,
-        handler: HoverRowActionsDirective
-      ) => {
-        this.editItem(
-          item,
-          handler
-        );
+      action: {
+        click: (data: {
+          item: ImportableMapField | IMappedOption,
+          itemIndex: number
+        }) => {
+          this.editItem(data.item);
+        }
       }
-    }),
+    },
 
     // Cancel Modify
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'close',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CLOSE_MODIFY',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return this.elementInEditMode === item;
       },
-      click: (
-        _item: ImportableMapField | IMappedOption,
-        handler: HoverRowActionsDirective
-      ) => {
-        // clear
-        this.clearElementInEditMode();
-
-        // force hover row rerender
-        handler.hoverRowActionsComponent.hideEverything();
+      action: {
+        click: () => {
+          // clear
+          this.clearElementInEditMode();
+        }
       }
-    }),
+    },
 
     // Clone
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'content_copy',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CLONE',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return item instanceof ImportableMapField;
       },
-      click: (
-        item: ImportableMapField,
-        handler: HoverRowActionsDirective,
-        index: number
-      ) => {
-        // clone field
-        this.cloneFieldMap(
-          item,
-          handler,
-          index
-        );
+      action: {
+        click: (data: {
+          item: ImportableMapField,
+          itemIndex: number
+        }) => {
+          // clone field
+          this.cloneFieldMap(
+            data.item,
+            data.itemIndex
+          );
+        }
       }
-    }),
+    },
 
     // Remove
-    new HoverRowAction({
+    {
+      type: V2ActionType.ICON,
       icon: 'delete',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_REMOVE',
-      class: 'icon-item-delete',
+      cssClasses: () => 'import-data-map-fields-actions-action-icon-warning',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return !(item instanceof ImportableMapField) ||
-                    !item.readonly;
+          !item.readonly;
       },
-      click: (
-        item: ImportableMapField | IMappedOption,
-        _handler: HoverRowActionsDirective,
-        index: number
-      ) => {
-        // remove item
-        this.removeItemMap(
-          item,
-          index
-        );
+      action: {
+        click: (data: {
+          item: ImportableMapField | IMappedOption,
+          itemIndex: number
+        }) => {
+          // remove item
+          this.removeItemMap(
+            data.item,
+            data.itemIndex
+          );
+        }
       }
-    })
+    }
   ];
 
   // display map button or start import ?
@@ -614,6 +713,33 @@ export class ImportDataComponent
     [indexKey: string]: string[]
   } = {};
 
+  // user roles
+  userRoles: IResolverV2ResponseModel<UserRoleModel>;
+  userRoleNameMap: {
+    [name: string]: string;
+  } = {};
+
+  // outbreaks
+  outbreaks: IResolverV2ResponseModel<OutbreakModel>;
+  outbreakNameMap: {
+    [name: string]: string;
+  } = {};
+
+  // languages
+  languages: IResolverV2ResponseModel<LanguageModel>;
+  languageNameMap: {
+    [name: string]: string;
+  } = {};
+
+  // users
+  users: IResolverV2ResponseModel<UserModel>;
+  userNameAndEmailMap: {
+    [name: string]: string;
+  } = {};
+  userNameMap: {
+    [name: string]: string[];
+  } = {};
+
   // Used to keep function scope
   onWindowResizeScope: any;
 
@@ -641,13 +767,17 @@ export class ImportDataComponent
     private locationDataService: LocationDataService,
     private importLogDataService: ImportLogDataService,
     private importResultDataService: ImportResultDataService,
-    activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute
   ) {
     // list parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
+
+    // create helper mappings for data from resolvers
+    this.getDataOtherTemplates();
 
     // retrieve import mappings if we have any
     this.savedImportPage = activatedRoute.snapshot.data.savedImportPage;
@@ -655,7 +785,7 @@ export class ImportDataComponent
       this.savedMappings = activatedRoute.snapshot.data.savedImportMapping;
     }
 
-    // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
+    // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload the files
     if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
       (FileLikeObject.prototype as any)._createFromObjectPrev = FileLikeObject.prototype._createFromObject;
       FileLikeObject.prototype._createFromObject = (file: File) => {
@@ -682,10 +812,11 @@ export class ImportDataComponent
   ngOnInit() {
     // init array levels
     this.possibleSourceDestinationLevels = [];
-    for (let level = 0; level < 100; level++) {
+    for (let level = 0; level < 300; level++) {
       this.possibleSourceDestinationLevels.push({
         label: (level + 1).toString(),
-        value: level
+        value: level,
+        order: level
       });
     }
 
@@ -695,7 +826,8 @@ export class ImportDataComponent
       authToken: this.authDataService.getAuthToken(),
       url: `${environment.apiUrl}/${this.importFileUrl}`,
       additionalParameter: {},
-      itemAlias: this.fileUploadAlias
+      itemAlias: this.fileUploadAlias,
+      headers: this.importFileHeaders
     });
 
     // don't allow multiple files to be added
@@ -741,6 +873,34 @@ export class ImportDataComponent
         err = err.error ? err.error : err;
         this.toastV2Service.error(err);
 
+        // display error message
+        if (err.code === 'IMPORT_PARTIAL_SUCCESS_WITH_DETAILS') {
+          // set error type
+          this.failedPreValidation = true;
+
+          // construct custom message
+          this.errMsgDetails = err;
+
+          // get only the first 100 errors
+          const errorDetails: IImportErrorDetailsSimple = this.errMsgDetails.details as IImportErrorDetailsSimple;
+          errorDetails.failed = errorDetails.failed?.length > 0 ?
+            errorDetails.failed.slice(0, 50) :
+            [];
+
+          // translate messages if necessary
+          errorDetails.failed.forEach((item) => {
+            // nothing to do ?
+            if (!item.message) {
+              return;
+            }
+
+            // translate ?
+            if (item.message.startsWith('LNG_')) {
+              item.message = this.i18nService.instant(item.message);
+            }
+          });
+        }
+
         // hide loading
         this._displayLoading = false;
         this._displayLoadingLocked = false;
@@ -749,7 +909,10 @@ export class ImportDataComponent
         // display error
         this.displayError(
           'LNG_PAGE_IMPORT_DATA_ERROR_PROCESSING_FILE',
-          true
+          true,
+          {
+            error: e.message
+          }
         );
       }
     };
@@ -786,7 +949,8 @@ export class ImportDataComponent
         // display success
         this.toastV2Service.success(
           this.importSuccessMessage,
-          this.translationData
+          this.translationData,
+          AppMessages.APP_MESSAGE_IMPORT_DATA_SUCCESSFUL
         );
 
         // emit finished event - event should handle redirect
@@ -815,6 +979,9 @@ export class ImportDataComponent
 
     // initialize pagination
     this.initPaginator();
+
+    // hide toast
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_IMPORT_DATA_SUCCESSFUL);
   }
 
   /**
@@ -985,7 +1152,8 @@ export class ImportDataComponent
       fileType,
       this.fieldsWithoutTokens,
       this.extraDataUsedToFormatData,
-      this.formatDataBeforeUse
+      this.formatDataBeforeUse,
+      this.selectedOutbreak
     );
 
     // we should have at least the headers of the file
@@ -1159,7 +1327,8 @@ export class ImportDataComponent
         // create new possible map item
         const importableItem = new ImportableMapField(
           destination,
-          source.value
+          source.value,
+          this.importableObject
         );
 
         // add options if necessary
@@ -1244,35 +1413,47 @@ export class ImportDataComponent
         });
       } else {
         // found the language tokens
+        // for custom objects (e.g., age), the properties are prefixed with the object name when they are exported (e.g., "age age.years")
         let mappedHeaderObj: IMappedHeader[];
         if (
           (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}`).toLowerCase()]) ||
-                    (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
-                    (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()])
+          (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}`).toLowerCase()]) ||
+          (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${value}`).toLowerCase()]) ||
+          (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath} ${parentPath}.${property}`).toLowerCase()])
         ) {
           pushNewMapField(
-            `${parentPath}.${property}`,
+            parentPath ?
+              `${parentPath}.${property}` :
+              property,
             mappedHeaderObj
           );
         } else {
           // NOT FOUND
-          // check if parent key should be translated
+          // check if parent key should be translated or match by field name
           const parentPrefixIndex: number = parentPath ? parentPath.lastIndexOf('.') : -1;
           const parentPrefix = parentPrefixIndex > -1 ? parentPath.substring(0, parentPrefixIndex) : null;
+          const fieldName = parentPrefixIndex > -1 && parentPath.endsWith('[]') ?
+            parentPath.substring(parentPrefixIndex + 1, parentPath.lastIndexOf('[]')) :
+            null;
           const parentPathTranslation: string = this.fieldsWithoutTokens && this.fieldsWithoutTokens[parentPath] !== undefined ?
             (this.fieldsWithoutTokens[parentPath] ? this.i18nService.instant(this.fieldsWithoutTokens[parentPath]) : '') :
             undefined;
           if (
             parentPath &&
-                        parentPathTranslation !== undefined && (
+            parentPathTranslation !== undefined && (
               (
                 parentPathTranslation &&
-                                (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPathTranslation}[].${this.i18nService.instant(value)}`).toLowerCase()])
+                (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPathTranslation}[].${this.i18nService.instant(value)}`).toLowerCase()])
               ) || (
                 parentPrefix &&
-                                (mappedHeaderObj = mappedHeaders[_.camelCase(
-                                  `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}`
-                                ).toLowerCase()])
+                (mappedHeaderObj = mappedHeaders[_.camelCase(
+                  `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}`
+                ).toLowerCase()])
+              ) || (
+                fieldName &&
+                (mappedHeaderObj = mappedHeaders[_.camelCase(
+                  `${fieldName}.${this.i18nService.instant(value)}`
+                ).toLowerCase()])
               )
             )
           ) {
@@ -1281,16 +1462,17 @@ export class ImportDataComponent
               mappedHeaderObj
             );
 
-            // search though flat values - for arrays
+            // search though flat values - for arrays (match also by field name)
           } else if (
             mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[1]`).toLowerCase()] ||
-                        mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()] || (
+            mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[1]`).toLowerCase()] || (
               parentPathTranslation !== undefined &&
-                            parentPrefix &&
-                            mappedHeaders[_.camelCase(
-                              `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}[1]`
-                            ).toLowerCase()]
-            )
+              parentPrefix &&
+              mappedHeaders[_.camelCase(
+                `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}[1]`
+              ).toLowerCase()]
+            ) ||
+            mappedHeaders[_.camelCase(`${parentPath}.${property}[1]`).toLowerCase()]
           ) {
             // map all determined levels
             _.each(
@@ -1298,17 +1480,20 @@ export class ImportDataComponent
               (supportedLevel: ILabelValuePairModel) => {
                 if (
                   (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) ||
-                                    (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) || (
+                  (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) || (
                     parentPathTranslation !== undefined &&
-                                        parentPrefix &&
-                                        (mappedHeaderObj = mappedHeaders[_.camelCase(
-                                          `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`
-                                        ).toLowerCase()])
-                  )
+                    parentPrefix &&
+                    (mappedHeaderObj = mappedHeaders[_.camelCase(
+                      `${parentPrefix}${parentPathTranslation !== '' ? ('.' + parentPathTranslation + '[]') : ''}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`
+                    ).toLowerCase()])
+                  ) ||
+                  (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${property}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()])
                 ) {
                   // create object
                   pushNewMapField(
-                    `${parentPath}.${property}`,
+                    parentPath ?
+                      `${parentPath}.${property}` :
+                      property,
                     mappedHeaderObj,
                     supportedLevel.value
                   );
@@ -1328,12 +1513,21 @@ export class ImportDataComponent
     };
 
     // go through each property of the model and try to map it to a property from the imported file
-    _.each(this.importableObject.modelProperties, (value: ImportableFilePropertiesModel, property: string) => {
+    _.each(this.importableObject.modelProperties, (value, property: string) => {
       if (_.isObject(value)) {
         mapToHeaderFile(
           value,
           property,
           property
+        );
+      } else if (
+        // array of primitives ?
+        property.indexOf('[]') > -1
+      ) {
+        mapToHeaderFile(
+          value,
+          property,
+          ''
         );
       } else {
         // TOKEN
@@ -1357,7 +1551,8 @@ export class ImportDataComponent
       // create new possible map item
       const importableItem = new ImportableMapField(
         destinationField,
-        sourceField
+        sourceField,
+        this.importableObject
       );
 
       // add options if necessary
@@ -1377,7 +1572,9 @@ export class ImportDataComponent
     _.each(mapOfRequiredDestinationFields, (_n: boolean, property: string) => {
       // create
       const importableItem = new ImportableMapField(
-        property
+        property,
+        null,
+        this.importableObject
       );
 
       // make it readonly
@@ -1415,16 +1612,20 @@ export class ImportDataComponent
     // there is no point in setting mapped values if we  don't have to map something
     if (
       !importableItem.sourceFieldWithoutIndexes ||
-            !importableItem.destinationField ||
-            !this.distinctValuesCache ||
-            !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] || (
+      !importableItem.destinationField ||
+      !this.distinctValuesCache ||
+      !this.distinctValuesCache[importableItem.sourceFieldWithoutIndexes] || (
         !this.importableObject.modelPropertyValuesMap[importableItem.destinationField] &&
-                !this.addressFields[importableItem.destinationField]
+        !this.addressFields[importableItem.destinationField] &&
+        !this.roleFields[importableItem.destinationField] &&
+        !this.outbreakFields[importableItem.destinationField] &&
+        !this.languageFields[importableItem.destinationField] &&
+        !this.userFields[importableItem.destinationField]
       ) || (
         this.usedSourceFieldOptionsForOptionMapping &&
-                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
-                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes &&
-                this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes !== importableItem.sourceFieldWithSelectedIndexes
+        this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes] &&
+        this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes &&
+        this.usedSourceFieldOptionsForOptionMapping[importableItem.sourceFieldWithoutIndexes].sourceFieldWithSelectedIndexes !== importableItem.sourceFieldWithSelectedIndexes
       )
     ) {
       return;
@@ -1457,16 +1658,32 @@ export class ImportDataComponent
           const destinationValue: string = restrictTo[mapOpt.sourceOption][0];
 
           // determine destination option
-          destinationOpt = this.addressFields[importableItem.destinationField] ? (
-            this.locationCache[destinationValue] ?
+          if (this.addressFields[importableItem.destinationField]) {
+            destinationOpt = this.locationCache[destinationValue] ?
               destinationValue :
-              undefined
-          ) : (
-            this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
-                            this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined ?
+              undefined;
+          } else if (this.roleFields[importableItem.destinationField]) {
+            destinationOpt = this.userRoles.map[destinationValue] ?
               destinationValue :
-              undefined
-          );
+              undefined;
+          } else if (this.outbreakFields[importableItem.destinationField]) {
+            destinationOpt = this.outbreaks.map[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else if (this.languageFields[importableItem.destinationField]) {
+            destinationOpt = this.languages.map[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else if (this.userFields[importableItem.destinationField]) {
+            destinationOpt = this.users.map[destinationValue] ?
+              destinationValue :
+              undefined;
+          } else {
+            destinationOpt = this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField] &&
+            this.importableObject.modelPropertyValuesMapChildMap[importableItem.destinationField][destinationValue] !== undefined ?
+              destinationValue :
+              undefined;
+          }
 
           // found a possible destination field
           if (destinationOpt) {
@@ -1480,18 +1697,42 @@ export class ImportDataComponent
         // check if we can find a proper destination option
         const sourceOption: string = mapOpt.sourceOption;
         const sourceOptReduced: string = _.camelCase(sourceOption).toLowerCase();
-        destinationOpt = this.addressFields[importableItem.destinationField] ? (
-          this.locationCacheIndex[sourceOptReduced] && this.locationCacheIndex[sourceOptReduced].length === 1 ?
-            this.locationCacheIndex[sourceOptReduced][0] : (
-              this.locationCache && this.locationCache[sourceOption] ?
-                sourceOption :
-                undefined
-            )
-        ) : (
-          this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField] ?
-            this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced] :
-            undefined
-        );
+        if (this.addressFields[importableItem.destinationField]) {
+          if (
+            this.locationCacheIndex[sourceOptReduced] &&
+            this.locationCacheIndex[sourceOptReduced].length === 1
+          ) {
+            destinationOpt = this.locationCacheIndex[sourceOptReduced][0];
+          } else if (this.locationCache && this.locationCache[sourceOption]) {
+            destinationOpt = sourceOption;
+          }
+        } else if (this.roleFields[importableItem.destinationField]) {
+          if (this.userRoleNameMap[sourceOptReduced]) {
+            destinationOpt = this.userRoleNameMap[sourceOptReduced];
+          }
+        } else if (this.outbreakFields[importableItem.destinationField]) {
+          if (this.outbreakNameMap[sourceOptReduced]) {
+            destinationOpt = this.outbreakNameMap[sourceOptReduced];
+          }
+        } else if (this.languageFields[importableItem.destinationField]) {
+          if (this.languageNameMap[sourceOptReduced]) {
+            destinationOpt = this.languageNameMap[sourceOptReduced];
+          }
+        } else if (this.userFields[importableItem.destinationField]) {
+          // try to map by name and email
+          if (this.userNameAndEmailMap[sourceOptReduced]) {
+            destinationOpt = this.userNameAndEmailMap[sourceOptReduced];
+          } else {
+            // try to map by name
+            if (this.userNameMap[sourceOptReduced]?.length === 1) {
+              destinationOpt = this.userNameMap[sourceOptReduced][0];
+            } else if (this.users && this.users[sourceOption]) {
+              destinationOpt = sourceOption;
+            }
+          }
+        } else if (this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField]) {
+          destinationOpt = this.importableObject.modelPropertyValuesMapIndex[importableItem.destinationField][sourceOptReduced];
+        }
 
         // found a possible destination field
         if (destinationOpt) {
@@ -1820,7 +2061,8 @@ export class ImportDataComponent
                 // initialize field map
                 const field: ImportableMapField = new ImportableMapField(
                   savedFieldMap.destination,
-                  savedFieldMap.source
+                  savedFieldMap.source,
+                  this.importableObject
                 );
 
                 // map levels
@@ -1845,7 +2087,9 @@ export class ImportDataComponent
               ) => {
                 // create
                 const importableItem = new ImportableMapField(
-                  destinationField
+                  destinationField,
+                  null,
+                  this.importableObject
                 );
 
                 // make it readonly
@@ -1931,6 +2175,14 @@ export class ImportDataComponent
     mapValue: string,
     itemLevels: number[]
   ): any {
+    // if non-flat remove array for primitives
+    if (
+      this.importableObject.fileType === ImportDataExtension.JSON &&
+      mapValue.endsWith('[]')
+    ) {
+      mapValue = mapValue.substring(0, mapValue.lastIndexOf('['));
+    }
+
     // add indexes
     let index: number = 0;
     while (mapValue ? mapValue.indexOf('[]') > -1 : false) {
@@ -2137,7 +2389,8 @@ export class ImportDataComponent
                         // display success
                         this.toastV2Service.success(
                           this.importSuccessMessage,
-                          this.translationData
+                          this.translationData,
+                          AppMessages.APP_MESSAGE_IMPORT_DATA_SUCCESSFUL
                         );
 
                         // hide loading
@@ -2176,7 +2429,7 @@ export class ImportDataComponent
                       // trigger error list refresh
                       if (
                         (this.errMsgDetails.details as any).imported &&
-                                                (this.errMsgDetails.details as any).imported.failedNo > 0
+                        (this.errMsgDetails.details as any).imported.failedNo > 0
                       ) {
                         this.needsRefreshList(true);
                       }
@@ -2192,7 +2445,8 @@ export class ImportDataComponent
                 // display success
                 this.toastV2Service.success(
                   this.importSuccessMessage,
-                  this.translationData
+                  this.translationData,
+                  AppMessages.APP_MESSAGE_IMPORT_DATA_SUCCESSFUL
                 );
 
                 // hide loading
@@ -2212,6 +2466,7 @@ export class ImportDataComponent
      */
   tryAgain() {
     // reset data
+    this.failedPreValidation = false;
     this.distinctValuesCache = {};
     this.locationCache = {};
     this.locationCacheIndex = {};
@@ -2242,11 +2497,11 @@ export class ImportDataComponent
      */
   setSourceDestinationValueAndDetermineOptions(
     item: ImportableMapField,
-    property: string,
-    value: any
+    property: 'sourceField' | 'destinationField',
+    value: string
   ) {
     // set value
-    item[property] = value ? value.value : value;
+    item[property] = value;
 
     // 1 - prepare data need to determine what options we can add
     this.validateData();
@@ -2287,6 +2542,61 @@ export class ImportDataComponent
   }
 
   /**
+   * Get data from resolvers
+   */
+  private getDataOtherTemplates(): void {
+    // roles
+    this.userRoles = this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>;
+    if (this.userRoles?.list?.length) {
+      this.userRoles.list.forEach((item: UserRoleModel) => {
+        // user role name is unique
+        const roleName: string = _.camelCase(item.name).toLowerCase();
+        this.userRoleNameMap[roleName] = item.id;
+      });
+    }
+
+    // outbreaks
+    this.outbreaks = (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>);
+    if (this.outbreaks?.list?.length) {
+      (this.outbreaks.list || []).forEach((item: OutbreakModel) => {
+        // outbreak name is unique
+        const outbreakName: string = _.camelCase(item.name).toLowerCase();
+        this.outbreakNameMap[outbreakName] = item.id;
+      });
+    }
+
+    // languages
+    this.languages = (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>);
+    if (this.languages?.list?.length) {
+      this.languages.list.forEach((item: LanguageModel) => {
+        // language name is unique
+        const languageName: string = _.camelCase(item.name).toLowerCase();
+        this.languageNameMap[languageName] = item.id;
+      });
+    }
+
+    // users
+    this.users = (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>);
+    if (this.users?.list?.length) {
+      this.users.list.forEach((item: UserModel) => {
+        // map name and email to id. the name with email pair is unique
+        const userNameAndEmail: string = _.camelCase(item.nameAndEmail).toLowerCase();
+        this.userNameAndEmailMap[userNameAndEmail] = item.id;
+
+        // map name to id
+        const userName: string = _.camelCase(item.name).toLowerCase();
+        if (this.userNameMap[userName]) {
+          if (!this.userNameMap[userName].includes(item.id)) {
+            this.userNameMap[userName].push(item.id);
+          }
+        } else {
+          this.userNameMap[userName] = [item.id];
+        }
+      });
+    }
+  }
+
+  /**
      * Clear element in edit mode
      */
   private clearElementInEditMode(): void {
@@ -2297,20 +2607,12 @@ export class ImportDataComponent
   /**
      * Edit item
      */
-  private editItem(
-    item: ImportableMapField | IMappedOption,
-    handler?: HoverRowActionsDirective
-  ): void {
+  private editItem(item: ImportableMapField | IMappedOption): void {
     // clear element in edit mode
     this.clearElementInEditMode();
 
     // remember element in edit mode
     this.elementInEditMode = item;
-
-    // render row selection
-    if (handler) {
-      handler.hoverRowActionsComponent.hideEverything();
-    }
   }
 
   /**
@@ -2325,7 +2627,11 @@ export class ImportDataComponent
      */
   addNewFieldMap(): void {
     // create the new item
-    const newItem: ImportableMapField = new ImportableMapField();
+    const newItem: ImportableMapField = new ImportableMapField(
+      null,
+      null,
+      this.importableObject
+    );
 
     // add new item at the top
     this.mappedFields = [
@@ -2352,10 +2658,7 @@ export class ImportDataComponent
   /**
      * Add new field option map
      */
-  private addNewOptionMap(
-    item: ImportableMapField,
-    handler: HoverRowActionsDirective
-  ): void {
+  private addNewOptionMap(item: ImportableMapField): void {
     // create new field option
     const fieldOption: IMappedOption = {
       id: uuid(),
@@ -2369,10 +2672,7 @@ export class ImportDataComponent
     ];
 
     // start edit
-    this.editItem(
-      fieldOption,
-      handler
-    );
+    this.editItem(fieldOption);
 
     // prepare data
     this.validateData();
@@ -2383,14 +2683,14 @@ export class ImportDataComponent
      */
   private cloneFieldMap(
     item: ImportableMapField,
-    handler: HoverRowActionsDirective,
     index: number
   ): void {
     // clone field item
     // mapped options aren't cloneable
     const clonedItem: ImportableMapField = new ImportableMapField(
       item.destinationField,
-      item.sourceField
+      item.sourceField,
+      this.importableObject
     );
 
     // insert item in table
@@ -2401,10 +2701,7 @@ export class ImportDataComponent
     );
 
     // start edit item
-    this.editItem(
-      clonedItem,
-      handler
-    );
+    this.editItem(clonedItem);
 
     // prepare data
     this.validateData();
@@ -2515,12 +2812,16 @@ export class ImportDataComponent
       // this.distinctValuesCache && this.distinctValuesCache[field.sourceFieldWithoutIndexes]
       if (
         field.destinationField &&
-                field.sourceFieldWithoutIndexes && (
+        field.sourceFieldWithoutIndexes && (
           !!this.importableObject.modelPropertyValuesMap[field.destinationField] ||
-                    this.addressFields[field.destinationField]
+          this.addressFields[field.destinationField] ||
+          this.roleFields[field.destinationField] ||
+          this.outbreakFields[field.destinationField] ||
+          this.languageFields[field.destinationField] ||
+          this.userFields[field.destinationField]
         ) && (
           !this.distinctValuesCache ||
-                    !this.distinctValuesCache[field.sourceFieldWithoutIndexes]
+          !this.distinctValuesCache[field.sourceFieldWithoutIndexes]
         )
       ) {
         this.needToMapOptions = true;
@@ -2652,12 +2953,12 @@ export class ImportDataComponent
   setDestinationLevel(
     item: ImportableMapField,
     levelIndex: number,
-    value: any
+    value: number
   ): void {
     // set level
     item.setSourceDestinationLevel(
       levelIndex,
-      value ? value.value : value
+      value
     );
 
     // prepare data
@@ -2670,13 +2971,13 @@ export class ImportDataComponent
   setMapOptionValue(
     mappedOpt: IMappedOption,
     source: boolean,
-    data: ImportableLabelValuePair | ILabelValuePairModel
+    value: string
   ): void {
     // set source option
     if (source) {
-      mappedOpt.sourceOption = data ? data.value : data;
+      mappedOpt.sourceOption = value;
     } else {
-      mappedOpt.destinationOption = data ? data.value : data;
+      mappedOpt.destinationOption = value;
     }
 
     // prepare data
@@ -2711,8 +3012,8 @@ export class ImportDataComponent
   }
 
   /**
-     * Retrieve distinct values used to map fields
-     */
+   * Retrieve distinct values used to map fields
+   */
   retrieveDistinctValues(
     loadingDialog?: IV2LoadingDialogHandler,
     importMapping?: SavedImportMappingModel
@@ -2733,11 +3034,15 @@ export class ImportDataComponent
       // or already retrieved
       if (
         !field.destinationField ||
-                !field.sourceFieldWithoutIndexes || (
+        !field.sourceFieldWithoutIndexes || (
           !this.importableObject.modelPropertyValuesMap[field.destinationField] &&
-                    !this.addressFields[field.destinationField]
+          !this.addressFields[field.destinationField] &&
+          !this.roleFields[field.destinationField] &&
+          !this.outbreakFields[field.destinationField] &&
+          !this.languageFields[field.destinationField] &&
+          !this.userFields[field.destinationField]
         ) ||
-                this.distinctValuesCache[field.sourceFieldWithoutIndexes]
+        this.distinctValuesCache[field.sourceFieldWithoutIndexes]
       ) {
         return;
       }
@@ -2791,7 +3096,7 @@ export class ImportDataComponent
         // there is no point in mapping if we don't have everything we need
         if (
           !savedImportField.source ||
-                    !savedImportField.destination
+          !savedImportField.destination
         ) {
           return;
         }
@@ -2811,7 +3116,7 @@ export class ImportDataComponent
           // no point in continuing ?
           if (
             !savedImportOption.source ||
-                        !savedImportOption.destination
+            !savedImportOption.destination
           ) {
             return;
           }
@@ -2887,8 +3192,8 @@ export class ImportDataComponent
             // add items to cache
             if (
               response.distinctFileColumnValues &&
-                            response.distinctFileColumnValues[key] &&
-                            response.distinctFileColumnValues[key].length > 0
+              response.distinctFileColumnValues[key] &&
+              response.distinctFileColumnValues[key].length > 0
             ) {
               response.distinctFileColumnValues[key].forEach((fileUniqueValue) => {
                 // ignore empty values
@@ -2928,7 +3233,7 @@ export class ImportDataComponent
           _.each(mustRetrieveLocations, (_N, key: string) => {
             if (
               this.distinctValuesCache[key] &&
-                            this.distinctValuesCache[key].length > 0
+              this.distinctValuesCache[key].length > 0
             ) {
               // go through distinct values
               this.distinctValuesCache[key].forEach((data) => {
@@ -2936,7 +3241,7 @@ export class ImportDataComponent
                 if (
                   !data.label || (
                     typeof data.label === 'string' &&
-                                        data.label.toLowerCase() === 'null'
+                    data.label.toLowerCase() === 'null'
                   )
                 ) {
                   return;
@@ -2952,7 +3257,7 @@ export class ImportDataComponent
                   // do we have field source & destination, otherwise there is no point in continuing
                   if (
                     !locationField.sourceField ||
-                                        !locationField.destinationField
+                    !locationField.destinationField
                   ) {
                     return;
                   }
@@ -2960,7 +3265,7 @@ export class ImportDataComponent
                   // go through each saved sub-option destination and make sure we retrieve that location too
                   if (
                     importMappingFieldSubOptionsMap[locationField.sourceField] &&
-                                        importMappingFieldSubOptionsMap[locationField.sourceField][locationField.destinationField]
+                    importMappingFieldSubOptionsMap[locationField.sourceField][locationField.destinationField]
                   ) {
                     _.each(importMappingFieldSubOptionsMap[locationField.sourceField][locationField.destinationField], (destinationOptions: string[]) => {
                       destinationOptions.forEach((locationId: string) => {
@@ -2981,7 +3286,7 @@ export class ImportDataComponent
           } else {
             // retrieve locations
             const retrieveLocationsData = (locations: string[]): Observable<LocationModel[]> => {
-              // construct regular expression for case insensitive search for names
+              // construct regular expression for case-insensitive search for names
               let nameRegex: string = '';
               locations.forEach((location) => {
                 nameRegex = `${nameRegex}${nameRegex ? '|' : ''}(${RequestFilterGenerator.escapeStringForRegex(location)})`;
@@ -3187,8 +3492,8 @@ export class ImportDataComponent
                   field,
                   true,
                   importMappingFieldSubOptionsMap && field.sourceField && field.destinationField &&
-                                        importMappingFieldSubOptionsMap[field.sourceField] && importMappingFieldSubOptionsMap[field.sourceField][field.destinationField] ?
-                  // fieldOptionSource => fieldOptionDestination[]
+                  importMappingFieldSubOptionsMap[field.sourceField] && importMappingFieldSubOptionsMap[field.sourceField][field.destinationField] ?
+                    // fieldOptionSource => fieldOptionDestination[]
                     importMappingFieldSubOptionsMap[field.sourceField][field.destinationField] :
                     null
                 );
@@ -3249,8 +3554,8 @@ export class ImportDataComponent
   }
 
   /**
-     * Mapped field option location changed handler
-     */
+   * Mapped field option location changed handler
+   */
   mappedOptionsLocationChanged(
     mappedOpt: IMappedOption,
     locationAutoItem: ILocation
@@ -3270,7 +3575,7 @@ export class ImportDataComponent
     // cache location if necessary
     if (
       !this.locationCache[locationAutoItem.id] ||
-            !this.locationCache[locationAutoItem.id].parentsLoaded
+      !this.locationCache[locationAutoItem.id].parentsLoaded
     ) {
       // retrieve parents labels
       let parentNames: string = '';
@@ -3302,6 +3607,52 @@ export class ImportDataComponent
 
     // set option value
     mappedOpt.destinationOption = locationAutoItem.id;
+
+    // prepare data
+    this.validateData();
+  }
+
+  /**
+   * Mapped field option role changed handler
+   */
+  getOptionsOtherTemplate(
+    destinationField: string
+  ): ILabelValuePairModel[] {
+    // return options
+    if (this.roleFields[destinationField]) {
+      return this.userRoles.options;
+    } else if (this.outbreakFields[destinationField]) {
+      return this.outbreaks.options;
+    } else if (this.languageFields[destinationField]) {
+      return this.languages.options;
+    } else if (this.userFields[destinationField]) {
+      return this.users.options;
+    }
+
+    // no template found
+    return [];
+  }
+
+  /**
+   * Mapped field option role changed handler
+   */
+  mappedOptionsOtherTemplateChanged(
+    destinationField: string,
+    mappedOpt: IMappedOption,
+    optionId: string
+  ): void {
+    // set option value
+    if (this.roleFields[destinationField]) {
+      mappedOpt.destinationOption = this.userRoles.map[optionId].id;
+    } else if (this.outbreakFields[destinationField]) {
+      mappedOpt.destinationOption = this.outbreaks.map[optionId].id;
+    } else if (this.languageFields[destinationField]) {
+      mappedOpt.destinationOption = this.languages.map[optionId].id;
+    } else if (this.userFields[destinationField]) {
+      mappedOpt.destinationOption = this.users.map[optionId].id;
+    } else {
+      mappedOpt.destinationOption = null;
+    }
 
     // prepare data
     this.validateData();
@@ -3532,6 +3883,16 @@ export class ImportDataComponent
     this.importResultsList$ = this.importResultDataService
       .getImportResultsList(this.queryBuilder)
       .pipe(
+        tap((data) => {
+          data.forEach((item) => {
+            if (
+              item.error.message &&
+              item.error.error?.code === ImportServerErrorCodes.PRE_VALIDATION
+            ) {
+              item.error.message = this.i18nService.instant(item.error.message);
+            }
+          });
+        }),
         catchError((err) => {
           this.toastV2Service.error(err);
           return throwError(err);
@@ -3555,6 +3916,7 @@ export class ImportDataComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // retrieve only import results from a specific import
     countQueryBuilder.filter.byEquality(
@@ -3603,10 +3965,10 @@ export class ImportDataComponent
   /**
    * See record data
    */
-  seeRecordData(
+  seeRecordData(data: {
     file: any,
-    save: any
-  ): void {
+    save?: any
+  }): void {
     this.dialogV2Service
       .showSideDialog({
         // title
@@ -3623,7 +3985,7 @@ export class ImportDataComponent
           {
             type: V2SideDialogConfigInputType.HTML,
             name: 'message',
-            placeholder: `
+            placeholder: data.save ? `
               <div style="display: flex; flex-direction: row;">
                   <div style="flex: 1 1 0%; overflow: auto; font-weight: bold; padding-bottom: 8px;">
                       ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE')}
@@ -3636,13 +3998,26 @@ export class ImportDataComponent
               <div style="display: flex; flex-direction: row;">
                   <div style="flex: 1 1 0%; overflow: auto;">
                       <code>
-                          <pre>${JSON.stringify(file, null, 1)}</pre>
+                          <pre>${JSON.stringify(data.file, null, 1)}</pre>
                       </code>
                   </div>
                   <div style="display: flex; width: 16px;"></div>
                   <div style="flex: 1 1 0%; overflow: auto;">
                       <code>
-                          <pre>${JSON.stringify(save, null, 1)}</pre>
+                          <pre>${JSON.stringify(data.save, null, 1)}</pre>
+                      </code>
+                  </div>
+              </div>
+            ` : `
+              <div style="display: flex; flex-direction: row;">
+                  <div style="flex: 1 1 0%; overflow: auto; font-weight: bold; padding-bottom: 8px;">
+                      ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE')}
+                  </div>
+              </div>
+              <div style="display: flex; flex-direction: row;">
+                  <div style="flex: 1 1 0%; overflow: auto;">
+                      <code>
+                          <pre>${JSON.stringify(data.file, null, 1)}</pre>
                       </code>
                   </div>
               </div>
@@ -3732,5 +4107,37 @@ export class ImportDataComponent
           }
         ]
       }).subscribe();
+  }
+
+  /**
+   * Maps the option value from a dropdown
+   */
+  getOptionValue(destinationField: string, destinationOption: string): string {
+    // return if no valid input provided
+    if (
+      !destinationField ||
+      !destinationOption
+    ) {
+      return '-';
+    }
+
+    // check custom dropdown
+    if (this.addressFields[destinationField] && this.locationCache[destinationOption]) {
+      return this.locationCache[destinationOption].label;
+    } else if (this.roleFields[destinationField] && this.userRoles.map[destinationOption]) {
+      return this.userRoles.map[destinationOption].name;
+    } else if (this.outbreakFields[destinationField] && this.outbreaks.map[destinationOption]) {
+      return this.outbreaks.map[destinationOption].name;
+    } else if (this.languageFields[destinationField] && this.languages.map[destinationOption]) {
+      return this.languages.map[destinationOption].name;
+    } else if (this.userFields[destinationField] && this.users.map[destinationOption]) {
+      return this.users.map[destinationOption].nameAndEmail;
+    } else {
+      // general dropdown
+      return this.importableObject.modelPropertyValuesMapChildMap[destinationField] &&
+      this.importableObject.modelPropertyValuesMapChildMap[destinationField][destinationOption] ?
+        this.importableObject.modelPropertyValuesMapChildMap[destinationField][destinationOption] :
+        '—';
+    }
   }
 }

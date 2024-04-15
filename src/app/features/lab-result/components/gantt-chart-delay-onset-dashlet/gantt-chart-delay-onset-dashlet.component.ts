@@ -12,9 +12,9 @@ import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { Moment } from '../../../../core/helperClasses/x-moment';
 import { v4 as uuid } from 'uuid';
 import { IGanttDataInterface } from '../../interfaces/gantt-data.interface';
+import { Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-gantt-chart-delay-onset-dashlet',
@@ -72,6 +72,9 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
   // loading data
   displayLoading: boolean = true;
 
+  // timers
+  private _displayChartTimer: number;
+
   /**
      * Global Filters changed
      */
@@ -95,7 +98,7 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
     // retrieve ref data
     this.displayLoading = true;
     this.refdataSubscriber = this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE)
       .subscribe((personTypes) => {
         const casePersonType = _.find(personTypes.entries, { value: EntityType.CASE });
         if (casePersonType) {
@@ -150,6 +153,9 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
       this.refreshDataCaller.unsubscribe();
       this.refreshDataCaller = null;
     }
+
+    // stop timers
+    this.stopDisplayChartTimer();
   }
 
   /**
@@ -234,6 +240,16 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop timer
+   */
+  private stopDisplayChartTimer(): void {
+    if (this._displayChartTimer) {
+      clearTimeout(this._displayChartTimer);
+      this._displayChartTimer = undefined;
+    }
+  }
+
+  /**
      * Refresh Data
      */
   refreshData() {
@@ -275,9 +291,16 @@ export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
           // configure data
           this.formatData(results);
 
+          // stop previous
+          this.stopDisplayChartTimer();
+
           // bind properties => show container
           this.displayLoading = false;
-          setTimeout(() => {
+          this._displayChartTimer = setTimeout(() => {
+            // reset
+            this._displayChartTimer = undefined;
+
+            // display
             this.displayChart();
           });
         });

@@ -5,6 +5,7 @@ import { AuthDataService } from '../../data/auth.data.service';
 import { CaseModel } from '../../../models/case.model';
 import { ContactModel } from '../../../models/contact.model';
 import { EntityType } from '../../../models/entity-type';
+import { ContactOfContactModel } from '../../../models/contact-of-contact.model';
 
 @Injectable()
 export class LabPersonTypeDataResolver implements IMapResolverV2<ILabelValuePairModel> {
@@ -32,6 +33,12 @@ export class LabPersonTypeDataResolver implements IMapResolverV2<ILabelValuePair
       entries.push({
         label: EntityType.CONTACT,
         value: EntityType.CONTACT
+      });
+    }
+    if (ContactOfContactModel.canListLabResult(authUser)) {
+      entries.push({
+        label: EntityType.CONTACT_OF_CONTACT,
+        value: EntityType.CONTACT_OF_CONTACT
       });
     }
 

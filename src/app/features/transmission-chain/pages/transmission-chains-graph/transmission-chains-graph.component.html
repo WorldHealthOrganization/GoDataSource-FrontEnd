@@ -14,7 +14,7 @@
 
 <!-- Edit Mode -->
 <div
-    fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem"
+    fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutAlign="start" fxLayoutGap="1.6rem"
     class="transmission-chain-edit-mode">
     <div
         *ngFor="let person of selectedNodes.nodes; let index = index"
@@ -24,12 +24,13 @@
         [class.multiple-selected]="selectedNodes.nodes.length > 1">
         <mat-card>
             <app-person-summary
-                [person]="person"
-                (remove)="removeSelectedNode(index)"
-                (modifyPerson)="modifySelectedPerson($event)"
-                (deletePerson)="deleteSelectedPerson($event)"
-                (createContact)="createContactForSelectedPerson($event)"
-                (createContactOfContact)="createContactOfContactForSelectedPerson($event)"
+              [selectedOutbreak]="selectedOutbreak"
+              [person]="person"
+              (remove)="removeSelectedNode(index)"
+              (modifyPerson)="modifySelectedPerson($event)"
+              (deletePerson)="deleteSelectedPerson($event)"
+              (createContact)="createContactForSelectedPerson($event)"
+              (createContactOfContact)="createContactOfContactForSelectedPerson($event)"
             ></app-person-summary>
         </mat-card>
     </div>
@@ -42,11 +43,12 @@
         [class.selected-relationship-edit]="selectedRelationship && currentNodeAction === NodeAction.MODIFY_EDGE">
         <mat-card>
             <app-relationship-summary
-                [relationship]="selectedRelationship"
-                (remove)="removeRelationship()"
-                (modifyRelationship)="modifySelectedRelationship()"
-                (deleteRelationship)="deleteSelectedRelationship()"
-                (reverseRelationshipPersons)="refreshAfterReverseRelationshipPersons()">
+              [selectedOutbreak]="selectedOutbreak"
+              [relationship]="selectedRelationship"
+              (remove)="removeRelationship()"
+              (modifyRelationship)="modifySelectedRelationship()"
+              (deleteRelationship)="deleteSelectedRelationship()"
+              (reverseRelationshipPersons)="refreshAfterReverseRelationshipPersons()">
             </app-relationship-summary>
         </mat-card>
     </div>
@@ -88,11 +90,9 @@
                     </button>
                 </div>
 
-                <app-form-relationship-quick
-                    name="relationship"
-                    [ngModel]="newRelationship"
-                    required="true"
-                ></app-form-relationship-quick>
+                <!-- Relationship -->
+                <app-quick-editor-v2
+                  [quick]="retrieveQuickInputHandlers(newRelationship)"></app-quick-editor-v2>
 
                 <div class="create-relationship-footer" fxLayout="row" fxLayoutAlign="center center">
                     <button mat-flat-button color="primary" type="submit">
@@ -115,29 +115,9 @@
         </div>
 
         <form #form="ngForm" (submit)="modifyPerson(form)">
-            <app-form-case-quick
-                *ngIf="selectedNodes.nodes[0].type === EntityType.CASE"
-                name="person"
-                [ngModel]="selectedNodes.nodes[0]"
-            ></app-form-case-quick>
-
-            <app-form-contact-quick
-                *ngIf="selectedNodes.nodes[0].type === EntityType.CONTACT"
-                name="person"
-                [ngModel]="selectedNodes.nodes[0]"
-            ></app-form-contact-quick>
-
-            <app-form-event-quick
-                *ngIf="selectedNodes.nodes[0].type === EntityType.EVENT"
-                name="person"
-                [ngModel]="selectedNodes.nodes[0]"
-            ></app-form-event-quick>
-
-            <app-form-contact-of-contact-quick
-                *ngIf="selectedNodes.nodes[0].type === EntityType.CONTACT_OF_CONTACT"
-                name="person"
-                [ngModel]="selectedNodes.nodes[0]"
-            ></app-form-contact-of-contact-quick>
+            <!-- Case / Contact / Contact of Contact / Event -->
+            <app-quick-editor-v2
+              [quick]="retrieveQuickInputHandlers(selectedNodes.nodes[0])"></app-quick-editor-v2>
 
             <div class="modify-person-footer" fxLayout="row" fxLayoutAlign="center center">
                 <button mat-flat-button color="primary" type="submit">
@@ -153,13 +133,14 @@
         class="modify-person"
         fxFlex fxLayout="column"
     >
+        <div class="modify-person-header">
+            <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_TITLE' | translate}}</h1>
+        </div>
+
         <form #form="ngForm" (submit)="modifyRelationship(form)">
-            <app-form-relationship-quick
-                name="relationship"
-                [ngModel]="selectedRelationship"
-                required="true"
-            >
-            </app-form-relationship-quick>
+            <!-- Relationship -->
+            <app-quick-editor-v2
+              [quick]="retrieveQuickInputHandlers(selectedRelationship)"></app-quick-editor-v2>
 
             <div class="modify-person-footer" fxLayout="row" fxLayoutAlign="center center">
                 <button mat-flat-button color="primary" type="submit">
@@ -178,7 +159,7 @@
         <div class="create-contact-header">
             <h1>{{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_TITLE' | translate}}</h1>
         </div>
-        
+
         <form #form="ngForm" (submit)="createContact(form)" class="create-contact-content">
 
             <div fxLayout="column" fxLayoutGap="0.8rem" fxLayoutAlign="start start">
@@ -186,20 +167,19 @@
                     {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_LABEL_CONTACT_FIELDS' | translate}}
                 </span>
 
-                <app-form-contact-quick
-                    name="contact"
-                    [ngModel]="newContact"
-                ></app-form-contact-quick>
+                <!-- Contact -->
+                <app-quick-editor-v2
+                  parentName="contact"
+                  [quick]="retrieveQuickInputHandlers(newContact)"></app-quick-editor-v2>
 
                 <span class="section-title">
                     {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_LABEL_RELATIONSHIP_FIELDS' | translate}}
                 </span>
 
-                <app-form-relationship-quick
-                    name="relationship"
-                    [ngModel]="newRelationship"
-                    required="true"
-                ></app-form-relationship-quick>
+                <!-- Relationship -->
+                <app-quick-editor-v2
+                  parentName="relationship"
+                  [quick]="retrieveQuickInputHandlers(newRelationship)"></app-quick-editor-v2>
 
                 <div class="create-contact-footer" fxLayout="row" fxLayoutAlign="center center">
                     <button mat-flat-button color="primary" type="submit">
@@ -223,26 +203,25 @@
 
         <form #form="ngForm" (submit)="createContactOfContact(form)">
 
-            <div fxLayout="column" fxLayoutGap="10px">
+            <div fxLayout="column" fxLayoutGap="0.8rem" fxLayoutAlign="start start">
 
                 <span class="section-title">
                     {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_LABEL_CONTACT_FIELDS' | translate}}
                 </span>
 
-                <app-form-contact-of-contact-quick
-                    name="contact"
-                    [ngModel]="newContact"
-                ></app-form-contact-of-contact-quick>
+                <!-- Contact of contact -->
+                <app-quick-editor-v2
+                  parentName="contact"
+                  [quick]="retrieveQuickInputHandlers(newContactOfContact)"></app-quick-editor-v2>
 
                 <span class="section-title">
                     {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_LABEL_RELATIONSHIP_FIELDS' | translate}}
                 </span>
 
-                <app-form-relationship-quick
-                    name="relationship"
-                    [ngModel]="newRelationship"
-                    required="true"
-                ></app-form-relationship-quick>
+                <!-- Relationship -->
+                <app-quick-editor-v2
+                  parentName="relationship"
+                  [quick]="retrieveQuickInputHandlers(newRelationship)"></app-quick-editor-v2>
 
                 <div class="create-contact-footer" fxLayout="row" fxLayoutAlign="center center">
                     <button mat-flat-button color="primary" type="submit">

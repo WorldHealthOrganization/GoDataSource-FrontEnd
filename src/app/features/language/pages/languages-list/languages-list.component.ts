@@ -12,15 +12,20 @@ import { ExportDataExtension, ExportDataMethod } from '../../../../core/services
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { ActivatedRoute } from '@angular/router';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-languages-list',
   templateUrl: './languages-list.component.html'
 })
 export class LanguagesListComponent
-  extends ListComponent<LanguageModel>
+  extends ListComponent<LanguageModel, IV2Column>
   implements OnDestroy {
 
   /**
@@ -30,9 +35,15 @@ export class LanguagesListComponent
     protected listHelperService: ListHelperService,
     private languageDataService: LanguageDataService,
     private toastV2Service: ToastV2Service,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private activatedRoute: ActivatedRoute,
+    private i18nService: I18nService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**
@@ -241,6 +252,82 @@ export class LanguagesListComponent
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_LANGUAGE_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_LANGUAGE_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        link: (data) => {
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_LANGUAGE_FIELD_LABEL_CREATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_LANGUAGE_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        link: (data) => {
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_LANGUAGE_FIELD_LABEL_UPDATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
   }
@@ -320,7 +407,12 @@ export class LanguagesListComponent
     return [
       'id',
       'name',
-      'readOnly'
+      'readOnly',
+      'createdOn',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
     ];
   }
 
@@ -328,6 +420,10 @@ export class LanguagesListComponent
    * Re(load) the Languages list
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
     // retrieve the list of Languages
     this.records$ = this.languageDataService
       .getLanguagesList(this.queryBuilder)
@@ -353,6 +449,7 @@ export class LanguagesListComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

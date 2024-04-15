@@ -3,12 +3,24 @@ import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-b
 import * as _ from 'lodash';
 import { IV2DateRange } from '../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 
+/**
+ * Transmission chain filters from
+ */
+export enum TransmissionChainFiltersFrom {
+  COT,
+  CASE_COUNT
+}
+
+/**
+ * Transmission chain filters
+ */
 export class TransmissionChainFilters {
   classificationId: string[];
   occupation: string[];
   outcomeId: string[];
   firstName: string;
   lastName: string;
+  labSequenceResult?: string[];
   gender: string[];
   locationIds: string[];
   clusterIds: string[];
@@ -29,6 +41,7 @@ export class TransmissionChainFilters {
     outcomeId?: string[],
     firstName?: string,
     lastName?: string,
+    labSequenceResult?: string[],
     gender?: string[],
     locationIds?: string[],
     clusterIds?: string[],
@@ -46,7 +59,32 @@ export class TransmissionChainFilters {
   /**
    * Attach conditions to query builder
    */
-  attachConditionsToRequestQueryBuilder(qb: RequestQueryBuilder) {
+  attachConditionsToRequestQueryBuilder(
+    qb: RequestQueryBuilder,
+    config: {
+      from: TransmissionChainFiltersFrom
+    }
+  ) {
+    // clusterIds
+    if (!_.isEmpty(this.clusterIds)) {
+      const relationshipQueryBuilder = qb.addChildQueryBuilder('relationship');
+      relationshipQueryBuilder.filter.where({
+        clusterId: {
+          inq: this.clusterIds
+        }
+      });
+    }
+
+    // Lab result variant/strain result
+    if (!_.isEmpty(this.labSequenceResult)) {
+      const labResultQueryBuilder = qb.addChildQueryBuilder('labResult');
+      labResultQueryBuilder.filter.where({
+        'sequence.resultId': {
+          inq: this.labSequenceResult
+        }
+      });
+    }
+
     // case classification
     if (!_.isEmpty(this.classificationId)) {
       qb.filter.where({
@@ -115,32 +153,45 @@ export class TransmissionChainFilters {
 
     // location
     if (!_.isEmpty(this.locationIds)) {
-      qb.filter.where({
-        or: [
-          {
-            type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
-            'address.parentLocationIdFilter': {
-              inq: this.locationIds
+      if (config.from === TransmissionChainFiltersFrom.COT) {
+        qb.filter.where({
+          or: [
+            {
+              type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
+              'address.parentLocationIdFilter': {
+                inq: this.locationIds
+              }
+            }, {
+              type: {
+                inq: !this.includeContactsOfContacts ?
+                  [
+                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                  ] :
+                  [
+                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
+                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT'
+                  ]
+              },
+              'addresses.parentLocationIdFilter': {
+                inq: this.locationIds
+              }
             }
-          }, {
-            type: {
-              inq: !this.includeContactsOfContacts ?
-                [
-                  'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                  'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
-                ] :
-                [
-                  'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                  'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
-                  'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT'
-                ]
-            },
-            'addresses.parentLocationIdFilter': {
-              inq: this.locationIds
+          ]
+        });
+      } else {
+        qb.filter.where({
+          addresses: {
+            $elemMatch: {
+              typeId: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE',
+              parentLocationIdFilter: {
+                inq: this.locationIds
+              }
             }
           }
-        ]
-      });
+        });
+      }
     }
 
     // age

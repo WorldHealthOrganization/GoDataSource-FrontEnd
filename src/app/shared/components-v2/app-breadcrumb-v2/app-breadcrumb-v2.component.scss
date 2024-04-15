@@ -1,4 +1,5 @@
 @import 'font';
+@import 'mixins';
 
 /* Breadcrumbs */
 .gd-breadcrumbs {
@@ -16,6 +17,24 @@
     .gd-breadcrumbs-bread-label-active {
       color: var(--gd-secondary);
       cursor: default;
+    }
+  }
+
+  .gd-breadcrumbs-bread-infos {
+    @include flex_align_items(center);
+    @include flex(inline-flex);
+    @include flex_direction(row);
+
+    .gd-breadcrumbs-bread-infos-info {
+      background: var(--gd-primary);
+      @include border-radius(1rem);
+      color: var(--gd-background);
+      @include flex(flex);
+      font-size: 1.2rem;
+      line-height: 1.1rem;
+      margin-left: 0.4rem;
+      padding: 0.4rem 0.8rem;
+      cursor: help;
     }
   }
 }

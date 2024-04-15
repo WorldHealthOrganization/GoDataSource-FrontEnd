@@ -53,9 +53,8 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
 
   ImportServerModelNames = ImportServerModelNames;
 
-  requiredDestinationFields = [
-    'contactDate',
-    'certaintyLevelId'
+  requiredDestinationFields: string[] = [
+    'contactDate'
   ];
 
   fieldsWithoutTokens = {

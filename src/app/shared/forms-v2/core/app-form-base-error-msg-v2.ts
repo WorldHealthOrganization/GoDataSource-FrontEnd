@@ -1,5 +1,30 @@
-import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
+/**
+ * Error type
+ */
+export enum AppFormBaseErrorMsgV2Type {
+  REQUIRED = 'required',
+  INTEGER = 'integerValidator',
+  MIN_NUMBER = 'minNumberValidator',
+  MAX_NUMBER = 'maxNumberValidator',
+  EMAIL = 'emailValidator',
+  INVALID_DATE = 'invalidDateValidator',
+  DATE = 'dateValidator',
+  GENERAL_ASYNC = 'generalAsyncValidatorDirective',
+  MIN_LENGTH = 'minlength',
+  EQUAL = 'equalValidator',
+  NOT_EQUAL = 'notEqualValidator',
+  REGEX = 'regexNotMatched',
+  NOT_NUMBER = 'notNumberValidator',
+  HAS_PROPERTY = 'hasPropertyValidator',
+  NO_SPACES = 'noSpaces',
+  MISSING_OPTIONS = 'missingRequiredOptions'
+}
+
+/**
+ * Error handler
+ */
 export abstract class AppFormBaseErrorMsgV2 {
   // error separator
   static readonly SEPARATOR: string = ' / ';
@@ -8,75 +33,77 @@ export abstract class AppFormBaseErrorMsgV2 {
    * Retrieve message
    */
   static msg(
-    translateService: TranslateService,
-    errKey: string,
+    i18nService: I18nService,
+    errKey: AppFormBaseErrorMsgV2Type,
     errData: any
   ): string {
     // dynamic error content, must generate string accordingly
     switch (errKey) {
-      case 'required':
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED');
+      case AppFormBaseErrorMsgV2Type.REQUIRED:
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_REQUIRED');
 
-      case 'minNumberValidator':
-        return translateService.instant(
+      case AppFormBaseErrorMsgV2Type.INTEGER:
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_INTEGER');
+      case AppFormBaseErrorMsgV2Type.MIN_NUMBER:
+        return i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_MIN_NUMBER',
           errData
         );
-      case 'maxNumberValidator':
-        return translateService.instant(
+      case AppFormBaseErrorMsgV2Type.MAX_NUMBER:
+        return i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER',
           errData
         );
 
-      case 'emailValidator':
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL');
+      case AppFormBaseErrorMsgV2Type.EMAIL:
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL');
 
-      case 'invalidDateValidator':
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_INVALID_DATE');
+      case AppFormBaseErrorMsgV2Type.INVALID_DATE:
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_INVALID_DATE');
 
-      case 'dateValidator':
-        return translateService.instant(
+      case AppFormBaseErrorMsgV2Type.DATE:
+        return i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_DATE_COMPARE',
           errData
         );
 
-      case 'generalAsyncValidatorDirective':
-        return translateService.instant(
+      case AppFormBaseErrorMsgV2Type.GENERAL_ASYNC:
+        return i18nService.instant(
           errData.err,
           errData.details
         );
 
-      case 'minlength':
-        return translateService.instant(
+      case AppFormBaseErrorMsgV2Type.MIN_LENGTH:
+        return i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH', {
             length: errData.requiredLength
           }
         );
 
-      case 'equalValidator':
-        return translateService.instant(errData.err);
+      case AppFormBaseErrorMsgV2Type.EQUAL:
+        return i18nService.instant(errData.err);
 
-      case 'notEqualValidator':
-        return translateService.instant(errData.err);
+      case AppFormBaseErrorMsgV2Type.NOT_EQUAL:
+        return i18nService.instant(errData.err);
 
-      case 'regexNotMatched':
-        return translateService.instant(
+      case AppFormBaseErrorMsgV2Type.REGEX:
+        return i18nService.instant(
           errData.msg ?
             errData.msg :
             'LNG_FORM_VALIDATION_ERROR_INVALID_REGEX'
         );
 
-      case 'notNumberValidator':
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER');
+      case AppFormBaseErrorMsgV2Type.NOT_NUMBER:
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER');
 
-      case 'hasPropertyValidator':
-        return translateService.instant(errData.err);
+      case AppFormBaseErrorMsgV2Type.HAS_PROPERTY:
+        return i18nService.instant(errData.err);
 
-      case 'noSpaces':
-        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NO_SPACES');
+      case AppFormBaseErrorMsgV2Type.NO_SPACES:
+        return i18nService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NO_SPACES');
 
-      case 'missingRequiredOptions':
-        return translateService.instant(
+      case AppFormBaseErrorMsgV2Type.MISSING_OPTIONS:
+        return i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_MISSING_REQUIRED_OPTIONS', {
             options: errData.options.join(', ')
           }

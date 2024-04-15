@@ -9,9 +9,13 @@ import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey, StorageService } from '../services/helper/storage.service';
 import { UserModel, UserSettings } from '../models/user.model';
 import * as LzString from 'lz-string';
-import { applyResetOnAllFilters, applySortBy } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { applyResetOnAllFilters, applySortBy, IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem } from '../../shared/components-v2/app-list-table-v2/models/action.model';
+import {
+  IV2ActionIconLabel,
+  IV2ActionMenuLabel,
+  IV2GroupActions
+} from '../../shared/components-v2/app-list-table-v2/models/action.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IBasicCount } from '../models/basic-count.interface';
@@ -19,18 +23,22 @@ import { AuthenticatedComponent } from '../components/authenticated/authenticate
 import { ICachedFilter, ICachedFilterItems, ICachedInputsValues, ICachedSortItem } from './models/cache.model';
 import { ListAppliedFiltersComponent } from './list-applied-filters-component';
 import { V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import {
+  V2AdvancedFilter,
+  V2AdvancedFilterType
+} from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { Directive, ViewChild } from '@angular/core';
 import { AppListTableV2Component } from '../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
-import { SavedFilterData } from '../models/saved-filters.model';
+import { SavedFilterData, SavedFilterDataAppliedFilter } from '../models/saved-filters.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { IV2ProcessSelectedData } from '../../shared/components-v2/app-list-table-v2/models/process-data.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 /**
  * List component
  */
 @Directive()
-export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
+export abstract class ListComponent<T, U extends (IV2Column | IV2ColumnToVisibleMandatoryConf)> extends ListAppliedFiltersComponent<U> {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
 
@@ -47,7 +55,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   quickActions: IV2ActionMenuLabel;
 
   // group actions
-  groupActions: V2ActionMenuItem[];
+  groupActions: IV2GroupActions;
 
   // add action
   addAction: IV2ActionIconLabel;
@@ -133,10 +141,15 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   // disable next load from cache input values ?
   private _disableNextLoadCachedInputValues: boolean = false;
   private _loadedCachedFilterPage: string;
-  private _disableFilterCaching: boolean = false;
-  get disableFilterCaching(): boolean {
-    return this._disableFilterCaching;
-  }
+  private readonly _disableFilterCaching: boolean = false;
+  private readonly _disableFilterCachingOnlyUrl: boolean = false;
+
+  // timers
+  private _initializeTimer: number;
+  private _outbreakChangedTimer: number;
+  private _browserLocationTimer: number;
+  private _forLoadingFiltersTimer: number;
+  private _refreshTableUITimer: number;
 
   // refresh only after we finish changing data
   private triggerListCountRefresh = new DebounceTimeCaller(() => {
@@ -208,7 +221,14 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    */
   protected constructor(
     protected listHelperService: ListHelperService,
-    disableFilterCaching: boolean = false
+    config?: {
+      // optional
+      disableFilterCaching?: boolean,
+      disableFilterCachingOnlyUrl?: boolean,
+      disableWaitForSelectedOutbreakToRefreshList?: boolean,
+      initializeTableColumnsAfterSelectedOutbreakChanged?: boolean,
+      initializeTableAdvancedFiltersAfterSelectedOutbreakChanged?: boolean
+    }
   ) {
     // parent constructor
     super(
@@ -222,7 +242,10 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         triggeredByPageChange?: boolean
       ) => {
         // do we have outbreak - if not, it will be refreshed by that ?
-        if (!this.selectedOutbreak?.id) {
+        if (
+          !config?.disableWaitForSelectedOutbreakToRefreshList &&
+          !this.selectedOutbreak?.id
+        ) {
           return;
         }
 
@@ -239,7 +262,10 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     this.authUser = this.listHelperService.authDataService.getAuthenticatedUser();
 
     // wait for binding so some things get processed
-    setTimeout(() => {
+    this._initializeTimer = setTimeout(() => {
+      // reset
+      this._initializeTimer = undefined;
+
       // initialize breadcrumbs
       this.initializeBreadcrumbs();
 
@@ -247,7 +273,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       this.initializeTableColumnActions();
 
       // initialize table columns
-      this.initializeTableColumns();
+      if (!config?.initializeTableColumnsAfterSelectedOutbreakChanged) {
+        this.initializeTableColumns();
+      }
 
       // initialize process data
       this.initializeProcessSelectedData();
@@ -256,7 +284,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       this.initializeTableInfos();
 
       // initialize advanced filters
-      this.initializeTableAdvancedFilters();
+      if (!config?.initializeTableAdvancedFiltersAfterSelectedOutbreakChanged) {
+        this.initializeTableAdvancedFilters();
+      }
 
       // initialize table quick actions
       this.initializeQuickActions();
@@ -271,10 +301,17 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       this.initializeGroupedData();
 
       // load saved filters
-      this.loadCachedFilters();
+      if (
+        !config?.initializeTableColumnsAfterSelectedOutbreakChanged &&
+        !config?.initializeTableAdvancedFiltersAfterSelectedOutbreakChanged
+      ) {
+        this.loadCachedFilters();
+      }
 
       // apply table column filters
-      this.applyTableColumnFilters();
+      if (!config?.initializeTableColumnsAfterSelectedOutbreakChanged) {
+        this.applyTableColumnFilters();
+      }
 
       // component initialized
       this.initialized();
@@ -300,16 +337,76 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
 
+        // merge default fields
+        this.listHelperService.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.selectedOutbreak);
+
+        // stop previous
+        this.stopOutbreakChangedTimer();
+
         // trigger outbreak selection changed
         // - wait for binding
-        setTimeout(() => {
+        this._outbreakChangedTimer = setTimeout(() => {
+          // reset
+          this._outbreakChangedTimer = undefined;
+
+          // refresh table ui ?
+          let refreshTableUI: boolean = false;
+
+          // initialize table columns
+          if (config?.initializeTableColumnsAfterSelectedOutbreakChanged) {
+            // init
+            this.initializeTableColumns();
+
+            // we need to refresh table ui
+            refreshTableUI = true;
+          }
+
+          // initialize advanced filters
+          if (config?.initializeTableAdvancedFiltersAfterSelectedOutbreakChanged) {
+            // init
+            this.initializeTableAdvancedFilters();
+
+            // we need to refresh table ui
+            refreshTableUI = true;
+          }
+
+          // load saved filters
+          if (
+            config?.initializeTableColumnsAfterSelectedOutbreakChanged ||
+            config?.initializeTableAdvancedFiltersAfterSelectedOutbreakChanged
+          ) {
+            this.loadCachedFilters();
+          }
+
+          // apply table column filters
+          if (config?.initializeTableColumnsAfterSelectedOutbreakChanged) {
+            this.applyTableColumnFilters();
+          }
+
+          // call
           this.selectedOutbreakChanged();
+
+          // update table ui ?
+          if (refreshTableUI) {
+            // stop previous
+            this.stopRefreshTableUITimer();
+
+            // wait for column binding to take effect
+            this._refreshTableUITimer = setTimeout(() => {
+              // reset
+              this._refreshTableUITimer = undefined;
+
+              // resize
+              this.tableV2Component.resizeTable();
+            });
+          }
         });
       });
 
 
     // disable filter caching ?
-    this._disableFilterCaching = disableFilterCaching;
+    this._disableFilterCaching = !!config?.disableFilterCaching;
+    this._disableFilterCachingOnlyUrl = !!config?.disableFilterCachingOnlyUrl;
 
     // check filters
     this.checkListFilters();
@@ -328,7 +425,14 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // listen for back / forward buttons
     ListComponent.locationSubscription = this.listHelperService.location
       .subscribe(() => {
-        setTimeout(() => {
+        // stop previous
+        this.stopBrowserLocationTimer();
+
+        // location changed
+        this._browserLocationTimer = setTimeout(() => {
+          // reset
+          this._browserLocationTimer = undefined;
+
           // check if subscription was closed
           if (
             !ListComponent.locationSubscription ||
@@ -353,6 +457,12 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
           // re-init breadcrumbs
           this.initializeBreadcrumbs();
 
+          // initialize table columns
+          this.initializeTableColumns();
+
+          // initialize advanced filters
+          this.initializeTableAdvancedFilters();
+
           // load cached filters if necessary
           this.loadCachedFiltersIfNecessary();
 
@@ -369,8 +479,18 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Release resources
    */
   onDestroy(): void {
+    // call
+    super.onDestroy();
+
     // release subscribers
     this.releaseSubscribers();
+
+    // stop timers
+    this.stopInitializeTimer();
+    this.stopOutbreakChangedTimer();
+    this.stopBrowserLocationTimer();
+    this.stopForLoadingFiltersTimer();
+    this.stopRefreshTableUITimer();
 
     // unsubscribe other requests
     this.destroyed$.next(true);
@@ -492,8 +612,58 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Tell list that we need to refresh list
-     */
+   * Stop timer
+   */
+  private stopInitializeTimer(): void {
+    if (this._initializeTimer) {
+      clearTimeout(this._initializeTimer);
+      this._initializeTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopOutbreakChangedTimer(): void {
+    if (this._outbreakChangedTimer) {
+      clearTimeout(this._outbreakChangedTimer);
+      this._outbreakChangedTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopRefreshTableUITimer(): void {
+    if (this._refreshTableUITimer) {
+      clearTimeout(this._refreshTableUITimer);
+      this._refreshTableUITimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopBrowserLocationTimer(): void {
+    if (this._browserLocationTimer) {
+      clearTimeout(this._browserLocationTimer);
+      this._browserLocationTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopForLoadingFiltersTimer(): void {
+    if (this._forLoadingFiltersTimer) {
+      clearTimeout(this._forLoadingFiltersTimer);
+      this._forLoadingFiltersTimer = undefined;
+    }
+  }
+
+  /**
+   * Tell list that we need to refresh list
+   */
   public needsRefreshList(
     instant: boolean = false,
     resetPagination: boolean = true,
@@ -602,21 +772,11 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   }
 
   /**
-   * Called after query builder is cleared
-   */
-  clearedQueryBuilder() {
-    // NOTHING
-  }
-
-  /**
    * Clear query builder of conditions and sorting criterias
    */
   clearQueryBuilder() {
     // clear query filters
     this.queryBuilder.clear();
-
-    // cleared query builder
-    this.clearedQueryBuilder();
   }
 
   /**
@@ -681,17 +841,17 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // add default filter criteria
     this.resetFiltersAddDefault();
 
-    // apply table column filters
-    this.applyTableColumnFilters();
-
     // retrieve Side filters
-    let queryBuilder;
+    let queryBuilder: RequestQueryBuilder;
     if (
       this.tableV2Component &&
       (queryBuilder = this.tableV2Component.advancedFiltersQueryBuilder)
     ) {
       this.queryBuilder.merge(queryBuilder);
     }
+
+    // apply table column filters
+    this.applyTableColumnFilters();
 
     // if no side query builder then clear side filters too
     if (
@@ -704,6 +864,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
 
+    // update cached filters
+    this.updateCachedFilters();
+
     // refresh
     this.needsRefreshList(
       true,
@@ -715,7 +878,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Apply the filters selected from the Side Filters section
    */
   applySideFilters(queryBuilder: RequestQueryBuilder) {
-    // clear query builder of conditions and sorting criterias
+    // clear query builder of conditions and sorting criteria
     this.clearQueryBuilder();
 
     // clear table filters
@@ -731,6 +894,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
+
+    // update cached filters
+    this.updateCachedFilters();
 
     // refresh list
     this.needsRefreshList(true);
@@ -764,7 +930,15 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         ) {
           // display only if we're loading data, for save it doesn't matter since we will overwrite it
           if (forLoadingFilters) {
-            setTimeout(() => {
+            // stop previous
+            this.stopForLoadingFiltersTimer();
+
+            // call
+            this._forLoadingFiltersTimer = setTimeout(() => {
+              // reset
+              this._forLoadingFiltersTimer = undefined;
+
+              // show error
               this.listHelperService.toastV2Service.error('LNG_COMMON_LABEL_INVALID_URL_FILTERS');
             });
           }
@@ -897,6 +1071,12 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Save cache to url
    */
   private saveCacheToUrl(currentUserCache: ICachedFilterItems): void {
+    // disabled ?
+    if (this._disableFilterCachingOnlyUrl) {
+      return;
+    }
+
+    // update
     this.mergeQueryParamsToUrl({
       cachedListFilters: JSON.stringify(currentUserCache)
     });
@@ -999,6 +1179,45 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
           // finished
           break;
 
+        case V2FilterType.MULTIPLE_SELECT:
+          // map
+          const selectMap: {
+            [id: string]: true
+          } = {};
+          column.filter.options?.forEach((option) => {
+            selectMap[option.value] = true;
+          });
+
+          // get value
+          column.filter.value = Array.isArray(value) ?
+            value.filter((item) =>
+              typeof item !== 'string' ||
+              !column.filter.options ||
+              selectMap[item]
+            ) :
+            value;
+
+          // finished
+          break;
+
+        // deleted is always a special case
+        // - take in account the side filter cached value
+        case V2FilterType.DELETED:
+
+          // side filter takes precedence, deleted column shouldn't overwrite value
+          let sideFilterValue: SavedFilterDataAppliedFilter = currentUserCacheForCurrentPath.sideFilters?.appliedFilters.find((item) => item.filter?.uniqueKey === `${column.field}${column.label}`);
+          if (!sideFilterValue) {
+            // one more try with global label
+            // - we shouldn't use this one
+            sideFilterValue = currentUserCacheForCurrentPath.sideFilters?.appliedFilters.find((item) => item.filter?.uniqueKey === `${column.field}LNG_COMMON_MODEL_FIELD_LABEL_DELETED`);
+          }
+          column.filter.value = sideFilterValue?.value !== undefined ?
+            sideFilterValue.value :
+            value;
+
+          // finished
+          break;
+
         default:
           column.filter.value = value;
       }
@@ -1037,12 +1256,45 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       return;
     }
 
+    // filter outbreak specific data
+    currentUserCacheForCurrentPath.sideFilters?.appliedFilters?.forEach((applied) => {
+      // nothing to look for ?
+      if (!applied.filter?.uniqueKey) {
+        return;
+      }
+
+      // find filter
+      const filter = this.advancedFilters?.find((advancedFilter) => `${advancedFilter.field}${advancedFilter.label}` === applied.filter.uniqueKey);
+
+      // only multi-selects are of interest
+      // - IMPORTANT: for now we don't need to handle single selects since they are used only for yes/no dropdowns and follow-ups status
+      if (filter?.type === V2AdvancedFilterType.MULTISELECT) {
+        // filter out values
+        if (Array.isArray(applied.value)) {
+          // map
+          const selectMap: {
+            [id: string]: true
+          } = {};
+          filter.options?.forEach((option) => {
+            selectMap[option.value] = true;
+          });
+
+          // get value
+          applied.value = applied.value.filter((item) =>
+            typeof item !== 'string' ||
+            !filter.options ||
+            selectMap[item]
+          );
+        }
+      }
+    });
+
     // load side filters
     this.tableV2Component.generateFiltersFromFilterData(new SavedFilterData(currentUserCacheForCurrentPath.sideFilters));
   }
 
   /**
-   * Check if we need to load cached filters if necessary depending if we already loaded for this route or not
+   * Check if we need to load cached filters if necessary depending on if we already loaded for this route or not
    */
   private loadCachedFiltersIfNecessary(): void {
     // if we loaded cached filters for this page then we don't need to load it again
@@ -1072,7 +1324,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // needs to be here, otherwise DONT_LOAD_STATIC_FILTERS_KEY won't work properly, since this method is called twice...
     this._loadedCachedFilterPage = this.getCachedFilterPageKey();
 
-    // did we disabled loading cached filters for this page ?
+    // did we disable loading cached filters for this page ?
     if (this.listHelperService.route.snapshot.queryParams[Constants.DONT_LOAD_STATIC_FILTERS_KEY]) {
       // next time load the saved filters
       this.mergeQueryParamsToUrl({
@@ -1130,5 +1382,19 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         this.pageSize = this.queryBuilder.paginator.limit;
       }
     }
+  }
+
+  /**
+   * Check if a column should be visible depending on outbreak visible/mandatory settings
+   */
+  protected shouldVisibleMandatoryTableColumnBeVisible(
+    visibleMandatoryKey: string,
+    prop: string
+  ): boolean {
+    return this.listHelperService.model.shouldVisibleMandatoryTableColumnBeVisible(
+      this.selectedOutbreak,
+      visibleMandatoryKey,
+      prop
+    );
   }
 }

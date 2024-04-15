@@ -54,8 +54,14 @@
       border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
       padding: 0.8rem 0;
 
+      &:last-child {
+        border-bottom: 0 none;
+        padding-bottom: 0;
+      }
+
       /* KPI Dashlet - Value - Left */
       .gd-dashlet-kpi-bottom-value-left {
+        @include flex_align_items(center);
         overflow: hidden;
         width: calc(100% - 5rem);
 

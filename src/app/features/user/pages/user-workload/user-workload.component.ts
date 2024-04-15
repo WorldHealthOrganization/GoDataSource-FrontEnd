@@ -1,10 +1,8 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
-import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { map, takeUntil, tap } from 'rxjs/operators';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -16,12 +14,13 @@ import { Location } from '@angular/common';
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../../core/models/saved-filters.model';
 import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-user-workload',
   templateUrl: './user-workload.component.html'
 })
-export class UserWorkloadComponent extends ListComponent<any> implements OnDestroy {
+export class UserWorkloadComponent extends ListComponent<any, IV2Column> implements OnDestroy {
   // default table columns
   defaultTableColumns: IV2Column[] = [
     {
@@ -64,8 +63,9 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
     private location: Location
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
   }
 
@@ -83,8 +83,8 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
   selectedOutbreakChanged(): void {
     // set default advanced filters
     const defaultFilter: IV2DateRange = {
-      startDate: moment(Constants.getCurrentDate().subtract(28, 'days')).startOf('day'),
-      endDate: moment(Constants.getCurrentDate()).endOf('day')
+      startDate: LocalizationHelper.today().subtract(28, 'days').startOf('day'),
+      endDate: LocalizationHelper.today().endOf('day')
     };
     this.tableV2Component.generateFiltersFromFilterData(new SavedFilterData({
       appliedFilterOperator: RequestFilterOperator.AND,
@@ -250,19 +250,19 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
               },
               followUpsPerDay: _.keyBy(user.dates, (entry) => {
                 // determine min & max dates
-                const date = moment(entry.date).startOf('day');
+                const date = LocalizationHelper.toMoment(entry.date).startOf('day');
                 minDate = minDate ?
                   (date.isBefore(minDate) ? date : minDate) :
                   date;
                 maxDate = maxDate ?
-                  (date.isAfter(maxDate) ? moment(date) : maxDate) :
-                  moment(date);
+                  (date.isAfter(maxDate) ? LocalizationHelper.toMoment(date) : maxDate) :
+                  LocalizationHelper.toMoment(date);
 
                 // mark date found
-                usedDates[date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)] = true;
+                usedDates[LocalizationHelper.displayDate(date)] = true;
 
                 // set keys to dates
-                return [date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)];
+                return [LocalizationHelper.displayDate(date)];
               })
             };
           });
@@ -276,7 +276,7 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
             // push dates
             while (minDate.isSameOrBefore(maxDate)) {
               // - exclude dates with no data
-              const formattedDate = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const formattedDate = LocalizationHelper.displayDate(minDate);
               if (usedDates[formattedDate]) {
                 daysColumns.push({
                   field: formattedDate,
@@ -304,7 +304,7 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
                     }
 
                     // construct url
-                    const url: string = `/contacts/follow-ups?fromWorkload=true&date=${ moment(followUpsPerDay.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }&user=${ data.user && data.user.id ? data.user.id : '' }`;
+                    const url: string = `/contacts/follow-ups?fromWorkload=true&date=${ LocalizationHelper.displayDate(followUpsPerDay.date) }&user=${ data.user && data.user.id ? data.user.id : '' }`;
 
                     // status for successful followups
                     const status: string = '&status=' + encodeURIComponent(JSON.stringify([

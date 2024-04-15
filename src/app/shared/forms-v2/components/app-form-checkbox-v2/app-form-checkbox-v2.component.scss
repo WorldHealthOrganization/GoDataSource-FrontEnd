@@ -3,12 +3,19 @@
 /* Checkbox */
 .gd-form-checkbox-v2 {
   .mat-checkbox {
+    cursor: default;
     font-family: $gd-font-family;
 
     .mat-checkbox-layout {
+      cursor: pointer;
+
       .mat-checkbox-inner-container {
         height: 2rem;
         width: 2rem;
+
+        .cdk-visually-hidden {
+          height: 0;
+        }
 
         .mat-checkbox-ripple {
           display: none;

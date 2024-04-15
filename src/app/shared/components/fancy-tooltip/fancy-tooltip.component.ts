@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
   templateUrl: './fancy-tooltip.component.html',
   styleUrls: ['./fancy-tooltip.component.scss']
 })
-export class FancyTooltipComponent implements OnDestroy {
+export class FancyTooltipComponent implements OnInit, OnDestroy {
   // tooltip
   private _tooltipToken: string;
   private _tooltip: string | SafeHtml;
@@ -34,13 +34,37 @@ export class FancyTooltipComponent implements OnDestroy {
   private languageSubscription: Subscription;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected i18nService: I18nService,
     private sanitized: DomSanitizer
-  ) {
-    // on language change..we need to translate again the token
+  ) {}
+
+  /**
+   * Component initialized
+   */
+  ngOnInit(): void {
+    // subscribe to language change
+    this.initializeLanguageChangeListener();
+  }
+
+  /**
+   * Component destroyed
+   */
+  ngOnDestroy(): void {
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+  }
+
+  /**
+   *  Subscribe to language change
+   */
+  private initializeLanguageChangeListener(): void {
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+
+    // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
       .subscribe(() => {
         this.tooltip = this._tooltipToken;
@@ -48,9 +72,10 @@ export class FancyTooltipComponent implements OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
-  ngOnDestroy() {
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();
       this.languageSubscription = null;

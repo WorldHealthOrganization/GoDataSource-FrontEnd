@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { AddressModel } from './address.model';
 import { ContactModel } from './contact.model';
-import { IAnswerData, QuestionModel } from './question.model';
+import { IAnswerData } from './question.model';
 import { BaseModel } from './base.model';
 import { FillLocationModel } from './fill-location.model';
 import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermissionFollowUp, IPermissionRestorable } from './permission.interface';
@@ -10,21 +10,23 @@ import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { EntityType } from './entity-type';
 import { CaseModel } from './case.model';
-import { Moment } from '../helperClasses/x-moment';
+import { SafeHtml } from '@angular/platform-browser';
+import { ContactOfContactModel } from './contact-of-contact.model';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class FollowUpModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRestorable,
-        IPermissionBasicBulk,
-        IPermissionExportable,
-        IPermissionFollowUp {
+    IPermissionBasic,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionExportable,
+    IPermissionFollowUp {
   id: string;
   date: string | Moment;
   address: AddressModel;
   personId: string;
-  person: ContactModel | CaseModel;
+  person: ContactOfContactModel | ContactModel | CaseModel;
   targeted: boolean;
   questionnaireAnswers: {
     [variable: string]: IAnswerData[];
@@ -41,78 +43,14 @@ export class FollowUpModel
   responsibleUserId: string;
   responsibleUser: UserModel;
 
-  /**
-     * Determine alertness
-     */
-  static determineAlertness(
-    template: QuestionModel[],
-    entities: FollowUpModel[]
-  ): FollowUpModel[] {
-    // map alert question answers to object for easy find
-    const alertQuestionAnswers: {
-      [question_variable: string]: {
-        [answer_value: string]: boolean
-      }
-    } = QuestionModel.determineAlertAnswers(template);
+  createdAs: string;
 
-    // map alert value to follow-ups
-    return _.map(entities, (followUpData: FollowUpModel) => {
-      // check if we need to mark follow-up as alerted because of questionnaire answers
-      followUpData.alerted = false;
-      _.each(followUpData.questionnaireAnswers, (
-        answers: IAnswerData[],
-        questionVariable: string
-      ) => {
-        // retrieve answer value
-        // only the newest one is of interest, the old ones shouldn't trigger an alert
-        // the first item should be the newest
-        const answerKey = _.get(answers, '0.value', undefined);
-
-        // there is no point in checking the value if there isn't one
-        if (
-          _.isEmpty(answerKey) &&
-                    !_.isNumber(answerKey)
-        ) {
-          return;
-        }
-
-        // at least one alerted ?
-        if (_.isArray(answerKey)) {
-          // go through all answers
-          _.each(answerKey, (childAnswerKey: string) => {
-            if (_.get(alertQuestionAnswers, `[${questionVariable}][${childAnswerKey}]`)) {
-              // alerted
-              followUpData.alerted = true;
-
-              // stop each
-              return false;
-            }
-          });
-
-          // stop ?
-          if (followUpData.alerted) {
-            // stop each
-            return false;
-          }
-        } else {
-          if (_.get(alertQuestionAnswers, `[${questionVariable}][${answerKey}]`)) {
-            // alerted
-            followUpData.alerted = true;
-
-            // stop each
-            return false;
-          }
-        }
-      });
-
-      // finished
-      return followUpData;
-    });
-  }
+  // used by ui
+  uiStatusForms: SafeHtml;
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Static Permissions - IPermissionBasic
+   */
   static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_VIEW) : false; }
   static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_LIST) : false; }
   static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_CREATE) : false; }
@@ -120,34 +58,34 @@ export class FollowUpModel
   static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_DELETE) : false; }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_RESTORE) : false; }
 
   /**
-     * Static Permissions - IPermissionBasicBulk
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
   static canBulkCreate(): boolean { return false; }
   static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_MODIFY) : false); }
   static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_DELETE) : false); }
   static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_EXPORT) : false; }
 
   /**
-     * Static Permissions - IPermissionFollowUp
-     */
+   * Static Permissions - IPermissionFollowUp
+   */
   static canListDashboard(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_LIST_RANGE) : false; }
   static canGenerate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_GENERATE) : false; }
   static canExportRange(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_EXPORT_RANGE) : false; }
   static canExportDailyForm(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_EXPORT_DAILY_FORM) : false; }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     data = null,
     includeContact: boolean = true
@@ -174,10 +112,17 @@ export class FollowUpModel
         {}
       );
 
-      if (person.type === EntityType.CASE) {
-        this.person = new CaseModel(person);
-      } else {
-        this.person = new ContactModel(person);
+      switch (person.type) {
+        case EntityType.CASE:
+          this.person = new CaseModel(person);
+          break;
+        case EntityType.CONTACT_OF_CONTACT:
+          this.person = new ContactOfContactModel(person);
+          break;
+        // case EntityType.CONTACT:
+        default:
+          this.person = new ContactModel(person);
+          break;
       }
     }
 
@@ -191,11 +136,13 @@ export class FollowUpModel
     if (this.responsibleUser) {
       this.responsibleUser = new UserModel(this.responsibleUser);
     }
+
+    this.createdAs = _.get(data, 'createdAs', 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT');
   }
 
   /**
-     * Permissions - IPermissionBasic
-     */
+   * Permissions - IPermissionBasic
+   */
   canView(user: UserModel): boolean { return FollowUpModel.canView(user); }
   canList(user: UserModel): boolean { return FollowUpModel.canList(user); }
   canCreate(user: UserModel): boolean { return FollowUpModel.canCreate(user); }
@@ -203,26 +150,26 @@ export class FollowUpModel
   canDelete(user: UserModel): boolean { return FollowUpModel.canDelete(user); }
 
   /**
-     * Permissions - IPermissionRestorable
-     */
+   * Permissions - IPermissionRestorable
+   */
   canRestore(user: UserModel): boolean { return FollowUpModel.canRestore(user); }
 
   /**
-     * Permissions - IPermissionBasicBulk
-     */
+   * Permissions - IPermissionBasicBulk
+   */
   canBulkCreate(): boolean { return FollowUpModel.canBulkCreate(); }
   canBulkModify(user: UserModel): boolean { return FollowUpModel.canBulkModify(user); }
   canBulkDelete(user: UserModel): boolean { return FollowUpModel.canBulkDelete(user); }
   canBulkRestore(user: UserModel): boolean { return FollowUpModel.canBulkRestore(user); }
 
   /**
-     * Permissions - IPermissionExportable
-     */
+   * Permissions - IPermissionExportable
+   */
   canExport(user: UserModel): boolean { return FollowUpModel.canExport(user); }
 
   /**
-     * Permissions - IPermissionFollowUp
-     */
+   * Permissions - IPermissionFollowUp
+   */
   canListDashboard(user: UserModel): boolean { return FollowUpModel.canListDashboard(user); }
   canGenerate(user: UserModel): boolean { return FollowUpModel.canGenerate(user); }
   canExportRange(user: UserModel): boolean { return FollowUpModel.canExportRange(user); }

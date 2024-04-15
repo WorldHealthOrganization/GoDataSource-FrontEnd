@@ -13,23 +13,21 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 import { ActivatedRoute } from '@angular/router';
 import { GlobalEntitySearchDataService } from '../../../../core/services/data/global-entity-search.data.service';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import * as _ from 'lodash';
-import { IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-search-result-list',
   templateUrl: './search-result-list.component.html'
 })
-export class SearchResultListComponent extends ListComponent<CaseModel | ContactModel | ContactOfContactModel | EventModel> implements OnDestroy {
+export class SearchResultListComponent extends ListComponent<CaseModel | ContactModel | ContactOfContactModel | EventModel, IV2Column> implements OnDestroy {
   // search by value
   private _searchValue: string;
 
@@ -39,10 +37,8 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
   constructor(
     protected listHelperService: ListHelperService,
     private globalEntitySearchDataService: GlobalEntitySearchDataService,
-    private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
-    private entityHelperService: EntityHelperService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(listHelperService);
@@ -148,7 +144,8 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
                   type: IV2ColumnStatusFormType.CIRCLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           }
@@ -165,7 +162,11 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
             forms.push({
               type: IV2ColumnStatusFormType.CIRCLE,
               color: (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type].getColorCode(),
-              tooltip: this.translateService.instant(data.type)
+              tooltip: this.personAndRelatedHelperService.i18nService.instant(data.type)
+            });
+          } else {
+            forms.push({
+              type: IV2ColumnStatusFormType.EMPTY
             });
           }
 
@@ -190,7 +191,8 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
           type: V2ColumnFormat.BUTTON
         },
         cssCellClass: 'gd-cell-button',
-        buttonLabel: (item) =>
+        buttonLabel: (item) => item.numberOfContacts === 0 ?
+          item.numberOfContacts.toLocaleString('en') :
           (item.numberOfContacts || '').toLocaleString('en'),
         color: 'text',
         click: (item) => {
@@ -200,7 +202,7 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
           }
 
           // display dialog
-          this.entityHelperService.contacts(this.selectedOutbreak, item);
+          this.personAndRelatedHelperService.relationship.contacts(this.selectedOutbreak, item);
         },
         disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipContacts(this.authUser)
       },
@@ -211,7 +213,8 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
           type: V2ColumnFormat.BUTTON
         },
         cssCellClass: 'gd-cell-button',
-        buttonLabel: (item) =>
+        buttonLabel: (item) => item.numberOfExposures === 0 ?
+          item.numberOfExposures.toLocaleString('en') :
           (item.numberOfExposures || '').toLocaleString('en'),
         color: 'text',
         click: (item) => {
@@ -221,7 +224,7 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
           }
 
           // display dialog
-          this.entityHelperService.exposures(this.selectedOutbreak, item);
+          this.personAndRelatedHelperService.relationship.exposures(this.selectedOutbreak, item);
         },
         disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipExposures(this.authUser)
       }
@@ -349,7 +352,7 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
       .pipe(
         catchError((err) => {
           // show error
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
 
           // continue
           return throwError(err);

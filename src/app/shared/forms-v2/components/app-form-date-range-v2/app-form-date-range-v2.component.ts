@@ -8,11 +8,10 @@ import {
   SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { IV2DateRange } from './models/date.model';
-import * as momentOriginal from 'moment';
-import { Moment } from '../../../../core/helperClasses/x-moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-form-date-range-v2',
@@ -41,13 +40,13 @@ export class AppFormDateRangeV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
     // parent initialization
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
 
@@ -83,7 +82,7 @@ export class AppFormDateRangeV2Component
     // must update dates ?
     if (
       this.value?.endDate &&
-      this.value?.endDate instanceof momentOriginal
+      LocalizationHelper.isInstanceOfMoment(this.value?.endDate)
     ) {
       // mutable
       (this.value?.endDate as Moment).endOf('day');

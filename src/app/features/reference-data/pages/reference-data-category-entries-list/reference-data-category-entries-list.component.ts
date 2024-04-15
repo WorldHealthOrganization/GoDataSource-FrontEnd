@@ -12,20 +12,22 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
-import { TranslateService } from '@ngx-translate/core';
 import { IconModel } from '../../../../core/models/icon.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
   templateUrl: './reference-data-category-entries-list.component.html'
 })
-export class ReferenceDataCategoryEntriesListComponent extends ListComponent<ReferenceDataEntryModel> implements OnDestroy {
+export class ReferenceDataCategoryEntriesListComponent extends ListComponent<ReferenceDataEntryModel, IV2Column> implements OnDestroy {
   // category
   category: ReferenceDataCategoryModel;
 
@@ -38,11 +40,13 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
-    private translateService: TranslateService
+    private i18nService: I18nService
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
     );
 
     // retrieve category
@@ -130,7 +134,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
                       title: {
                         get: () => 'LNG_COMMON_LABEL_DELETE',
                         data: () => ({
-                          name: `${ this.translateService.instant(item.value) }`
+                          name: `${ this.i18nService.instant(item.value) }`
                         })
                       },
                       message: {
@@ -199,7 +203,12 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       },
       {
         field: 'code',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE'
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'description',
@@ -230,8 +239,35 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE',
         format: {
           type: V2ColumnFormat.BOOLEAN
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
-      },
+      }
+    ];
+
+    // add system-wide column ?
+    if ((this.activatedRoute.snapshot.data.diseaseSpecificCategories as IResolverV2ResponseModel<ReferenceDataCategoryModel>)?.map[this.category.id]) {
+      this.tableColumns.push({
+        field: 'isSystemWide',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_IS_SYSTEM_WIDE',
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      });
+    }
+
+    // add remaining columns
+    this.tableColumns.push(
       {
         field: 'readonly',
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE',
@@ -244,18 +280,37 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY',
         notVisible: true,
         format: {
-          type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.createdBy].name :
-            ''
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -270,15 +325,18 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
         format: {
-          type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.updatedBy].name :
-            ''
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
         },
         exclude: (): boolean => {
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }
@@ -291,14 +349,14 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
           type: V2ColumnFormat.DATETIME
         }
       }
-    ];
+    );
 
     // add lat & lng for specific categories
     if (
-      this.category.id === ReferenceDataCategory.INSTITUTION_NAME ||
-      this.category.id === ReferenceDataCategory.LAB_NAME ||
-      this.category.id === ReferenceDataCategory.LAB_SEQUENCE_LABORATORY ||
-      this.category.id === ReferenceDataCategory.DATE_RANGE_CENTRE_NAME
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_INSTITUTION_NAME ||
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_NAME ||
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_LABORATORY ||
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME
     ) {
       this.tableColumns.push({
         field: 'geoLocation.lat',
@@ -440,7 +498,24 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'categoryId',
+      'value',
+      'code',
+      'description',
+      'iconUrl',
+      'colorCode',
+      'order',
+      'active',
+      'isSystemWide',
+      'readOnly',
+      'createdBy',
+      'createdOn',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
+    ];
   }
 
   /**
@@ -478,6 +553,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // add category id to request
     countQueryBuilder.filter.byEquality(
@@ -586,8 +662,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
                 ) {
                   // equal ?
                   if (item1.order === item2.order) {
-                    return (item1.value ? this.translateService.instant(item1.value) : '')
-                      .localeCompare((item2.value ? this.translateService.instant(item2.value) : ''));
+                    return (item1.value ? this.i18nService.instant(item1.value) : '')
+                      .localeCompare((item2.value ? this.i18nService.instant(item2.value) : ''));
                   }
 
                   // finished
@@ -605,8 +681,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
                 }
 
                 // finished
-                return (item1.value ? this.translateService.instant(item1.value) : '')
-                  .localeCompare((item2.value ? this.translateService.instant(item2.value) : ''));
+                return (item1.value ? this.i18nService.instant(item1.value) : '')
+                  .localeCompare((item2.value ? this.i18nService.instant(item2.value) : ''));
               });
 
               // create list of items that we need to sort

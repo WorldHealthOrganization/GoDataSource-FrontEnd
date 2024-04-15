@@ -755,6 +755,11 @@ export interface IPermissionContact {
   canConvertToCase(user: UserModel): boolean;
 
   /**
+   * Has permission to convert contact to contact of contact ?
+   */
+  canConvertToContactOfContact(user: UserModel): boolean;
+
+  /**
      * Has permission to export daily follow-up list ?
      */
   canExportDailyFollowUpList(user: UserModel): boolean;
@@ -768,6 +773,11 @@ export interface IPermissionContact {
      * Has permission to export contact dossier ?
      */
   canExportDossier(user: UserModel): boolean;
+
+  /**
+   * Has permission to determine isolated contacts ?
+   */
+  canListIsolatedContacts(user: UserModel): boolean;
 }
 
 /**
@@ -783,6 +793,11 @@ export interface IPermissionContactOfContacts {
      * Has permission to export contact dossier ?
      */
   canExportDossier(user: UserModel): boolean;
+
+  /**
+   * Has permission to convert contact of contact to contact ?
+   */
+  canConvertToContact(user: UserModel): boolean;
 }
 
 /**
@@ -903,6 +918,36 @@ export interface IPermissionDashboard {
      * Has view permission ?
      */
   canViewCasesNotIdentifiedThroughContactsDashlet(user: UserModel): boolean;
+
+  /**
+   * Has export permission ?
+   */
+  canExportCaseFollowUpSuccessRateReport(user: UserModel): boolean;
+
+  /**
+   * Has view permission ?
+   */
+  canViewCasesFromFollowUpsDashlet(user: UserModel): boolean;
+
+  /**
+   * Has view permission ?
+   */
+  canViewCasesLostToFollowUpsDashlet(user: UserModel): boolean;
+
+  /**
+   * Has view permission ?
+   */
+  canViewCasesNotSeenInXDaysDashlet(user: UserModel): boolean;
+
+  /**
+   * Has view permission ?
+   */
+  canViewCasesSeenDashlet(user: UserModel): boolean;
+
+  /**
+   * Has view permission ?
+   */
+  canViewCasesWithSuccessfulFollowUpsDashlet(user: UserModel): boolean;
 
   /**
      * Has view permission ?

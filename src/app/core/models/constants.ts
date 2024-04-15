@@ -1,5 +1,3 @@
-import { moment, Moment } from '../helperClasses/x-moment';
-
 /**
  * Export status steps
  */
@@ -13,6 +11,19 @@ export enum ExportStatusStep {
   LNG_STATUS_STEP_ENCRYPT = 'LNG_STATUS_STEP_ENCRYPT',
   LNG_STATUS_STEP_ARCHIVE = 'LNG_STATUS_STEP_ARCHIVE',
   LNG_STATUS_STEP_EXPORT_FINISHED = 'LNG_STATUS_STEP_EXPORT_FINISHED'
+}
+
+/**
+ * Restore db backup steps
+ */
+export enum RestoreStatusStep {
+  LNG_STATUS_STEP_PREPARING_RESTORE = 'LNG_STATUS_STEP_PREPARING_RESTORE',
+  LNG_STATUS_STEP_UNZIPPING = 'LNG_STATUS_STEP_UNZIPPING',
+  LNG_STATUS_STEP_DECRYPTING = 'LNG_STATUS_STEP_DECRYPTING',
+  LNG_STATUS_STEP_UNZIPPING_COLLECTIONS = 'LNG_STATUS_STEP_UNZIPPING_COLLECTIONS',
+  LNG_STATUS_STEP_RESTORING = 'LNG_STATUS_STEP_RESTORING',
+  LNG_STATUS_STEP_MIGRATING_DATABASE = 'LNG_STATUS_STEP_MIGRATING_DATABASE',
+  LNG_STATUS_STEP_RESTORE_FINISHED = 'LNG_STATUS_STEP_RESTORE_FINISHED'
 }
 
 /**
@@ -47,14 +58,15 @@ export enum ApplyListFilter {
   EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN = 'events_without_date_of_reporting_chain',
   CONTEXT_SENSITIVE_HELP_ITEMS = 'context_sensitive_help_items',
   CASE_SUMMARY = 'case-summary',
-  CASES_BY_LOCATION = 'cases-by-location'
+  CASES_BY_LOCATION = 'cases-by-location',
+  CASES_FOLLOWUP_LIST = 'cases_followup_list',
+  CASES_LOST_TO_FOLLOW_UP = 'cases_lost_to_follow_up',
+  CASES_NOT_SEEN = 'cases_not_seen',
+  CASES_SEEN = 'cases_seen',
+  CASES_FOLLOWED_UP = 'cases_followed_up'
 }
 
 export class Constants {
-  // default display constants
-  static DEFAULT_DATE_DISPLAY_FORMAT = 'YYYY-MM-DD';
-  static DEFAULT_DATE_TIME_DISPLAY_FORMAT = 'YYYY-MM-DD HH:mm';
-
   // default random configs
   static DEFAULT_RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   static DEFAULT_RANDOM_KEY_LENGTH = 16;
@@ -63,6 +75,9 @@ export class Constants {
   static DEFAULT_DEBOUNCE_TIME_MILLISECONDS = 500;
   static DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS = 500;
   static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
+
+  // json property . replacer
+  static readonly DEFAULT_DB_DOT_REPLACER: string = '____';
 
   // pagination defaults and configuration
   static PAGE_SIZE_OPTIONS = [50, 100, 500, 1000];
@@ -211,6 +226,10 @@ export class Constants {
       label: 'LNG_APP_PAGE_CONTACT_LAB_RESULTS',
       value: 'LNG_APP_PAGE_CONTACT_LAB_RESULTS'
     },
+    CONTACT_OF_CONTACT_LAB_RESULTS: {
+      label: 'LNG_APP_PAGE_CONTACT_OF_CONTACT_LAB_RESULTS',
+      value: 'LNG_APP_PAGE_CONTACT_OF_CONTACT_LAB_RESULTS'
+    },
     AVAILABLE_ENTITIES_FOR_RELATIONSHIPS: {
       label: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS',
       value: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_RELATIONSHIPS'
@@ -230,6 +249,10 @@ export class Constants {
     PEOPLE_TO_SHARE_RELATIONSHIPS_WITH: {
       label: 'LNG_APP_PAGE_PEOPLE_TO_SHARE_RELATIONSHIPS_WITH',
       value: 'LNG_APP_PAGE_PEOPLE_TO_SHARE_RELATIONSHIPS_WITH'
+    },
+    AVAILABLE_ENTITIES_FOR_ADD_EXPOSURE: {
+      label: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_ADD_EXPOSURE',
+      value: 'LNG_APP_PAGE_AVAILABLE_ENTITIES_FOR_ADD_EXPOSURE'
     },
     CASES: {
       label: 'LNG_APP_PAGE_CASES',
@@ -318,6 +341,10 @@ export class Constants {
     SYSTEM_DEVICES: {
       label: 'LNG_APP_PAGE_SYSTEM_DEVICES',
       value: 'LNG_APP_PAGE_SYSTEM_DEVICES'
+    },
+    SYSTEM_CLIENT_APPLICATIONS: {
+      label: 'LNG_APP_PAGE_SYSTEM_CLIENT_APPLICATIONS',
+      value: 'LNG_APP_PAGE_SYSTEM_CLIENT_APPLICATIONS'
     }
   };
 
@@ -441,6 +468,18 @@ export class Constants {
     RELATIONSHIP_DATA: {
       label: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA',
       value: 'LNG_APP_PAGE_IMPORT_RELATIONSHIP_DATA'
+    },
+    USER_DATA: {
+      label: 'LNG_APP_PAGE_IMPORT_USER_DATA',
+      value: 'LNG_APP_PAGE_IMPORT_USER_DATA'
+    },
+    ROLE_DATA: {
+      label: 'LNG_APP_PAGE_IMPORT_USER_ROLE_DATA',
+      value: 'LNG_APP_PAGE_IMPORT_USER_ROLE_DATA'
+    },
+    TEAM_DATA: {
+      label: 'LNG_APP_PAGE_IMPORT_TEAM_DATA',
+      value: 'LNG_APP_PAGE_IMPORT_TEAM_DATA'
     }
   };
 
@@ -466,6 +505,40 @@ export class Constants {
     }
   };
 
+  /**
+   * System sync log status step - backup restore
+   */
+  static SYSTEM_SYNC_LOG_STATUS_STEP_BACKUP_RESTORE = {
+    PREPARING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_PREPARING_RESTORE,
+      value: RestoreStatusStep.LNG_STATUS_STEP_PREPARING_RESTORE
+    },
+    UNZIPPING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING,
+      value: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING
+    },
+    DECRYPTING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_DECRYPTING,
+      value: RestoreStatusStep.LNG_STATUS_STEP_DECRYPTING
+    },
+    UNZIPPING_COLLECTIONS: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING_COLLECTIONS,
+      value: RestoreStatusStep.LNG_STATUS_STEP_UNZIPPING_COLLECTIONS
+    },
+    RESTORING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_RESTORING,
+      value: RestoreStatusStep.LNG_STATUS_STEP_RESTORING
+    },
+    MIGRATING: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_MIGRATING_DATABASE,
+      value: RestoreStatusStep.LNG_STATUS_STEP_MIGRATING_DATABASE
+    },
+    FINISHED: {
+      label: RestoreStatusStep.LNG_STATUS_STEP_RESTORE_FINISHED,
+      value: RestoreStatusStep.LNG_STATUS_STEP_RESTORE_FINISHED
+    }
+  };
+
   // keep functionality
   static APPLY_LIST_FILTER = ApplyListFilter;
 
@@ -485,15 +558,12 @@ export class Constants {
     }
   };
 
-  static PROGRESS_OPTIONS = {
-    IN_PROGRESS: {
-      label: 'LNG_PROGRESS_OPTION_LABEL_IN_PROGRESS',
-      value: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_IN_PROGRESS'
-    },
-    COMPLETED: {
-      label: 'LNG_PROGRESS_OPTION_LABEL_COMPLETED',
-      value: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_COMPLETED'
-    }
+  /**
+   * Lab result status
+   */
+  static LAB_TEST_RESULT_STATUS = {
+    IN_PROGRESS: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_IN_PROGRESS',
+    COMPLETED: 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_COMPLETED'
   };
 
   /**
@@ -630,6 +700,10 @@ export class Constants {
 
   // used for the criteria radio buttons in the chains of transmission settings
   static TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS = {
+    NONE: {
+      label: 'LNG_COMMON_LABEL_NONE',
+      value: 'none'
+    },
     CERTAINITY_LEVEL: {
       label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
       value: 'certaintyLevelId'
@@ -925,6 +999,14 @@ export class Constants {
     FILE_ATTACHMENT: {
       label: 'LNG_MODULE_LABEL_FILE_ATTACHMENT',
       value: 'fileAttachment'
+    },
+    IMPORT_MAPPING: {
+      label: 'LNG_MODULE_LABEL_IMPORT_MAPPING',
+      value: 'importMapping'
+    },
+    CLIENT_APPLICATION: {
+      label: 'LNG_MODULE_LABEL_CLIENT_APPLICATION',
+      value: 'clientApplication'
     }
   };
 
@@ -1017,28 +1099,46 @@ export class Constants {
     DEVICE_HISTORY: {
       label: 'LNG_MODULE_LABEL_DEVICE_HISTORY',
       value: 'deviceHistory'
+    },
+    IMPORT_MAPPING: {
+      label: 'LNG_MODULE_LABEL_IMPORT_MAPPING',
+      value: 'importMapping'
+    },
+    CLIENT_APPLICATION: {
+      label: 'LNG_MODULE_LABEL_CLIENT_APPLICATION',
+      value: 'clientApplication'
     }
   };
 
   // possible export types for export sync package
-  static SYNC_PACKAGE_EXPORT_TYPES = {
-    MOBILE: {
-      label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE',
-      value: 'mobile'
-    },
-    SYSTEM: {
-      label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM',
-      value: 'system'
-    },
-    OUTBREAK: {
-      label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK',
-      value: 'outbreak'
-    },
-    FULL: {
-      label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL',
-      value: 'full'
+  static SYNC_PACKAGE_EXPORT_TYPES: {
+    [key: string]: {
+      label: string,
+      value: string,
+      description: string
     }
-  };
+  } = {
+      SYSTEM: {
+        label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM',
+        value: 'system',
+        description: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_SYSTEM_DESCRIPTION'
+      },
+      OUTBREAK: {
+        label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK',
+        value: 'outbreak',
+        description: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_OUTBREAK_DESCRIPTION'
+      },
+      FULL: {
+        label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL',
+        value: 'full',
+        description: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_FULL_DESCRIPTION'
+      },
+      MOBILE: {
+        label: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE',
+        value: 'mobile',
+        description: 'LNG_SYNC_PACKAGE_EXPORT_TYPE_FIELD_LABEL_MOBILE_DESCRIPTION'
+      }
+    };
 
 
   static EPI_CURVE_VIEW_TYPE = {
@@ -1129,20 +1229,14 @@ export class Constants {
     }
   };
 
-  /**
-     * Today date
-     */
-  static getCurrentDate(): Moment {
-    return moment().startOf('day');
-  }
+  // export groups
+  static EXPORT_GROUP = {
+    RELATIONSHIPS_DATA: 'LNG_COMMON_LABEL_EXPORT_GROUP_RELATIONSHIPS_DATA',
+    RECORD_CREATION_AND_UPDATE_DATA: 'LNG_COMMON_LABEL_EXPORT_GROUP_RECORD_CREATION_AND_UPDATE_DATA'
+  };
 
-  /**
-     * Check if a given date is in the future
-     */
-  static isDateInTheFuture(date): boolean {
-    const dateMoment = date ? moment(date) : null;
-    return !!(dateMoment && dateMoment.startOf('day').isAfter(Constants.getCurrentDate()));
-  }
+  // go data who link
+  static readonly GO_DATA_WHO_LINK: string = 'https://godata.who.int';
 
   /**
      * Generate random string

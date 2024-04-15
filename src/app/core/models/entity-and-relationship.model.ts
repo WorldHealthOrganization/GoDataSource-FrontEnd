@@ -4,8 +4,6 @@ import { CaseModel } from './case.model';
 import { EventModel } from './event.model';
 import { EntityType } from './entity-type';
 import { IAnswerData, QuestionModel } from './question.model';
-import { Constants } from './constants';
-import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { RelationshipPersonModel } from './relationship-person.model';
 import { UserModel } from './user.model';
@@ -15,6 +13,7 @@ import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermiss
 import { ContactOfContactModel } from './contact-of-contact.model';
 import { DocumentModel } from './document.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
 
 export class RelationshipModel
   extends BaseModel
@@ -39,8 +38,8 @@ export class RelationshipModel
   dateOfFirstContact: string | Moment;
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Static Permissions - IPermissionBasic
+   */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_CREATE) : false); }
@@ -48,27 +47,27 @@ export class RelationshipModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionRelationship
-     */
+   * Static Permissions - IPermissionRelationship
+   */
   static canReverse(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_REVERSE) : false); }
   static canShare(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_SHARE) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_EXPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionBasicBulk
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
   static canBulkCreate(): boolean { return false; }
   static canBulkModify(): boolean { return false; }
   static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.RELATIONSHIP_BULK_DELETE) : false); }
   static canBulkRestore(): boolean { return false; }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 
@@ -268,7 +267,7 @@ export class EntityModel {
       // no need to do something custom
       (value) => value,
       (value) => ({
-        label: moment(value).isValid() ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : value,
+        label: LocalizationHelper.toMoment(value).isValid() ? LocalizationHelper.displayDate(value) : value,
         value
       })
     );
@@ -318,31 +317,35 @@ export class EntityModel {
   }
 
   /**
-     * Get name + date or age
+     * Get name, type + date or age
      * @param model
      */
-  static getNameWithDOBAge(
-    model: CaseModel | ContactModel | ContactOfContactModel,
+  static getDuplicatePersonDetails(
+    entity: EntityModel,
+    typeLabel,
     yearsLabel: string,
     monthsLabel: string
   ) {
-    // initialize
-    let name: string = model.name;
-
-    // add dob / age
-    if (model.dob) {
-      name += ' ( ' + moment(model.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + ' )';
-    } else if (
-      model.age && (
-        model.age.years > 0 ||
-                model.age.months > 0
-      )
+    // check dob / age
+    let dob = '';
+    if (
+      entity.model.type !== EntityType.EVENT &&
+      !(entity.model instanceof EventModel)
     ) {
-      name += ' ( ' + EntityModel.getAgeString(model.age, yearsLabel, monthsLabel) + ' )';
+      if (entity.model.dob) {
+        dob = ', ' + LocalizationHelper.displayDate(entity.model.dob);
+      } else if (
+        entity.model.age && (
+          entity.model.age.years > 0 ||
+          entity.model.age.months > 0
+        )
+      ) {
+        dob += ', ' + EntityModel.getAgeString(entity.model.age, yearsLabel, monthsLabel);
+      }
     }
 
-    // finished
-    return name;
+    // return entity details
+    return entity.model.name + ' ( ' + typeLabel + dob + ')';
   }
 
   /**
@@ -380,9 +383,9 @@ export class EntityModel {
       records,
       '',
       // no need to do something custom
-      (value: CaseModel | ContactModel | ContactOfContactModel) => moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+      (value: CaseModel | ContactModel | ContactOfContactModel) => LocalizationHelper.displayDate(value.dob),
       (value: CaseModel | ContactModel | ContactOfContactModel) => ({
-        label: moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+        label: LocalizationHelper.displayDate(value.dob),
         value: value.dob
       })
     );
@@ -391,70 +394,80 @@ export class EntityModel {
   /**
    * Determine alertness
    */
-  static determineAlertness<T extends CaseModel | ContactModel>(
+  static determineAlertness<T extends CaseModel | ContactModel | EventModel>(
     template: QuestionModel[],
     entities: T[]
   ): T[] {
     // map alert question answers to object for easy find
     const alertQuestionAnswers: {
       [question_variable: string]: {
-        [answer_value: string]: boolean
+        [answer_value: string]: true
       }
     } = QuestionModel.determineAlertAnswers(template);
 
-    // map alert value to cases
-    return _.map(entities, (itemData: T) => {
-      // check if we need to mark case as alerted because of questionnaire answers
-      itemData.alerted = false;
-      _.each(itemData.questionnaireAnswers, (
-        answers: IAnswerData[],
-        questionVariable: string
-      ) => {
-        // retrieve answer value
-        // only the newest one is of interest, the old ones shouldn't trigger an alert
-        // the first item should be the newest
-        const answerKey = _.get(answers, '0.value', undefined);
+    // map alert value to follow-ups
+    entities.forEach((entity: T) => {
+      // check if we need to mark follow-up as alerted because of questionnaire answers
+      entity.alerted = false;
+      if (entity.questionnaireAnswers) {
+        const props: string[] = Object.keys(entity.questionnaireAnswers);
+        for (let propIndex: number = 0; propIndex < props.length; propIndex++) {
+          // get answer data
+          const questionVariable: string = props[propIndex];
+          const answers: IAnswerData[] = entity.questionnaireAnswers[questionVariable];
 
-        // there is no point in checking the value if there isn't one
-        if (
-          _.isEmpty(answerKey) &&
-          !_.isNumber(answerKey)
-        ) {
-          return;
-        }
+          // retrieve answer value
+          // only the newest one is of interest, the old ones shouldn't trigger an alert
+          // the first item should be the newest
+          const answerKey = answers?.length > 0 ?
+            answers[0].value :
+            undefined;
 
-        // at least one alerted ?
-        if (_.isArray(answerKey)) {
-          // go through all answers
-          _.each(answerKey, (childAnswerKey: string) => {
-            if (_.get(alertQuestionAnswers, `[${questionVariable}][${childAnswerKey}]`)) {
-              // alerted
-              itemData.alerted = true;
+          // there is no point in checking the value if there isn't one
+          if (
+            !answerKey &&
+            typeof answerKey !== 'number'
+          ) {
+            continue;
+          }
 
-              // stop each
-              return false;
+          // at least one alerted ?
+          if (Array.isArray(answerKey)) {
+            // go through all answers
+            for (let answerKeyIndex: number = 0; answerKeyIndex < answerKey.length; answerKeyIndex++) {
+              if (
+                alertQuestionAnswers[questionVariable] &&
+                alertQuestionAnswers[questionVariable][answerKey[answerKeyIndex]]
+              ) {
+                // alerted
+                entity.alerted = true;
+
+                // stop
+                break;
+              }
             }
-          });
 
-          // stop ?
-          if (itemData.alerted) {
-            // stop each
-            return false;
-          }
-        } else {
-          if (_.get(alertQuestionAnswers, `[${questionVariable}][${answerKey}]`)) {
+            // stop ?
+            if (entity.alerted) {
+              // stop
+              break;
+            }
+          } else if (
+            alertQuestionAnswers[questionVariable] &&
+            alertQuestionAnswers[questionVariable][answerKey]
+          ) {
             // alerted
-            itemData.alerted = true;
+            entity.alerted = true;
 
-            // stop each
-            return false;
+            // stop
+            break;
           }
         }
-      });
-
-      // finished
-      return itemData;
+      }
     });
+
+    // finished
+    return entities;
   }
 
   /**
@@ -505,14 +518,14 @@ export class EntityModel {
     if (Array.isArray(this.labResults)) {
       this.labResults = this.labResults.sort((lab1, lab2) => {
         // retrieve lab 1 date
-        const lab1Date = moment(
+        const lab1Date = LocalizationHelper.toMoment(
           lab1.sequence && lab1.sequence.dateResult ?
             lab1.sequence.dateResult :
             lab1.dateSampleTaken
         );
 
         // retrieve lab 2 date
-        const lab2Date = moment(
+        const lab2Date = LocalizationHelper.toMoment(
           lab2.sequence && lab2.sequence.dateResult ?
             lab2.sequence.dateResult :
             lab2.dateSampleTaken

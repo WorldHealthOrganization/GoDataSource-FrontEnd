@@ -8,13 +8,14 @@ import {
   SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 import { MAT_SELECT_CONFIG } from '@angular/material/select';
 import * as _ from 'lodash';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-form-select-multiple-v2',
@@ -60,17 +61,8 @@ export class AppFormSelectMultipleV2Component
     // set data
     this._tooltip = tooltip;
 
-    // translate tooltip
-    const tooltipTranslated = this._tooltip ?
-      this.translateService.instant(this._tooltip) :
-      this._tooltip;
-
-    // add / remove tooltip icon
-    this.tooltipButton = !tooltipTranslated ?
-      undefined : {
-        icon: 'help',
-        tooltip: tooltipTranslated
-      };
+    // update tooltip translation
+    this.updateTooltipTranslation(false);
   }
   get tooltip(): string {
     return this._tooltip;
@@ -97,7 +89,7 @@ export class AppFormSelectMultipleV2Component
       if (this._includeNoValue) {
         // add to all options
         const item = {
-          label: this.translateService.instant('LNG_COMMON_LABEL_NONE'),
+          label: this.i18nService.instant('LNG_COMMON_LABEL_NONE'),
           value: AppFormSelectMultipleV2Component.HAS_NO_VALUE
         };
         this.allOptions.splice(
@@ -141,7 +133,7 @@ export class AppFormSelectMultipleV2Component
         .forEach((item) => {
           // translate
           item.label = item.label ?
-            this.translateService.instant(item.label) :
+            this.i18nService.instant(item.label) :
             item.label;
         });
 
@@ -155,8 +147,8 @@ export class AppFormSelectMultipleV2Component
           ) {
             // equal ?
             if (item1.order === item2.order) {
-              return (item1.label ? this.translateService.instant(item1.label) : '')
-                .localeCompare((item2.label ? this.translateService.instant(item2.label) : ''));
+              return (item1.label ? this.i18nService.instant(item1.label) : '')
+                .localeCompare((item2.label ? this.i18nService.instant(item2.label) : ''));
             }
 
             // finished
@@ -174,8 +166,8 @@ export class AppFormSelectMultipleV2Component
           }
 
           // finished
-          return (item1.label ? this.translateService.instant(item1.label) : '')
-            .localeCompare((item2.label ? this.translateService.instant(item2.label) : ''));
+          return (item1.label ? this.i18nService.instant(item1.label) : '')
+            .localeCompare((item2.label ? this.i18nService.instant(item2.label) : ''));
         });
 
       // add no value if missing
@@ -184,7 +176,7 @@ export class AppFormSelectMultipleV2Component
           0,
           0,
           {
-            label: this.translateService.instant('LNG_COMMON_LABEL_NONE'),
+            label: this.i18nService.instant('LNG_COMMON_LABEL_NONE'),
             value: AppFormSelectMultipleV2Component.HAS_NO_VALUE
           }
         );
@@ -210,6 +202,17 @@ export class AppFormSelectMultipleV2Component
   // toggle all
   toggleAllCheckboxChecked: boolean = false;
 
+  // search value
+  private _searchValue: string;
+
+  // selected values
+  selectedValues: {
+    [value: string]: true
+  } = {};
+
+  // language handler
+  private languageSubscription: Subscription;
+
   // vscroll handler
   @ViewChild('cdkVirtualScrollViewport') cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
@@ -222,48 +225,135 @@ export class AppFormSelectMultipleV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
+    // parent
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
+
+    // language change
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update tooltip translation
+        this.updateTooltipTranslation(true);
+      });
   }
 
   /**
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+  }
+
+  /**
+   * Update visible options depending on if they were disabled or not
+   */
+  writeValue(value: string[]) {
+    // parent
+    super.writeValue(value);
+
+    // do we need to update options ?
+    if (
+      !this.allowDisabledToBeSelected &&
+      this.value?.length
+    ) {
+      this.filterOptions();
+    }
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = undefined;
+    }
+  }
+
+  /**
+   * Update tooltip translation
+   */
+  private updateTooltipTranslation(detectChanges: boolean): void {
+    // translate tooltip
+    const tooltipTranslated = this._tooltip ?
+      this.i18nService.instant(this._tooltip) :
+      this._tooltip;
+
+    // add / remove tooltip icon
+    this.tooltipButton = !tooltipTranslated ?
+      undefined : {
+        icon: 'help',
+        tooltip: tooltipTranslated
+      };
+
+    // update
+    if (detectChanges) {
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   /**
    * Filter options
    */
-  filterOptions(byValue?: string): void {
+  filterOptions(searchValue?: string): void {
+    // update search value
+    if (searchValue !== undefined) {
+      this._searchValue = searchValue;
+    }
+
     // nothing to filter ?
     if (!this.options) {
       this.filteredOptions = [];
       return;
     }
 
+    // map selected values for easy find
+    this.selectedValues = {};
+    if (this.value?.length) {
+      this.value.forEach((value) => {
+        this.selectedValues[value] = true;
+      });
+    }
+
     // filter options
-    if (!byValue) {
+    if (!this._searchValue) {
       // all visible options
-      this.filteredOptions = this.options;
+      this.filteredOptions = this.allowDisabledToBeSelected ?
+        this.options :
+        this.options.filter((item: ILabelValuePairModel): boolean => {
+          return !item.disabled ||
+            this.selectedValues[item.value];
+        });
 
       // finished
       return;
     }
 
     // case insensitive
-    byValue = byValue.toLowerCase();
+    const byValues: string[] = this._searchValue.toLowerCase().split(' ').filter((byValue) => byValue !== '');
 
     // filter
     this.filteredOptions = this.options.filter((item: ILabelValuePairModel): boolean => {
-      return item.label.toLowerCase().indexOf(byValue) > -1;
+      let labelLowered: string;
+      return (
+        this.allowDisabledToBeSelected ||
+        !item.disabled ||
+        this.selectedValues[item.value]
+      ) && (
+        (labelLowered = item.label.toLowerCase()) &&
+        byValues.every((byValue) => labelLowered.indexOf(byValue) > -1)
+      );
     });
   }
 

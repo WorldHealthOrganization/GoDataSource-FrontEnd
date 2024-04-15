@@ -55,9 +55,11 @@
 
   &.toast-top-center {
     .ngx-toastr {
-      width: 50rem;
+      max-height: 40vh;
+      overflow: auto;
+      width: 62.5rem;
 
-      @include breakpoint('xxs') {
+      @include breakpoint('xs') {
         width: 100%;
       }
     }

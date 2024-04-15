@@ -4,8 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -15,7 +13,6 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -24,6 +21,11 @@ import { UserRoleDataService } from '../../../../core/services/data/user-role.da
 import { PERMISSION, PermissionModel } from '../../../../core/models/permission.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 /**
  * Component
@@ -40,23 +42,25 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
-    protected userRoleDataService: UserRoleDataService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected userRoleDataService: UserRoleDataService
   ) {
     // parent
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // clone role ?
@@ -167,7 +171,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_USER_ROLES_TITLE', {
             name: this.itemData.name
           }
@@ -177,7 +181,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_USER_ROLES_TITLE', {
             name: this.itemData.name
           }
@@ -186,6 +190,11 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -201,8 +210,8 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_USER_ROLE_CREATE_USER_ROLE_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -311,13 +320,13 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
               requiredWithoutDefaultValues: true,
               groupOptionFormatMethod: this.isView ? undefined : (
                 sanitized,
-                translateService,
+                i18nService,
                 optionsMap,
                 option
               ) => {
                 return UserRoleHelper.groupOptionFormatMethod(
                   sanitized,
-                  translateService,
+                  i18nService,
                   optionsMap,
                   option
                 );
@@ -325,14 +334,14 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
               groupSelectionChanged: (data) => {
                 UserRoleHelper.groupSelectionChanged(
                   data,
-                  this.translateService,
+                  this.i18nService,
                   this.dialogV2Service
                 );
               },
               groupOptionCheckStateChanged: (data) => {
                 UserRoleHelper.groupOptionCheckStateChanged(
                   data,
-                  this.translateService,
+                  this.i18nService,
                   this.dialogV2Service
                 );
               },
@@ -387,9 +396,11 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_COMMON_LABEL_DETAILS',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }
@@ -471,6 +482,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = UserRoleModel.generateAdvancedFilters({
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         permission: this.activatedRoute.snapshot.data.permission as PermissionModel[]
       }

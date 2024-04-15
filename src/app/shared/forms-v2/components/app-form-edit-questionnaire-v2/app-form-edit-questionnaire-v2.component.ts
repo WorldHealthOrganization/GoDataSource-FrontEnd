@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Host, HostListener, Input, OnDestroy, Optional, SkipSelf, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { Constants } from '../../../../core/models/constants';
@@ -25,6 +24,10 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import * as _ from 'lodash';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 import { IV2BottomDialogConfigButtonType } from '../../../components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 
 /**
  * Flatten type
@@ -90,6 +93,9 @@ export class AppFormEditQuestionnaireV2Component
   // view only
   @Input() viewOnly: boolean;
 
+  // outbreak
+  @Input() outbreak: OutbreakModel | OutbreakTemplateModel;
+
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
 
@@ -98,6 +104,9 @@ export class AppFormEditQuestionnaireV2Component
 
   // invalid drag zone
   private _isInvalidDragEvent: boolean = true;
+
+  // timers
+  private _scrollToItemTimer: number;
 
   // constants
   FlattenType = FlattenType;
@@ -130,16 +139,17 @@ export class AppFormEditQuestionnaireV2Component
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef,
     protected dialogV2Service: DialogV2Service,
     protected activatedRoute: ActivatedRoute,
-    protected formHelperService: FormHelperService
+    protected formHelperService: FormHelperService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
 
@@ -151,7 +161,11 @@ export class AppFormEditQuestionnaireV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // stop timers
+    this.stopScrollToItemTimer();
   }
 
   /**
@@ -169,14 +183,14 @@ export class AppFormEditQuestionnaireV2Component
       questions.forEach((question) => {
         // translate
         question.text = question.text ?
-          this.translateService.instant(question.text) :
+          this.i18nService.instant(question.text) :
           question.text;
 
         // translate answers
         (question.answers || []).forEach((answer) => {
           // translate
           answer.label = answer.label ?
-            this.translateService.instant(answer.label) :
+            this.i18nService.instant(answer.label) :
             answer.label;
 
           // translate sub questions
@@ -471,16 +485,32 @@ export class AppFormEditQuestionnaireV2Component
   }
 
   /**
+   * Stop timer
+   */
+  private stopScrollToItemTimer(): void {
+    if (this._scrollToItemTimer) {
+      clearTimeout(this._scrollToItemTimer);
+      this._scrollToItemTimer = undefined;
+    }
+  }
+
+  /**
    * Make sure our item is visible
    */
   private scrollToItem(scrollToItem: QuestionModel | AnswerModel): void {
+    // stop previous
+    this.stopScrollToItemTimer();
+
     // not valid ?
     if (!scrollToItem) {
       return;
     }
 
     // scroll
-    setTimeout(() => {
+    this._scrollToItemTimer = setTimeout(() => {
+      // reset
+      this._scrollToItemTimer = undefined;
+
       // determine index
       const indexOfMovedItem: number = this.flattenedQuestions.findIndex((item) => item.data === scrollToItem);
       if (
@@ -545,7 +575,7 @@ export class AppFormEditQuestionnaireV2Component
         type: V2SideDialogConfigInputType.HTML,
         name: 'details',
         cssClasses: 'gd-form-edit-questionnaire-v2-details',
-        placeholder: this.translateService.instant(
+        placeholder: this.i18nService.instant(
           'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_DETAILS', {
             details: parent ?
               parent.label :
@@ -711,7 +741,11 @@ export class AppFormEditQuestionnaireV2Component
           value: modifyQuestion ?
             modifyQuestion.category :
             '',
-          options: (this.activatedRoute.snapshot.data.questionnaireQuestionCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.outbreak,
+            (this.activatedRoute.snapshot.data.questionnaireQuestionCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            modifyQuestion?.category
+          ),
           validators: {
             required: () => true
           }
@@ -737,6 +771,7 @@ export class AppFormEditQuestionnaireV2Component
         {
           type: V2SideDialogConfigInputType.ROW,
           name: 'inactive_required_multi_answer',
+          cssClasses: 'gd-app-side-dialog-v2-content-middle-item-input-row-flex',
           inputs: [
             // inactive
             {
@@ -812,7 +847,7 @@ export class AppFormEditQuestionnaireV2Component
         },
         hideInputFilter: true,
         dontCloseOnBackdrop: true,
-        width: '50rem',
+        width: '60rem',
         bottomButtons,
         inputs
       })
@@ -1018,7 +1053,7 @@ export class AppFormEditQuestionnaireV2Component
         type: V2SideDialogConfigInputType.HTML,
         name: 'details',
         cssClasses: 'gd-form-edit-questionnaire-v2-details',
-        placeholder: this.translateService.instant(
+        placeholder: this.i18nService.instant(
           'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_DETAILS', {
             details: parent ?
               parent.text :
@@ -1141,7 +1176,7 @@ export class AppFormEditQuestionnaireV2Component
         },
         hideInputFilter: true,
         dontCloseOnBackdrop: true,
-        width: '50rem',
+        width: '60rem',
         bottomButtons,
         inputs
       })
@@ -1256,9 +1291,9 @@ export class AppFormEditQuestionnaireV2Component
         type: V2SideDialogConfigInputType.HTML,
         name: 'details',
         cssClasses: 'gd-form-edit-questionnaire-v2-details',
-        placeholder: this.translateService.instant(
+        placeholder: this.i18nService.instant(
           'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CLONING', {
-            type: this.translateService.instant(
+            type: this.i18nService.instant(
               item.data instanceof QuestionModel ?
                 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TYPE_QUESTION' :
                 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TYPE_ANSWER'
@@ -1369,7 +1404,7 @@ export class AppFormEditQuestionnaireV2Component
             {
               type: V2SideDialogConfigInputType.TEXT,
               name: `${question.variable}[text]`,
-              placeholder: `${this.translateService.instant('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT')} ${questionNo}`,
+              placeholder: `${this.i18nService.instant('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT')} ${questionNo}`,
               value: question.text,
               validators: {
                 required: () => true
@@ -1427,7 +1462,7 @@ export class AppFormEditQuestionnaireV2Component
           {
             type: V2SideDialogConfigInputType.TEXT,
             name: 'answer[label]',
-            placeholder: this.translateService.instant('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL'),
+            placeholder: this.i18nService.instant('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL'),
             value: item.data.label,
             validators: {
               required: () => true

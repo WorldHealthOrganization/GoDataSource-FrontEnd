@@ -14,7 +14,6 @@ import * as _ from 'lodash';
 import { HierarchicalLocationModel } from '../../models/hierarchical-location.model';
 import { PeoplePossibleDuplicateModel } from '../../models/people-possible-duplicate.model';
 import { EntityType } from '../../models/entity-type';
-import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { catchError, map, mergeMap, takeUntil, tap } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
@@ -25,6 +24,7 @@ import {
   ExportFieldsGroupModelNameEnum
 } from '../../models/export-fields-group.model';
 import { ToastV2Service } from '../helper/toast-v2.service';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/forms-v2/validators/general-async-validator.directive';
 
 @Injectable()
 export class OutbreakDataService {
@@ -44,13 +44,27 @@ export class OutbreakDataService {
   ) {}
 
   /**
-     * Retrieve the list of Outbreaks
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<OutbreakModel[]>}
-     */
+   * Retrieve the list of Outbreaks
+   */
   getOutbreaksList(
-    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
+    usePost?: boolean,
+    retrieveCreatedUpdatedBy?: boolean
   ): Observable<OutbreakModel[]> {
+    // use post
+    if (usePost) {
+      const filter = queryBuilder.buildQuery(false);
+      return this.modelHelper.mapObservableListToModel(
+        this.http.post(
+          `outbreaks/filter${retrieveCreatedUpdatedBy ? '?retrieveCreatedUpdatedBy=1' : ''}`, {
+            filter
+          }
+        ),
+        OutbreakModel
+      );
+    }
+
+    // default
     const filter = queryBuilder.buildQuery();
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`outbreaks?filter=${filter}`),
@@ -86,11 +100,23 @@ export class OutbreakDataService {
   }
 
   /**
-     * Retrieve the number of Outbreaks
-     * @param {RequestQueryBuilder} queryBuilder
-     */
-  getOutbreaksCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
-    // build where filter
+   * Retrieve the number of Outbreaks
+   */
+  getOutbreaksCount(
+    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
+    usePost?: boolean
+  ): Observable<IBasicCount> {
+    // use post
+    if (usePost) {
+      const whereFilter = queryBuilder.filter.generateCondition(false);
+      return this.http.post(
+        'outbreaks/count', {
+          where: whereFilter
+        }
+      );
+    }
+
+    // default
     const whereFilter = queryBuilder.filter.generateCondition(true);
     return this.http.get(`outbreaks/count?where=${whereFilter}`);
   }
@@ -126,12 +152,10 @@ export class OutbreakDataService {
   }
 
   /**
-     * Create a new Outbreak
-     * @param { OutbreakModel } outbreak
-     * @param { string } outbreakTemplateId
-     */
-  createOutbreak(outbreak: OutbreakModel, outbreakTemplateId?: string): Observable<any> {
-    return this.http.post(`outbreaks${outbreakTemplateId ? `?templateId=${outbreakTemplateId}` : '' }`, outbreak)
+   * Create a new Outbreak
+   */
+  createOutbreak(outbreak: OutbreakModel): Observable<any> {
+    return this.http.post('outbreaks', outbreak)
       .pipe(
         mergeMap((res) => {
           // re-determine the selected Outbreak

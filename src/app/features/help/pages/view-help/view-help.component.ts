@@ -6,15 +6,16 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { Observable } from 'rxjs';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { takeUntil } from 'rxjs/operators';
-import { TranslateService } from '@ngx-translate/core';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-view-help-item',
@@ -33,20 +34,22 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    private helpDataService: HelpDataService,
-    private translateService: TranslateService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
+    private helpDataService: HelpDataService
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve path data
@@ -87,10 +90,10 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
     return new Observable((subscriber) => {
       this.helpDataService
         .getHelpItem(this._categoryId, this._itemId)
-        .subscribe(helpItemData => {
+        .subscribe((helpItemData) => {
           // process data
           this._helpItemTitle = helpItemData?.title ?? '';
-          this._helpItemContent = this.translateService.instant(helpItemData?.content) ?? '';
+          this._helpItemContent = this.i18nService.instant(helpItemData?.content) ?? '';
 
           // finish
           subscriber.next(null);
@@ -196,7 +199,7 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
       type: CreateViewModifyV2ExpandColumnType.TEXT,
       link: (item: HelpItemModel) => ['/help/categories', item.categoryId, 'items', item.id, 'view-global'],
       get: {
-        text: (item: HelpItemModel) => this.translateService.instant(item.title)
+        text: (item: HelpItemModel) => this.i18nService.instant(item.title)
       }
     };
   }
@@ -273,4 +276,9 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
       }
     ];
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 }

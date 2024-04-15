@@ -21,7 +21,7 @@ export class InstitutionDataResolver implements IMapResolverV2<ReferenceDataEntr
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.INSTITUTION_NAME)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_INSTITUTION_NAME)
       .pipe(
         map((data) => {
           // construct map

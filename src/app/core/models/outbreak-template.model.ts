@@ -4,9 +4,11 @@ import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreakTemplate, IP
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { Constants } from './constants';
-import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { BaseModel } from './base.model';
+import {
+  ITreeEditorDataValue
+} from '../../shared/forms-v2/components/app-form-tree-editor-v2/models/tree-editor.model';
+import { IVisibleMandatoryDataValue } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
 
 export class OutbreakTemplateModel
   extends BaseModel
@@ -30,86 +32,39 @@ export class OutbreakTemplateModel
   longPeriodsBetweenCaseOnset: number;
   caseInvestigationTemplate: QuestionModel[];
   contactInvestigationTemplate: QuestionModel[];
+  eventInvestigationTemplate: QuestionModel[];
+  caseFollowUpTemplate: QuestionModel[];
   contactFollowUpTemplate: QuestionModel[];
   labResultsTemplate: QuestionModel[];
   isContactLabResultsActive: boolean;
   isContactsOfContactsActive: boolean;
-  isDateOfOnsetRequired: boolean;
   applyGeographicRestrictions: boolean;
+  checkLastContactDateAgainstDateOnSet: boolean;
+  disableModifyingLegacyQuestionnaire: boolean;
 
   generateFollowUpsOverwriteExisting: boolean;
   generateFollowUpsKeepTeamAssignment: boolean;
   generateFollowUpsTeamAssignmentAlgorithm: string;
   generateFollowUpsDateOfLastContact: boolean;
+  generateFollowUpsWhenCreatingContacts: boolean;
+
+  // case follow-ups
+  allowCasesFollowUp: boolean;
+  periodOfFollowupCases: number;
+  frequencyOfFollowUpPerDayCases: number;
+  intervalOfFollowUpCases: string;
+  generateFollowUpsOverwriteExistingCases: boolean;
+  generateFollowUpsKeepTeamAssignmentCases: boolean;
+  generateFollowUpsTeamAssignmentAlgorithmCases: string;
+  generateFollowUpsDateOfOnset: boolean;
+  generateFollowUpsWhenCreatingCases: boolean;
+
+  allowedRefDataItems: ITreeEditorDataValue;
+  visibleAndMandatoryFields: IVisibleMandatoryDataValue;
 
   /**
-   * Advanced filters
+   * Static Permissions - IPermissionBasic
    */
-  static generateAdvancedFilters(data: {
-    options: {
-      disease: ILabelValuePairModel[],
-      followUpGenerationTeamAssignmentAlgorithm: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[]
-    }
-  }): V2AdvancedFilter[] {
-    // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'name',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'description',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'disease',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE',
-        options: data.options.disease,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'generateFollowUpsTeamAssignmentAlgorithm',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
-        options: data.options.followUpGenerationTeamAssignmentAlgorithm,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'generateFollowUpsOverwriteExisting',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'generateFollowUpsKeepTeamAssignment',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'generateFollowUpsDateOfLastContact',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
-        options: data.options.yesNo,
-        sortable: true
-      }
-    ];
-
-    // finished
-    return advancedFilters;
-  }
-
-  /**
-     * Static Permissions - IPermissionBasic
-     */
   static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_VIEW) : false; }
   static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_LIST) : false; }
   static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_CREATE) : false; }
@@ -117,26 +72,28 @@ export class OutbreakTemplateModel
   static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_DELETE) : false; }
 
   /**
-     * Static Permissions - IPermissionQuestionnaire
-     */
+   * Static Permissions - IPermissionQuestionnaire
+   */
   static canModifyCaseQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE) : false; }
   static canModifyContactQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_QUESTIONNAIRE) : false; }
+  static canModifyEventQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_EVENT_QUESTIONNAIRE) : false; }
+  static canModifyCaseFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_FOLLOW_UP_QUESTIONNAIRE) : false; }
   static canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE) : false; }
   static canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE) : false; }
 
   /**
-     * Static Permissions - IPermissionOutbreakTemplate
-     */
+   * Static Permissions - IPermissionOutbreakTemplate
+   */
   static canGenerateOutbreak(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_CREATE, PERMISSION.OUTBREAK_TEMPLATE_VIEW, PERMISSION.OUTBREAK_TEMPLATE_GENERATE_OUTBREAK) : false; }
 
   /**
-     * Static Permissions - IPermissionCloneable
-     */
+   * Static Permissions - IPermissionCloneable
+   */
   static canClone(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.OUTBREAK_TEMPLATE_CREATE_CLONE) : false; }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 
@@ -155,12 +112,28 @@ export class OutbreakTemplateModel
     this.longPeriodsBetweenCaseOnset = _.get(data, 'longPeriodsBetweenCaseOnset');
     this.isContactLabResultsActive = _.get(data, 'isContactLabResultsActive', false);
     this.isContactsOfContactsActive = _.get(data, 'isContactsOfContactsActive', false);
-    this.isDateOfOnsetRequired = _.get(data, 'isDateOfOnsetRequired', true);
     this.applyGeographicRestrictions = _.get(data, 'applyGeographicRestrictions', false);
+    this.checkLastContactDateAgainstDateOnSet = _.get(data, 'checkLastContactDateAgainstDateOnSet', false);
+    this.disableModifyingLegacyQuestionnaire = _.get(data, 'disableModifyingLegacyQuestionnaire', false);
+    this.allowCasesFollowUp = _.get(data, 'allowCasesFollowUp', false);
     this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
     this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
     this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
     this.generateFollowUpsDateOfLastContact = _.get(data, 'generateFollowUpsDateOfLastContact', false);
+    this.generateFollowUpsWhenCreatingCases = _.get(data, 'generateFollowUpsWhenCreatingCases', false);
+    this.generateFollowUpsWhenCreatingContacts = _.get(data, 'generateFollowUpsWhenCreatingContacts', false);
+    this.allowedRefDataItems = _.get(data, 'allowedRefDataItems');
+
+    // case follow-ups
+    this.allowCasesFollowUp = _.get(data, 'allowCasesFollowUp', false);
+    this.periodOfFollowupCases = _.get(data, 'periodOfFollowupCases');
+    this.frequencyOfFollowUpPerDayCases = _.get(data, 'frequencyOfFollowUpPerDayCases');
+    this.intervalOfFollowUpCases = _.get(data, 'intervalOfFollowUpCases');
+    this.generateFollowUpsOverwriteExistingCases = _.get(data, 'generateFollowUpsOverwriteExistingCases', false);
+    this.generateFollowUpsKeepTeamAssignmentCases = _.get(data, 'generateFollowUpsKeepTeamAssignmentCases', true);
+    this.generateFollowUpsTeamAssignmentAlgorithmCases = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithmCases', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
+    this.generateFollowUpsDateOfOnset = _.get(data, 'generateFollowUpsDateOfOnset', false);
+    this.generateFollowUpsWhenCreatingCases = _.get(data, 'generateFollowUpsWhenCreatingCases', false);
 
     // CASE INVESTIGATION TEMPLATE
     this.caseInvestigationTemplate = _.map(
@@ -171,6 +144,18 @@ export class OutbreakTemplateModel
     // CONTACT INVESTIGATION TEMPLATE
     this.contactInvestigationTemplate = _.map(
       _.get(data, 'contactInvestigationTemplate', []),
+      (lData: any) => {
+        return new QuestionModel(lData);
+      });
+    // EVENT TEMPLATE
+    this.eventInvestigationTemplate = _.map(
+      _.get(data, 'eventInvestigationTemplate', []),
+      (lData: any) => {
+        return new QuestionModel(lData);
+      });
+    // CASE FOLLOW_UP INVESTIGATION TEMPLATE
+    this.caseFollowUpTemplate = _.map(
+      _.get(data, 'caseFollowUpTemplate', []),
       (lData: any) => {
         return new QuestionModel(lData);
       });
@@ -186,11 +171,23 @@ export class OutbreakTemplateModel
       (lData: any) => {
         return new QuestionModel(lData);
       });
+
+    // visible / mandatory fields
+    // default values are configured later after initialization where necessary (create/modify outbreak, retrieve selected outbreak)
+    this.visibleAndMandatoryFields = _.get(data, 'visibleAndMandatoryFields');
+
+    // reconstruct property names
+    if (
+      this.visibleAndMandatoryFields &&
+      Object.keys(this.visibleAndMandatoryFields).length > 0
+    ) {
+      this.visibleAndMandatoryFields = JSON.parse(JSON.stringify(this.visibleAndMandatoryFields).replace(new RegExp(Constants.DEFAULT_DB_DOT_REPLACER, 'g'), '.'));
+    }
   }
 
   /**
-     * Permissions - IPermissionBasic
-     */
+   * Permissions - IPermissionBasic
+   */
   canView(user: UserModel): boolean { return OutbreakTemplateModel.canView(user); }
   canList(user: UserModel): boolean { return OutbreakTemplateModel.canList(user); }
   canCreate(user: UserModel): boolean { return OutbreakTemplateModel.canCreate(user); }
@@ -198,20 +195,21 @@ export class OutbreakTemplateModel
   canDelete(user: UserModel): boolean { return OutbreakTemplateModel.canDelete(user); }
 
   /**
-     * Permissions - IPermissionQuestionnaire
-     */
+   * Permissions - IPermissionQuestionnaire
+   */
   canModifyCaseQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyCaseQuestionnaire(user); }
   canModifyContactQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyContactQuestionnaire(user); }
+  canModifyEventQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyEventQuestionnaire(user); }
   canModifyContactFollowUpQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyContactFollowUpQuestionnaire(user); }
   canModifyCaseLabResultQuestionnaire(user: UserModel): boolean { return OutbreakTemplateModel.canModifyCaseLabResultQuestionnaire(user); }
 
   /**
-     * Permissions - IPermissionOutbreakTemplate
-     */
+   * Permissions - IPermissionOutbreakTemplate
+   */
   canGenerateOutbreak(user: UserModel): boolean { return OutbreakTemplateModel.canGenerateOutbreak(user); }
 
   /**
-     * Permissions - IPermissionCloneable
-     */
+   * Permissions - IPermissionCloneable
+   */
   canClone(user: UserModel): boolean { return OutbreakTemplateModel.canClone(user); }
 }

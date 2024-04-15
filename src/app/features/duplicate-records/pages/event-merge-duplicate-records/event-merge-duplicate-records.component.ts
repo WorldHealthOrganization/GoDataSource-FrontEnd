@@ -6,18 +6,26 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { EventModel } from '../../../../core/models/event.model';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import {
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2Buttons,
+  ICreateViewModifyV2CreateOrUpdate,
+  ICreateViewModifyV2Tab,
+  ICreateViewModifyV2TabTable
+} from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { TranslateService } from '@ngx-translate/core';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
@@ -31,32 +39,38 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     date: ILabelValuePairModel[],
     dateOfReporting: ILabelValuePairModel[],
     isDateOfReportingApproximate: ILabelValuePairModel[],
+    visualId: ILabelValuePairModel[],
     responsibleUserId: ILabelValuePairModel[],
     eventCategory: ILabelValuePairModel[],
     endDate: ILabelValuePairModel[],
-    description: ILabelValuePairModel[]
-    addresses: ILabelValuePairModel[]
+    description: ILabelValuePairModel[],
+    addresses: ILabelValuePairModel[],
+    questionnaireAnswers: ILabelValuePairModel[]
   };
   private _addressID: string;
+  private _selectedQuestionnaireAnswers: number;
 
   /**
    * Constructor
    */
   constructor(
-    private activatedRoute: ActivatedRoute,
-    private outbreakDataService: OutbreakDataService,
-    private translateService: TranslateService,
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
+    private outbreakDataService: OutbreakDataService,
+    private locationDataService: LocationDataService
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve events ids
@@ -102,97 +116,191 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
           })
         )
         .subscribe((mergeRecords) => {
-          // determine data
-          this._uniqueOptions = {
-            name: this.getFieldOptions(
-              mergeRecords,
-              'name'
-            ).options,
-            date: this.getFieldOptions(
-              mergeRecords,
-              'date'
-            ).options,
-            dateOfReporting: this.getFieldOptions(
-              mergeRecords,
-              'dateOfReporting'
-            ).options,
-            isDateOfReportingApproximate: this.getFieldOptions(
-              mergeRecords,
-              'isDateOfReportingApproximate'
-            ).options,
-            responsibleUserId: this.getFieldOptions(
-              mergeRecords,
-              'responsibleUserId'
-            ).options,
-            eventCategory: this.getFieldOptions(
-              mergeRecords,
-              'eventCategory'
-            ).options,
-            endDate: this.getFieldOptions(
-              mergeRecords,
-              'endDate'
-            ).options,
-            description: this.getFieldOptions(
-              mergeRecords,
-              'description'
-            ).options,
-            addresses: []
+          // map locations
+          const locationsMap: {
+            [id: string]: string
+          } = {};
+
+          // determine and format data for each item
+          const finish = () => {
+            // determine data
+            this._uniqueOptions = {
+              name: this.getFieldOptions(
+                mergeRecords,
+                'name'
+              ).options,
+              date: this.getFieldOptions(
+                mergeRecords,
+                'date'
+              ).options,
+              dateOfReporting: this.getFieldOptions(
+                mergeRecords,
+                'dateOfReporting'
+              ).options,
+              isDateOfReportingApproximate: this.getFieldOptions(
+                mergeRecords,
+                'isDateOfReportingApproximate'
+              ).options,
+              visualId: this.getFieldOptions(
+                mergeRecords,
+                'visualId'
+              ).options,
+              responsibleUserId: this.getFieldOptions(
+                mergeRecords,
+                'responsibleUserId'
+              ).options,
+              eventCategory: this.getFieldOptions(
+                mergeRecords,
+                'eventCategory'
+              ).options,
+              endDate: this.getFieldOptions(
+                mergeRecords,
+                'endDate'
+              ).options,
+              description: this.getFieldOptions(
+                mergeRecords,
+                'description'
+              ).options,
+              addresses: [],
+              questionnaireAnswers: mergeRecords
+                .filter((item) => (item.model as EventModel).questionnaireAnswers && Object.keys((item.model as EventModel).questionnaireAnswers).length > 0)
+                .map((item, index) => ({
+                  label: `${ this.i18nService.instant('LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
+                  value: index,
+                  data: (item.model as EventModel).questionnaireAnswers
+                }))
+            };
+
+            // go through records and determine data
+            mergeRecords.forEach((item) => {
+              // determine addresses
+              const event = item.model as EventModel;
+              const eventFullAddress = event.address?.fullAddress;
+
+              // create a full address with all fields (filter is used to remove empty strings or undefined values)
+              const addressLabelFields: string = [
+                eventFullAddress,
+                event.address?.locationId ? locationsMap[event.address.locationId] : undefined,
+                event.address?.postalCode,
+                event.address?.emailAddress,
+                event.address?.phoneNumber,
+                event.address?.geoLocation?.lat,
+                event.address?.geoLocation?.lng
+              ].map((e) => e ? e.toString().trim() : e)
+                .filter((e) => e)
+                .join(', ');
+
+              // add to list ?
+              if (addressLabelFields) {
+                this._uniqueOptions.addresses.push({
+                  label: addressLabelFields,
+                  value: event.id,
+                  data: event.address
+                });
+              }
+            });
+
+            // auto-select if only one value
+            const data: EventModel = new EventModel();
+            data.name = this._uniqueOptions.name.length === 1 ?
+              this._uniqueOptions.name[0].value :
+              data.name;
+            data.date = this._uniqueOptions.date.length === 1 ?
+              this._uniqueOptions.date[0].value :
+              data.date;
+            data.dateOfReporting = this._uniqueOptions.dateOfReporting.length === 1 ?
+              this._uniqueOptions.dateOfReporting[0].value :
+              data.dateOfReporting;
+            data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
+              this._uniqueOptions.isDateOfReportingApproximate[0].value :
+              data.isDateOfReportingApproximate;
+            data.visualId = this._uniqueOptions.visualId.length === 1 ?
+              this._uniqueOptions.visualId[0].value :
+              data.visualId;
+            data.responsibleUserId = this._uniqueOptions.responsibleUserId.length === 1 ?
+              this._uniqueOptions.responsibleUserId[0].value :
+              data.responsibleUserId;
+            data.eventCategory = this._uniqueOptions.eventCategory.length === 1 ?
+              this._uniqueOptions.eventCategory[0].value :
+              data.eventCategory;
+            data.endDate = this._uniqueOptions.endDate.length === 1 ?
+              this._uniqueOptions.endDate[0].value :
+              data.endDate;
+            data.description = this._uniqueOptions.description.length === 1 ?
+              this._uniqueOptions.description[0].value :
+              data.description;
+            this._addressID = this._uniqueOptions.addresses.length === 1 ?
+              this._uniqueOptions.addresses[0].value :
+              undefined;
+            data.address = this._addressID !== undefined ?
+              this._uniqueOptions.addresses.find((addressItem) => addressItem.value === this._addressID).data :
+              undefined;
+
+            // select questionnaire answers
+            this._selectedQuestionnaireAnswers = this._uniqueOptions.questionnaireAnswers.length === 1 ?
+              this._uniqueOptions.questionnaireAnswers[0].value :
+              this._selectedQuestionnaireAnswers;
+            if (
+              this._selectedQuestionnaireAnswers ||
+              this._selectedQuestionnaireAnswers === 0
+            ) {
+              data.questionnaireAnswers = this._uniqueOptions.questionnaireAnswers[this._selectedQuestionnaireAnswers].data;
+            }
+
+            // finish
+            subscriber.next(data);
+            subscriber.complete();
           };
 
-          // go through records and determine data
+          // map list of location Ids
+          const locationIdsMap: {
+            [locationId: string]: true
+          } = {};
           mergeRecords.forEach((item) => {
-            // determine addresses
-            const event = item.model as EventModel;
-
-            // add to list ?
-            if (
-              event.address.locationId ||
-              event.address.fullAddress
-            ) {
-              this._uniqueOptions.addresses.push({
-                label: event.address.fullAddress,
-                value: event.id,
-                data: event.address
-              });
+            if ((item.model as EventModel)?.address?.locationId) {
+              locationIdsMap[(item.model as EventModel).address.locationId] = true;
             }
           });
 
-          // auto-select if only one value
-          const data: EventModel = new EventModel();
-          data.name = this._uniqueOptions.name.length === 1 ?
-            this._uniqueOptions.name[0].value :
-            data.name;
-          data.date = this._uniqueOptions.date.length === 1 ?
-            this._uniqueOptions.date[0].value :
-            data.date;
-          data.dateOfReporting = this._uniqueOptions.dateOfReporting.length === 1 ?
-            this._uniqueOptions.dateOfReporting[0].value :
-            data.dateOfReporting;
-          data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
-            this._uniqueOptions.isDateOfReportingApproximate[0].value :
-            data.isDateOfReportingApproximate;
-          data.responsibleUserId = this._uniqueOptions.responsibleUserId.length === 1 ?
-            this._uniqueOptions.responsibleUserId[0].value :
-            data.responsibleUserId;
-          data.eventCategory = this._uniqueOptions.eventCategory.length === 1 ?
-            this._uniqueOptions.eventCategory[0].value :
-            data.eventCategory;
-          data.endDate = this._uniqueOptions.endDate.length === 1 ?
-            this._uniqueOptions.endDate[0].value :
-            data.endDate;
-          data.description = this._uniqueOptions.description.length === 1 ?
-            this._uniqueOptions.description[0].value :
-            data.description;
-          this._addressID = this._uniqueOptions.addresses.length === 1 ?
-            this._uniqueOptions.addresses[0].value :
-            undefined;
-          data.address = this._addressID !== undefined ?
-            this._uniqueOptions.addresses.find((addressItem) => addressItem.value === this._addressID).data :
-            undefined;
+          // check if there are location to retrieve
+          const locationIds: string[] = Object.keys(locationIdsMap);
+          if (locationIds.length) {
+            // construct query builder
+            const qbLocations: RequestQueryBuilder = new RequestQueryBuilder();
+            qb.fields(
+              'id',
+              'name'
+            );
+            qbLocations.filter.bySelect(
+              'id',
+              locationIds,
+              false,
+              null
+            );
 
-          // finish
-          subscriber.next(data);
-          subscriber.complete();
+            // retrieve locations
+            this.locationDataService
+              .getLocationsList(qbLocations)
+              .pipe(
+                catchError((err) => {
+                  // finished
+                  subscriber.error(err);
+                  return throwError(err);
+                })
+              )
+              .subscribe((locations) => {
+                // map the new locations
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location.name;
+                });
+
+                // format data
+                finish();
+              });
+          } else {
+            // format data
+            finish();
+          }
         });
     });
   }
@@ -238,6 +346,11 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
     * Initialize tabs
     */
   protected initializeTabs(): void {
@@ -245,7 +358,10 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       // tabs
       tabs: [
         // Personal
-        this.initializeTabsDetails()
+        this.initializeTabsDetails(),
+
+        // Questionnaires
+        this.initializeTabsQuestionnaire()
       ],
 
       // create details
@@ -282,6 +398,33 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
    * Refresh expand list
    */
   refreshExpandList(_data): void {}
+
+  /**
+   * Initialize tab - Questionnaire
+   */
+  private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'questionnaire',
+      label: 'LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
+        name: 'questionnaireAnswers',
+        questionnaire: this.selectedOutbreak.eventInvestigationTemplate,
+        disableValidation: true,
+        value: {
+          get: () => this.itemData.questionnaireAnswers,
+          set: undefined
+        },
+        updateErrors: () => {}
+      },
+      invalidHTMLSuffix: () => '',
+      visible: () => this.selectedOutbreak.eventInvestigationTemplate?.length > 0 &&
+        this.itemData.questionnaireAnswers &&
+        Object.keys(this.itemData.questionnaireAnswers).length > 0
+    };
+  }
+
 
   /**
  * Initialize buttons
@@ -331,6 +474,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     ) => {
       // cleanup
       delete data.addresses;
+      delete data._selectedQuestionnaireAnswers;
 
       // finished
       this.outbreakDataService
@@ -460,6 +604,21 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'visualId',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+            description: () => this.i18nService.instant(
+              'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+              this.selectedOutbreak.eventIdMask
+            ),
+            options: this._uniqueOptions.visualId,
+            value: {
+              get: () => this.itemData.visualId,
+              set: (value) => {
+                this.itemData.visualId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'responsibleUserId',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
             description: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
@@ -472,7 +631,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             },
             replace: {
               condition: () => !UserModel.canListForFilters(this.authUser),
-              html: this.translateService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
+              html: this.i18nService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -541,7 +700,40 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
                 get: () => this.itemData.address
               },
               visible: () => !!this.itemData.address,
-              readonly: true
+              readonly: true,
+              visibleMandatoryChild: {
+                visible: () => true,
+                mandatory: () => false
+              }
+            }
+          ]
+        },
+        // Questionnaires
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE',
+          inputs: [
+            // answers
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: '_selectedQuestionnaireAnswers',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+              options: this._uniqueOptions.questionnaireAnswers,
+              value: {
+                get: () => this._selectedQuestionnaireAnswers as any,
+                set: (value) => {
+                  // set data
+                  this._selectedQuestionnaireAnswers = value as any;
+
+                  // hack to force re-render without throwing errors because some bindings are missing
+                  this.itemData.questionnaireAnswers = {};
+                  setTimeout(() => {
+                    this.itemData.questionnaireAnswers = this._selectedQuestionnaireAnswers || this._selectedQuestionnaireAnswers === 0 ?
+                      this._uniqueOptions.questionnaireAnswers[this._selectedQuestionnaireAnswers].data :
+                      null;
+                  });
+                }
+              }
             }
           ]
         }

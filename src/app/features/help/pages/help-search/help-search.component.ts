@@ -7,20 +7,20 @@ import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { TranslateService } from '@ngx-translate/core';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-help-search',
   templateUrl: './help-search.component.html'
 })
-export class HelpSearchComponent extends ListComponent<HelpItemModel> implements OnDestroy {
+export class HelpSearchComponent extends ListComponent<HelpItemModel, IV2Column> implements OnDestroy {
   // help items
   helpItemsList$: Observable<HelpItemModel[]>;
 
@@ -33,13 +33,15 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
   constructor(
     protected listHelperService: ListHelperService,
     private helpDataService: HelpDataService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
     );
   }
 
@@ -100,7 +102,7 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
         label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY',
         format: {
           type: (item) => item.category?.name ?
-            this.translateService.instant(item.category.name) :
+            this.i18nService.instant(item.category.name) :
             ''
         },
         sortable: true,

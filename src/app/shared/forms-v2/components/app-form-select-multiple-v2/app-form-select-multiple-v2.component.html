@@ -108,7 +108,7 @@
         <mat-option
           *cdkVirtualFor="let option of filteredOptions; templateCacheSize: 0"
           [value]="option.value"
-          [disabled]="!allowDisabledToBeSelected && option.disabled">
+          [disabled]="!allowDisabledToBeSelected && option.disabled && !selectedValues[option.value]">
           <div
             [matTooltip]="optionTooltipKey ? option.data[optionTooltipKey] : undefined">
 

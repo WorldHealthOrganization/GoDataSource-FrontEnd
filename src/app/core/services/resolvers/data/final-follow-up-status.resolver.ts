@@ -21,7 +21,7 @@ export class FinalFollowUpStatusDataResolver implements IMapResolverV2<Reference
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.CONTACT_FINAL_FOLLOW_UP_STATUS)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE)
       .pipe(
         map((data) => {
           // construct map

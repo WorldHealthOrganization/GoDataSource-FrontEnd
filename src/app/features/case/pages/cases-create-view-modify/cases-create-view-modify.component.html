@@ -4,6 +4,7 @@
   [loadingPage]="loadingPage"
   [loadingItemData]="loadingItemData"
   [breadcrumbs]="breadcrumbs"
+  [breadcrumbInfos]="breadcrumbInfos"
   [pageTitle]="pageTitle"
   [pageTitleData]="pageTitleData"
   [itemID]="itemData?.id"
@@ -17,6 +18,7 @@
   expandListAdvancedFiltersCacheKey="/cases"
   [pageSettingsKey]="UserSettings.CASE_GENERAL"
   enableTabReorder="true"
+  [tabConfiguration]="tabConfiguration"
   (expandListRefreshData)="refreshExpandList($event)"
   (expandListChangeRecord)="expandListChangeRecord($event)">
 </app-create-view-modify-v2>

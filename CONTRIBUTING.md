@@ -20,4 +20,4 @@ There are a few ways you can contribute to this project:
 
 ## Code of Conduct
 
-Any contribution, including Issues, Discussion and comments, must adhere to our [Code of Conduct](CODE_OF_CONDUCT.md).
+Any contribution, including Issues, Discussion and comments, must adhere to our [Code of Conduct](https://github.com/WorldHealthOrganization/godata/blob/master/CODE_OF_CONDUCT.md).

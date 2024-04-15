@@ -3,7 +3,6 @@ import { AppDashletV2 } from '../../helperClasses/app-dashlet-v2';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Constants } from '../../../../core/models/constants';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -11,7 +10,6 @@ import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { TranslateService } from '@ngx-translate/core';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { MetricContactsPerCaseModel } from '../../../../core/models/metrics/metric-contacts-per-case.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
@@ -26,6 +24,8 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 import { MetricContactsSeenEachDays } from '../../../../core/models/metrics/metric-contacts-seen-each-days.model';
 import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
 import { AppKpiDashletComponent } from '../app-kpi-dashlet/app-kpi-dashlet.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contacts-kpi-dashlet',
@@ -43,7 +43,7 @@ export class AppContactsKpiDashletComponent
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private relationshipDataService: RelationshipDataService,
     private followUpsDataService: FollowUpsDataService,
     private caseDataService: CaseDataService,
@@ -97,7 +97,7 @@ export class AppContactsKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.byDateRange(
               'contactDate', {
-                endDate: moment(globalFilterDate).endOf('day').format()
+                endDate: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             );
           }
@@ -146,7 +146,7 @@ export class AppContactsKpiDashletComponent
           _globalFilterLocationId,
           _globalFilterClassificationId
         ) => undefined,
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEAN_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEAN_TITLE_DESCRIPTION')
       },
 
       // Contacts per case median
@@ -168,7 +168,7 @@ export class AppContactsKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.byDateRange(
               'contactDate', {
-                endDate: moment(globalFilterDate).endOf('day').format()
+                endDate: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             );
           }
@@ -217,7 +217,7 @@ export class AppContactsKpiDashletComponent
           _globalFilterLocationId,
           _globalFilterClassificationId
         ) => undefined,
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE_DESCRIPTION')
       },
 
       // Contacts on the follow-up list
@@ -228,7 +228,7 @@ export class AppContactsKpiDashletComponent
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE',
         prefixData: () => ({
           date: this.globalFilterDate ?
-            moment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(this.globalFilterDate) :
             '—'
         }),
         refresh: (
@@ -267,10 +267,10 @@ export class AppContactsKpiDashletComponent
             qb.filter
               .byEquality(
                 'startDate',
-                moment(globalFilterDate).startOf('day').toISOString()
+                LocalizationHelper.toMoment(globalFilterDate).startOf('day').toISOString()
               ).byEquality(
                 'endDate',
-                moment(globalFilterDate).endOf('day').toISOString()
+                LocalizationHelper.toMoment(globalFilterDate).endOf('day').toISOString()
               );
           }
 
@@ -312,7 +312,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE_DESCRIPTION')
       },
 
       // Contacts Lost to follow-up
@@ -337,7 +337,7 @@ export class AppContactsKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               dateOfReporting: {
-                lte: moment(globalFilterDate).toISOString()
+                lte: LocalizationHelper.toMoment(globalFilterDate).toISOString()
               }
             });
           }
@@ -396,7 +396,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP_DESCRIPTION')
       },
 
       // Contacts Not Seen
@@ -423,7 +423,7 @@ export class AppContactsKpiDashletComponent
           if (inputValue !== undefined) {
             // add number of days until current day
             if (globalFilterDate) {
-              inputValue += moment().endOf('day').diff(moment(globalFilterDate).endOf('day'), 'days');
+              inputValue += LocalizationHelper.now().endOf('day').diff(LocalizationHelper.toMoment(globalFilterDate).endOf('day'), 'days');
             }
 
             // create filter
@@ -437,7 +437,7 @@ export class AppContactsKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               date: {
-                lte: moment(globalFilterDate).toISOString()
+                lte: LocalizationHelper.toMoment(globalFilterDate).toISOString()
               }
             });
           }
@@ -498,7 +498,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE_DESCRIPTION')
       },
 
       // Number of contacts becoming cases in period & location
@@ -553,7 +553,7 @@ export class AppContactsKpiDashletComponent
             );
             qb.filter.byDateRange(
               'dateBecomeCase', {
-                endDate: moment(globalFilterDate).endOf('day').format()
+                endDate: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             );
           }
@@ -633,7 +633,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_DESCRIPTION')
       },
 
       // Contacts seen each day
@@ -644,7 +644,7 @@ export class AppContactsKpiDashletComponent
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY',
         prefixData: () => ({
           date: this.globalFilterDate ?
-            moment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(this.globalFilterDate) :
             '—'
         }),
         refresh: (
@@ -656,7 +656,7 @@ export class AppContactsKpiDashletComponent
           // retrieve data
           return this.listFilterDataService
             .filterContactsSeen(
-              moment(globalFilterDate),
+              LocalizationHelper.toMoment(globalFilterDate),
               globalFilterLocationId,
               globalFilterClassificationId
             );
@@ -692,7 +692,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY_DESCRIPTION')
       },
 
       // Contacts with successful follow-ups
@@ -703,7 +703,7 @@ export class AppContactsKpiDashletComponent
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP',
         prefixData: () => ({
           date: this.globalFilterDate ?
-            moment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            LocalizationHelper.displayDate(this.globalFilterDate) :
             '—'
         }),
         refresh: (
@@ -715,7 +715,7 @@ export class AppContactsKpiDashletComponent
           // retrieve data
           return this.listFilterDataService
             .filterContactsWithSuccessfulFollowup(
-              moment(globalFilterDate),
+              LocalizationHelper.toMoment(globalFilterDate),
               globalFilterLocationId,
               globalFilterClassificationId
             );
@@ -751,7 +751,7 @@ export class AppContactsKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP_DESCRIPTION')
       }
     ];
 

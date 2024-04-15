@@ -9,20 +9,27 @@ import { AuthDataService } from '../data/auth.data.service';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { AuthModel } from '../../models/auth.model';
-import { moment } from '../../helperClasses/x-moment';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { of } from 'rxjs/internal/observable/of';
+import { LocalizationHelper } from '../../helperClasses/localization-helper';
 
 @Injectable()
 export class I18nService {
+  // default language
   private defaultLanguageId = 'english_us';
 
+  // events
   private languageLoadedEvent = new EventEmitter<void>();
   public languageChangedEvent = new EventEmitter<void>();
 
+  // used to determine if language was loaded
+  get currentLang(): string {
+    return this.translateService.currentLang;
+  }
+
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private translateService: TranslateService,
     private storageService: StorageService,
@@ -94,7 +101,7 @@ export class I18nService {
     // determine since when we need to update tokens
     const loadedLanguages = this.translateService.getLangs() || [];
     const oldDates = this.storageService.get(StorageKey.LANGUAGE_UPDATE_LAST);
-    return loadedLanguages.includes(languageId) && oldDates && oldDates[languageId] ? moment(oldDates[languageId]) : null;
+    return loadedLanguages.includes(languageId) && oldDates && oldDates[languageId] ? LocalizationHelper.toMoment(oldDates[languageId]) : null;
   }
 
   /**
@@ -181,12 +188,17 @@ export class I18nService {
      * Note: If user is NOT authenticated, or doesn't have a language selected, use the default language (english_us)
      * @returns {Observable<void>}
      */
-  loadUserLanguage(): Observable<void> {
+  loadUserLanguage(clearLastUpdate?: boolean): Observable<void> {
     // get the selected language ID
     const langId = this.getSelectedLanguageId();
 
     // save the selected language to local storage
     this.storageService.set(StorageKey.SELECTED_LANGUAGE_ID, langId);
+
+    // reload all translations ?
+    if (clearLastUpdate) {
+      this.storageService.remove(StorageKey.LANGUAGE_UPDATE_LAST);
+    }
 
     // retrieve the language data
     return this.languageDataService

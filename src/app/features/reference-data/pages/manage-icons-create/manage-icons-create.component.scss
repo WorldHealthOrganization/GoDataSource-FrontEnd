@@ -1,0 +1,81 @@
+app-manage-icons-create {
+    .manage-icon-loading {
+        height: 240px;
+        text-align: center;
+
+        mat-spinner {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: 64px !important;
+            height: 64px !important;
+
+            svg {
+                width: 64px !important;
+                height: 64px !important;
+            }
+        }
+
+        .manage-icon-loading-progress {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            vertical-align: middle;
+            width: 64px;
+            height: 18px;
+        }
+    }
+
+    .manage-icon-drop-zone {
+        border: dotted 3px lightgray;
+        height: 100px;
+
+        &.manage-icon-file-over {
+            border: dotted 3px red;
+        }
+    }
+
+    .manage-icon-file-or {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .manage-icon-file-input {
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+
+        .manage-icon-file-input-label {
+            padding: 10px;
+            background-color: #EEE;
+            border-radius: 5px 0 0 5px;
+            border: 1px solid #CCC;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        .manage-icon-file-input-file {
+            padding: 10px;
+            border: 1px solid #CCC;
+            box-sizing: border-box;
+        }
+
+        .manage-icon-file-input-browse {
+            padding: 10px;
+            background-color: #EEE;
+            border-radius: 0 5px 5px 0;
+            border: 1px solid #CCC;
+            font-weight: bold;
+            box-sizing: border-box;
+
+            &:hover {
+                background-color: #CCC;
+            }
+        }
+    }
+}

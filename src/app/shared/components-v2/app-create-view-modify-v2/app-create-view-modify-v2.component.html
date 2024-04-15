@@ -135,7 +135,7 @@
                 <div
                   *cdkVirtualFor="let record of expandListRecords; templateCacheSize: 0;"
                   [ngSwitch]="expandListColumnRenderer?.type"
-                  [ngStyle]="{height: expandListColumnRenderer.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS ? '6.4rem' : '4rem'}"
+                  [style.height]="expandListColumnRenderer.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS ? '6.4rem' : '4rem'"
                   class="gd-create-view-modify-list-data-record"
                   [class.gd-create-view-modify-list-data-record-active]="record.id === itemID">
 
@@ -181,6 +181,7 @@
 
                         <!-- Details -->
                         <span
+                          *ngIf="expandListColumnRenderer.get.details"
                           class="gd-create-view-modify-list-data-record-is-status-and-details-details-details">
                           {{ expandListColumnRenderer.get.details(record) }}
                         </span>
@@ -258,6 +259,7 @@
           <!-- Breadcrumbs -->
           <app-breadcrumb-v2
             [breadcrumbs]="breadcrumbs"
+            [infos]="breadcrumbInfos"
             (detectChanges)="resizeTable()"></app-breadcrumb-v2>
 
           <!-- Title & buttons -->
@@ -267,6 +269,7 @@
 
             <!-- Title & view button -->
             <div
+              *ngIf="!isSmallScreenMode"
               fxFlex fxFlex.lt-md="none" fxLayoutAlign="start center" fxLayoutGap="1.6rem"
               class="gd-create-view-modify-top-title-buttons-title">
 
@@ -275,11 +278,12 @@
                 {{pageTitle | translate:pageTitleData}}
               </span>
 
-              <!-- View button -->
+              <!-- Large screen - View button -->
               <a
                 *ngIf="isModify && tabData.buttons.view && (!tabData.buttons.view.visible || tabData.buttons.view.visible())"
                 type="button"
                 mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_VIEW_DATA' | translate"
                 [routerLink]="tabData.buttons.view.link.link()"
                 [queryParams]="tabData.buttons.view.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.view.link.queryParams()) : selectedTabParams">
                 <mat-icon>visibility</mat-icon>
@@ -319,6 +323,17 @@
                 </ng-template>
 
               </ng-container>
+
+              <!-- Small screen - View button -->
+              <a
+                *ngIf="isSmallScreenMode && isModify && tabData.buttons.view && (!tabData.buttons.view.visible || tabData.buttons.view.visible())"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_VIEW_DATA' | translate"
+                [routerLink]="tabData.buttons.view.link.link()"
+                [queryParams]="tabData.buttons.view.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.view.link.queryParams()) : selectedTabParams">
+                <mat-icon>visibility</mat-icon>
+              </a>
 
               <!-- Quick Actions -->
               <ng-container
@@ -497,6 +512,8 @@
                   [class.gd-create-view-modify-bottom-section-content-input-has-address]="input.type === CreateViewModifyV2TabInputType.ADDRESS"
                   [class.gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-tree-editor]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-visible-and-mandatory]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY"
                   [class.gd-create-view-modify-bottom-section-content-input-has-select-groups]="input.type === CreateViewModifyV2TabInputType.SELECT_GROUPS"
                   [class.gd-create-view-modify-bottom-section-content-input-has-wysiwyg]="input.type === CreateViewModifyV2TabInputType.WYSIWYG"
                   [class.gd-create-view-modify-bottom-section-content-input-has-label]="input.type === CreateViewModifyV2TabInputType.LABEL"
@@ -512,6 +529,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [viewOnly]="isView || !input.value.set"
                     [selectedTab]="selectedTab === tab"
+                    [outbreak]="input.outbreak"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-edit-questionnaire-v2>
 
                   <!-- Fill questionnaire -->
@@ -522,11 +540,39 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [viewOnly]="isView || !input.value.set"
                     [questionnaire]="input.questionnaire"
+                    [hideQuestionNumbers]="input.hideQuestionNumbers"
                     [selectedTab]="selectedTab === tab"
                     [disableValidation]="input.disableValidation"
                     app-questionnaire-answers-validator
                     (ngModelChange)="input.value.set($event, parentItemIndex)"
                     (errorsChanged)="input.updateErrors($event)"></app-form-fill-questionnaire-v2>
+
+                  <!-- Tree editor -->
+                  <app-form-tree-editor-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [viewOnly]="isView || !input.value.set"
+                    [selectedTab]="selectedTab === tab"
+                    [options]="input.options"
+                    [emptyLabel]="input.emptyLabel"
+                    [addNewItemVisible]="input.add && (!input.add.visible || input.add.visible())"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"
+                    (addNewItem)="input.add ? input.add.callback($event) : undefined"></app-form-tree-editor-v2>
+
+                  <!-- Visible and mandatory -->
+                  <app-form-visible-mandatory-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [viewOnly]="isView || !input.value.set"
+                    [selectedTab]="selectedTab === tab"
+                    [options]="input.options"
+                    app-visible-mandatory-validator
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"
+                    (errorsChanged)="input.updateErrors($event)"></app-form-visible-mandatory-v2>
 
                   <!-- Text -->
                   <app-form-input-v2
@@ -617,6 +663,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [placeholder]="input.placeholder()"
                     [tooltip]="input.description ? input.description() : undefined"
+                    [viewOnly]="isView || !input.value.set"
                     [suffixIconButtons]="input.suffixIconButtons"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
@@ -639,7 +686,7 @@
                     [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [viewOnly]="isView || !input.value.set"
                     [options]="input.options"
-                    [clearable]="true"
+                    [clearable]="input.clearable === undefined || input.clearable"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     [suffixIconButtons]="input.suffixIconButtons"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
@@ -691,6 +738,7 @@
                     [excludeLocationsIds]="input.excludeLocationsIds"
                     [clearable]="true"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-location-single-v2>
 
                   <!-- Location multiple -->
@@ -718,6 +766,7 @@
                     [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     [suffixIconButtons]="input.suffixIconButtons"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-textarea-v2>
 
                   <!-- Select groups -->
@@ -985,6 +1034,7 @@
 
                     <!-- Type -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('type')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('type'))"
                       fxFlex
                       [(ngModel)]="input.value.get(parentItemIndex).type"
                       name="type"
@@ -993,11 +1043,12 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.typeOptions"
-                      required="true"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('type')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('type')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                     <!-- Date -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('number')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('number'))"
                       fxFlex
                       [(ngModel)]="input.value.get(parentItemIndex).number"
                       name="number"
@@ -1005,7 +1056,7 @@
                       tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
-                      required="true"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('number')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('number')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                   </div>
@@ -1019,6 +1070,7 @@
 
                     <!-- Type -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('typeId')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('typeId'))"
                       [(ngModel)]="input.value.get(parentItemIndex).typeId"
                       name="typeId"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_TYPE"
@@ -1026,42 +1078,49 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
                       [options]="input.typeOptions"
-                      [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('typeId')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('typeId')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                     <!-- Date -->
                     <app-form-date-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('date')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('date'))"
                       [(ngModel)]="input.value.get(parentItemIndex).date"
                       name="date"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_DATE"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('date')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('date')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-date-v2>
 
                     <!-- Email address -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('emailAddress')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('emailAddress'))"
                       [(ngModel)]="input.value.get(parentItemIndex).emailAddress"
                       name="emailAddress"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('emailAddress')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('emailAddress')))"
                       app-email-validator
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Phone number -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('phoneNumber')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('phoneNumber'))"
                       [(ngModel)]="input.value.get(parentItemIndex).phoneNumber"
                       name="phoneNumber"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('phoneNumber')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('phoneNumber')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Location -->
                     <app-form-select-location-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('locationId')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('locationId'))"
                       [(ngModel)]="input.value.get(parentItemIndex).locationId"
                       name="locationId"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
@@ -1069,42 +1128,49 @@
                       [disabled]="parentInput?.readonly || input.readonly"
                       useOutbreakLocations="true"
                       clearable="true"
-                      [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('locationId')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('locationId')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
-                      (selectedLocationChanged)="addressLocationChanged(input.value.get(parentItemIndex), $event)"></app-form-select-location-single-v2>
+                      (selectedLocationChanged)="addressLocationChanged(input, $event, parentInput, parentItemIndex)"></app-form-select-location-single-v2>
 
                     <!-- City -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('city')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('city'))"
                       [(ngModel)]="input.value.get(parentItemIndex).city"
                       name="city"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_CITY"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('city')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('city')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Postal code -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('postalCode')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('postalCode'))"
                       [(ngModel)]="input.value.get(parentItemIndex).postalCode"
                       name="postalCode"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('postalCode')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('postalCode')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Address line 1 -->
                     <app-form-input-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('addressLine1')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('addressLine1'))"
                       [(ngModel)]="input.value.get(parentItemIndex).addressLine1"
                       name="addressLine1"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('addressLine1')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('addressLine1')))"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Lat & Lng -->
                     <div
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('geoLocation')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('geoLocation'))"
                       fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="1.6rem" fxLayoutGap.xs="0"
                       ngModelGroup="geoLocation"
                       class="gd-create-view-modify-bottom-section-content-input-coordinates">
@@ -1147,6 +1213,7 @@
 
                     <!-- Geo location accurate -->
                     <app-form-toggle-checkbox-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('geoLocationAccurate')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('geoLocationAccurate'))"
                       [(ngModel)]="input.value.get(parentItemIndex).geoLocationAccurate"
                       name="geoLocationAccurate"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES"
@@ -1164,6 +1231,7 @@
 
                     <!-- Vaccine -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('vaccine')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('vaccine'))"
                       fxFlex
                       [(ngModel)]="input.value.get(parentItemIndex).vaccine"
                       name="vaccine"
@@ -1171,19 +1239,24 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.vaccineOptions"
-                      required="true"></app-form-select-single-v2>
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('vaccine')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('vaccine')))"></app-form-select-single-v2>
 
                     <!-- Date -->
                     <app-form-date-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('date')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('date'))"
                       fxFlex
                       [(ngModel)]="input.value.get(parentItemIndex).date"
                       name="date"
                       placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_DATE"
                       [viewOnly]="isView"
-                      [disabled]="parentInput?.readonly"></app-form-date-v2>
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
+                      [disabled]="parentInput?.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('date')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('date')))"></app-form-date-v2>
 
                     <!-- Vaccine status -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('status')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('status'))"
                       fxFlex
                       [(ngModel)]="input.value.get(parentItemIndex).status"
                       name="status"
@@ -1191,7 +1264,8 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.vaccineStatusOptions"
-                      required="true"></app-form-select-single-v2>
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('status')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('status')))"></app-form-select-single-v2>
 
                   </div>
 
@@ -1204,20 +1278,25 @@
 
                     <!-- Type -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('typeId')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('typeId'))"
                       [(ngModel)]="input.value.get(parentItemIndex).typeId"
                       name="typeId"
                       placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.typeOptions"
-                      required="true"></app-form-select-single-v2>
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('typeId')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('typeId')))"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-select-single-v2>
 
                     <!-- From & To -->
                     <div
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('startDate')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('startDate')) ||
+                             (input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('endDate')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('endDate'))"
                       fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="1.6rem" fxLayoutGap.xs="0">
 
                       <!-- Date range - start -->
                       <app-form-date-v2
+                        *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('startDate')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('startDate'))"
                         fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
                         [(ngModel)]="input.value.get(parentItemIndex).startDate"
                         name="startDate"
@@ -1226,10 +1305,13 @@
                         [disabled]="parentInput?.readonly"
                         app-date-validator
                         dateSameOrBefore="endDate"
-                        [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
+                        [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"
+                        [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('startDate')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('startDate')))"
+                        (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-date-v2>
 
                       <!-- Date range - end -->
                       <app-form-date-v2
+                        *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('endDate')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('endDate'))"
                         fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
                         [(ngModel)]="input.value.get(parentItemIndex).endDate"
                         name="endDate"
@@ -1237,36 +1319,47 @@
                         [viewOnly]="isView"
                         [disabled]="parentInput?.readonly"
                         app-date-validator
-                        dateSameOrAfter="startDate"></app-form-date-v2>
+                        dateSameOrAfter="startDate"
+                        [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('endDate')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('endDate')))"
+                        (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-date-v2>
 
                     </div>
 
                     <!-- Center name -->
                     <app-form-select-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('centerName')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('centerName'))"
                       [(ngModel)]="input.value.get(parentItemIndex).centerName"
                       name="centerName"
                       placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
-                      [options]="input.centerOptions"></app-form-select-single-v2>
+                      [options]="input.centerOptions"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('centerName')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('centerName')))"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-select-single-v2>
 
                     <!-- Location -->
                     <app-form-select-location-single-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('locationId')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('locationId'))"
                       [(ngModel)]="input.value.get(parentItemIndex).locationId"
                       name="locationId"
                       placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       useOutbreakLocations="true"
-                      clearable="true"></app-form-select-location-single-v2>
+                      clearable="true"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('locationId')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('locationId')))"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-select-location-single-v2>
 
                     <!-- Comments -->
                     <app-form-textarea-v2
+                      *ngIf="(input.visibleMandatoryChild?.visible && input.visibleMandatoryChild.visible('comments')) || (parentInput && parentInput.visibleMandatoryChild?.visible && parentInput.visibleMandatoryChild.visible('comments'))"
                       [(ngModel)]="input.value.get(parentItemIndex).comments"
                       name="comments"
                       placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"
                       [viewOnly]="isView"
-                      [disabled]="parentInput?.readonly"></app-form-textarea-v2>
+                      [disabled]="parentInput?.readonly"
+                      [required]="isView ? undefined : ((input.visibleMandatoryChild?.mandatory && input.visibleMandatoryChild?.mandatory('comments')) || (parentInput && parentInput.visibleMandatoryChild?.mandatory && parentInput.visibleMandatoryChild?.mandatory('comments')))"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex, form, parentName)"></app-form-textarea-v2>
 
                   </div>
 
@@ -1284,6 +1377,7 @@
                       placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME"
                       tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION"
                       [viewOnly]="isView"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                       required="true"></app-form-input-v2>
 
                     <!-- Vector type -->
@@ -1293,7 +1387,8 @@
                       placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_TYPE"
                       tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_TYPE_DESCRIPTION"
                       [viewOnly]="isView"
-                      [options]="input.vectorTypeOptions"></app-form-select-single-v2>
+                      [options]="input.vectorTypeOptions"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                     <!-- Url -->
                     <app-form-input-v2
@@ -1303,6 +1398,7 @@
                       tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
                       class="gd-create-view-modify-bottom-section-content-input-url"
                       [viewOnly]="isView"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                       required="true"></app-form-input-v2>
 
                     <!-- Show only if specific type -->
@@ -1318,7 +1414,8 @@
                         class="gd-create-view-modify-bottom-section-content-input-url"
                         [viewOnly]="isView"
                         app-general-async-validator
-                        [asyncValidatorObservable]="input.styleAsyncValidator(input, parentItemIndex)"></app-form-input-v2>
+                        [asyncValidatorObservable]="input.styleAsyncValidator(input, parentItemIndex)"
+                        (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                       <!-- Style source -->
                       <app-form-select-single-v2
@@ -1328,7 +1425,8 @@
                         tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_SOURCE_DESCRIPTION"
                         [viewOnly]="isView"
                         [options]="input.styleSourceOptions[input.value.get(parentItemIndex).styleUrl]"
-                        [required]="!!input.value.get(parentItemIndex).styleUrl"></app-form-select-single-v2>
+                        [required]="!!input.value.get(parentItemIndex).styleUrl"
+                        (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                     </ng-container>
 
@@ -1527,7 +1625,7 @@
                 <ng-template
                   #replaceHtml>
                   <div
-                    class="gd-create-view-modify-bottom-section-content-input-replaced"
+                    class="gd-create-view-modify-bottom-section-content-input gd-create-view-modify-bottom-section-content-input-replaced"
                     [innerHTML]="input.replace.html | safeHtml"></div>
                 </ng-template>
               </ng-template>
@@ -1625,13 +1723,25 @@
                 [ngTemplateOutlet]="formRender"
                 [ngTemplateOutletContext]="{ tab }"></ng-template>
 
+              <!-- Tree editor -->
+              <ng-template
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR"
+                [ngTemplateOutlet]="formRender"
+                [ngTemplateOutletContext]="{ tab }"></ng-template>
+
+              <!-- Visible and mandatory -->
+              <ng-template
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY"
+                [ngTemplateOutlet]="formRender"
+                [ngTemplateOutletContext]="{ tab }"></ng-template>
+
             </ng-container>
           </ng-template>
 
-          <!-- Order tabs -->
+          <!-- Configure tabs -->
           <button
-            *ngIf="enableTabReorder && !!tabData?.tabs?.length"
-            class="gd-order-tabs-button"
+            *ngIf="!!tabData?.tabs?.length && (enableTabReorder || !!tabConfiguration?.inputs?.length)"
+            class="gd-conf-tabs-button"
             type="button"
             mat-icon-button
             color="primary"
@@ -1682,6 +1792,8 @@
                   class="gd-create-view-modify-bottom-content"
                   [class.gd-create-view-modify-bottom-content-edit-questionnaire]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-content-fill-questionnaire]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
+                  [class.gd-create-view-modify-bottom-content-tree-editor]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR"
+                  [class.gd-create-view-modify-bottom-content-visible-and-mandatory-editor]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_VISIBLE_AND_MANDATORY"
                   [ngSwitch]="tab.type">
 
                   <!-- Tab -->

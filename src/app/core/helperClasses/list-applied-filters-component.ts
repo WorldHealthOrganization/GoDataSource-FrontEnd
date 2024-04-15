@@ -4,14 +4,18 @@ import * as _ from 'lodash';
 import { AddressType } from '../models/address.model';
 import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
 import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
-import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { ListQueryComponent } from './list-query-component';
+import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { LocalizationHelper, Moment } from './localization-helper';
+import { MetricCasesWithSuccessfulFollowUp } from '../models/metrics/metric.cases-with-success-follow-up.model';
+import { MetricCasesSeenEachDays } from '../models/metrics/metric-cases-seen-each-days.model';
 
 /**
  * Applied filters
  */
-export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
+export abstract class ListAppliedFiltersComponent<T extends (IV2Column | IV2ColumnToVisibleMandatoryConf)> extends ListQueryComponent<T> {
   // Applied list filter on this list page
   appliedListFilter: ApplyListFilter;
 
@@ -20,6 +24,9 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
 
   // List Filter Query Builder
   protected appliedListFilterQueryBuilder: RequestQueryBuilder;
+
+  // timers
+  private _applyListFiltersTimer: number;
 
   /**
    * Constructor
@@ -34,9 +41,18 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
     ) => void
   ) {
     super(
+      listHelperService,
       queryBuilderChangedCallback,
       refreshCallback
     );
+  }
+
+  /**
+   * Release resources
+   */
+  onDestroy(): void {
+    // stop timers
+    this.stopApplyListFiltersTimer();
   }
 
   /**
@@ -69,7 +85,7 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
 
     // parse date
     if (global.date) {
-      global.date = moment(global.date);
+      global.date = LocalizationHelper.toMoment(global.date);
     }
 
     // finished
@@ -124,6 +140,26 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
           .subscribe((qbFilterContactsOnFollowUpLists) => {
             // merge query builder
             this.appliedListFilterQueryBuilder = qbFilterContactsOnFollowUpLists;
+            this.mergeListFilterToMainFilter();
+
+            // refresh list
+            this.refreshCallback(true);
+          });
+        break;
+
+      // Filter cases on the followup list
+      case Constants.APPLY_LIST_FILTER.CASES_FOLLOWUP_LIST:
+
+        // get the correct query builder and merge with the existing one
+        this.listHelperService.listFilterDataService
+          .filterCasesOnFollowUpLists(
+            globalFilters.date,
+            globalFilters.locationId,
+            globalFilters.classificationId
+          )
+          .subscribe((qbFilterCasesOnFollowUpLists) => {
+            // merge query builder
+            this.appliedListFilterQueryBuilder = qbFilterCasesOnFollowUpLists;
             this.mergeListFilterToMainFilter();
 
             // refresh list
@@ -257,7 +293,7 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
                         }
                       }, {
                         startDate: {
-                          $lte: moment(globalFilters.date).endOf('day').toISOString()
+                          $lte: LocalizationHelper.toMoment(globalFilters.date).endOf('day').toISOString()
                         }
                       }
                     ]
@@ -269,7 +305,7 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
                         }
                       }, {
                         endDate: {
-                          $gte: moment(globalFilters.date).startOf('day').toISOString()
+                          $gte: LocalizationHelper.toMoment(globalFilters.date).startOf('day').toISOString()
                         }
                       }
                     ]
@@ -306,6 +342,28 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
           .subscribe((qbFilterContactsNotSeen) => {
             // merge query builder
             this.appliedListFilterQueryBuilder = qbFilterContactsNotSeen;
+            this.mergeListFilterToMainFilter();
+
+            // refresh list
+            this.refreshCallback(true);
+          });
+        break;
+
+      // Filter cases not seen
+      case Constants.APPLY_LIST_FILTER.CASES_NOT_SEEN:
+        // get the number of days if it was updated
+        const noDaysNotSeenCases = _.get(queryParams, 'x', null);
+        // get the correct query builder and merge with the existing one
+        this.listHelperService.listFilterDataService
+          .filterCasesNotSeen(
+            globalFilters.date,
+            globalFilters.locationId,
+            globalFilters.classificationId,
+            noDaysNotSeenCases
+          )
+          .subscribe((qbFilterCasesNotSeen) => {
+            // merge query builder
+            this.appliedListFilterQueryBuilder = qbFilterCasesNotSeen;
             this.mergeListFilterToMainFilter();
 
             // refresh list
@@ -401,17 +459,30 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
 
         // construct query builder to filter by location
         const locationId = _.get(queryParams, 'locationId', null);
-        this.appliedListFilterQueryBuilder.filter.where({
+        const locationFilter: { [prop: string]: any }[] = [{
           addresses: {
             elemMatch: {
               typeId: AddressType.CURRENT_ADDRESS,
               parentLocationIdFilter: {
-                // fix for not beeing consistent through the website, sometimes we use elemMatch other times $elemMatch which causes some issues on the api
+                // fix for not being consistent through the website, sometimes we use elemMatch other times $elemMatch which causes some issues on the api
                 // if we want to fix this we need to change in many places, so this is an workaround
                 $in: [locationId]
               }
             }
           }
+        }];
+
+        // global location
+        // IMPORTANT - we need both the above one and this one to work properly, otherwise if you filter by location on dashboard might cause strange behaviour
+        if (globalFilters.locationId) {
+          locationFilter.push({
+            'addresses.parentLocationIdFilter': globalFilters.locationId
+          });
+        }
+
+        // append condition
+        this.appliedListFilterQueryBuilder.filter.where({
+          and: locationFilter
         });
 
         // date
@@ -460,6 +531,24 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
           .subscribe((qbFilterContactsLostToFollowUp) => {
             // merge query builder
             this.appliedListFilterQueryBuilder = qbFilterContactsLostToFollowUp;
+            this.mergeListFilterToMainFilter();
+
+            // refresh list
+            this.refreshCallback(true);
+          });
+        break;
+
+      // Filter cases lost to follow-up
+      case Constants.APPLY_LIST_FILTER.CASES_LOST_TO_FOLLOW_UP:
+        // get the correct query builder and merge with the existing one
+        this.listHelperService.listFilterDataService.filterCasesLostToFollowUp(
+          globalFilters.date,
+          globalFilters.locationId,
+          globalFilters.classificationId
+        )
+          .subscribe((qbFilterCasesLostToFollowUp) => {
+            // merge query builder
+            this.appliedListFilterQueryBuilder = qbFilterCasesLostToFollowUp;
             this.mergeListFilterToMainFilter();
 
             // refresh list
@@ -760,6 +849,28 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
           });
         break;
 
+      // Filter cases seen
+      case Constants.APPLY_LIST_FILTER.CASES_SEEN:
+        this.listHelperService.listFilterDataService.filterCasesSeen(
+          globalFilters.date,
+          globalFilters.locationId,
+          globalFilters.classificationId
+        )
+          .subscribe((result: MetricCasesSeenEachDays) => {
+            // merge query builder
+            this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+            this.appliedListFilterQueryBuilder.filter.where({
+              id: {
+                'inq': result.caseIDs
+              }
+            }, true);
+            this.mergeListFilterToMainFilter();
+
+            // refresh list
+            this.refreshCallback(true);
+          });
+        break;
+
       // Filter contacts witch successful follow-up
       case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
         this.listHelperService.listFilterDataService
@@ -770,6 +881,35 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
           )
           .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
             const contactIDs: string[] = _.chain(result.contacts)
+              .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
+              .map((item: ContactFollowedUp) => {
+                return item.id;
+              }).value();
+            // merge query builder
+            this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+            this.appliedListFilterQueryBuilder.filter.where({
+              id: {
+                'inq': contactIDs
+              }
+            }, true);
+
+            this.mergeListFilterToMainFilter();
+
+            // refresh list
+            this.refreshCallback(true);
+          });
+        break;
+
+      // Filter cases witch successful follow-up
+      case Constants.APPLY_LIST_FILTER.CASES_FOLLOWED_UP:
+        this.listHelperService.listFilterDataService
+          .filterCasesWithSuccessfulFollowup(
+            globalFilters.date,
+            globalFilters.locationId,
+            globalFilters.classificationId
+          )
+          .subscribe((result: MetricCasesWithSuccessfulFollowUp) => {
+            const contactIDs: string[] = _.chain(result.cases)
               .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
               .map((item: ContactFollowedUp) => {
                 return item.id;
@@ -970,6 +1110,16 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
   }
 
   /**
+   * Stop timer
+   */
+  private stopApplyListFiltersTimer(): void {
+    if (this._applyListFiltersTimer) {
+      clearTimeout(this._applyListFiltersTimer);
+      this._applyListFiltersTimer = undefined;
+    }
+  }
+
+  /**
    * Check if list filter applies
    */
   protected checkListFilters() {
@@ -983,8 +1133,14 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
     // do we need to wait for list filter to be initialized ?
     this.appliedListFilterLoading = !_.isEmpty(this.appliedListFilter);
 
+    // stop previous
+    this.stopApplyListFiltersTimer();
+
     // wait for component initialization, since this method is called from constructor
-    setTimeout(() => {
+    this._applyListFiltersTimer = setTimeout(() => {
+      // reset
+      this._applyListFiltersTimer = undefined;
+
       // do we have query params to apply ?
       if (_.isEmpty(queryParams)) {
         return;

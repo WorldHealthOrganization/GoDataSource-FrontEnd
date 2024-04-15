@@ -18,14 +18,14 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-inconsistencies-list',
   templateUrl: './inconsistencies-list.component.html'
 })
-export class InconsistenciesListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+export class InconsistenciesListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel, IV2Column> implements OnDestroy {
   // Outbreak
   private _outbreak: OutbreakModel;
 
@@ -40,8 +40,10 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
     );
 
     // get data
@@ -163,7 +165,8 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
                   type: IV2ColumnStatusFormType.CIRCLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           }
@@ -181,6 +184,10 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
               type: IV2ColumnStatusFormType.CIRCLE,
               color: (this.route.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type].getColorCode(),
               tooltip: this.i18nService.instant(data.type)
+            });
+          } else {
+            forms.push({
+              type: IV2ColumnStatusFormType.EMPTY
             });
           }
 

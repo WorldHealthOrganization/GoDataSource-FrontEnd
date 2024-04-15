@@ -1,21 +1,6 @@
 @import 'font';
 
 /* List table actions */
-.cdk-overlay-pane {
-  .mat-menu-panel {
-    .gd-list-table-actions-action-menu-button {
-      &.gd-list-table-actions-action-menu-warning {
-        color: var(--gd-danger);
-
-        &:hover {
-          background: rgba(var(--gd-danger-rgb), 0.1);
-          color: var(--gd-danger);
-        }
-      }
-    }
-  }
-}
-
 .gd-list-table-actions {
   .gd-list-table-actions-action {
     button.mat-icon-button,
@@ -33,6 +18,12 @@
       &.gd-list-table-actions-action-icon-active {
         background: var(--gd-primary),;
         color: var(--gd-background);
+
+        mat-progress-spinner {
+          circle {
+            stroke: var(--gd-background);
+          }
+        }
       }
     }
   }

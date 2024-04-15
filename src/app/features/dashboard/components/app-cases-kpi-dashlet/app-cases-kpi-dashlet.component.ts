@@ -6,7 +6,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { MetricCasesWithContactsModel } from '../../../../core/models/metrics/metric-cases-contacts.model';
 import { Constants } from '../../../../core/models/constants';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -15,11 +14,17 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { CaseModel } from '../../../../core/models/case.model';
-import { TranslateService } from '@ngx-translate/core';
 import { MetricNewCasesWithContactsModel } from '../../../../core/models/metric-new-cases-contacts.model';
 import { MetricCasesTransmissionChainsModel } from '../../../../core/models/metrics/metric-cases-transmission-chains.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { AppKpiDashletComponent } from '../app-kpi-dashlet/app-kpi-dashlet.component';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
+import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import { MetricCasesLostToFollowUpModel } from '../../../../core/models/metrics/metric-cases-lost-to-follow-up.model';
+import { MetricCasesModel } from '../../../../core/models/metrics/metric-cases.model';
+import { MetricCasesSeenEachDays } from '../../../../core/models/metrics/metric-cases-seen-each-days.model';
+import { MetricCasesWithSuccessfulFollowUp } from '../../../../core/models/metrics/metric.cases-with-success-follow-up.model';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -39,8 +44,9 @@ export class AppCasesKpiDashletComponent
     private caseDataService: CaseDataService,
     private relationshipDataService: RelationshipDataService,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private listFilterDataService: ListFilterDataService,
+    private followUpsDataService: FollowUpsDataService,
     authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
   ) {
@@ -97,7 +103,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.byDateRange(
               'dateOfOutcome', {
-                endDate: moment(globalFilterDate).endOf('day').format()
+                endDate: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             );
           }
@@ -159,7 +165,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE_DESCRIPTION')
       },
 
       // Cases hospitalised
@@ -242,7 +248,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE_DESCRIPTION')
       },
 
       // Cases with Less than x Contacts
@@ -269,7 +275,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.byDateRange(
               'contactDate', {
-                endDate: moment(globalFilterDate).endOf('day').format()
+                endDate: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             );
           }
@@ -347,7 +353,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE_DESCRIPTION')
       },
 
       // New cases detected in the previous x days among contacts
@@ -400,7 +406,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               dateOfReporting: {
-                lte: moment(globalFilterDate).toISOString()
+                lte: LocalizationHelper.toMoment(globalFilterDate).toISOString()
               }
             });
           }
@@ -409,7 +415,7 @@ export class AppCasesKpiDashletComponent
           if (inputValue !== undefined) {
             // add number of days until current day
             if (globalFilterDate) {
-              inputValue += moment().endOf('day').diff(moment(globalFilterDate).endOf('day'), 'days');
+              inputValue += LocalizationHelper.now().endOf('day').diff(LocalizationHelper.toMoment(globalFilterDate).endOf('day'), 'days');
             }
 
             // create filter for daysNotSeen
@@ -458,7 +464,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE_DESCRIPTION')
       },
 
       // Cases refusing to be transferred to a treatment unit
@@ -506,7 +512,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               dateOfReporting: {
-                lte: moment(globalFilterDate).endOf('day').format()
+                lte: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             });
           }
@@ -549,7 +555,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE_DESCRIPTION')
       },
 
       // New cases in previous x days in known transmission chains
@@ -576,7 +582,7 @@ export class AppCasesKpiDashletComponent
           if (inputValue !== undefined) {
             // add number of days until current day
             if (globalFilterDate) {
-              inputValue += moment().endOf('day').diff(moment(globalFilterDate).endOf('day'), 'days');
+              inputValue += LocalizationHelper.now().endOf('day').diff(LocalizationHelper.toMoment(globalFilterDate).endOf('day'), 'days');
             }
 
             // create filter
@@ -590,7 +596,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               contactDate: {
-                lte: moment(globalFilterDate).toISOString()
+                lte: LocalizationHelper.toMoment(globalFilterDate).toISOString()
               }
             });
           }
@@ -643,7 +649,7 @@ export class AppCasesKpiDashletComponent
             {
               link: ['/cases'],
               linkQueryParams: {
-                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS,
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_IN_THE_TRANSMISSION_CHAINS,
                 [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
                 x: inputValue,
                 global: JSON.stringify({
@@ -659,7 +665,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_BEFORE_VALUE_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_BEFORE_VALUE_DESCRIPTION')
       },
 
       // Suspect Cases where the lab result is pending
@@ -707,7 +713,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               dateOfReporting: {
-                lte: moment(globalFilterDate).endOf('day').format()
+                lte: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             });
           }
@@ -750,7 +756,7 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT_DESCRIPTION')
       },
 
       // Number of cases who are not identified though known contact list
@@ -794,7 +800,7 @@ export class AppCasesKpiDashletComponent
           if (globalFilterDate) {
             qb.filter.where({
               dateOfReporting: {
-                lte: moment(globalFilterDate).endOf('day').format()
+                lte: LocalizationHelper.toMoment(globalFilterDate).endOf('day').format()
               }
             });
           }
@@ -837,7 +843,406 @@ export class AppCasesKpiDashletComponent
             } :
             undefined;
         },
-        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS_DESCRIPTION')
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS_DESCRIPTION')
+      },
+
+      // Cases on the follow-up list
+      {
+        name: DashboardDashlet.CASES_ON_THE_FOLLOW_UP_LIST,
+        group: DashboardKpiGroup.CASE,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_FOLLOWUP_LIST_TITLE',
+        prefixData: () => ({
+          date: this.globalFilterDate ?
+            LocalizationHelper.displayDate(this.globalFilterDate) :
+            '—'
+        }),
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // change the way we build query
+          qb.filter.firstLevelConditions();
+
+          // add location condition
+          if (globalFilterLocationId) {
+            qb.filter.byEquality(
+              'addresses.parentLocationIdFilter',
+              globalFilterLocationId
+            );
+          }
+
+          // classification
+          // !!! must be on first level and not under $and
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.bySelect(
+              'classification',
+              globalFilterClassificationId,
+              false,
+              null
+            );
+          }
+
+          // date
+          if (globalFilterDate) {
+            qb.filter
+              .byEquality(
+                'startDate',
+                LocalizationHelper.toMoment(globalFilterDate).startOf('day').toISOString()
+              ).byEquality(
+                'endDate',
+                LocalizationHelper.toMoment(globalFilterDate).endOf('day').toISOString()
+              );
+          }
+
+          // retrieve data
+          return this.followUpsDataService
+            .getCountIdsOfCasesOnTheFollowUpList(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: MetricCasesModel) => {
+          return response.casesCount.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewCasesFromFollowUpsDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_FOLLOWUP_LIST,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_FOLLOWUP_LIST_TITLE_DESCRIPTION')
+      },
+
+      // Cases Lost to follow-up
+      {
+        name: DashboardDashlet.CASES_LOST_TO_FOLLOW_UP,
+        group: DashboardKpiGroup.CASE,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_LOST_TO_FOLLOW_UP',
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // change the way we build query
+          qb.filter.firstLevelConditions();
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.where({
+              dateOfReporting: {
+                lte: LocalizationHelper.toMoment(globalFilterDate).toISOString()
+              }
+            });
+          }
+
+          // location
+          if (globalFilterLocationId) {
+            qb.filter.byEquality('addresses.parentLocationIdFilter', globalFilterLocationId);
+          }
+
+          // classification
+          // !!! must be on first level and not under $and
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.bySelect(
+              'classification',
+              globalFilterClassificationId,
+              false,
+              null
+            );
+          }
+
+          // retrieve data
+          return this.followUpsDataService
+            .getNumberOfCasesWhoAreLostToFollowUp(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: MetricCasesLostToFollowUpModel) => {
+          return response.casesCount.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewCasesLostToFollowUpsDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_LOST_TO_FOLLOW_UP,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_LOST_TO_FOLLOW_UP_DESCRIPTION')
+      },
+
+      // Cases Not Seen
+      {
+        name: DashboardDashlet.CASES_NOT_SEEN_IN_X_DAYS,
+        group: DashboardKpiGroup.CASE,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_NOT_SEEN_TITLE_BEFORE_VALUE',
+        suffix: 'LNG_PAGE_DASHBOARD_KPI_CASES_NOT_SEEN_TITLE_AFTER_VALUE',
+        inputValue: this.selectedOutbreak.noDaysNotSeen,
+        refresh: (
+          inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // change the way we build query
+          qb.filter.firstLevelConditions();
+
+          // convert
+          if (inputValue !== undefined) {
+            // add number of days until current day
+            if (globalFilterDate) {
+              inputValue += LocalizationHelper.now().endOf('day').diff(LocalizationHelper.toMoment(globalFilterDate).endOf('day'), 'days');
+            }
+
+            // create filter
+            qb.filter.byEquality(
+              'noDaysNotSeen',
+              inputValue
+            );
+          }
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.where({
+              date: {
+                lte: LocalizationHelper.toMoment(globalFilterDate).toISOString()
+              }
+            });
+          }
+
+          // location
+          if (globalFilterLocationId) {
+            qb.include('case').queryBuilder.filter
+              .byEquality('addresses.parentLocationIdFilter', globalFilterLocationId);
+          }
+
+          // classification
+          // !!! must be on first level and not under $and
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.bySelect(
+              'classification',
+              globalFilterClassificationId,
+              false,
+              null
+            );
+          }
+
+          // retrieve data
+          return this.followUpsDataService
+            .getCountIdsOfCasesNotSeen(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: MetricCasesModel) => {
+          return response.casesCount.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewCasesNotSeenInXDaysDashlet(this.authUser);
+        },
+        getLink: (
+          inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_NOT_SEEN,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                x: inputValue,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NOT_SEEN_TITLE_BEFORE_VALUE_DESCRIPTION')
+      },
+
+      // Cases seen each day
+      {
+        name: DashboardDashlet.CASES_SEEN_EACH_DAY,
+        group: DashboardKpiGroup.CASE,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_SEEN_EACH_DAY',
+        prefixData: () => ({
+          date: this.globalFilterDate ?
+            LocalizationHelper.displayDate(this.globalFilterDate) :
+            '—'
+        }),
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // retrieve data
+          return this.listFilterDataService
+            .filterCasesSeen(
+              LocalizationHelper.toMoment(globalFilterDate),
+              globalFilterLocationId,
+              globalFilterClassificationId
+            );
+        },
+        process: (response: MetricCasesSeenEachDays) => {
+          return response.casesSeenCount.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewCasesSeenDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_SEEN,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_SEEN_EACH_DAY_DESCRIPTION')
+      },
+
+      // Cases with successful follow-ups
+      {
+        name: DashboardDashlet.CASES_WITH_SUCCESSFUL_FOLLOW_UP,
+        group: DashboardKpiGroup.CASE,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_WITH_SUCCESSFUL_FOLLOW_UP',
+        prefixData: () => ({
+          date: this.globalFilterDate ?
+            LocalizationHelper.displayDate(this.globalFilterDate) :
+            '—'
+        }),
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // retrieve data
+          return this.listFilterDataService
+            .filterCasesWithSuccessfulFollowup(
+              LocalizationHelper.toMoment(globalFilterDate),
+              globalFilterLocationId,
+              globalFilterClassificationId
+            );
+        },
+        process: (response: MetricCasesWithSuccessfulFollowUp) => {
+          return `${response.casesWithSuccessfulFollowupsCount.toLocaleString('en')}/${response.totalCasesWithFollowupsCount.toLocaleString('en')}`;
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewCasesWithSuccessfulFollowUpsDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_FOLLOWED_UP,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.i18nService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_WITH_SUCCESSFUL_FOLLOW_UP_DESCRIPTION')
       }
     ];
 

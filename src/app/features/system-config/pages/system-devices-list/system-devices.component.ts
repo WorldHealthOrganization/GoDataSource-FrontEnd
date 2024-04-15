@@ -11,14 +11,19 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-system-devices-list',
   templateUrl: './system-devices.component.html'
 })
-export class SystemDevicesComponent extends ListComponent<DeviceModel> implements OnDestroy {
+export class SystemDevicesComponent extends ListComponent<DeviceModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */
@@ -26,9 +31,15 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
     protected listHelperService: ListHelperService,
     private deviceDataService: DeviceDataService,
     private toastV2Service: ToastV2Service,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private i18nService: I18nService,
+    private activatedRoute: ActivatedRoute
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**
@@ -338,6 +349,88 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
         filter: {
           type: V2FilterType.DATE_RANGE
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_CREATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_UPDATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
   }
@@ -414,6 +507,11 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
    * Refresh list
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
+    // retrieve
     this.records$ = this.deviceDataService
       .getDevices(this.queryBuilder)
       .pipe(
@@ -438,6 +536,7 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

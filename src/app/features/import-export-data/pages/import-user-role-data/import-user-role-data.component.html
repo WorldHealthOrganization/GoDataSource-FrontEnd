@@ -1,0 +1,14 @@
+<app-basic-page-v2
+  [breadcrumbs]="breadcrumbs"
+  pageTitle="LNG_PAGE_IMPORT_USER_ROLE_DATA_TITLE">
+  <app-import-data
+    [allowedExtensions]="allowedExtensions"
+    [title]="'LNG_PAGE_IMPORT_USER_ROLE_DATA_TITLE'"
+    (finished)="finished()"
+    importFileUrl="importable-files"
+    importDataUrl="roles/import-importable-file-using-map"
+    [model]="ImportServerModelNames.ROLE"
+    [requiredDestinationFields]="requiredDestinationFields"
+    [asyncImport]="true">
+  </app-import-data>
+</app-basic-page-v2>

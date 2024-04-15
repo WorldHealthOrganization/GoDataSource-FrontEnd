@@ -3,25 +3,35 @@ import { AddressModel } from './address.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { Moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
-import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRelatedContact, IPermissionRelatedContactBulk, IPermissionRelatedRelationship, IPermissionRestorable } from './permission.interface';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import {
+  IPermissionBasic,
+  IPermissionBasicBulk,
+  IPermissionExportable,
+  IPermissionImportable,
+  IPermissionRelatedContact,
+  IPermissionRelatedContactBulk,
+  IPermissionRelatedRelationship,
+  IPermissionRestorable
+} from './permission.interface';
+import { IAnswerData } from './question.model';
+import { SafeHtml } from '@angular/platform-browser';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class EventModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRelatedRelationship,
-        IPermissionRestorable,
-        IPermissionImportable,
-        IPermissionExportable,
-        IPermissionRelatedContact,
-        IPermissionRelatedContactBulk {
+    IPermissionBasic,
+    IPermissionRelatedRelationship,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionImportable,
+    IPermissionExportable,
+    IPermissionRelatedContact,
+    IPermissionRelatedContactBulk {
   id: string;
   name: string;
   date: string | Moment;
@@ -34,6 +44,9 @@ export class EventModel
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
   endDate: string | Moment;
+  questionnaireAnswers: {
+    [variable: string]: IAnswerData[];
+  };
 
   numberOfContacts: number;
   numberOfExposures: number;
@@ -43,93 +56,19 @@ export class EventModel
 
   matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
+  // visual id
+  visualId: string;
+
   responsibleUserId: string;
   responsibleUser: UserModel;
 
+  // used by ui
+  uiStatusForms: SafeHtml;
+  alerted: boolean = false;
+
   /**
-   * Advanced filters
+   * Static Permissions - IPermissionBasic
    */
-  static generateAdvancedFilters(data: {
-    options: {
-      user: ILabelValuePairModel[],
-      eventCategory: ILabelValuePairModel[]
-    }
-  }): V2AdvancedFilter[] {
-    // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'name',
-        label: 'LNG_EVENT_FIELD_LABEL_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'date',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'eventCategory',
-        label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
-        options: data.options.eventCategory
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'description',
-        label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'address',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-        isArray: false
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfReporting',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'isDateOfReportingApproximate',
-        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'endDate',
-        label: 'LNG_EVENT_FIELD_LABEL_END_DATE'
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfContacts',
-        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfExposures',
-        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user
-      }
-    ];
-
-    // finished
-    return advancedFilters;
-  }
-
-  /**
-     * Static Permissions - IPermissionBasic
-     */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_CREATE) : false); }
@@ -137,33 +76,46 @@ export class EventModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionEvent
+   */
+  static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_GENERATE_VISUAL_ID) : false); }
+
+  /**
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
+  static canBulkModify(): boolean { return false; }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_BULK_RESTORE) : false); }
+
+  /**
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_IMPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_EXPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedContact
-     */
+   * Static Permissions - IPermissionRelatedContact
+   */
   static canCreateContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_CREATE_CONTACT) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedContactBulk
-     */
+   * Static Permissions - IPermissionRelatedContactBulk
+   */
   static canBulkCreateContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_CREATE_BULK_CONTACT) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedRelationship
-     */
+   * Static Permissions - IPermissionRelatedRelationship
+   */
   static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_LIST_RELATIONSHIP_CONTACTS) : false); }
   static canViewRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_VIEW_RELATIONSHIP_CONTACTS) : false); }
   static canCreateRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_CREATE_RELATIONSHIP_CONTACTS) : false); }
@@ -189,6 +141,7 @@ export class EventModel
     super(data);
 
     this.id = _.get(data, 'id');
+    this.visualId = _.get(data, 'visualId');
     this.name = _.get(data, 'name');
     this.date = _.get(data, 'date');
     this.dateApproximate = _.get(data, 'dateApproximate');
@@ -198,6 +151,8 @@ export class EventModel
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
     this.outbreakId = _.get(data, 'outbreakId');
     this.endDate = _.get(data, 'endDate');
+
+    this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});
 
     this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
@@ -240,9 +195,22 @@ export class EventModel
   canDelete(user: UserModel): boolean { return EventModel.canDelete(user); }
 
   /**
+   * Permissions - IPermissionEvent
+   */
+  canGenerateVisualId(user: UserModel): boolean { return EventModel.canGenerateVisualId(user); }
+
+  /**
      * Permissions - IPermissionRestorable
      */
   canRestore(user: UserModel): boolean { return EventModel.canRestore(user); }
+
+  /**
+   * Permissions - IPermissionBasicBulk
+   */
+  canBulkCreate(): boolean { return EventModel.canBulkCreate(); }
+  canBulkModify(): boolean { return EventModel.canBulkModify(); }
+  canBulkDelete(user: UserModel): boolean { return EventModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return EventModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionImportable

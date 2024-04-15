@@ -68,6 +68,10 @@
           height: 2.2rem;
           margin-right: 0.4rem;
           width: 2.2rem;
+
+          @include breakpoint('lg') {
+            margin-right: 0.2rem;
+          }
         }
       }
     }
@@ -307,12 +311,12 @@
   }
 
   &.gd-form-edit-questionnaire-v2-item-markup {
-    background-color: rgba(var(--gd-warning-rgb), 0.2);
+    background-color: rgba(var(--gd-warning-rgb), 0.1);
     color: var(--gd-primary-alt);
     font-weight: 700;
 
     &:hover {
-      background-color: rgba(var(--gd-warning-rgb), 0.2);
+      background-color: rgba(var(--gd-warning-rgb), 0.1);
     }
   }
 }

@@ -145,7 +145,13 @@
       line-height: 2.4rem;
       padding: 0.8rem 1.6rem;
 
+      @include safari {
+        height: 3em;
+      }
+
       .mat-option-text {
+        @include flex_justify(space-between);
+
         .mat-tooltip-trigger {
           @include flex(flex);
           @include flex_align_items(center);
@@ -204,13 +210,20 @@
         }
 
         &:not(.mat-option-disabled) {
-          color: var(--gd-primary);
+          color: var(--gd-text);
+        }
+
+        &.mat-active {
+          background: rgba(var(--gd-secondary-rgb), 0.1);
         }
       }
 
       &.mat-active {
-        background: transparent;
-        color: var(--gd-text);
+        background: rgba(var(--gd-secondary-rgb), 0.1);
+        
+        &:not(.mat-option-disabled) {
+          color: var(--gd-text);
+        }
       }
 
       .mat-pseudo-checkbox {
@@ -223,34 +236,15 @@
         }
 
         &.mat-pseudo-checkbox-checked {
-          background: var(--gd-primary);
+          &:not(.mat-pseudo-checkbox-disabled) {
+            background: var(--gd-primary);
+          }
 
           &:after {
             height: 0.4rem;
             left: 0.1rem;
             top: 0.3rem;
             width: 1rem;
-          }
-
-          /* Checkbox checked and disabled */
-          &.mat-pseudo-checkbox-disabled {
-            background-color: var(--gd-primary);
-            color: var(--gd-background);
-          }
-        }
-
-        /* Checkbox not checked and disabled */
-        &:not(.mat-pseudo-checkbox-checked) {
-          &.mat-pseudo-checkbox-disabled {
-            color: rgba(var(--gd-secondary-rgb), 0.5);
-          }
-        }
-
-        &.mat-pseudo-checkbox-disabled {
-          color: rgba(var(--gd-secondary-rgb), 0.5);
-
-          + .mat-option-text {
-            color: var(--gd-text);
           }
         }
       }

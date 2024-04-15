@@ -14,7 +14,7 @@
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "less"
+          "style": "scss"
         }
       },
       "architect": {
@@ -42,23 +42,25 @@
             },
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "c3",
+              "billboard.js",
               "clone-deep",
               "core-js",
               "cytoscape",
               "cytoscape-cola",
               "cytoscape-dagre",
-              "dom-to-image",
               "earcut",
               "file-saver",
+              "html2canvas",
               "lodash",
               "lru-cache",
               "luxon",
               "mapbox-to-css-font",
               "moment",
+              "moment-timezone",
               "numbro",
               "pikaday",
               "rbush",
+              "rfdc",
               "rxjs",
               "web-worker",
               "webfont-matcher",

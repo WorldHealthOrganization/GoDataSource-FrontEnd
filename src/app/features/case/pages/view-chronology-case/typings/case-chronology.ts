@@ -6,11 +6,14 @@ import { I18nService } from '../../../../../core/services/helper/i18n.service';
 import { RelationshipModel } from '../../../../../core/models/entity-and-relationship.model';
 import { ContactModel } from '../../../../../core/models/contact.model';
 import { EventModel } from '../../../../../core/models/event.model';
+import { FollowUpModel } from '../../../../../core/models/follow-up.model';
+import { Constants } from '../../../../../core/models/constants';
 
 export class CaseChronology {
   static getChronologyEntries(
     i18nService: I18nService,
     caseData: CaseModel,
+    followUps: FollowUpModel[],
     labResults: LabResultModel[],
     relationshipsData?: RelationshipModel[]
   ): ChronologyItem[] {
@@ -168,6 +171,17 @@ export class CaseChronology {
         chronologyEntries.push(new ChronologyItem({
           date: labResult.dateOfResult,
           label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_LABEL_LAB_RESULT_DATE'
+        }));
+      }
+    });
+
+    // build chronology items from followUp
+    _.forEach(followUps, (followUp: FollowUpModel) => {
+      if (!_.isEmpty(followUp.date)) {
+        chronologyEntries.push(new ChronologyItem({
+          date: followUp.date,
+          label: followUp.statusId,
+          type: Constants.CHRONOLOGY_ITEM_TYPE.FOLLOW_UP
         }));
       }
     });

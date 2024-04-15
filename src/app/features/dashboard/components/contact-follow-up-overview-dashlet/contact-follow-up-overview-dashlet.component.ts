@@ -9,8 +9,8 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { MetricContactsFollowedUpReportModel } from '../../../../core/models/metrics/metric-contacts-followed-up-report.model';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
-import { FormatFunction } from 'c3';
+import { FormatFunction } from 'billboard.js';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contact-follow-up-overview-dashlet',
@@ -191,9 +191,9 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
     };
 
     // build chart data
-    _.forEach(metricData, (metric) => {
+    (metricData || []).forEach((metric) => {
       // create the array with categories ( dates displayed on x axis )
-      this.chartDataCategories.push(moment(metric.day).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+      this.chartDataCategories.push(LocalizationHelper.displayDate(metric.day));
 
       if (chartData[followedUpTranslated]) {
         chartData[followedUpTranslated].push(metric.followedUp);
@@ -271,12 +271,12 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
       if (this.globalFilterDate) {
         qb.filter.byEquality(
           'endDate',
-          moment(this.globalFilterDate).clone().endOf('day').toISOString()
+          LocalizationHelper.toMoment(this.globalFilterDate).clone().endOf('day').toISOString()
         );
       } else {
         qb.filter.byEquality(
           'endDate',
-          moment().endOf('day').toISOString()
+          LocalizationHelper.now().endOf('day').toISOString()
         );
       }
 

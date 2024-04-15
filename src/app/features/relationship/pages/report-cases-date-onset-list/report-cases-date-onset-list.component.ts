@@ -1,6 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Params } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
 import { takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -9,27 +8,28 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-with-onset.model';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
 
 @Component({
   selector: 'app-report-cases-date-onset-list',
   templateUrl: './report-cases-date-onset-list.component.html'
 })
-export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCasesWithOnsetModel> implements OnDestroy {
+export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCasesWithOnsetModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
   /**
    * Constructor
    */
   constructor(
     protected listHelperService: ListHelperService,
-    private relationshipDataService: RelationshipDataService,
-    private translateService: TranslateService
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true
+      }
     );
   }
 
@@ -221,41 +221,73 @@ export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCases
     this.tableColumns = [
       {
         field: 'primaryCase.firstName',
-        label: `${this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY')} ${this.translateService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME')}`
+        label: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY')} ${this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME')}`,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        )
       },
       {
         field: 'primaryCase.lastName',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`
+        label: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        )
       },
       {
         field: 'primaryCase.dateOfOnset',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET') }`,
+        label: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET') }`,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateOfOnset'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         }
       },
       {
         field: 'primaryCase.classification',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`
+        label: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'classification'
+        )
       },
       {
         field: 'secondaryCase.firstName',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME') }`
+        label: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME') }`,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'firstName'
+        )
       },
       {
         field: 'secondaryCase.lastName',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`
+        label: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'lastName'
+        )
       },
       {
         field: 'secondaryCase.dateOfOnset',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET') }`,
+        label: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET') }`,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'dateOfOnset'
+        ),
         format: {
           type: V2ColumnFormat.DATE
         }
       },
       {
         field: 'secondaryCase.classification',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`
+        label: `${ this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.personAndRelatedHelperService.i18nService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`,
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.case.visibleMandatoryKey,
+          'classification'
+        )
       }
     ];
   }
@@ -341,7 +373,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCases
    */
   refreshList() {
     // retrieve the list
-    this.records$ = this.relationshipDataService
+    this.records$ = this.personAndRelatedHelperService.relationship.relationshipDataService
       .getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
       .pipe(
         // update page count

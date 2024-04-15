@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { Moment } from '../../../core/helperClasses/x-moment';
 import { DashboardDashlet, DashboardKpiGroup } from '../../../core/enums/dashboard.enum';
 import { Params } from '@angular/router';
+import { Moment } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Dashlet value status
@@ -52,7 +52,7 @@ export interface IDashletValue {
   value?: string;
   status?: DashletValueStatus;
   subscription?: Subscription;
-  reload?: any;
+  reload?: number;
   inputValue?: number;
   link?: string[];
   linkQueryParams?: Params;

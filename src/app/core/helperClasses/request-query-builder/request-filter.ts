@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
-import { moment } from '../x-moment';
 import { RequestFilterGenerator } from './request-filter-generator';
+import { LocalizationHelper } from '../localization-helper';
 
 export enum RequestFilterOperator {
   AND = 'and',
@@ -313,17 +313,14 @@ export class RequestFilter {
   }
 
   /**
-     * Filter by comparing a field if it is equal to the provided value
-     * @param {string} property
-     * @param {string | number} value
-     * @param {boolean} replace
-     * @returns {RequestFilter}
-     */
+   * Filter by comparing a field if it is equal to the provided value
+   */
   byEquality(
     property: string,
     value: string | number,
     replace: boolean = true,
-    caseInsensitive: boolean = false
+    caseInsensitive: boolean = false,
+    useLike?: boolean
   ): RequestFilter {
     if (
       _.isEmpty(value) &&
@@ -339,7 +336,10 @@ export class RequestFilter {
       // use regexp for case insensitive compare
       if (caseInsensitive) {
         this.where({
-          [property]: RequestFilterGenerator.textIs(value as string)
+          [property]: RequestFilterGenerator.textIs(
+            value as string,
+            useLike
+          )
         }, replace, false);
       } else {
         // case sensitive search
@@ -614,10 +614,10 @@ export class RequestFilter {
     // convert date range to simple range
     const rangeValue: any = {};
     if (value.startDate) {
-      rangeValue.from = value.startDate.toISOString ? value.startDate.toISOString() : moment(value.startDate).toISOString();
+      rangeValue.from = value.startDate.toISOString ? value.startDate.toISOString() : LocalizationHelper.toMoment(value.startDate).toISOString();
     }
     if (value.endDate) {
-      rangeValue.to = value.endDate.toISOString ? value.endDate.toISOString() : moment(value.endDate).toISOString();
+      rangeValue.to = value.endDate.toISOString ? value.endDate.toISOString() : LocalizationHelper.toMoment(value.endDate).toISOString();
     }
 
     // filter by range
@@ -699,16 +699,15 @@ export class RequestFilter {
   }
 
   /**
-     * Filter all records that have a value on a specific field
-     * @param property
-     */
-  byHasValue(
-    property: string
-  ): RequestFilter {
+   * Filter all records that have a value on a specific field
+   */
+  byHasValue(property: string): RequestFilter {
     // filter no values
-    this.where({
-      [property]: RequestFilterGenerator.hasValue()
-    }, false, false);
+    this.where(
+      RequestFilterGenerator.hasValue(property),
+      false,
+      false
+    );
 
     // trigger change
     this.triggerChangeListener();
@@ -722,12 +721,14 @@ export class RequestFilter {
    */
   byNotHavingValue(
     property: string,
+    checkForEmptyString: boolean,
     forMongo: boolean = false
   ): RequestFilter {
     // filter no values
     this.where(
       RequestFilterGenerator.doesntHaveValue(
         property,
+        checkForEmptyString,
         forMongo
       ),
       false,
@@ -787,6 +788,121 @@ export class RequestFilter {
     }
 
     // finished
+    return this;
+  }
+
+  /**
+   * Search deep if a filter is set on a property an remove it
+   */
+  removeDeep(
+    property: string,
+    triggerChangeListener: boolean = true
+  ): RequestFilter {
+    // deep remove handler
+    const deepRemoveHandler = (objectArray) => {
+      // nothing to do ?
+      if (!objectArray) {
+        return;
+      }
+
+      // object or array ?
+      if (Array.isArray(objectArray)) {
+        // check if we need to remove
+        const indexesToRemove: number[] = [];
+        objectArray.forEach((arrayItem, index) => {
+          // cleanup
+          deepRemoveHandler(arrayItem);
+
+          // empty ?
+          if (
+            arrayItem &&
+            typeof arrayItem === 'object' &&
+            Object.keys(arrayItem).length < 1
+          ) {
+            indexesToRemove.push(index);
+          }
+        });
+
+        // cleanup
+        for (let itemIndex = indexesToRemove.length - 1; itemIndex >= 0; itemIndex--) {
+          objectArray.splice(
+            indexesToRemove[itemIndex],
+            1
+          );
+        }
+      } else if (typeof objectArray === 'object') {
+        // check if we have or and ands - OR
+        if (objectArray.or) {
+          // check if we need to remove
+          deepRemoveHandler(objectArray.or);
+
+          // empty array ?
+          if (
+            !objectArray.or ||
+            objectArray.or.length < 1
+          ) {
+            delete objectArray.or;
+          }
+        }
+
+        // check if we have or and ands - $OR
+        if (objectArray.$or) {
+          // check if we need to remove
+          deepRemoveHandler(objectArray.$or);
+
+          // empty array ?
+          if (
+            !objectArray.$or ||
+            objectArray.$or.length < 1
+          ) {
+            delete objectArray.$or;
+          }
+        }
+
+        // check if we have or and ands - AND
+        if (objectArray.and) {
+          // check if we need to remove
+          deepRemoveHandler(objectArray.and);
+
+          // empty array ?
+          if (
+            !objectArray.and ||
+            objectArray.and.length < 1
+          ) {
+            delete objectArray.and;
+          }
+        }
+
+        // check if we have or and ands - $AND
+        if (objectArray.$and) {
+          // check if we need to remove
+          deepRemoveHandler(objectArray.$and);
+
+          // empty array ?
+          if (
+            !objectArray.$and ||
+            objectArray.$and.length < 1
+          ) {
+            delete objectArray.$and;
+          }
+        }
+
+        // has our property ?
+        if (objectArray[property] !== undefined) {
+          delete objectArray[property];
+        }
+      }
+    };
+
+    // start deep remove
+    deepRemoveHandler(this.conditions);
+
+    // trigger change
+    if (triggerChangeListener) {
+      this.triggerChangeListener();
+    }
+
+    // chain
     return this;
   }
 
@@ -1153,14 +1269,14 @@ export class RequestFilter {
       condition = _.transform(this.conditions, (result, conditionData) => {
         // this could overwrite other conditions with the same property, but since API isn't able to process multi level conditions in this case..it won't matter if we overwrite it...
         _.each(conditionData, (data, property) => {
-          result[property] = data;
+          result[property] = _.cloneDeep(data);
         });
       }, {});
     } else {
       condition = this.conditions.length === 0 ?
         {} :
         {
-          [this.operator]: this.conditions
+          [this.operator]: _.cloneDeep(this.conditions)
         };
     }
 

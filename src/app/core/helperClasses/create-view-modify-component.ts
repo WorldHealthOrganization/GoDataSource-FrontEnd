@@ -1,26 +1,31 @@
 import { Observable, ReplaySubject, throwError } from 'rxjs';
-import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { IV2Breadcrumb, IV2BreadcrumbInfo } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel, UserSettings } from '../models/user.model';
-import { ICreateViewModifyV2 } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { ActivatedRoute } from '@angular/router';
+import { ICreateViewModifyV2, ICreateViewModifyV2Config } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { Directive, Renderer2, ViewChild } from '@angular/core';
 import { TopnavComponent } from '../components/topnav/topnav.component';
-import { AuthDataService } from '../services/data/auth.data.service';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { ToastV2Service } from '../services/helper/toast-v2.service';
 import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
 import { Constants } from '../models/constants';
 import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { CreateViewModifyV2ExpandColumn } from '../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { ICreateViewModifyV2Refresh } from '../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
-import { RedirectService } from '../services/helper/redirect.service';
 import { AppCreateViewModifyV2Component } from '../../shared/components-v2/app-create-view-modify-v2/app-create-view-modify-v2.component';
+import { AuthDataService } from '../services/data/auth.data.service';
+import { ActivatedRoute } from '@angular/router';
+import { OutbreakAndOutbreakTemplateHelperService } from '../services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../services/helper/redirect.service';
+import { ToastV2Service } from '../services/helper/toast-v2.service';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T>
   extends ConfirmOnFormChanges {
+  // constants
+  protected static readonly GENERAL_SETTINGS_TAB_OPTIONS: string = 'tabsOptions';
+  protected static readonly GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS: string = 'hideQuestionNumbers';
+
   // handler for stopping take until
   protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
@@ -35,6 +40,7 @@ export abstract class CreateViewModifyComponent<T>
 
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[];
+  breadcrumbInfos: IV2BreadcrumbInfo[];
 
   // authenticated user data
   authUser: UserModel;
@@ -73,6 +79,9 @@ export abstract class CreateViewModifyComponent<T>
   // tabs
   tabData: ICreateViewModifyV2;
 
+  // tab configuration
+  tabConfiguration: ICreateViewModifyV2Config;
+
   // expanded list records observable
   expandListRecords$: Observable<T[]>;
 
@@ -88,6 +97,10 @@ export abstract class CreateViewModifyComponent<T>
   // click listener
   private _clickListener: () => void;
 
+  // timers
+  private _createNewItemTimer: number;
+  private _retrieveItemTimer: number;
+
   // constants
   Constants = Constants;
   UserSettings = UserSettings;
@@ -96,11 +109,12 @@ export abstract class CreateViewModifyComponent<T>
    * Constructor
    */
   protected constructor(
-    protected toastV2Service: ToastV2Service,
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
     protected renderer2: Renderer2,
     protected redirectService: RedirectService,
-    activatedRoute: ActivatedRoute,
-    authDataService: AuthDataService,
+    protected toastV2Service: ToastV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     dontDisableOutbreakSelect?: boolean
   ) {
     // initialize parent
@@ -112,19 +126,25 @@ export abstract class CreateViewModifyComponent<T>
     }
 
     // get auth data
-    this.authUser = authDataService.getAuthenticatedUser();
+    this.authUser = this.authDataService.getAuthenticatedUser();
 
     // retrieve basic data
-    this.action = activatedRoute.snapshot.data.action;
+    this.action = this.activatedRoute.snapshot.data.action;
 
     // retrieve selected outbreak - since on create, view & modify select outbreak dropdown should be disabled
-    this.selectedOutbreak = activatedRoute.snapshot.data.outbreak;
+    this.selectedOutbreak = this.activatedRoute.snapshot.data.outbreak;
+
+    // merge default fields
+    this.outbreakAndOutbreakTemplateHelperService.mergeDefaultVisibleMandatoryFields(this.selectedOutbreak);
 
     // create ?
     this.loadingPage = true;
     if (this.isCreate) {
       // create
-      setTimeout(() => {
+      this._createNewItemTimer = setTimeout(() => {
+        // reset
+        this._createNewItemTimer = undefined;
+
         // initialize item
         this.itemData = this.createNewItem();
 
@@ -138,7 +158,11 @@ export abstract class CreateViewModifyComponent<T>
     } else {
       // view / modify
       // retrieve item data
-      setTimeout(() => {
+      this._retrieveItemTimer = setTimeout(() => {
+        // reset
+        this._retrieveItemTimer = undefined;
+
+        // retrieve
         this.getData(this.retrieveItem());
       });
     }
@@ -173,6 +197,11 @@ export abstract class CreateViewModifyComponent<T>
    * Initialize breadcrumbs
    */
   protected abstract initializeBreadcrumbs(): void;
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected abstract initializeBreadcrumbInfos(): void;
 
   /**
    * Initialize tabs
@@ -216,6 +245,30 @@ export abstract class CreateViewModifyComponent<T>
       this._clickListener();
       this._clickListener = undefined;
     }
+
+    // stop timers
+    this.stopCreateNewItemTimer();
+    this.stopRetrieveItemTimer();
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopCreateNewItemTimer(): void {
+    if (this._createNewItemTimer) {
+      clearTimeout(this._createNewItemTimer);
+      this._createNewItemTimer = undefined;
+    }
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopRetrieveItemTimer(): void {
+    if (this._retrieveItemTimer) {
+      clearTimeout(this._retrieveItemTimer);
+      this._retrieveItemTimer = undefined;
+    }
   }
 
   /**
@@ -230,6 +283,9 @@ export abstract class CreateViewModifyComponent<T>
 
     // initialize breadcrumbs
     this.initializeBreadcrumbs();
+
+    // initialize breadcrumb infos
+    this.initializeBreadcrumbInfos();
 
     // initialize tabs
     this.initializeTabs();
@@ -265,6 +321,35 @@ export abstract class CreateViewModifyComponent<T>
         this.redirectService.to([event.target.parentElement.getAttribute('href')]);
       }
     );
+  }
+
+  /**
+   * Updates user general settings
+   */
+  updateGeneralSettings(
+    settingsPath: string,
+    options: {
+      [setting: string]: boolean
+    },
+    finish: () => void
+  ) {
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [settingsPath]: Object.keys(options).length ? options : undefined
+      })
+      .pipe(
+        catchError((err) => {
+          // error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finish
+        finish();
+      });
   }
 
   /**

@@ -25,12 +25,18 @@ import { IsActiveMatchOptions, NavigationEnd, Router } from '@angular/router';
 import { PERMISSION } from '../../models/permission.model';
 import { HelpDataService } from '../../services/data/help.data.service';
 import { HelpItemModel } from '../../models/help-item.model';
-import { TranslateService } from '@ngx-translate/core';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import {
+  RequestQueryBuilder,
+  RequestSortDirection
+} from '../../helperClasses/request-query-builder';
 import { EntityModel } from '../../models/entity-and-relationship.model';
 import { GlobalEntitySearchDataService } from '../../services/data/global-entity-search.data.service';
 import { RedirectService } from '../../services/helper/redirect.service';
 import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { I18nService } from '../../services/helper/i18n.service';
+import { LanguageDataService } from '../../services/data/language.data.service';
+import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
+import { SystemSettingsDataService } from '../../services/data/system-settings.data.service';
 
 @Component({
   selector: 'app-topnav',
@@ -53,6 +59,12 @@ export class TopnavComponent implements OnInit, OnDestroy {
       TopnavComponent._UPDATE_CALLBACK();
     }
   }
+
+  // language handler
+  languageSubscription: Subscription;
+
+  // version information
+  versionData: SystemSettingsVersionModel;
 
   // global search
   globalSearchValue: string;
@@ -171,9 +183,11 @@ export class TopnavComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
     private helpDataService: HelpDataService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private globalEntitySearchDataService: GlobalEntitySearchDataService,
-    private redirectService: RedirectService
+    private redirectService: RedirectService,
+    private languageDataService: LanguageDataService,
+    private systemSettingsDataService: SystemSettingsDataService
   ) {
     // update render mode
     this.updateRenderMode();
@@ -264,12 +278,26 @@ export class TopnavComponent implements OnInit, OnDestroy {
         }
       });
 
+    // retrieve version data
+    this.systemSettingsDataService
+      .getAPIVersion()
+      .subscribe((versionData) => {
+        // set data version
+        this.versionData = versionData;
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
+      });
+
     // subscribe to history changes
     this.historyChangedSubscription = this.toastV2Service.historyChanged
       .subscribe(() => {
         // update ui
         this.changeDetectorRef.detectChanges();
       });
+
+    // subscribe to language change
+    this.initializeLanguageChangeListener();
   }
 
   /**
@@ -300,8 +328,37 @@ export class TopnavComponent implements OnInit, OnDestroy {
       this._contextSearchHelpSubscription = null;
     }
 
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+
     // close loading handler
     this.hideLoading();
+  }
+
+  /**
+   *  Subscribe to language change
+   */
+  private initializeLanguageChangeListener(): void {
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update ui
+        this.changeDetectorRef.detectChanges();
+      });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
   }
 
   /**
@@ -740,6 +797,106 @@ export class TopnavComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Change language
+   */
+  changeLanguage(): void {
+    // show dialog
+    this.dialogV2Service.showSideDialog({
+      title: {
+        get: () => 'LNG_LAYOUT_LANGUAGE_LABEL'
+      },
+      hideInputFilter: true,
+      inputs: [{
+        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+        name: 'selectedLanguageId',
+        placeholder: 'LNG_LAYOUT_LANGUAGE_LABEL',
+        value: this.i18nService.getSelectedLanguageId(),
+        options: []
+      }],
+      bottomButtons: [{
+        type: IV2SideDialogConfigButtonType.OTHER,
+        label: 'LNG_COMMON_BUTTON_CHANGE',
+        color: 'primary'
+      }, {
+        type: IV2SideDialogConfigButtonType.CANCEL,
+        label: 'LNG_COMMON_BUTTON_CANCEL',
+        color: 'text'
+      }],
+      initialized: (handler) => {
+        // display loading
+        handler.loading.show();
+
+        // construct query
+        const qb = new RequestQueryBuilder();
+        qb.fields(
+          'id',
+          'name'
+        );
+
+        // sort them
+        qb.sort
+          .by('name', RequestSortDirection.ASC);
+
+        // retrieve records
+        this.languageDataService
+          .getLanguagesList(qb)
+          .pipe(
+            // should be last one
+            catchError((err) => {
+              // display error
+              this.toastV2Service.error(err);
+
+              // send error further
+              return throwError(err);
+            })
+          )
+          .subscribe((languages) => {
+            // convert response to a ILabelValuePairModel type
+            (handler.data.map.selectedLanguageId as IV2SideDialogConfigInputSingleDropdown).options = languages.map((item) => {
+              return {
+                label: item.name,
+                value: item.id
+              };
+            });
+
+            // hide loading
+            handler.loading.hide();
+          });
+      }
+    }).subscribe((response) => {
+      // cancelled ?
+      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+        // finished
+        return;
+      }
+
+      // change language
+      response.handler.loading.show();
+      this.i18nService
+        .changeLanguage((response.data.map.selectedLanguageId as IV2SideDialogConfigInputSingleDropdown).value)
+        .pipe(
+          catchError((err) => {
+            // show error
+            this.toastV2Service.error(err);
+
+            // hide
+            response.handler.hide();
+
+            // send error down the road
+            return throwError(err);
+          })
+        )
+        .subscribe(() => {
+          // hide
+          response.handler.hide();
+
+          // finished
+          this.toastV2Service.success('LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE');
+        });
+    });
+  }
+
+  /**
    * Display dialog with help items for this page
    */
   displayPageHelpDialog(): void {
@@ -760,7 +917,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
       helpInputs.push({
         type: V2SideDialogConfigInputType.ROW,
         name: `row-${helpItem.id}`,
-        placeholder: `${this.translateService.instant(helpItem.title)} - ${helpItem.category?.name ? this.translateService.instant(helpItem.category?.name) : ''}`,
+        placeholder: `${this.i18nService.instant(helpItem.title)} - ${helpItem.category?.name ? this.i18nService.instant(helpItem.category?.name) : ''}`,
         inputs: [{
           type: V2SideDialogConfigInputType.GROUP,
           name: `group-${helpItem.id}`,

@@ -3,10 +3,7 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
@@ -21,47 +18,86 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { catchError, takeUntil } from 'rxjs/operators';
+import {
+  catchError,
+  map,
+  takeUntil
+} from 'rxjs/operators';
 import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Constants } from '../../../../core/models/constants';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import {
+  IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { DomSanitizer } from '@angular/platform-browser';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-events-create-view-modify',
   templateUrl: './events-create-view-modify.component.html'
 })
 export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<EventModel> implements OnDestroy {
+  // constants
+  private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
+
+  // event visual id mask
+  private _eventVisualIDMask: {
+    mask: string
+  };
+
+  // hide/show question numbers
+  hideQuestionNumbers: boolean = false;
+
   /**
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected eventDataService: EventDataService,
-    protected translateService: TranslateService,
-    protected toastV2Service: ToastV2Service,
-    protected dialogV2Service: DialogV2Service,
-    protected entityHelperService: EntityHelperService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected renderer2: Renderer2,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected router: Router,
+    protected domSanitizer: DomSanitizer,
+    protected referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
+
+    // do we have tabs options already saved ?
+    const generalSettings: {
+      [key: string]: any
+    } = this.authDataService
+      .getAuthenticatedUser()
+      .getSettings(UserSettings.EVENT_GENERAL);
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
+      undefined;
+
+    // use the saved options
+    this.hideQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] : false;
   }
 
   /**
@@ -85,6 +121,10 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
               data.searchBy
             )
           }, {
+            visualId: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
+          }, {
             description: RequestFilterGenerator.textContains(
               data.searchBy
             )
@@ -94,12 +134,20 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     }
 
     // retrieve data
-    this.expandListRecords$ = this.eventDataService
+    this.expandListRecords$ = this.personAndRelatedHelperService.event.eventDataService
       .getEventsList(
         this.selectedOutbreak.id,
         data.queryBuilder
       )
       .pipe(
+        // determine alertness
+        map((events: EventModel[]) => {
+          return EntityModel.determineAlertness(
+            this.selectedOutbreak.eventInvestigationTemplate,
+            events
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
@@ -111,7 +159,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   protected createNewItem(): EventModel {
     return new EventModel({
       address: new AddressModel({
-        typeId: AddressType.CURRENT_ADDRESS
+        typeId: AddressType.CURRENT_ADDRESS,
+        date: LocalizationHelper.now().toISOString()
       })
     });
   }
@@ -120,7 +169,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Retrieve item
    */
   protected retrieveItem(record?: EventModel): Observable<EventModel> {
-    return this.eventDataService
+    return this.personAndRelatedHelperService.event.eventDataService
       .getEvent(
         this.selectedOutbreak.id,
         record ?
@@ -132,7 +181,17 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   /**
    * Data initialized
    */
-  protected initializedData(): void {}
+  protected initializedData(): void {
+    // initialize visual ID mask
+    this._eventVisualIDMask = {
+      mask: this.personAndRelatedHelperService.event.generateEventIDMask(this.selectedOutbreak.eventIdMask)
+    };
+
+    // set visual id for event
+    this.itemData.visualId = this.isCreate ?
+      this._eventVisualIDMask.mask :
+      this.itemData.visualId;
+  }
 
   /**
    * Initialize page title
@@ -190,7 +249,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_MODIFY_EVENT_TITLE', {
             name: this.itemData.name
           }
@@ -200,7 +259,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.personAndRelatedHelperService.i18nService.instant(
           'LNG_PAGE_VIEW_EVENT_TITLE', {
             name: this.itemData.name
           }
@@ -211,14 +270,56 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   }
 
   /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
+
+  /**
    * Initialize tabs
    */
   protected initializeTabs(): void {
+    // tab custom configuration
+    this.tabConfiguration = {
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TAB_OPTIONS'
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_EVENT_TAB_OPTION_SHOW_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_EVENT_TAB_OPTION_SHOW_QUESTION_NUMBERS',
+          value: !this.hideQuestionNumbers
+        }
+      ],
+      apply: (data, finish) => {
+        // save settings
+        const hideQuestionNumbers: boolean = !(data.map[EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
+        this.updateGeneralSettings(
+          `${UserSettings.EVENT_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideQuestionNumbers = hideQuestionNumbers;
+            this.tabsV2Component.detectChanges();
+
+            // finish
+            finish();
+          });
+      }
+    };
+
+    // tabs
     this.tabData = {
       // tabs
       tabs: [
         // Details
         this.initializeTabsDetails(),
+
+        // Questionnaires
+        this.initializeTabsQuestionnaire(),
 
         // Contacts, exposures ...
         this.initializeTabsContacts(),
@@ -228,8 +329,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_BUTTON'),
+          message: () => this.personAndRelatedHelperService.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -264,10 +365,39 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    */
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: EventModel) => ['/events', item.id, 'view'],
+      statusVisible: this.expandListColumnRenderer?.statusVisible === undefined ?
+        true :
+        this.expandListColumnRenderer.statusVisible,
+      maxNoOfStatusForms: 1,
       get: {
-        text: (item: EventModel) => item.name
+        status: (item: EventModel) => {
+          // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
+          if (!item.uiStatusForms) {
+            // determine forms
+            const forms: V2ColumnStatusForm[] = this.personAndRelatedHelperService.event.getStatusForms({
+              item
+            });
+
+            // create html
+            let html: string = '';
+            forms.forEach((form, formIndex) => {
+              html += AppListTableV2Component.renderStatusForm(
+                form,
+                formIndex < forms.length - 1
+              );
+            });
+
+            // convert to safe html
+            item.uiStatusForms = this.domSanitizer.bypassSecurityTrustHtml(html);
+          }
+
+          // finished
+          return item.uiStatusForms;
+        },
+        text: (item: EventModel) => item.name,
+        details: (item: EventModel) => item.visualId
       }
     };
   }
@@ -278,7 +408,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   protected initializeExpandListQueryFields(): void {
     this.expandListQueryFields = [
       'id',
-      'name'
+      'name',
+      'questionnaireAnswers'
     ];
   }
 
@@ -286,10 +417,15 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = EventModel.generateAdvancedFilters({
+    this.expandListAdvancedFilters = this.personAndRelatedHelperService.event.generateAdvancedFilters(this.selectedOutbreak, {
+      eventInvestigationTemplate: () => this.selectedOutbreak.eventInvestigationTemplate,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-        eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
       }
     });
   }
@@ -298,138 +434,18 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Initialize tab details
    */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      name: 'details',
-      label: this.isCreate ?
-        'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' :
-        'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
-      sections: [
-        // Details
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: this.isCreate ?
-            'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' :
-            'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'name',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_NAME',
-            description: () => 'LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.name,
-              set: (value) => {
-                this.itemData.name = value;
-              }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'date',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.date,
-              set: (value) => {
-                this.itemData.date = value;
-              }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfReporting',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfReporting,
-              set: (value) => {
-                this.itemData.dateOfReporting = value;
-              }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'isDateOfReportingApproximate',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.isDateOfReportingApproximate,
-              set: (value) => {
-                this.itemData.isDateOfReportingApproximate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'responsibleUserId',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-            description: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-            value: {
-              get: () => this.itemData.responsibleUserId,
-              set: (value) => {
-                this.itemData.responsibleUserId = value;
-              }
-            },
-            replace: {
-              condition: () => !UserModel.canListForFilters(this.authUser),
-              html: this.translateService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'eventCategory',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
-            description: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => this.itemData.eventCategory,
-              set: (value) => {
-                this.itemData.eventCategory = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'endDate',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_END_DATE',
-            description: () => 'LNG_EVENT_FIELD_LABEL_END_DATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.endDate,
-              set: (value) => {
-                this.itemData.endDate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: 'description',
-            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
-            description: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
-            value: {
-              get: () => this.itemData.description,
-              set: (value) => {
-                this.itemData.description = value;
-              }
-            }
-          }]
-        },
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.ADDRESS,
-            typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            name: 'address',
-            value: {
-              get: () => this.itemData.address
-            }
-          }]
-        }
-      ]
-    };
+    return this.personAndRelatedHelperService.event.generateTabsDetails(this.selectedOutbreak, {
+      selectedOutbreak: this.selectedOutbreak,
+      isCreate: this.isCreate,
+      itemData: this.itemData,
+      eventVisualIDMask: this._eventVisualIDMask,
+      options: {
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        deletedUser: (this.activatedRoute.snapshot.data.deletedUser as IResolverV2ResponseModel<UserModel>).options,
+        eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      }
+    });
   }
 
   /**
@@ -447,39 +463,71 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
-        tableColumnActions: this.entityHelperService.retrieveTableColumnActions({
+        tableColumnActions: this.personAndRelatedHelperService.relationship.retrieveTableColumnActions({
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
           relationshipType: RelationshipType.CONTACT,
-          authUser: this.authUser,
           refreshList: () => {
             // reload data
             const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.entityHelperService.retrieveTableColumns({
-          authUser: this.authUser,
+        tableColumns: this.personAndRelatedHelperService.relationship.retrieveTableColumns(this.selectedOutbreak, {
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
+            createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
             user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
           }
         }),
-        advancedFilters: this.entityHelperService.generateAdvancedFilters({
+        advancedFilters: this.personAndRelatedHelperService.relationship.generateAdvancedFilters(this.selectedOutbreak, {
           options: {
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+            exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
+            yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
           }
         }),
         queryBuilder: new RequestQueryBuilder(),
@@ -487,7 +535,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         refresh: (tab) => {
           // refresh data
           const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          localTab.records$ = this.entityHelperService
+          localTab.records$ = this.personAndRelatedHelperService.relationship
             .retrieveRecords(
               RelationshipType.CONTACT,
               this.selectedOutbreak,
@@ -522,6 +570,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
           countQueryBuilder.paginator.clear();
           countQueryBuilder.sort.clear();
+          countQueryBuilder.clearFields();
 
           // apply has more limit
           if (localTab.applyHasMoreLimit) {
@@ -532,7 +581,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           }
 
           // count
-          this.entityHelperService
+          this.personAndRelatedHelperService.relationship
             .retrieveRecordsCount(
               RelationshipType.CONTACT,
               this.selectedOutbreak,
@@ -568,39 +617,71 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
-        tableColumnActions: this.entityHelperService.retrieveTableColumnActions({
+        tableColumnActions: this.personAndRelatedHelperService.relationship.retrieveTableColumnActions({
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
           selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
           relationshipType: RelationshipType.EXPOSURE,
-          authUser: this.authUser,
           refreshList: () => {
             // reload data
             const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
             localTab.refresh(newTab);
           }
         }),
-        tableColumns: this.entityHelperService.retrieveTableColumns({
-          authUser: this.authUser,
+        tableColumns: this.personAndRelatedHelperService.relationship.retrieveTableColumns(this.selectedOutbreak, {
           personType: this.activatedRoute.snapshot.data.personType,
           cluster: this.activatedRoute.snapshot.data.cluster,
           options: {
+            createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
             user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
           }
         }),
-        advancedFilters: this.entityHelperService.generateAdvancedFilters({
+        advancedFilters: this.personAndRelatedHelperService.relationship.generateAdvancedFilters(this.selectedOutbreak, {
           options: {
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+            exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              undefined
+            ),
+            cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
+            yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
           }
         }),
         queryBuilder: new RequestQueryBuilder(),
@@ -608,7 +689,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         refresh: (tab) => {
           // refresh data
           const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
-          localTab.records$ = this.entityHelperService
+          localTab.records$ = this.personAndRelatedHelperService.relationship
             .retrieveRecords(
               RelationshipType.EXPOSURE,
               this.selectedOutbreak,
@@ -643,6 +724,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
           countQueryBuilder.paginator.clear();
           countQueryBuilder.sort.clear();
+          countQueryBuilder.clearFields();
 
           // apply has more limit
           if (localTab.applyHasMoreLimit) {
@@ -653,7 +735,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           }
 
           // count
-          this.entityHelperService
+          this.personAndRelatedHelperService.relationship
             .retrieveRecordsCount(
               RelationshipType.EXPOSURE,
               this.selectedOutbreak,
@@ -672,6 +754,39 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
 
     // finished
     return newTab;
+  }
+
+  /**
+   * Initialize tabs - Questionnaire
+   */
+  private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: EventsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+      label: 'LNG_PAGE_MODIFY_EVENT_TAB_QUESTIONNAIRE_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
+        name: 'questionnaireAnswers',
+        questionnaire: this.selectedOutbreak.eventInvestigationTemplate,
+        value: {
+          get: () => this.itemData.questionnaireAnswers,
+          set: (value) => {
+            this.itemData.questionnaireAnswers = value;
+          }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideQuestionNumbers;
+        },
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
+      },
+      visible: () => this.selectedOutbreak.eventInvestigationTemplate?.length > 0
+    };
   }
 
   /**
@@ -714,10 +829,12 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
             action: {
               click: () => {
                 // show record details dialog
-                this.dialogV2Service.showRecordDetailsDialog(
+                this.personAndRelatedHelperService.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_PAGE_MODIFY_EVENT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }
@@ -785,11 +902,11 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     ) => {
       // finished
       (type === CreateViewModifyV2ActionType.CREATE ?
-        this.eventDataService.createEvent(
+        this.personAndRelatedHelperService.event.eventDataService.createEvent(
           this.selectedOutbreak.id,
           data
         ) :
-        this.eventDataService.modifyEvent(
+        this.personAndRelatedHelperService.event.eventDataService.modifyEvent(
           this.selectedOutbreak.id,
           this.itemData.id,
           data
@@ -808,7 +925,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         takeUntil(this.destroyed$)
       ).subscribe((item: EventModel) => {
         // success creating / updating event
-        this.toastV2Service.success(
+        this.personAndRelatedHelperService.toastV2Service.success(
           type === CreateViewModifyV2ActionType.CREATE ?
             'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE' :
             'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE'

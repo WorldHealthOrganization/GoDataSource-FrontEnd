@@ -13,14 +13,18 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-manage-icons-list',
   templateUrl: './manage-icons-list.component.html'
 })
-export class ManageIconsListComponent extends ListComponent<IconModel> implements OnDestroy {
+export class ManageIconsListComponent extends ListComponent<IconModel, IV2Column> implements OnDestroy {
   // Category Name
   private _category: ReferenceDataCategoryModel;
 
@@ -32,9 +36,14 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
     private activatedRoute: ActivatedRoute,
     private iconDataService: IconDataService,
     private toastV2Service: ToastV2Service,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private i18nService: I18nService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
 
     // retrieve data
     this._category = this.activatedRoute.snapshot.data.category;
@@ -167,6 +176,88 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
         format: {
           type: V2ColumnFormat.ICON_URL
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_ICON_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_ICON_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_ICON_FIELD_LABEL_CREATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_ICON_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_ICON_FIELD_LABEL_UPDATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
   }
@@ -273,7 +364,12 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
   protected refreshListFields(): string[] {
     return [
       'id',
-      'name'
+      'name',
+      'createdOn',
+      'createdBy',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
     ];
   }
 
@@ -281,6 +377,11 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
    * Retrieve Icons
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
+    // retrieve
     this.records$ = this.iconDataService
       .getIconsList(this.queryBuilder)
       .pipe(
@@ -305,6 +406,7 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

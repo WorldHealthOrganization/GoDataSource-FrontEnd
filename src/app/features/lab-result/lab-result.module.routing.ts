@@ -22,13 +22,18 @@ import { LabPersonTypeDataResolver } from '../../core/services/resolvers/data/la
 import { GanttChartTypeDataResolver } from '../../core/services/resolvers/data/gantt-chart-type.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
   component: fromPages.LabResultsCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
     labName: LabNameDataResolver,
     labSampleType: LabSampleTypeDataResolver,
     labTestType: LabTestTypeDataResolver,
@@ -37,9 +42,10 @@ const createViewModifyFoundation: Route = {
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
     user: UserDataResolver,
-    yesNo: YesNoDataResolver,
+    deletedUser: DeletedUserDataResolver,
     entityData: PersonDataResolver,
-    outbreak: SelectedOutbreakDataResolver
+    outbreak: SelectedOutbreakDataResolver,
+    classification: ClassificationDataResolver
   }
 };
 
@@ -48,7 +54,9 @@ const entityLabResultsFoundation = {
   component: fromPages.EntityLabResultsListComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
     labName: LabNameDataResolver,
     labSampleType: LabSampleTypeDataResolver,
     labTestType: LabTestTypeDataResolver,
@@ -57,7 +65,6 @@ const entityLabResultsFoundation = {
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
     user: UserDataResolver,
-    yesNo: YesNoDataResolver,
     entityData: PersonDataResolver,
     classification: ClassificationDataResolver
   }
@@ -75,13 +82,16 @@ const routes: Routes = [
         new PermissionExpression({
           or: [
             PERMISSION.CASE_LIST_LAB_RESULT,
-            PERMISSION.CONTACT_LIST_LAB_RESULT
+            PERMISSION.CONTACT_LIST_LAB_RESULT,
+            PERMISSION.CONTACT_OF_CONTACT_LIST_LAB_RESULT
           ]
         })
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
       classification: ClassificationDataResolver,
       labName: LabNameDataResolver,
       labSampleType: LabSampleTypeDataResolver,
@@ -214,6 +224,68 @@ const routes: Routes = [
       ],
       personType: EntityType.CONTACT,
       action: CreateViewModifyV2Action.MODIFY
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
+  // Contact of contact Lab results
+  {
+    path: 'contacts-of-contacts/:contactOfContactId',
+    ...entityLabResultsFoundation,
+    data: {
+      permissions: [
+        PERMISSION.CONTACT_OF_CONTACT_LIST_LAB_RESULT
+      ],
+      personType: EntityType.CONTACT_OF_CONTACT
+    }
+  },
+  // View Contact Lab Result
+  {
+    path: 'contacts-of-contacts/:contactOfContactId/:labResultId/view',
+    ...createViewModifyFoundation,
+    data: {
+      permissions: [
+        PERMISSION.CONTACT_OF_CONTACT_VIEW_LAB_RESULT
+      ],
+      personType: EntityType.CONTACT_OF_CONTACT,
+      action: CreateViewModifyV2Action.VIEW
+    }
+  },
+  // Modify Contact Lab Result
+  {
+    path: 'contacts-of-contacts/:contactOfContactId/:labResultId/modify',
+    ...createViewModifyFoundation,
+    data: {
+      permissions: [
+        PERMISSION.CONTACT_OF_CONTACT_MODIFY_LAB_RESULT
+      ],
+      personType: EntityType.CONTACT_OF_CONTACT,
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
+  // Modify list of Lab Results
+  {
+    path: 'modify-list',
+    component: fromPages.LabResultsBulkModifyComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.LAB_RESULT_BULK_MODIFY
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      entity: RelationshipPersonDataResolver,
+      labName: LabNameDataResolver,
+      labTestResult: LabTestResultDataResolver,
+      labResultProgress: LabProgressDataResolver,
+      labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
+      labSequenceResult: LabSequenceResultDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard

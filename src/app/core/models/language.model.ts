@@ -1,8 +1,9 @@
 import * as _ from 'lodash';
-import { moment, Moment } from '../helperClasses/x-moment';
 import { IPermissionBasic, IPermissionLanguage } from './permission.interface';
 import { PERMISSION } from './permission.model';
 import { UserModel } from './user.model';
+import { LocalizationHelper, Moment } from '../helperClasses/localization-helper';
+import { BaseModel } from './base.model';
 
 export class LanguageTokenModel {
   token: string;
@@ -23,7 +24,7 @@ export class LanguageTokenDetails {
     this.languageId = _.get(data, 'languageId');
 
     this.lastUpdateDate = _.get(data, 'lastUpdateDate');
-    this.lastUpdateDate = this.lastUpdateDate ? moment(this.lastUpdateDate) : null;
+    this.lastUpdateDate = this.lastUpdateDate ? LocalizationHelper.toMoment(this.lastUpdateDate) : null;
 
     this.tokens = _.get(data, 'tokens');
     this.tokens = (this.tokens || []).map((token) => new LanguageTokenModel(token));
@@ -31,7 +32,7 @@ export class LanguageTokenDetails {
 }
 
 export class LanguageModel
-implements
+  extends BaseModel implements
   IPermissionBasic,
   IPermissionLanguage {
   id: string;
@@ -67,50 +68,13 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    super(data);
+
     // data
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
     this.tokens = _.get(data, 'tokens', []);
     this.readOnly = _.get(data, 'readOnly', false);
-
-    // created at
-    this.createdAt = _.get(data, 'createdAt');
-    if (this.createdAt) {
-      this.createdAt = moment.utc(this.createdAt);
-    }
-
-    // created by
-    this.createdBy = _.get(data, 'createdBy');
-
-    // created by user
-    this.createdByUser = _.get(data, 'createdByUser');
-    if (this.createdByUser) {
-      this.createdByUser = new UserModel(this.createdByUser);
-    }
-
-    // updated at
-    this.updatedAt = _.get(data, 'updatedAt');
-    if (this.updatedAt) {
-      this.updatedAt = moment.utc(this.updatedAt);
-    }
-
-    // updated by
-    this.updatedBy = _.get(data, 'updatedBy');
-
-    // updated by user
-    this.updatedByUser = _.get(data, 'updatedByUser');
-    if (this.updatedByUser) {
-      this.updatedByUser = new UserModel(this.updatedByUser);
-    }
-
-    // deleted ?
-    this.deleted = _.get(data, 'deleted');
-
-    // deleted at
-    this.deletedAt = _.get(data, 'deletedAt');
-    if (this.deletedAt) {
-      this.deletedAt = moment.utc(this.deletedAt);
-    }
   }
 
   /**

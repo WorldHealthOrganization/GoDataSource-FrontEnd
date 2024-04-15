@@ -5,49 +5,46 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
-import { IAnswerData, QuestionModel } from './question.model';
+import { IAnswerData } from './question.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import {
   IPermissionBasic,
+  IPermissionBasicBulk,
   IPermissionCase,
   IPermissionChronology,
   IPermissionExportable,
   IPermissionImportable,
   IPermissionMovement,
   IPermissionRelatedContact,
-  IPermissionRelatedContactBulk, IPermissionRelatedLabResult,
+  IPermissionRelatedContactBulk,
+  IPermissionRelatedLabResult,
   IPermissionRelatedRelationship,
   IPermissionRestorable
 } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
-import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { LocationModel } from './location.model';
-import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
-import { ReferenceDataEntryModel } from './reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
 import { SafeHtml } from '@angular/platform-browser';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class CaseModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRelatedRelationship,
-        IPermissionRestorable,
-        IPermissionImportable,
-        IPermissionExportable,
-        IPermissionRelatedContact,
-        IPermissionRelatedContactBulk,
-        IPermissionMovement,
-        IPermissionChronology,
-        IPermissionCase,
-        IPermissionRelatedLabResult {
+    IPermissionBasic,
+    IPermissionRelatedRelationship,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionImportable,
+    IPermissionExportable,
+    IPermissionRelatedContact,
+    IPermissionRelatedContactBulk,
+    IPermissionMovement,
+    IPermissionChronology,
+    IPermissionCase,
+    IPermissionRelatedLabResult {
   id: string;
   firstName: string;
   middleName: string;
@@ -66,7 +63,6 @@ export class CaseModel
   dateOfOnset: string | Moment;
   isDateOfOnsetApproximate: boolean;
   dateOfOutcome: string | Moment;
-  dateBecomeCase: string | Moment;
   safeBurial: boolean;
   dateOfBurial: string | Moment;
   dateRanges: CaseCenterDateRangeModel[];
@@ -82,22 +78,30 @@ export class CaseModel
   dateOfLastContact: string;
   isDateOfReportingApproximate: boolean;
   transferRefused: boolean;
+  deathLocationId: string;
+  deathLocation: LocationModel;
   outbreakId: string;
   investigationStatus: string;
   dateInvestigationCompleted: string | Moment;
   outcomeId: string;
-  dateBecomeContact: string;
+  wasCase: boolean;
+  dateBecomeCase: string | Moment;
   wasContact: boolean;
+  dateBecomeContact: string | Moment;
+  wasContactOfContact: boolean;
+  dateBecomeContactOfContact: string | Moment;
 
   numberOfContacts: number;
   numberOfExposures: number;
 
+  // these properties were added to handle the legacy follow-ups (if the case was a contact)
   followUp: {
     originalStartDate: string,
     startDate: string,
     endDate: string,
     status: string
   };
+  followUpTeamId: string;
 
   responsibleUserId: string;
   responsibleUser: UserModel;
@@ -129,326 +133,13 @@ export class CaseModel
 
   // used by ui
   uiStatusForms: SafeHtml;
+  uiDocuments: string;
+  uiVaccines: string;
+  uiDateRanges: string;
 
   /**
-   * Advanced filters
+   * Static Permissions - IPermissionBasic
    */
-  static generateAdvancedFilters(data: {
-    authUser: UserModel,
-    caseInvestigationTemplate: () => QuestionModel[],
-    options: {
-      gender: ILabelValuePairModel[],
-      occupation: ILabelValuePairModel[],
-      risk: ILabelValuePairModel[],
-      classification: ILabelValuePairModel[],
-      yesNo: ILabelValuePairModel[],
-      outcome: ILabelValuePairModel[],
-      clusterLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void,
-      pregnancy: ILabelValuePairModel[],
-      vaccine: ILabelValuePairModel[],
-      vaccineStatus: ILabelValuePairModel[],
-      user: ILabelValuePairModel[],
-      investigationStatus: ILabelValuePairModel[]
-    }
-  }): V2AdvancedFilter[] {
-    // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
-      // Case
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'firstName',
-        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'middleName',
-        label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'lastName',
-        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'gender',
-        label: 'LNG_CASE_FIELD_LABEL_GENDER',
-        options: data.options.gender,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_AGE,
-        field: 'age',
-        label: 'LNG_CASE_FIELD_LABEL_AGE'
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'addresses',
-        label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
-        field: 'addresses',
-        label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dob',
-        label: 'LNG_CASE_FIELD_LABEL_DOB',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'occupation',
-        label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-        options: data.options.occupation
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'riskLevel',
-        label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-        options: data.options.risk
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'riskReason',
-        label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'visualId',
-        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'classification',
-        label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-        options: data.options.classification
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfInfection',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfOnset',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfOutcome',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateBecomeCase',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'safeBurial',
-        label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'isDateOfOnsetApproximate',
-        label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfReporting',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'isDateOfReportingApproximate',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'transferRefused',
-        label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'investigationStatus',
-        label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
-        options: data.options.investigationStatus
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateInvestigationCompleted',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'outcomeId',
-        label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-        options: data.options.outcome
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'wasContact',
-        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-        options: data.options.yesNo,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfContacts',
-        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfExposures',
-        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'clusterId',
-        label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
-        relationshipPath: ['relationships'],
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER',
-        optionsLoad: data.options.clusterLoad
-      }, {
-        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-        field: 'questionnaireAnswers',
-        label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        template: data.caseInvestigationTemplate
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'pregnancyStatus',
-        label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-        options: data.options.pregnancy,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'vaccinesReceived.vaccine',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE',
-        options: data.options.vaccine
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'vaccinesReceived.status',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
-        options: data.options.vaccineStatus
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'vaccinesReceived.date',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE'
-      }
-    ];
-
-    // allowed to filter by responsible user ?
-    if (UserModel.canListForFilters(data.authUser)) {
-      advancedFilters.push({
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: data.options.user
-      });
-    }
-
-    // finished
-    return advancedFilters;
-  }
-
-  /**
-   * Retrieve statuses forms
-   */
-  static getStatusForms(
-    info: {
-      // required
-      item: CaseModel,
-      translateService: TranslateService,
-      classification: IResolverV2ResponseModel<ReferenceDataEntryModel>,
-      outcome: IResolverV2ResponseModel<ReferenceDataEntryModel>
-    }
-  ): V2ColumnStatusForm[] {
-    // construct list of forms that we need to display
-    const forms: V2ColumnStatusForm[] = [];
-
-    // classification
-    if (
-      info.item.classification &&
-      info.classification.map[info.item.classification]
-    ) {
-      forms.push({
-        type: IV2ColumnStatusFormType.CIRCLE,
-        color: info.classification.map[info.item.classification].getColorCode(),
-        tooltip: info.translateService.instant(info.item.classification)
-      });
-    }
-
-    // outcome
-    if (
-      info.item.outcomeId &&
-      info.outcome.map[info.item.outcomeId]
-    ) {
-      forms.push({
-        type: IV2ColumnStatusFormType.TRIANGLE,
-        color: info.outcome.map[info.item.outcomeId].getColorCode(),
-        tooltip: info.translateService.instant(info.item.outcomeId)
-      });
-    }
-
-    // alerted
-    if (info.item.alerted) {
-      forms.push({
-        type: IV2ColumnStatusFormType.STAR,
-        color: 'var(--gd-danger)',
-        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
-      });
-    }
-
-    // finished
-    return forms;
-  }
-
-  /**
-   * Return case id mask with data replaced
-   */
-  static generateCaseIDMask(caseIdMask: string): string {
-    // validate
-    if (_.isEmpty(caseIdMask)) {
-      return '';
-    }
-
-    // !!!!!!!!!!!!!!!
-    // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
-    // !!!!!!!!!!!!!!!
-    return caseIdMask
-      .replace(/YYYY/g, moment().format('YYYY'))
-      .replace(/\*/g, '');
-  }
-
-  /**
-     * Static Permissions - IPermissionBasic
-     */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE) : false); }
@@ -456,8 +147,8 @@ export class CaseModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedRelationship
-     */
+   * Static Permissions - IPermissionRelatedRelationship
+   */
   static canListRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_RELATIONSHIP_CONTACTS) : false); }
   static canViewRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW_RELATIONSHIP_CONTACTS) : false); }
   static canCreateRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE_RELATIONSHIP_CONTACTS) : false); }
@@ -477,44 +168,52 @@ export class CaseModel
   static canBulkDeleteRelationshipExposures(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_DELETE_RELATIONSHIP_EXPOSURES) : false); }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
+  static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_MODIFY) : false); }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_BULK_RESTORE) : false); }
+
+  /**
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_IMPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedContact
-     */
+   * Static Permissions - IPermissionRelatedContact
+   */
   static canCreateContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE_CONTACT) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedContactBulk
-     */
+   * Static Permissions - IPermissionRelatedContactBulk
+   */
   static canBulkCreateContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE_BULK_CONTACT) : false); }
 
   /**
-     * Static Permissions - IPermissionMovement
-     */
+   * Static Permissions - IPermissionMovement
+   */
   static canViewMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW_MOVEMENT_MAP) : false); }
   static canExportMovementMap(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_MOVEMENT_MAP) : false); }
 
   /**
-     * Static Permissions - IPermissionChronology
-     */
+   * Static Permissions - IPermissionChronology
+   */
   static canViewChronologyChart(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW_CHRONOLOGY_CHART) : false); }
 
   /**
-     * Static Permissions - IPermissionCase
-     */
+   * Static Permissions - IPermissionCase
+   */
   static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_GENERATE_VISUAL_ID) : false); }
   static canConvertToContact(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CONVERT_TO_CONTACT) : false); }
   static canExportInvestigationForm(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_INVESTIGATION_FORM) : false); }
@@ -524,10 +223,12 @@ export class CaseModel
   static canListLongPeriodBetweenOnsetDatesReport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_LONG_PERIOD_BETWEEN_DATES_REPORT) : false); }
   static canExportDossier(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_DOSSIER) : false); }
   static canListIsolatedCases(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_ISOLATED_CASES) : false); }
+  static canExportDailyFollowUpList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_DAILY_FOLLOW_UP_LIST) : false); }
+  static canExportDailyFollowUpsForm(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_DAILY_FOLLOW_UP_FORM) : false); }
 
   /**
-     * Static Permissions - IPermissionRelatedLabResult
-     */
+   * Static Permissions - IPermissionRelatedLabResult
+   */
   static canViewLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_VIEW_LAB_RESULT) : false); }
   static canListLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_LIST_LAB_RESULT) : false); }
   static canCreateLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_CREATE_LAB_RESULT) : false); }
@@ -538,8 +239,13 @@ export class CaseModel
   static canExportLabResult(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_EXPORT_LAB_RESULT) : false); }
 
   /**
-     * Constructor
-     */
+   * Static Permissions - IPermissionRelatedFollowUp
+   */
+  static canCreateFollowUp(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.CASE_FOLLOW_UP_CREATE) : false); }
+
+  /**
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 
@@ -590,7 +296,6 @@ export class CaseModel
     this.dateOfInfection = _.get(data, 'dateOfInfection');
     this.dateOfOnset = _.get(data, 'dateOfOnset');
     this.dateOfOutcome = _.get(data, 'dateOfOutcome');
-    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
     this.dateOfBurial = _.get(data, 'dateOfBurial');
     this.safeBurial = _.get(data, 'safeBurial');
     this.isDateOfOnsetApproximate = _.get(data, 'isDateOfOnsetApproximate');
@@ -611,6 +316,7 @@ export class CaseModel
     this.dateOfLastContact = _.get(data, 'dateOfLastContact');
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
     this.transferRefused = _.get(data, 'transferRefused');
+    this.deathLocationId = _.get(data, 'deathLocationId');
     this.outbreakId = _.get(data, 'outbreakId');
     this.investigationStatus = _.get(data, 'investigationStatus');
     this.dateInvestigationCompleted = _.get(data, 'dateInvestigationCompleted');
@@ -620,8 +326,12 @@ export class CaseModel
     this.questionnaireAnswersContact = _.get(data, 'questionnaireAnswersContact', {});
 
     this.relationships = _.get(data, 'relationships', []);
-    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+    this.wasCase = _.get(data, 'wasCase');
+    this.dateBecomeCase = _.get(data, 'dateBecomeCase');
     this.wasContact = _.get(data, 'wasContact');
+    this.dateBecomeContact = _.get(data, 'dateBecomeContact');
+    this.wasContactOfContact = _.get(data, 'wasContactOfContact');
+    this.dateBecomeContactOfContact = _.get(data, 'dateBecomeContactOfContact');
 
     this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
@@ -640,6 +350,7 @@ export class CaseModel
     });
 
     this.followUp = _.get(data, 'followUp', {});
+    this.followUpTeamId = _.get(data, 'followUpTeamId');
 
     this.responsibleUserId = _.get(data, 'responsibleUserId');
     this.responsibleUser = _.get(data, 'responsibleUser');
@@ -684,6 +395,14 @@ export class CaseModel
   canRestore(user: UserModel): boolean { return CaseModel.canRestore(user); }
 
   /**
+   * Permissions - IPermissionBasicBulk
+   */
+  canBulkCreate(): boolean { return CaseModel.canBulkCreate(); }
+  canBulkModify(user: UserModel): boolean { return CaseModel.canBulkModify(user); }
+  canBulkDelete(user: UserModel): boolean { return CaseModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return CaseModel.canBulkRestore(user); }
+
+  /**
      * Permissions - IPermissionImportable
      */
   canImport(user: UserModel): boolean { return CaseModel.canImport(user); }
@@ -726,6 +445,8 @@ export class CaseModel
   canListLongPeriodBetweenOnsetDatesReport(user: UserModel): boolean { return CaseModel.canListLongPeriodBetweenOnsetDatesReport(user); }
   canExportDossier(user: UserModel): boolean { return CaseModel.canExportDossier(user); }
   canListIsolatedCases(user: UserModel): boolean { return CaseModel.canListIsolatedCases(user); }
+  canExportDailyFollowUpList(user: UserModel): boolean { return CaseModel.canExportDailyFollowUpList(user); }
+  canExportDailyFollowUpsForm(user: UserModel): boolean { return CaseModel.canExportDailyFollowUpsForm(user); }
 
   /**
      * Permissions - IPermissionRelatedLabResult
@@ -738,6 +459,11 @@ export class CaseModel
   canRestoreLabResult(user: UserModel): boolean { return CaseModel.canRestoreLabResult(user); }
   canImportLabResult(user: UserModel): boolean { return CaseModel.canImportLabResult(user); }
   canExportLabResult(user: UserModel): boolean { return CaseModel.canExportLabResult(user); }
+
+  /**
+   * Permissions - IPermissionRelatedFollowUp
+   */
+  canCreateFollowUp(user: UserModel): boolean { return CaseModel.canCreateFollowUp(user); }
 
   /**
      * Case Name
@@ -770,25 +496,8 @@ export class CaseModel
     // finished
     return mainAddress ?
       mainAddress :
-      new AddressModel();
-  }
-
-  /**
-     * Get phone numbers
-     */
-  get phoneNumbers(): string[] {
-    return this.addresses.reduce((acc: string[], address) => {
-      if (!_.isEmpty(address.phoneNumber)) {
-        acc.push(address.phoneNumber);
-      }
-      return acc;
-    }, []);
-  }
-
-  /**
-     * Check if case has questionnaire answers registered as contact
-     */
-  get hasQuestionnaireAnswersContact(): boolean {
-    return !_.isEmpty(this.questionnaireAnswersContact);
+      new AddressModel({
+        typeId: AddressType.CURRENT_ADDRESS
+      });
   }
 }

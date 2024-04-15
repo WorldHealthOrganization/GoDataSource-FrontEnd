@@ -1,26 +1,30 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
+  CreateViewModifyV2ActionType, CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
-import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemClientApplicationModel } from '../../../../core/models/system-client-application.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import * as _ from 'lodash';
 import { Constants } from '../../../../core/models/constants';
-import { catchError } from 'rxjs/operators';
-import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ClientApplicationDataService } from '../../../../core/services/data/client-application.data.service';
+import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
+import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ClientApplicationHelperService } from '../../../../core/services/helper/client-application-helper.service';
 
 /**
  * Component
@@ -34,22 +38,26 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
    * Constructor
    */
   constructor(
-    protected systemSettingsDataService: SystemSettingsDataService,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
-    protected router: Router,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    private i18nService: I18nService,
+    private clientApplicationDataService: ClientApplicationDataService,
+    private router: Router,
+    private dialogV2Service: DialogV2Service,
+    private clientApplicationHelperService: ClientApplicationHelperService
   ) {
     // parent
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -71,8 +79,13 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
   /**
    * Retrieve item
    */
-  protected retrieveItem(): Observable<SystemClientApplicationModel> {
-    return null;
+  protected retrieveItem(record?: SystemClientApplicationModel): Observable<SystemClientApplicationModel> {
+    return this.clientApplicationDataService
+      .getClientApplication(
+        record ?
+          record.id :
+          this.activatedRoute.snapshot.params.clientApplicationId
+      );
   }
 
   /**
@@ -85,8 +98,21 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
    */
   protected initializePageTitle(): void {
     // add info accordingly to page type
-    this.pageTitle = 'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TITLE';
-    this.pageTitleData = undefined;
+    if (this.isCreate) {
+      this.pageTitle = 'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TITLE';
+      this.pageTitleData = undefined;
+    } else if (this.isModify) {
+      this.pageTitle = 'LNG_PAGE_MODIFY_SYSTEM_CLIENT_APPLICATION_TITLE';
+      this.pageTitleData = {
+        name: this.itemData.name
+      };
+    } else {
+      // view
+      this.pageTitle = 'LNG_PAGE_VIEW_SYSTEM_CLIENT_APPLICATION_TITLE';
+      this.pageTitleData = {
+        name: this.itemData.name
+      };
+    }
   }
 
   /**
@@ -116,11 +142,37 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
     }
 
     // add info accordingly to page type
-    this.breadcrumbs.push({
-      label: 'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TITLE',
-      action: null
-    });
+    if (this.isCreate) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TITLE',
+        action: null
+      });
+    } else if (this.isModify) {
+      this.breadcrumbs.push({
+        label: this.i18nService.instant(
+          'LNG_PAGE_MODIFY_SYSTEM_CLIENT_APPLICATION_TITLE', {
+            name: this.itemData.name
+          }
+        ),
+        action: null
+      });
+    } else {
+      // view
+      this.breadcrumbs.push({
+        label: this.i18nService.instant(
+          'LNG_PAGE_VIEW_SYSTEM_CLIENT_APPLICATION_TITLE', {
+            name: this.itemData.name
+          }
+        ),
+        action: null
+      });
+    }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -136,8 +188,8 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_UPSTREAM_SERVER_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -149,11 +201,20 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: () => {
-        // redirect to list
-        this.router.navigate([
-          '/system-config/client-applications'
-        ]);
+      redirectAfterCreateUpdate: (
+        data: SystemClientApplicationModel,
+        extraQueryParams: Params
+      ) => {
+        // redirect to view
+        this.router.navigate(
+          [
+            '/system-config/client-applications',
+            data.id,
+            'view'
+          ], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }
@@ -162,7 +223,8 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
    * Initialize tabs - Details
    */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
-    return {
+    // create tab
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'details',
       label: 'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TAB_DETAILS_TITLE',
@@ -222,6 +284,9 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
                 set: (value) => {
                   // set data
                   this.itemData.credentials.clientId = value;
+
+                  // mark as dirty
+                  tab.form?.controls['credentials[clientSecret]']?.markAsDirty();
                 }
               },
               validators: {
@@ -230,9 +295,13 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
               suffixIconButtons: [{
                 icon: 'shuffle',
                 tooltip: 'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_GENERATE_KEY_BUTTON',
-                clickAction: () => {
+                clickAction: (input) => {
                   // generate string
                   this.itemData.credentials.clientId = Constants.randomString(Constants.DEFAULT_RANDOM_KEY_LENGTH);
+
+                  // mark as dirty
+                  input.control?.markAsDirty();
+                  tab.form?.controls['credentials[clientSecret]']?.markAsDirty();
                 }
               }]
             }, {
@@ -245,6 +314,9 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
                 set: (value) => {
                   // set data
                   this.itemData.credentials.clientSecret = value;
+
+                  // mark as dirty
+                  tab.form?.controls['credentials[clientId]']?.markAsDirty();
                 }
               },
               validators: {
@@ -253,9 +325,13 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
               suffixIconButtons: [{
                 icon: 'shuffle',
                 tooltip: 'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_GENERATE_KEY_BUTTON',
-                clickAction: () => {
+                clickAction: (input) => {
                   // generate string
                   this.itemData.credentials.clientSecret = Constants.randomString(Constants.DEFAULT_RANDOM_KEY_LENGTH);
+
+                  // mark as dirty
+                  input.control?.markAsDirty();
+                  tab.form?.controls['credentials[clientId]']?.markAsDirty();
                 }
               }]
             }
@@ -263,6 +339,9 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
         }
       ]
     };
+
+    // finished
+    return tab;
   }
 
   /**
@@ -270,16 +349,67 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
    */
   private initializeButtons(): ICreateViewModifyV2Buttons {
     return {
-      view: undefined,
-      modify: undefined,
+      view: {
+        link: {
+          link: () => ['/system-config/client-applications', this.itemData?.id, 'view']
+        }
+      },
+      modify: {
+        link: {
+          link: () => ['/system-config/client-applications', this.itemData?.id, 'modify']
+        },
+        visible: () => SystemClientApplicationModel.canModify(this.authUser)
+      },
       createCancel: {
         link: {
           link: () => ['/system-config/client-applications']
         }
       },
-      viewCancel: undefined,
-      modifyCancel: undefined,
-      quickActions: undefined
+      viewCancel: {
+        link: {
+          link: () => ['/system-config/client-applications']
+        }
+      },
+      modifyCancel: {
+        link: {
+          link: () => ['/system-config/client-applications']
+        }
+      },
+      quickActions: {
+        options: [
+          // Record details
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_COMMON_LABEL_DETAILS',
+            action: {
+              click: () => {
+                // show record details dialog
+                this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
+                  'LNG_COMMON_LABEL_DETAILS',
+                  this.itemData,
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
+                );
+              }
+            }
+          },
+
+          // Download client application config file
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE',
+            action: {
+              click: () => {
+                this.clientApplicationHelperService.downloadConfFile(this.itemData);
+              }
+            },
+            visible: () => !this.isCreate &&
+              this.itemData?.active &&
+              SystemClientApplicationModel.canDownloadConfFile(this.authUser)
+          }
+        ]
+      }
     };
   }
 
@@ -288,63 +418,69 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
    */
   private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
     return (
-      _type,
+      type,
       data,
       finished,
       _loading,
       _forms
     ) => {
-      // always create
-      this.systemSettingsDataService
-        .getSystemSettings()
-        .pipe(
-          catchError((err) => {
-            // show error
-            finished(err, undefined);
-
-            // finished
-            return throwError(err);
-          })
+      // finished
+      (type === CreateViewModifyV2ActionType.CREATE ?
+        this.clientApplicationDataService.createClientApplication(
+          data
+        ) :
+        this.clientApplicationDataService.modifyClientApplication(
+          this.itemData.id,
+          data
         )
-        .subscribe((settings: SystemSettingsModel) => {
-          // add the new upstream server
-          settings.clientApplications = settings.clientApplications || [];
-          settings.clientApplications.push(data);
+      ).pipe(
+        // handle error
+        catchError((err) => {
+          // show error
+          finished(err, undefined);
 
-          // save upstream servers
-          this.systemSettingsDataService
-            .modifySystemSettings({
-              clientApplications: settings.clientApplications
-            })
-            .pipe(
-              catchError((err) => {
-                // show error
-                finished(err, undefined);
+          // finished
+          return throwError(err);
+        }),
 
-                // finished
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              // display success message
-              this.toastV2Service.success('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE');
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).subscribe((item: SystemClientApplicationModel) => {
+        // success creating / updating
+        this.toastV2Service.success(
+          type === CreateViewModifyV2ActionType.CREATE ?
+            'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_ACTION_CREATE_CLIENT_APPLICATION_SUCCESS_MESSAGE' :
+            'LNG_PAGE_MODIFY_SYSTEM_CLIENT_APPLICATION_ACTION_MODIFY_CLIENT_APPLICATION_SUCCESS_MESSAGE'
+        );
 
-              // hide loading & redirect
-              finished(undefined, settings);
-            });
-        });
+        // finished with success
+        finished(undefined, item);
+      });
     };
   }
 
   /**
    * Initialize expand list column renderer fields
    */
-  protected initializeExpandListColumnRenderer(): void {}
+  protected initializeExpandListColumnRenderer(): void {
+    this.expandListColumnRenderer = {
+      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      link: (item: SystemClientApplicationModel) => ['/system-config/client-applications', item.id, 'view'],
+      get: {
+        text: (item: SystemClientApplicationModel) => item.name
+      }
+    };
+  }
 
   /**
    * Initialize expand list query fields
    */
-  protected initializeExpandListQueryFields(): void {}
+  protected initializeExpandListQueryFields(): void {
+    this.expandListQueryFields = [
+      'id',
+      'name'
+    ];
+  }
 
   /**
    * Initialize expand list advanced filters
@@ -354,5 +490,22 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
   /**
    * Refresh expand list
    */
-  refreshExpandList(_data): void {}
+  refreshExpandList(data): void {
+    // append / remove search
+    if (data.searchBy) {
+      data.queryBuilder.filter.where({
+        name: RequestFilterGenerator.textContains(
+          data.searchBy
+        )
+      });
+    }
+
+    // retrieve data
+    this.expandListRecords$ = this.clientApplicationDataService
+      .getClientApplicationsList(data.queryBuilder)
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
 }

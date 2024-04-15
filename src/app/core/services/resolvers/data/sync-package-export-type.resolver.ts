@@ -38,7 +38,11 @@ export class SyncPackageExportTypeDataResolver implements IMapResolverV2<ILabelV
             response.options.push({
               label: item.label,
               value: item.value,
-              data: item
+              data: item,
+              infos: [{
+                icon: 'help',
+                label: item.description
+              }]
             });
           });
 

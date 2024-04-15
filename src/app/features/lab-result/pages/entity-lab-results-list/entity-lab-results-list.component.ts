@@ -1,11 +1,10 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -16,28 +15,34 @@ import {
 } from '../../../../core/models/export-fields-group.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import {
+  IV2BottomDialogConfigButtonType
+} from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { Moment } from 'moment/moment';
+import * as momentOriginal from 'moment/moment';
+import { UserModel } from '../../../../core/models/user.model';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-entity-lab-results-list',
   templateUrl: './entity-lab-results-list.component.html'
 })
-export class EntityLabResultsListComponent extends ListComponent<LabResultModel> implements OnDestroy {
+export class EntityLabResultsListComponent extends ListComponent<LabResultModel, IV2ColumnToVisibleMandatoryConf> implements OnDestroy {
   // entity
   personType: EntityType;
-  entityData: CaseModel | ContactModel;
+  entityData: CaseModel | ContactModel | ContactOfContactModel;
 
   // constants
   EntityType = EntityType;
@@ -62,13 +67,13 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE', value: 'sequence' },
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON', value: 'person' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   /**
@@ -77,17 +82,17 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   constructor(
     protected listHelperService: ListHelperService,
     private outbreakDataService: OutbreakDataService,
-    private toastV2Service: ToastV2Service,
-    private i18nService: I18nService,
-    private entityLabResultService: EntityLabResultService,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service,
-    private caseDataService: CaseDataService
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
     );
 
     // disable select outbreak
@@ -124,8 +129,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Table column - actions
    */
   protected initializeTableColumnActions(): void {
-    this.tableColumnActions = this.entityLabResultService.retrieveTableColumnActions({
-      authUser: this.authUser,
+    this.tableColumnActions = this.personAndRelatedHelperService.labResult.retrieveTableColumnActions({
       personType: this.personType,
       selectedOutbreak: () => this.selectedOutbreak,
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -140,17 +144,41 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
-    this.tableColumns = this.entityLabResultService.retrieveTableColumns({
-      authUser: this.authUser,
-      user: this.activatedRoute.snapshot.data.user,
+    this.tableColumns = this.personAndRelatedHelperService.labResult.retrieveTableColumns(this.selectedOutbreak, {
       options: {
-        labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestType: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        labSequenceLaboratory: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        labName: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }
@@ -158,7 +186,67 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   /**
    * Initialize process data
    */
-  protected initializeProcessSelectedData(): void {}
+  protected initializeProcessSelectedData(): void {
+    this.processSelectedData = [
+      // all selected records were not deleted ?
+      {
+        key: 'allNotDeleted',
+        shouldProcess: () => LabResultModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive,
+        process: (
+          dataMap: {
+            [id: string]: LabResultModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allNotDeleted: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (dataMap[selected[index]]?.deleted) {
+              // at least one not deleted
+              allNotDeleted = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allNotDeleted;
+        }
+      },
+
+      // all selected records were deleted ?
+      {
+        key: 'allDeleted',
+        shouldProcess: () => LabResultModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive,
+        process: (
+          dataMap: {
+            [id: string]: LabResultModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allDeleted: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (!dataMap[selected[index]]?.deleted) {
+              // at least one not deleted
+              allDeleted = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allDeleted;
+        }
+      }
+    ];
+  }
 
   /**
    * Initialize table infos
@@ -169,17 +257,44 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityLabResultService.generateAdvancedFilters({
+    this.advancedFilters = this.personAndRelatedHelperService.labResult.generateAdvancedFiltersPerson(this.selectedOutbreak, {
       labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
       options: {
-        labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestType: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        labSequenceLaboratory: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        labName: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSampleType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labTestResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labSequenceLaboratory: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        labSequenceResult: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }
@@ -195,6 +310,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
         return LabResultModel.canExport(this.authUser) && (
           (this.personType === EntityType.CASE && CaseModel.canExportLabResult(this.authUser)) ||
           (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser)) ||
+          (this.personType === EntityType.CONTACT_OF_CONTACT && ContactOfContactModel.canExportLabResult(this.authUser)) ||
           (
             this.personType === EntityType.CASE &&
             CaseModel.canModify(this.authUser) &&
@@ -240,7 +356,8 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
           visible: (): boolean => {
             return LabResultModel.canExport(this.authUser) && (
               (this.personType === EntityType.CASE && CaseModel.canExportLabResult(this.authUser)) ||
-              (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser))
+              (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser)) ||
+              (this.personType === EntityType.CONTACT_OF_CONTACT && ContactOfContactModel.canExportLabResult(this.authUser))
             );
           }
         }
@@ -251,7 +368,359 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {}
+  protected initializeGroupActions(): void {
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => (
+        this.selectedOutbreakIsActive &&
+        LabResultModel.canBulkModify(this.authUser)
+      ) || (
+        LabResultModel.canExport(this.authUser) && (
+          CaseModel.canExportLabResult(this.authUser) ||
+          ContactModel.canExportLabResult(this.authUser) ||
+          ContactOfContactModel.canExportLabResult(this.authUser)
+        )
+      ) || (
+        LabResultModel.canBulkDelete(this.authUser) &&
+        this.selectedOutbreakIsActive
+      ) ||
+      (
+        LabResultModel.canBulkRestore(this.authUser) &&
+        this.selectedOutbreakIsActive
+      ),
+      actions: [
+        // bulk modify
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_MODIFY_SELECTED_LAB_RESULTS'
+          },
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_DELETE_SELECTED_LAB_RESULTS_DESCRIPTION') :
+            undefined,
+          action: {
+            link: () => {
+              return ['/lab-results/modify-list'];
+            },
+            linkQueryParams: (selected: string[]): Params => {
+              return {
+                labResultsIds: JSON.stringify(selected),
+                entityType: this.entityData.type,
+                entityId: this.entityData.id
+              };
+            }
+          },
+          visible: (): boolean => {
+            return this.selectedOutbreakIsActive &&
+              LabResultModel.canBulkModify(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
+          }
+        },
+
+        // Export selected lab results
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_EXPORT_SELECTED_LAB_RESULTS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // create query
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
+
+              this.exportLabResultsData(qb);
+            }
+          },
+          visible: (): boolean => {
+            return LabResultModel.canExport(this.authUser) && (
+              CaseModel.canExportLabResult(this.authUser) ||
+              ContactModel.canExportLabResult(this.authUser) ||
+              ContactOfContactModel.canExportLabResult(this.authUser)
+            );
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        },
+
+        // Divider
+        {
+          visible: () => (
+            (
+              this.selectedOutbreakIsActive &&
+              LabResultModel.canBulkModify(this.authUser)
+            ) || (
+              LabResultModel.canExport(this.authUser) && (
+                CaseModel.canExportLabResult(this.authUser) ||
+                ContactModel.canExportLabResult(this.authUser) ||
+                ContactOfContactModel.canExportLabResult(this.authUser)
+              )
+            )
+          ) && (
+            (
+              LabResultModel.canBulkDelete(this.authUser) ||
+              LabResultModel.canBulkRestore(this.authUser)
+            ) &&
+            this.selectedOutbreakIsActive
+          )
+        },
+
+        // bulk delete
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_DELETE_SELECTED_LAB_RESULTS'
+          },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_DELETE_SELECTED_LAB_RESULTS_DESCRIPTION') :
+            undefined,
+          action: {
+            click: (selected: string[]) => {
+              // ask for confirmation
+              this.personAndRelatedHelperService.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_DELETE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_LAB_RESULTS'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // show loading
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+                  loading.message({
+                    message: 'LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SELECTED_LAB_RESULTS_WAIT_MESSAGE',
+                    messageData: {
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
+                      date: '—'
+                    }
+                  });
+
+                  // delete - we can't use bulk here since deleting cases triggers many hooks
+                  let startTime: Moment;
+                  const selectedShallowClone: string[] = [...selected];
+                  const nextDelete = () => {
+                    // finished ?
+                    if (selectedShallowClone.length < 1) {
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SELECTED_LAB_RESULTS_SUCCESS_MESSAGE');
+                      loading.close();
+                      this.needsRefreshList(true);
+                      return;
+                    }
+
+                    // delete
+                    this.personAndRelatedHelperService.labResult.labResultDataService
+                      .deleteLabResult(
+                        this.selectedOutbreak.id,
+                        selectedShallowClone.shift()
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // hide loading
+                          loading.close();
+
+                          // error
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // determine estimated end time
+                        let estimatedEndDate: Moment;
+
+                        // initialize start time if necessary
+                        if (!startTime) {
+                          startTime = momentOriginal();
+                        }
+
+                        // determine estimated time
+                        const processed: number = selected.length - selectedShallowClone.length;
+                        const total: number = selected.length;
+                        if (processed > 0) {
+                          const processedSoFarTimeMs: number = momentOriginal().diff(startTime);
+                          const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
+                          const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
+                          estimatedEndDate = momentOriginal().add(remainingTimeMs, 'ms');
+                        }
+
+                        // update progress
+                        loading.message({
+                          message: 'LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SELECTED_LAB_RESULTS_WAIT_MESSAGE',
+                          messageData: {
+                            no: processed.toLocaleString('en'),
+                            total: total.toLocaleString('en'),
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
+                          }
+                        });
+
+                        // next
+                        nextDelete();
+                      });
+                  };
+
+                  // start delete
+                  nextDelete();
+                });
+            }
+          },
+          visible: (): boolean => {
+            return LabResultModel.canBulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
+          }
+        },
+
+        // bulk restore
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_RESTORE_SELECTED_LAB_RESULTS'
+          },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_RESTORE_SELECTED_LAB_RESULTS_DESCRIPTION') :
+            undefined,
+          action: {
+            click: (selected: string[]) => {
+              // ask for confirmation
+              this.personAndRelatedHelperService.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_RESTORE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_LAB_RESULTS'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // map lab results
+                  const labResultsMap: {
+                    [id: string]: LabResultModel
+                  } = {};
+                  this.tableV2Component.recordsData.forEach((record: LabResultModel) => {
+                    labResultsMap[record.id] = record;
+                  });
+
+                  // show loading
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+                  loading.message({
+                    message: 'LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_SELECTED_LAB_RESULTS_WAIT_MESSAGE',
+                    messageData: {
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
+                      date: '—'
+                    }
+                  });
+
+                  // restore - we can't use bulk here since restoring cases triggers many hooks
+                  let startTime: Moment;
+                  const selectedShallowClone: string[] = [...selected];
+                  const nextRestore = () => {
+                    // finished ?
+                    if (selectedShallowClone.length < 1) {
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_SELECTED_LAB_RESULTS_SUCCESS_MESSAGE');
+                      loading.close();
+                      this.needsRefreshList(true);
+                      return;
+                    }
+
+                    // restore
+                    const labResultId: string = selectedShallowClone.shift();
+                    this.personAndRelatedHelperService.labResult.labResultDataService
+                      .restoreLabResult(
+                        this.selectedOutbreak.id,
+                        EntityModel.getLinkForEntityType(labResultsMap[labResultId].personType),
+                        labResultsMap[labResultId].personId,
+                        labResultId
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // hide loading
+                          loading.close();
+
+                          // error
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // determine estimated end time
+                        let estimatedEndDate: Moment;
+
+                        // initialize start time if necessary
+                        if (!startTime) {
+                          startTime = momentOriginal();
+                        }
+
+                        // determine estimated time
+                        const processed: number = selected.length - selectedShallowClone.length;
+                        const total: number = selected.length;
+                        if (processed > 0) {
+                          const processedSoFarTimeMs: number = momentOriginal().diff(startTime);
+                          const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
+                          const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
+                          estimatedEndDate = momentOriginal().add(remainingTimeMs, 'ms');
+                        }
+
+                        // update progress
+                        loading.message({
+                          message: 'LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_SELECTED_LAB_RESULTS_WAIT_MESSAGE',
+                          messageData: {
+                            no: processed.toLocaleString('en'),
+                            total: total.toLocaleString('en'),
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
+                          }
+                        });
+
+                        // next
+                        nextRestore();
+                      });
+                  };
+
+                  // start restore
+                  nextRestore();
+                });
+            }
+          },
+          visible: (): boolean => {
+            return LabResultModel.canBulkRestore(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allDeleted;
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table add action
@@ -281,36 +750,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   /**
    * Initialize table grouped data
    */
-  protected initializeGroupedData(): void {
-    this.groupActions = [
-      // Export selected lab results
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_EXPORT_SELECTED_LAB_RESULTS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // create query
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
-
-            this.exportLabResultsData(qb);
-          }
-        },
-        visible: (): boolean => {
-          return LabResultModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      }
-    ];
-  }
+  protected initializeGroupedData(): void {}
 
   /**
    * Initialize breadcrumbs
@@ -329,8 +769,20 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
 
     // entity list
     if (
+      this.personType === EntityType.CONTACT_OF_CONTACT &&
+      ContactOfContactModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+          action: {
+            link: ['/contacts-of-contacts']
+          }
+        }
+      );
+    } else if (
       this.personType === EntityType.CONTACT &&
-            ContactModel.canList(this.authUser)
+      ContactModel.canList(this.authUser)
     ) {
       this.breadcrumbs.push(
         {
@@ -342,7 +794,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
       );
     } else if (
       this.personType === EntityType.CASE &&
-            CaseModel.canList(this.authUser)
+      CaseModel.canList(this.authUser)
     ) {
       this.breadcrumbs.push(
         {
@@ -358,8 +810,20 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
     if (this.entityData) {
       // entity view
       if (
+        this.personType === EntityType.CONTACT_OF_CONTACT &&
+        ContactOfContactModel.canView(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          {
+            label: this.entityData.name,
+            action: {
+              link: [`/contacts-of-contacts/${ this.entityData.id }/view`]
+            }
+          }
+        );
+      } else if (
         this.personType === EntityType.CONTACT &&
-                ContactModel.canView(this.authUser)
+        ContactModel.canView(this.authUser)
       ) {
         this.breadcrumbs.push(
           {
@@ -371,7 +835,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
         );
       } else if (
         this.personType === EntityType.CASE &&
-                CaseModel.canView(this.authUser)
+        CaseModel.canView(this.authUser)
       ) {
         this.breadcrumbs.push(
           {
@@ -397,7 +861,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return this.entityLabResultService.refreshListFields();
+    return this.personAndRelatedHelperService.labResult.refreshListFields();
   }
 
   /**
@@ -414,10 +878,14 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
         this.initializeGroupedData();
       }
 
+      // retrieve created user & modified user information
+      this.queryBuilder.include('createdByUser', true);
+      this.queryBuilder.include('updatedByUser', true);
+
       // retrieve the list of lab results
-      this.records$ = this.entityLabResultService
+      this.records$ = this.personAndRelatedHelperService.labResult
         .retrieveRecords(
-          this.selectedOutbreak.id,
+          this.selectedOutbreak,
           EntityModel.getLinkForEntityType(this.personType),
           this.entityData.id,
           this.queryBuilder
@@ -450,6 +918,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
       const countQueryBuilder = _.cloneDeep(this.queryBuilder);
       countQueryBuilder.paginator.clear();
       countQueryBuilder.sort.clear();
+      countQueryBuilder.clearFields();
 
       // apply has more limit
       if (this.applyHasMoreLimit) {
@@ -460,7 +929,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
       }
 
       // count
-      this.entityLabResultService
+      this.personAndRelatedHelperService.labResult
         .retrieveRecordsCount(
           this.selectedOutbreak.id,
           this.personType,
@@ -481,7 +950,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Change case classification
    */
   private changeCaseClassification() {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showSideDialog({
         // title
         title: {
@@ -493,7 +962,11 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
             placeholder: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
-            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            options: this.referenceDataHelperService.filterPerOutbreakOptions(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              (this.entityData as CaseModel).classification
+            ),
             value: (this.entityData as CaseModel).classification,
             name: 'classification',
             validators: {
@@ -525,7 +998,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
         }
 
         // change case classification
-        this.caseDataService
+        this.personAndRelatedHelperService.case.caseDataService
           .modifyCase(
             this.selectedOutbreak.id,
             this.entityData.id,
@@ -535,7 +1008,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
           )
           .pipe(
             catchError((err) => {
-              this.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
               return throwError(err);
             })
           )
@@ -544,7 +1017,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
             (this.entityData as CaseModel).classification = (response.handler.data.map.classification as IV2SideDialogConfigInputSingleDropdown).value;
 
             // success message
-            this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
+            this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
 
             // close popup
             response.handler.hide();
@@ -559,7 +1032,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Export lab results
    */
   private exportLabResultsData(qb: RequestQueryBuilder) {
-    this.dialogV2Service.showExportDataAfterLoadingData({
+    this.personAndRelatedHelperService.dialogV2Service.showExportDataAfterLoadingData({
       title: {
         get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_TITLE'
       },
@@ -571,7 +1044,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
             // handle errors
             catchError((err) => {
               // show error
-              this.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
 
               // send error further
               return throwError(err);
@@ -591,15 +1064,25 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
             const labResultsFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
 
             // show export
+            // EntityType.CASE
+            let personId = this.activatedRoute.snapshot.params.caseId;
+            let pageTitle = 'LNG_PAGE_LIST_CASES_TITLE';
+            if (this.personType === EntityType.CONTACT_OF_CONTACT) {
+              personId = this.activatedRoute.snapshot.params.contactOfContactId;
+              pageTitle = 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE';
+            } else if (this.personType === EntityType.CONTACT) {
+              personId = this.activatedRoute.snapshot.params.contactId;
+              pageTitle = 'LNG_PAGE_LIST_CONTACTS_TITLE';
+            }
             finished({
               title: {
                 get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_TITLE'
               },
               export: {
-                url: `/outbreaks/${ this.selectedOutbreak.id }/${ EntityModel.getLinkForEntityType(this.personType) }/${ this.personType === EntityType.CONTACT ? this.activatedRoute.snapshot.params.contactId : this.activatedRoute.snapshot.params.caseId }/lab-results/export`,
+                url: `/outbreaks/${ this.selectedOutbreak.id }/${ EntityModel.getLinkForEntityType(this.personType) }/${ personId }/lab-results/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${ this.i18nService.instant(this.personType === EntityType.CONTACT ? 'LNG_PAGE_LIST_CONTACTS_TITLE' : 'LNG_PAGE_LIST_CASES_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
+                fileName: `${ this.personAndRelatedHelperService.i18nService.instant(pageTitle) } - ${ LocalizationHelper.now().format('YYYY-MM-DD') }`,
                 queryBuilder: qb,
                 allow: {
                   types: [
@@ -618,7 +1101,9 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
                     fields: labResultsFieldGroups,
                     required: labResultsFieldGroupsRequires
                   },
-                  fields: this.labFields,
+                  fields: {
+                    options: this.labFields
+                  },
                   dbColumns: true,
                   dbValues: true,
                   questionnaireVariables: true,

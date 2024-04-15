@@ -7,13 +7,16 @@ import { PageChangeConfirmationGuard } from '../../core/services/guards/page-cha
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // create / view / modify
 const createViewModifyFoundation: Route = {
   component: fromPages.LanguagesCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
-    user: UserDataResolver
+    user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver
   }
 };
 
@@ -30,6 +33,8 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
+      user: UserDataResolver,
       yesNoAll: YesNoAllDataResolver
     }
   },

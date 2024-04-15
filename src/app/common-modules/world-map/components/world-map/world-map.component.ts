@@ -236,8 +236,15 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     return this._displayLoading;
   }
 
+  // selected outbreak
+  selectedOutbreak: OutbreakModel;
+
   // Map Tiles / Layers
   layersLoading: boolean = true;
+  originalLayers: {
+    styleLoaded: boolean,
+    layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>
+  }[] = [];
   layers: {
     styleLoaded: boolean,
     layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>
@@ -384,9 +391,14 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   groupDataDialogHandler: IV2SideDialogHandler;
   groupDataDialogHandlerLoading: boolean = false;
 
+  // timers
+  private _updateSizeTimer: number;
+  private _initializeMapTimer: number;
+  private _displayChoseFromGroupDialogTimer: number;
+
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
@@ -394,8 +406,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   ) {}
 
   /**
-     * Init map
-     */
+   * Init map
+   */
   ngOnInit() {
     // fix ol bug in production build: https://github.com/openlayers/openlayers/issues/9019#issuecomment-444441291
     addCommonProjections();
@@ -409,104 +421,15 @@ export class WorldMapComponent implements OnInit, OnDestroy {
           return;
         }
 
+        // update selected outbreak
+        this.selectedOutbreak = selectedOutbreak;
+
         // construct layer data used by our map
         this.layersLoading = true;
-        this.layers = [];
-        (selectedOutbreak.arcGisServers || []).forEach((mapServer) => {
-          // filter out bad layers
-          if (!mapServer.url) {
-            return;
-          }
-
-          // create layer based on the map type
-          let layerData: {
-            layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>,
-            styleLoaded: boolean
-          };
-          switch (mapServer.type) {
-            case Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_XYZ.value:
-              // add '/tile/{z}/{y}/{x}' to url if not specified
-              layerData = {
-                styleLoaded: true,
-                layer: new TileLayer({
-                  source: new XYZ({
-                    url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}' : ''),
-                    crossOrigin: 'anonymous'
-                  })
-                })
-              };
-
-              // finished
-              break;
-
-            case Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value:
-              layerData = {
-                styleLoaded: false,
-                layer: new VectorTileLayer({
-                  // add '/tile/{z}/{y}/{x}.pbf' to url if not specified
-                  source: new VectorTileSource({
-                    url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}.pbf$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}.pbf' : ''),
-                    format: new MVT()
-                  })
-                })
-              };
-
-              // load styles if necessary
-              if (
-                !mapServer.styleUrl ||
-                !mapServer.styleUrlSource
-              ) {
-                // mark style as being loaded
-                layerData.styleLoaded = true;
-              } else {
-                // make sure that the path style Url ends with /
-                const pathStyleUrl = mapServer.styleUrl + (!/\/$/.test(mapServer.styleUrl) ? '/' : '');
-
-                // get and apply the style
-                fetch(mapServer.styleUrl)
-                  .then(r => r.json())
-                  .then((glStyle) => {
-                    // apply style
-                    applyStyle(
-                      layerData.layer as VectorTileLayer | VectorLayer<any>,
-                      glStyle,
-                      mapServer.styleUrlSource,
-                      pathStyleUrl
-                    ).then(() => {
-                      // mark style as being loaded
-                      layerData.styleLoaded = true;
-
-                      // try again to init map
-                      this.initializeMap();
-                    }).catch(() => {
-                      // display an error
-                      this.toastV2Service.error('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
-                    });
-                  });
-              }
-
-              // finished
-              break;
-
-            default:
-              // Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_TILE_ARC_GIS_REST.values:
-              layerData = {
-                styleLoaded: true,
-                layer: new TileLayer({
-                  source: new TileArcGISRest({
-                    url: mapServer.url,
-                    crossOrigin: 'anonymous'
-                  })
-                })
-              };
-
-              // finished
-              break;
-          }
-
-          // add layer to list
-          this.layers.push(layerData);
-        });
+        this.originalLayers = this.initializeLayers();
+        this.layers = this.originalLayers?.length > 0 ?
+          [...this.originalLayers] :
+          [];
 
         // initialize map
         this.initializeMap();
@@ -522,6 +445,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+
+    // stop timers
+    this.stopUpdateSizeTimer();
+    this.stopInitializeMapTimer();
+    this.stopDisplayChoseFromGroupDialogTimer();
 
     // not full screen anymore
     AuthenticatedComponent.FULL_SCREEN = false;
@@ -747,8 +675,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Style Features
-     */
+   * Style Features
+   */
   clusterStyleFeature(feature: Feature<any>): Style {
     // determine number of markers
     const features: Feature<any>[] = feature.get('features');
@@ -759,10 +687,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     let markerData: WorldMapMarker;
     if (
       size === 1 &&
-            features[0].getProperties &&
-            features[0].getProperties() &&
-            features[0].getProperties().dataForEventListeners &&
-            features[0].getProperties().dataForEventListeners.overlaySingleDisplayLabel
+      features[0].getProperties &&
+      features[0].getProperties() &&
+      features[0].getProperties().dataForEventListeners &&
+      features[0].getProperties().dataForEventListeners.overlaySingleDisplayLabel
     ) {
       markerData = features[0].getProperties().dataForEventListeners;
       cacheKey = markerData.id;
@@ -829,6 +757,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
     // schedule update
     this.clusterUpdatePending = setTimeout(() => {
+      // reset
+      this.clusterUpdatePending = undefined;
+
       // used to easily determine the cluster group later
       const clusterFeaturesMap: {
         [markerId: string]: IClusterFeatureGroup
@@ -1094,15 +1025,25 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Initialize World Map
-     */
+   * Stop timer - initialize map
+   */
+  private stopInitializeMapTimer(): void {
+    if (this._initializeMapTimer) {
+      clearTimeout(this._initializeMapTimer);
+      this._initializeMapTimer = undefined;
+    }
+  }
+
+  /**
+   * Initialize World Map
+   */
   initializeMap() {
     // no point in initializing map if map is hidden
     // or map already initialized
     if (
       this.displayLoading ||
-            this.layers.length < 1 ||
-            !_.isEmpty(this.map)
+      this.layers.length < 1 ||
+      !_.isEmpty(this.map)
     ) {
       return;
     }
@@ -1116,8 +1057,14 @@ export class WorldMapComponent implements OnInit, OnDestroy {
       }
     }
 
-    // wait for data to be binded so we can see the map dom element
-    setTimeout(() => {
+    // release previous
+    this.stopInitializeMapTimer();
+
+    // wait for data to be binded, so we can see the map dom element
+    this._initializeMapTimer = setTimeout(() => {
+      // reset
+      this._initializeMapTimer = undefined;
+
       // initialize map elements
       this.mapView = new View({
         center: [0, 0],
@@ -1126,6 +1073,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
       // create overlay layer source
       this.mapOverlayLayerSource = new VectorSource();
+
+      // re-initialize layers
+      this.layers = this.originalLayers?.length > 0 ?
+        [...this.originalLayers] :
+        [];
 
       // add overlay - markers & lines layer
       this.layers.push({
@@ -1290,8 +1242,18 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Update map size
-     */
+   * Stop timer - update size
+   */
+  private stopUpdateSizeTimer(): void {
+    if (this._updateSizeTimer) {
+      clearTimeout(this._updateSizeTimer);
+      this._updateSizeTimer = undefined;
+    }
+  }
+
+  /**
+   * Update map size
+   */
   public updateMapSize() {
     // check if map was initialized
     if (_.isEmpty(this.map)) {
@@ -1299,13 +1261,19 @@ export class WorldMapComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // cancel previous
+    this.stopUpdateSizeTimer();
+
     // update map size
-    setTimeout(() => {
+    this._updateSizeTimer = setTimeout(() => {
+      // reset
+      this._updateSizeTimer = undefined;
+
+      // update size
       if (this.map) {
         this.map.updateSize();
       }
     });
-
   }
 
   /**
@@ -1339,8 +1307,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Print map to blob
-     */
+   * Print map to blob
+   */
   printToBlob(): Observable<Blob> {
     return new Observable((observer: Subscriber<Blob>) => {
       // map initialized
@@ -1392,14 +1360,30 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Display dialog to choose from list of items from a group
-     * @param items
-     */
+   * Stop timer - display..
+   */
+  private stopDisplayChoseFromGroupDialogTimer(): void {
+    if (this._displayChoseFromGroupDialogTimer) {
+      clearTimeout(this._displayChoseFromGroupDialogTimer);
+      this._displayChoseFromGroupDialogTimer = undefined;
+    }
+  }
+
+  /**
+   * Display dialog to choose from list of items from a group
+   */
   private displayChoseFromGroupDialog(items: (WorldMapPath | WorldMapMarker)[]) {
     // wait for dialog to load ?
     if (this.groupDataDialogHandlerLoading) {
+      // stop previous
+      this.stopDisplayChoseFromGroupDialogTimer();
+
       // call later
-      setTimeout(() => {
+      this._displayChoseFromGroupDialogTimer = setTimeout(() => {
+        // reset
+        this._displayChoseFromGroupDialogTimer = undefined;
+
+        // call
         this.displayChoseFromGroupDialog(items);
       }, 200);
 
@@ -1563,11 +1547,128 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Update map size
-     */
+   * Update map size
+   */
   @HostListener('window:resize')
   // @ts-ignore: Ignore value not used
   private updateMapSizeOnWindowResize() {
     this.updateMapSize();
+  }
+
+  /**
+   * Initialize layers
+   */
+  private initializeLayers(): {
+    styleLoaded: boolean,
+    layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>
+  }[] {
+    // no selected outbreak ?
+    if (!this.selectedOutbreak?.id) {
+      return [];
+    }
+
+    // determine layers
+    const layers: {
+      styleLoaded: boolean,
+      layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>
+    }[] = [];
+    (this.selectedOutbreak.arcGisServers || []).forEach((mapServer) => {
+      // filter out bad layers
+      if (!mapServer.url) {
+        return;
+      }
+
+      // create layer based on the map type
+      let layerData: {
+        layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>,
+        styleLoaded: boolean
+      };
+      switch (mapServer.type) {
+        case Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_XYZ.value:
+          // add '/tile/{z}/{y}/{x}' to url if not specified
+          layerData = {
+            styleLoaded: true,
+            layer: new TileLayer({
+              source: new XYZ({
+                url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}' : ''),
+                crossOrigin: 'anonymous'
+              })
+            })
+          };
+
+          // finished
+          break;
+
+        case Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value:
+          layerData = {
+            styleLoaded: false,
+            layer: new VectorTileLayer({
+              // add '/tile/{z}/{y}/{x}.pbf' to url if not specified
+              source: new VectorTileSource({
+                url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}.pbf$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}.pbf' : ''),
+                format: new MVT()
+              })
+            })
+          };
+
+          // load styles if necessary
+          if (
+            !mapServer.styleUrl ||
+            !mapServer.styleUrlSource
+          ) {
+            // mark style as being loaded
+            layerData.styleLoaded = true;
+          } else {
+            // make sure that the path style Url ends with /
+            const pathStyleUrl = mapServer.styleUrl + (!/\/$/.test(mapServer.styleUrl) ? '/' : '');
+
+            // get and apply the style
+            fetch(mapServer.styleUrl)
+              .then((r) => r.json())
+              .then((glStyle) => {
+                // apply style
+                applyStyle(
+                  layerData.layer as VectorTileLayer | VectorLayer<any>,
+                  glStyle,
+                  mapServer.styleUrlSource,
+                  pathStyleUrl
+                ).then(() => {
+                  // mark style as being loaded
+                  layerData.styleLoaded = true;
+
+                  // try again to init map
+                  this.initializeMap();
+                }).catch(() => {
+                  // display an error
+                  this.toastV2Service.error('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
+                });
+              });
+          }
+
+          // finished
+          break;
+
+        default:
+          // Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_TILE_ARC_GIS_REST.values:
+          layerData = {
+            styleLoaded: true,
+            layer: new TileLayer({
+              source: new TileArcGISRest({
+                url: mapServer.url,
+                crossOrigin: 'anonymous'
+              })
+            })
+          };
+
+          // finished
+          break;
+      }
+
+      // add layer to list
+      layers.push(layerData);
+    });
+
+    // finished
+    return layers;
   }
 }

@@ -6,12 +6,17 @@ import { EventModel } from './event.model';
 import { DateDefaultPipe } from '../../shared/pipes/date-default-pipe/date-default.pipe';
 import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic } from './permission.interface';
+import { TeamModel } from './team.model';
+import { ContactOfContactModel } from './contact-of-contact.model';
 
 export class LocationUsageModel {
   followUp: FollowUpModel[];
   case: CaseModel[];
   contact: ContactModel[];
+  contactOfContact: ContactOfContactModel[];
   event: EventModel[];
+  team: TeamModel[];
+  outbreak: OutbreakModel[];
 
   constructor(data = null) {
     this.followUp = _.map(_.get(data, 'followUp', []), (followUpData) => {
@@ -23,8 +28,17 @@ export class LocationUsageModel {
     this.contact = _.map(_.get(data, 'contact', []), (contactData) => {
       return new ContactModel(contactData);
     });
+    this.contactOfContact = _.map(_.get(data, 'contactOfContact', []), (contactData) => {
+      return new ContactOfContactModel(contactData);
+    });
     this.event = _.map(_.get(data, 'event', []), (eventData) => {
       return new EventModel(eventData);
+    });
+    this.team = _.map(_.get(data, 'team', []), (teamData) => {
+      return new TeamModel(teamData);
+    });
+    this.outbreak = _.map(_.get(data, 'outbreak', []), (outbreakData) => {
+      return new OutbreakModel(outbreakData);
     });
   }
 }
@@ -33,13 +47,16 @@ export enum UsageDetailsItemType {
   FOLLOW_UP = 'follow-up',
   EVENT = 'event',
   CONTACT = 'contact',
-  CASE = 'case'
+  CONTACT_OF_CONTACT = 'contact-of-contact',
+  CASE = 'case',
+  TEAM = 'team',
+  OUTBREAK = 'outbreak'
 }
 
 export class UsageDetailsItem {
-  private _type: string;
+  private _type: UsageDetailsItemType;
   private _typePermissions: IPermissionBasic;
-  set type(type: string) {
+  set type(type: UsageDetailsItemType) {
     this._type = type;
     switch (this.type) {
       case UsageDetailsItemType.FOLLOW_UP:
@@ -51,12 +68,21 @@ export class UsageDetailsItem {
       case UsageDetailsItemType.CONTACT:
         this._typePermissions = ContactModel;
         break;
+      case UsageDetailsItemType.CONTACT_OF_CONTACT:
+        this._typePermissions = ContactOfContactModel;
+        break;
       case UsageDetailsItemType.CASE:
         this._typePermissions = CaseModel;
         break;
+      case UsageDetailsItemType.TEAM:
+        this._typePermissions = TeamModel;
+        break;
+      case UsageDetailsItemType.OUTBREAK:
+        this._typePermissions = OutbreakModel;
+        break;
     }
   }
-  get type(): string {
+  get type(): UsageDetailsItemType {
     return this._type;
   }
   get typePermissions(): IPermissionBasic {
@@ -71,7 +97,7 @@ export class UsageDetailsItem {
   outbreakName: string;
 
   constructor(data: {
-    type: string,
+    type: UsageDetailsItemType,
     typeLabel: string,
     name: string,
     viewUrl: string,
@@ -134,6 +160,19 @@ export class UsageDetails {
       }));
     });
 
+    // contacts of contacts
+    _.each(data.contactOfContact, (contactOfContact: ContactOfContactModel) => {
+      this.items.push(new UsageDetailsItem({
+        type: UsageDetailsItemType.CONTACT_OF_CONTACT,
+        typeLabel: 'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_CONTACT_OF_CONTACTS',
+        name: contactOfContact.name,
+        viewUrl: `/contacts-of-contacts/${contactOfContact.id}/view`,
+        modifyUrl: `/contacts-of-contacts/${contactOfContact.id}/modify`,
+        outbreakId: contactOfContact.outbreakId,
+        outbreakName: outbreaks[contactOfContact.outbreakId] ? outbreaks[contactOfContact.outbreakId].name : ''
+      }));
+    });
+
     // cases
     _.each(data.case, (caseM: CaseModel) => {
       this.items.push(new UsageDetailsItem({
@@ -144,6 +183,32 @@ export class UsageDetails {
         modifyUrl: `/cases/${caseM.id}/modify`,
         outbreakId: caseM.outbreakId,
         outbreakName: outbreaks[caseM.outbreakId] ? outbreaks[caseM.outbreakId].name : ''
+      }));
+    });
+
+    // teams
+    _.each(data.team, (team) => {
+      this.items.push(new UsageDetailsItem({
+        type: UsageDetailsItemType.TEAM,
+        typeLabel: 'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_TEAM',
+        name: team.name,
+        viewUrl: `/teams/${team.id}/view`,
+        modifyUrl: `/teams/${team.id}/modify`,
+        outbreakId: undefined,
+        outbreakName: undefined
+      }));
+    });
+
+    // outbreaks
+    _.each(data.outbreak, (outbreak) => {
+      this.items.push(new UsageDetailsItem({
+        type: UsageDetailsItemType.OUTBREAK,
+        typeLabel: 'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK',
+        name: outbreak.name,
+        viewUrl: `/outbreaks/${outbreak.id}/view`,
+        modifyUrl: `/outbreaks/${outbreak.id}/modify`,
+        outbreakId: undefined,
+        outbreakName: undefined
       }));
     });
   }

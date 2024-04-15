@@ -383,13 +383,13 @@ export class RequestQueryBuilder {
       }
     }
 
-    // merge "order" criterias
+    // merge "order" criteria
     this.sort.criterias = { ...this.sort.criterias, ...queryBuilder.sort.criterias };
 
     // update the "limit" if necessary
     this.limitResultsNumber = queryBuilder.limitResultsNumber || this.limitResultsNumber;
 
-    // apply pagination criterias
+    // apply pagination criteria
     if (!queryBuilder.paginator.isEmpty()) {
       this.paginator.limit = queryBuilder.paginator.limit;
       this.paginator.skip = queryBuilder.paginator.skip;
@@ -409,7 +409,7 @@ export class RequestQueryBuilder {
     if (!_.isEmpty(queryBuilder.childrenQueryBuilders)) {
       this.childrenQueryBuilders = {
         ...this.childrenQueryBuilders,
-        ...queryBuilder.childrenQueryBuilders
+        ..._.cloneDeep(queryBuilder.childrenQueryBuilders)
       };
     }
 

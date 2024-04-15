@@ -3,12 +3,10 @@ import { Observable, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { GridReadyEvent, IsFullWidthRowParams, RowHeightParams, RowNode, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
-import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
-import { Params, Router } from '@angular/router';
+import { Params } from '@angular/router';
 import {
   IV2Column,
   IV2ColumnAction,
@@ -30,7 +28,7 @@ import {
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel, IV2Link, V2ActionMenuItem, V2ActionType } from './models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel, IV2GroupActions, IV2Link, V2ActionType } from './models/action.model';
 import { IV2GroupedData, IV2GroupedDataValue } from './models/grouped-data.model';
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
@@ -59,6 +57,9 @@ import { AppListTableV2DetailRowComponent } from './components/detail/app-list-t
 import { AppListTableV2DetailColumnComponent } from './components/detail/app-list-table-v2-detail-column.component';
 import { IV2RowExpandRow, V2RowType } from './models/row.model';
 import { determineIfTouchDevice } from '../../../core/methods/touch-device';
+import { I18nService } from '../../../core/services/helper/i18n.service';
+import { RedirectService } from '../../../core/services/helper/redirect.service';
+import { LocalizationHelper } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -91,6 +92,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // check if this is a touch device
   isTouchDevice: boolean = determineIfTouchDevice();
+
+  // language handler
+  languageSubscription: Subscription;
 
   // records
   recordsSubscription: Subscription;
@@ -155,6 +159,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // paginator disabled ?
   @Input() paginatorDisabled: boolean = false;
 
+  // refresh list disabled ?
+  @Input() refreshDisabled: boolean = false;
+
   // has at least one table header filter ?
   hasTableHeaderFilters: boolean = false;
 
@@ -204,7 +211,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   @Input() quickActions: IV2ActionMenuLabel;
 
   // group actions
-  @Input() groupActions: V2ActionMenuItem[];
+  @Input() groupActions: IV2GroupActions;
   @Input() groupActionsSingleRecord: boolean;
 
   // add button
@@ -383,6 +390,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return !!this._pageSettingsKey;
   }
 
+  // collapse / expand bottom section
+  bottomSectionIsCollapsed: boolean = false;
+  bottomSectionSavingConfig: boolean = false;
+  private _pageSettingsKeyBottomSectionCollapsed: string = 'bottomSectionCollapsed';
+
   // info values - used to display additional information relevant for this page
   private _infos: string[];
   infosJoined: string;
@@ -397,7 +409,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       this._infos.length > 0
     ) {
       this._infos.forEach((info) => {
-        this.infosJoined += `<div>${this.translateService.instant(info)}</div>`;
+        this.infosJoined += `<div>${this.i18nService.instant(info)}</div>`;
       });
     }
   }
@@ -428,10 +440,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // simple item ?
         if (Array.isArray(item.value)) {
           // create html
-          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span>`;
+          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-items">`;
           (item.value as ILabelValuePairModel[]).forEach((subItem) => {
-            html += `<span class="gd-list-table-bottom-left-legend-item">${AppListTableV2Component.renderStatusForm({ type: IV2ColumnStatusFormType.SQUARE, color: subItem.color }, false)} ${this.translateService.instant(subItem.label)}</span>`;
+            html += `<span class="gd-list-table-bottom-left-legend-items-item">${AppListTableV2Component.renderStatusForm({ type: IV2ColumnStatusFormType.SQUARE, color: subItem.color }, false)} ${this.i18nService.instant(subItem.label)}</span>`;
           });
+
+          // close items list
+          html += '</span>';
 
           // add legend
           this._suffixLegendsHTML.push({
@@ -439,7 +454,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           });
         } else {
           this._suffixLegendsHTML.push({
-            html: `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-item">${item.value}</span>`
+            html: `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-items"><span class="gd-list-table-bottom-left-legend-items-item">${item.value}</span></span>`
           });
         }
       });
@@ -497,6 +512,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     }
   }
 
+  // timers
+  private _resizeTableTimer: number;
+
   // constants
   AppListTableV2LoadingComponent = AppListTableV2LoadingComponent;
   AppListTableV2NoDataComponent = AppListTableV2NoDataComponent;
@@ -510,52 +528,52 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     form: V2ColumnStatusForm,
     addGap: boolean
   ): string {
-    let statusHtml: string = '';
+    let statusHtml: string = `<svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">`;
     switch (form.type) {
       case IV2ColumnStatusFormType.CIRCLE:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <circle fill="${form.color}" cx="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" cy="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" r="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" />
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <circle fill="${form.color}" cx="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" cy="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" r="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}" />`;
 
         // finished
         break;
 
       case IV2ColumnStatusFormType.SQUARE:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <rect fill="${form.color}" width="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <rect fill="${form.color}" width="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />`;
 
         // finished
         break;
 
       case IV2ColumnStatusFormType.TRIANGLE:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} 0, 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}"/>
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} 0, 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}"/>`;
 
         // finished
         break;
 
       case IV2ColumnStatusFormType.STAR:
-        statusHtml += `
-          <svg width="${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)}" height="${AppListTableV2Component.STANDARD_SHAPE_SIZE}" viewBox="0 0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE + (addGap ? AppListTableV2Component.STANDARD_SHAPE_GAP : 0)} ${AppListTableV2Component.STANDARD_SHAPE_SIZE}" xmlns="http://www.w3.org/2000/svg">
-            ${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
-            <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2},0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.2},${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.95},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />
-          </svg>
-        `;
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2},0 ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.2},${AppListTableV2Component.STANDARD_SHAPE_SIZE} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.95},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.4} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE}" />`;
 
         // finished
         break;
+
+      case IV2ColumnStatusFormType.HEXAGON:
+        statusHtml += `${form.tooltip ? `<title>${form.tooltip}</title>` : ''}
+          <polygon fill="${form.color}" points="${AppListTableV2Component.STANDARD_SHAPE_SIZE}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.8},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.93} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.25},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.93} 0,${AppListTableV2Component.STANDARD_SHAPE_SIZE / 2}, ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.25},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.06} ${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.75},${AppListTableV2Component.STANDARD_SHAPE_SIZE * 0.06}" />`;
+
+        // finished
+        break;
+
+      default:
+      // case IV2ColumnStatusFormType.EMPTY:
+        // nothing to do, empty svg is enough
+        // finished
+        break;
     }
+
+    // close svg
+    statusHtml += '</svg>';
 
     // finished
     return statusHtml;
@@ -598,17 +616,17 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected location: Location,
     protected renderer2: Renderer2,
     protected elementRef: ElementRef,
-    protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected authDataService: AuthDataService,
-    protected toastV2Service: ToastV2Service
+    protected toastV2Service: ToastV2Service,
+    private redirectService: RedirectService
   ) {
-    // update small screen mode
-    this.updateRenderMode(true);
+    // update bottom section collapse / expand
+    this.loadBottomSectionConfig();
   }
 
   /**
@@ -652,10 +670,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         }
 
         // redirect
-        this.router.navigate(
-          [url], {
-            queryParams: params
-          }
+        // - redirect service needed to reload current component if necessary since we're not always listening to url changes to trigger updates
+        this.redirectService.to(
+          [url],
+          params
         );
       }
     );
@@ -667,12 +685,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       undefined;
     this._showHeaderFilters = filterVisibility === undefined || filterVisibility;
 
-    // update table size
-    // - hack to rectify some things not being rendered
-    this.resizeTable();
-    setTimeout(() => {
-      this.resizeTable();
-    });
+    // update small screen mode
+    // - calls this.resizeTable
+    this.updateRenderMode();
+
+    // subscribe to language change
+    this.initializeLanguageChangeListener();
   }
 
   /**
@@ -686,6 +704,37 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (this.clickListener) {
       this.clickListener();
       this.clickListener = undefined;
+    }
+
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+
+    // stop previous
+    this.stopResizeTableTimer();
+  }
+
+  /**
+   *  Subscribe to language change
+   */
+  private initializeLanguageChangeListener(): void {
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        this.updateColumnDefinitions();
+      });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
     }
   }
 
@@ -770,11 +819,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           this._recordsDataMap[record[this.keyField]] = record;
         });
 
-        // no records found ?
-        if (this._recordsData.length < 1) {
-          this._agTable.api.showNoRowsOverlay();
-        }
-
         // unselect everything
         this._agTable.api.deselectAll();
 
@@ -805,9 +849,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // already called
     delete this._callWhenReady.updateColumnDefinitions;
-
-    // reset data
-    this.legends = [];
 
     // nothing to do ?
     if (!this._columns) {
@@ -894,8 +935,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // attach items selection column only if we have group actions
     if (
-      this.groupActions?.length > 0 ||
-      this.groupActionsSingleRecord
+      this.groupActionsSingleRecord || (
+        this.groupActions && (
+          !this.groupActions.visible ||
+          this.groupActions.visible()
+        ) &&
+        this.groupActions.actions?.length > 0
+      )
     ) {
       columnDefs.push({
         pinned: this.isSmallScreenMode ?
@@ -920,7 +966,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             icon: 'expand_more',
             menuOptions: this.groupActionsSingleRecord ?
               [
-                ...(this.groupActions ? this.groupActions : [])
+                ...(this.groupActions?.actions?.length > 0 ? this.groupActions.actions : [])
               ] : [
                 {
                   label: {
@@ -959,7 +1005,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                     );
                   }
                 },
-                ...(this.groupActions ? this.groupActions : [])
+                ...(this.groupActions?.actions?.length > 0 ? this.groupActions.actions : [])
               ]
           }]
         }
@@ -1010,7 +1056,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // attach column to list of visible columns
       columnDefs.push({
         headerName: column.label && column.format?.type !== V2ColumnFormat.STATUS ?
-          this.translateService.instant(column.label) :
+          this.i18nService.instant(column.label) :
           '',
         field: column.field,
         pinned: this.isSmallScreenMode ?
@@ -1030,30 +1076,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         lockPosition: column.lockPosition,
         headerComponent: AppListTableV2ColumnHeaderComponent
       });
-
-      // update legends
-      if (column.format?.type === V2ColumnFormat.STATUS) {
-        // get column def
-        const statusColumn = column as IV2ColumnStatus;
-
-        // go through legends
-        statusColumn.legends.forEach((legend) => {
-          // render legends
-          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(legend.title)}</span> `;
-
-          // render legend
-          legend.items.forEach((legendItem) => {
-            html += `<span class="gd-list-table-bottom-left-legend-item">
-              ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.translateService.instant(legendItem.label)}
-            </span>`;
-          });
-
-          // add to legends to render
-          this.legends.push({
-            html
-          });
-        });
-      }
     };
 
     // keep order of columns
@@ -1092,6 +1114,61 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       });
     }
 
+    // legends should always be visible no matter if the column is visible because legends might contain information from other columns too and not only from the one that isn't visible
+    this.legends = [];
+    this._columns.forEach((column) => {
+      // update legends
+      if (column.format?.type === V2ColumnFormat.STATUS) {
+        // get column def
+        const statusColumn = column as IV2ColumnStatus;
+
+        // go through legends
+        statusColumn.legends.forEach((legend) => {
+          // render legends
+          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(legend.title)}</span><span class="gd-list-table-bottom-left-legend-items">`;
+
+          // render legend
+          legend.items
+            .sort((item1, item2) => {
+              // if same order, compare labels
+              if (item1.order === item2.order) {
+                return this.i18nService
+                  .instant(item1.label)
+                  .localeCompare(this.i18nService.instant(item2.label));
+              }
+
+              // format order
+              let order1: number = Number.MAX_SAFE_INTEGER;
+              try {
+                order1 = typeof item1.order === 'number' ? item1.order : parseInt(item1.order, 10);
+                order1 = isNaN(order1) ? Number.MAX_SAFE_INTEGER : order1;
+              } catch (e) {}
+              let order2: number = Number.MAX_SAFE_INTEGER;
+              try {
+                order2 = typeof item2.order === 'number' ? item2.order : parseInt(item2.order, 10);
+                order2 = isNaN(order2) ? Number.MAX_SAFE_INTEGER : order2;
+              } catch (e) {}
+
+              // compare order
+              return order1 - order2;
+            })
+            .forEach((legendItem) => {
+              html += `<span class="gd-list-table-bottom-left-legend-items-item">
+                ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.i18nService.instant(legendItem.label)}
+              </span>`;
+            });
+
+          // close items list
+          html += '</span>';
+
+          // add to legends to render
+          this.legends.push({
+            html
+          });
+        });
+      }
+    });
+
     // attach actions column to the start or to the end depending on if small or big screen
     if (this.columnActions) {
       // create action column
@@ -1117,7 +1194,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       if (this.isSmallScreenMode) {
         // add it to the beginning
         columnDefs.splice(
-          this.groupActions?.length > 0 || this.groupActionsSingleRecord ? 1 : 0,
+          this.groupActionsSingleRecord || (
+            this.groupActions && (
+              !this.groupActions.visible ||
+              this.groupActions.visible()
+            ) &&
+            this.groupActions.actions?.length > 0
+          ) ? 1 : 0,
           0,
           actionColumn
         );
@@ -1152,6 +1235,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // re-render page
     this.detectChanges();
+
+    // update table size
+    this.resizeTable();
   }
 
   /**
@@ -1169,12 +1255,22 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // path or method ?
       const formatType: string = typeof columnDefinition.format.type;
       if (formatType === 'string') {
-        return _.get(
+        // determine value
+        const tmpValue: any = _.get(
           valueFormat.data,
-          columnDefinition.format.type as string,
-          ''
+          columnDefinition.format.type as string
         );
 
+        // empty value ?
+        if (
+          tmpValue === undefined ||
+          tmpValue === null
+        ) {
+          return '';
+        }
+
+        // finished
+        return tmpValue;
       } else if (formatType === 'function') {
         return (columnDefinition.format.type as (any) => string)(valueFormat.data);
 
@@ -1198,30 +1294,26 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // AGE
           case V2ColumnFormat.AGE:
             return fieldValue?.months > 0 ?
-              fieldValue?.months + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
+              fieldValue?.months + ' ' + this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
               (
                 fieldValue?.years > 0 ?
-                  (fieldValue?.years + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS')) :
+                  (fieldValue?.years + ' ' + this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS')) :
                   ''
               );
 
           // DATE
           case V2ColumnFormat.DATE:
-            return fieldValue ?
-              moment(fieldValue).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-              '';
+            return LocalizationHelper.displayDate(fieldValue);
 
           // DATETIME
           case V2ColumnFormat.DATETIME:
-            return fieldValue ?
-              moment(fieldValue).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
-              '';
+            return LocalizationHelper.displayDateTime(fieldValue);
 
           // BOOLEAN
           case V2ColumnFormat.BOOLEAN:
             return fieldValue ?
-              this.translateService.instant('LNG_COMMON_LABEL_YES') :
-              this.translateService.instant('LNG_COMMON_LABEL_NO');
+              this.i18nService.instant('LNG_COMMON_LABEL_YES') :
+              this.i18nService.instant('LNG_COMMON_LABEL_NO');
 
           // COLOR & ICON
           case V2ColumnFormat.COLOR:
@@ -1249,9 +1341,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     }
 
     // default - try to translate if string
-    return valueFormat.value && typeof valueFormat.value === 'string' ?
-      this.translateService.instant(valueFormat.value) :
-      valueFormat.value;
+    return typeof valueFormat.value === 'string' ?
+      (
+        valueFormat.value ?
+          this.i18nService.instant(valueFormat.value) :
+          ''
+      ) : (
+        valueFormat.value === null || valueFormat.value === undefined ?
+          '' :
+          valueFormat.value
+      );
   }
 
   /**
@@ -1280,7 +1379,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         }
 
         // retrieve url link
-        const url: string = basicColumn.link(params.data);
+        const url: string = value ?
+          basicColumn.link(params.data) :
+          undefined;
 
         // create link
         return url ?
@@ -1301,7 +1402,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<div class="gd-list-table-color"><span style="background-color: ${value};"></span> ${value}</div>` :
-            this.translateService.instant(colorColumn.noColorLabel);
+            this.i18nService.instant(colorColumn.noColorLabel);
         };
       }
 
@@ -1318,7 +1419,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<img class="gd-list-table-icon-url" src="${value}" alt="${URLIconColumn.noIconLabel}" />` :
-            this.translateService.instant(URLIconColumn.noIconLabel);
+            this.i18nService.instant(URLIconColumn.noIconLabel);
         };
       }
 
@@ -1335,7 +1436,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<span class="gd-list-table-icon-material"><span class="material-icons">${value}</span></span>` :
-            this.translateService.instant(materialIconColumn.noIconLabel);
+            this.i18nService.instant(materialIconColumn.noIconLabel);
         };
       }
 
@@ -1516,9 +1617,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // set column width
         this._agTable.columnApi.setColumnWidth(
           column,
-          (maxForms - 1) * (AppListTableV2Component.STANDARD_SHAPE_SIZE + AppListTableV2Component.STANDARD_SHAPE_GAP) +
-          AppListTableV2Component.STANDARD_SHAPE_SIZE +
-          AppListTableV2Component.STANDARD_SHAPE_PADDING * 2
+          maxForms * (AppListTableV2Component.STANDARD_SHAPE_SIZE + AppListTableV2Component.STANDARD_SHAPE_PADDING) +
+            (maxForms < 2 ? AppListTableV2Component.STANDARD_SHAPE_PADDING : 0)
         );
       } else if (colDef.headerComponent === AppListTableV2SelectionHeaderComponent) {
         this._agTable.columnApi.setColumnWidth(
@@ -1563,7 +1663,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // filter out pinned columns since those are handled by a different button
       .filter((item) => !item.alwaysVisible && (!item.exclude || !item.exclude(item)))
       // sort columns by their label
-      .sort((v1, v2) => this.translateService.instant(v1.label).localeCompare(this.translateService.instant(v2.label)));
+      .sort((v1, v2) => this.i18nService.instant(v1.label).localeCompare(this.i18nService.instant(v2.label)));
 
     // construct list of checkboxes
     const checkboxInputs: V2SideDialogConfigInput[] = [];
@@ -1587,6 +1687,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
         // inputs
         inputs: checkboxInputs,
+        width: '60rem',
 
         // buttons
         bottomButtons: [{
@@ -1666,6 +1767,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // save the new settings
         this.saveVisibleAndOrderOfColumns();
       });
+  }
+
+  /**
+   * Stop resize table timer
+   */
+  private stopResizeTableTimer(): void {
+    if (this._resizeTableTimer) {
+      clearTimeout(this._resizeTableTimer);
+      this._resizeTableTimer = undefined;
+    }
   }
 
   /**
@@ -1929,6 +2040,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this._processedSelectedResults = {};
     if (this.processSelectedData?.length > 0) {
       this.processSelectedData.forEach((processor) => {
+        // no need to execute?
+        if (!processor.shouldProcess(
+          this._recordsDataMap,
+          this._selected
+        )) {
+          return;
+        }
+
+        // process
         this._processedSelectedResults[processor.key] = processor.process(
           this._recordsDataMap,
           this._selected
@@ -1966,7 +2086,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // sort
     this.sortBy.emit({
-      field: this._sortBy.column?.columnDefinition.field,
+      field: typeof this._sortBy.column?.columnDefinition.sortable === 'string' ?
+        this._sortBy.column.columnDefinition.sortable :
+        this._sortBy.column?.columnDefinition.field,
       direction: this._sortBy.direction
     });
   }
@@ -2181,23 +2303,32 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Update
    */
   @HostListener('window:resize')
-  private updateRenderMode(dontUpdate?: boolean): void {
+  private updateRenderMode(): void {
     // determine
     const isSmallScreenMode = determineIfSmallScreenMode();
 
-    // same as before ?
-    if (isSmallScreenMode === this.isSmallScreenMode) {
-      return;
-    }
+    // update column definitions only if responsive changes
+    if (isSmallScreenMode !== this.isSmallScreenMode) {
+      // small screen mode ?
+      this.isSmallScreenMode = isSmallScreenMode;
 
-    // small screen mode ?
-    this.isSmallScreenMode = isSmallScreenMode;
-
-    // must update
-    if (!dontUpdate) {
+      // this.detectChanges / this.resizeTable() are called by resize layout by updateColumnDefinitions
       this.updateColumnDefinitions();
+
+      // stop previous
+      this.stopResizeTableTimer();
+
+      // wait for html to be rendered since isSmallScreenMode was changed
+      this._resizeTableTimer = setTimeout(() => {
+        // reset
+        this._resizeTableTimer = undefined;
+
+        // update
+        this.resizeTable();
+      });
+    } else {
+      // update table size
       this.resizeTable();
-      this.detectChanges();
     }
   }
 
@@ -2224,5 +2355,51 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // finished
     return newData;
+  }
+
+  /**
+   * Retrieve bottom section setting
+   */
+  private loadBottomSectionConfig(): void {
+    // retrieve collapse / expand value
+    const authUser: UserModel = this.authDataService.getAuthenticatedUser();
+    this.bottomSectionIsCollapsed = !!authUser.getSettings(this._pageSettingsKeyBottomSectionCollapsed);
+  }
+
+  /**
+   * Expand / collapse bottom section (legend & pagination)
+   */
+  expandCollapseBottomSection(): void {
+    // disable while saving user settings
+    this.bottomSectionSavingConfig = true;
+
+    // attach / detach collapsed class
+    this.bottomSectionIsCollapsed = !this.bottomSectionIsCollapsed;
+
+    // refresh html
+    this.detectChanges();
+    this.resizeTable();
+
+    // update settings
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [this._pageSettingsKeyBottomSectionCollapsed]: this.bottomSectionIsCollapsed
+      })
+      .pipe(
+        catchError((err) => {
+          // error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished saving
+        this.bottomSectionSavingConfig = false;
+
+        // update layout
+        this.detectChanges();
+      });
   }
 }

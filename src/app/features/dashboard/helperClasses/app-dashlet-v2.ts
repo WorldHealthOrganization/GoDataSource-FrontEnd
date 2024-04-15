@@ -2,10 +2,10 @@ import { Subscription } from 'rxjs';
 import { IDashletValue } from './dashlet-value';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { Moment } from '../../../core/helperClasses/x-moment';
 import { Directive, Input } from '@angular/core';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../core/models/user.model';
+import { Moment } from '../../../core/helperClasses/localization-helper';
 
 /**
  * Dashlet
@@ -29,6 +29,9 @@ export abstract class AppDashletV2 {
 
   // authenticated user
   protected authUser: UserModel;
+
+  // timers
+  private _initializeDashletTimer: number;
 
   /**
    * Initialize
@@ -60,9 +63,15 @@ export abstract class AppDashletV2 {
         // select outbreak
         this.selectedOutbreak = selectedOutbreak;
 
+        // stop timers
+        this.stopInitializeDashletTimer();
+
         // trigger outbreak selection changed
         // - wait for binding
-        setTimeout(() => {
+        this._initializeDashletTimer = setTimeout(() => {
+          // reset
+          this._initializeDashletTimer = undefined;
+
           // init dashlet
           this.initializeDashlet();
         });
@@ -78,10 +87,23 @@ export abstract class AppDashletV2 {
       this._selectedOutbreakSubscription.unsubscribe();
       this._selectedOutbreakSubscription = undefined;
     }
+
+    // stop timers
+    this.stopInitializeDashletTimer();
   }
 
   /**
    * Initialize dashlet
    */
   protected abstract initializeDashlet(): void;
+
+  /**
+   * Stop timer
+   */
+  private stopInitializeDashletTimer(): void {
+    if (this._initializeDashletTimer) {
+      clearTimeout(this._initializeDashletTimer);
+      this._initializeDashletTimer = undefined;
+    }
+  }
 }

@@ -5,23 +5,24 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ICreateViewModifyV2Refresh } from '../../../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { TranslateService } from '@ngx-translate/core';
 import { UserModel } from '../../../../core/models/user.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contact-of-contact-merge-duplicate',
@@ -52,20 +53,22 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
    * Constructor
    */
   constructor(
-    private activatedRoute: ActivatedRoute,
-    private outbreakDataService: OutbreakDataService,
-    private translateService: TranslateService,
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
+    private outbreakDataService: OutbreakDataService
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve contacts ids
@@ -250,11 +253,20 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
 
             // determine addresses
             ((item.model as ContactOfContactModel).addresses || []).forEach((address) => {
+              // create a full address with all fields (filter is used to remove empty strings or undefined values)
+              const addressFields = [
+                address.fullAddress,
+                address.locationId,
+                address.postalCode,
+                address.emailAddress,
+                address.phoneNumber,
+                address.geoLocation?.lat,
+                address.geoLocation?.lng
+              ].map((e) => e ? e.toString().trim() : e)
+                .filter((e) => e);
+
               // add to list ?
-              if (
-                address.locationId ||
-                address.fullAddress
-              ) {
+              if (addressFields.length) {
                 // current address ?
                 // if we have multiple current addresses then we change them to previously addresses and keep the freshest one by address.date
                 if (address.typeId === AddressType.CURRENT_ADDRESS) {
@@ -264,7 +276,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                       // address is newer?
                       if (
                         !currentAddress.date ||
-                        moment(currentAddress.date).isBefore(moment(address.date))
+                        LocalizationHelper.toMoment(currentAddress.date).isBefore(LocalizationHelper.toMoment(address.date))
                       ) {
                         currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
                         data.addresses.push(currentAddress);
@@ -352,6 +364,11 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
       }
     ];
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
       * Initialize tabs
@@ -616,7 +633,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'visualId',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-              description: () => this.translateService.instant(
+              description: () => this.i18nService.instant(
                 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this.selectedOutbreak.contactOfContactIdMask
               ),
@@ -641,7 +658,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.i18nService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -675,6 +692,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -710,6 +731,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                   required: () => true
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
@@ -813,6 +838,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
@@ -828,8 +857,8 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
         mergeRecords,
-        this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-        this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
       );
       case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);

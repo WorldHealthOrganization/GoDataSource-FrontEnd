@@ -12,24 +12,23 @@ import { AuditLogDataService } from '../../../../core/services/data/audit-log.da
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IV2ColumnPinned, V2ColumnExpandRowType, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnExpandRowType, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { TranslateService } from '@ngx-translate/core';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { Constants } from '../../../../core/models/constants';
 import { ChangeValue, ChangeValueArray, ChangeValueObject, ChangeValueType } from '../../../../shared/components-v2/app-changes-v2/models/change.model';
-import * as momentOriginal from 'moment';
-import { moment } from '../../../../core/helperClasses/x-moment';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-audit-logs-list',
   templateUrl: './audit-logs-list.component.html'
 })
 export class AuditLogsListComponent
-  extends ListComponent<AuditLogModel>
+  extends ListComponent<AuditLogModel, IV2Column>
   implements OnDestroy {
 
   // audit-log fields
@@ -39,7 +38,7 @@ export class AuditLogsListComponent
     { label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME', value: 'modelName' },
     { label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID', value: 'recordId' },
     { label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA', value: 'changedData' },
-    { label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER', value: 'userId' },
+    { label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER', value: 'user' },
     { label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS', value: 'userIPAddress' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
@@ -58,10 +57,15 @@ export class AuditLogsListComponent
     private auditLogDataService: AuditLogDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**
@@ -121,7 +125,7 @@ export class AuditLogsListComponent
         sortable: true,
         format: {
           type: (item) => (this.activatedRoute.snapshot.data.auditLogModule as IResolverV2ResponseModel<ILabelValuePairModel>).map[item.modelName] ?
-            this.translateService.instant((this.activatedRoute.snapshot.data.auditLogModule as IResolverV2ResponseModel<ILabelValuePairModel>).map[item.modelName].label) :
+            this.i18nService.instant((this.activatedRoute.snapshot.data.auditLogModule as IResolverV2ResponseModel<ILabelValuePairModel>).map[item.modelName].label) :
             item.modelName
         },
         filter: {
@@ -139,12 +143,12 @@ export class AuditLogsListComponent
         filter: {
           type: V2FilterType.DATE_RANGE,
           value: {
-            startDate: moment().subtract(7, 'days').startOf('day'),
-            endDate: moment().endOf('day')
+            startDate: LocalizationHelper.now().subtract(7, 'days').startOf('day'),
+            endDate: LocalizationHelper.now().endOf('day')
           },
           defaultValue: {
-            startDate: moment().subtract(7, 'days').startOf('day'),
-            endDate: moment().endOf('day')
+            startDate: LocalizationHelper.now().subtract(7, 'days').startOf('day'),
+            endDate: LocalizationHelper.now().endOf('day')
           }
         }
       },
@@ -177,7 +181,7 @@ export class AuditLogsListComponent
         label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER',
         format: {
           type: (item) => item.userId && this.activatedRoute.snapshot.data.user.map[item.userId] ?
-            `${ this.activatedRoute.snapshot.data.user.map[item.userId].name } ( ${ this.activatedRoute.snapshot.data.user.map[item.userId].email } )` :
+            this.activatedRoute.snapshot.data.user.map[item.userId].nameAndEmail :
             ''
         },
         filter: {
@@ -189,7 +193,7 @@ export class AuditLogsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.userId ?
+          return data.userId && UserModel.canView(this.authUser) ?
             `/users/${ data.userId }/view` :
             undefined;
         }
@@ -262,42 +266,46 @@ export class AuditLogsListComponent
    * Initialize table group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => AuditLogModel.canExport(this.authUser),
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
 
-            // allow deleted records
-            qb.includeDeleted();
+              // allow deleted records
+              qb.includeDeleted();
 
-            // keep sort order
-            if (!this.queryBuilder.sort.isEmpty()) {
-              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+              }
+
+              // export
+              this.exportAuditLogs(qb);
             }
-
-            // export
-            this.exportAuditLogs(qb);
+          },
+          visible: (): boolean => {
+            return AuditLogModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return AuditLogModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**
@@ -382,7 +390,7 @@ export class AuditLogsListComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
-
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
@@ -422,7 +430,7 @@ export class AuditLogsListComponent
           url: '/audit-logs/export',
           async: true,
           method: ExportDataMethod.POST,
-          fileName: `${ this.translateService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
+          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ LocalizationHelper.now().format('YYYY-MM-DD HH:mm') }`,
           queryBuilder: qb,
           allow: {
             types: [
@@ -431,7 +439,9 @@ export class AuditLogsListComponent
             anonymize: {
               fields: this.auditLogFields
             },
-            fields: this.auditLogFields,
+            fields: {
+              options: this.auditLogFields
+            },
             dbColumns: true,
             dbValues: true,
             jsonReplaceUndefinedWithNull: true

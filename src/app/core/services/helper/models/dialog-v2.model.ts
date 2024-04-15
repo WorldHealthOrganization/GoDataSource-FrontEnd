@@ -1,8 +1,10 @@
 import { ExportStatusStep } from '../../../models/constants';
-import { Moment } from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
-import { IV2SideDialogHandler, V2SideDialogConfigInput } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogData, IV2SideDialogHandler, V2SideDialogConfigInput } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { ObservableInput } from 'rxjs';
+import { ErrorModel } from '../../../models/error.model';
+import { Moment } from '../../../helperClasses/localization-helper';
 
 /**
  * Export data config progress answer
@@ -93,9 +95,16 @@ export interface IV2ExportDataConfig {
         fields: ILabelValuePairModel[],
 
         // optional
-        required?: IV2ExportDataConfigGroupsRequired
+        required?: IV2ExportDataConfigGroupsRequired,
+        change?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => void
       },
-      fields?: ILabelValuePairModel[],
+      fields?: {
+        // required
+        options: ILabelValuePairModel[],
+
+        // optional
+        change?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => void
+      },
       dbColumns?: boolean,
       dbValues?: boolean,
       jsonReplaceUndefinedWithNull?: boolean,
@@ -112,7 +121,12 @@ export interface IV2ExportDataConfig {
       append: {
         [key: string]: any
       }
-    }
+    },
+    formDataPrefilter?: (
+      data: any,
+      qb: RequestQueryBuilder
+    ) => void,
+    catchError?: (err: Blob | ErrorModel | Error) => ObservableInput<any>
   };
 
   // optional

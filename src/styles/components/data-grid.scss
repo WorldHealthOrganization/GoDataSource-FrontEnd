@@ -7,6 +7,10 @@
   line-height: 2.4rem;
   min-height: 22rem;
 
+  @media only screen and (max-height: 599px) {
+    min-height: 0;
+  }
+
   &.ag-theme-balham {
     .ag-root-wrapper {
       border-color: rgba(var(--gd-secondary-rgb), 0.25);
@@ -435,6 +439,10 @@
     .ag-checkbox {
       &.ag-header-select-all {
         margin-right: 0;
+
+        + .ag-header-cell-comp-wrapper {
+          align-items: flex-start;
+        }
       }
 
       .ag-checkbox-input-wrapper {
@@ -501,26 +509,59 @@
         top: 8.9rem;
       }
     }
+
+    input[class^=ag-]:not([type]),
+    input[class^=ag-][type=date],
+    input[class^=ag-][type=datetime-local],
+    input[class^=ag-][type=number],
+    input[class^=ag-][type=tel],
+    input[class^=ag-][type=text],
+    textarea[class^=ag-] {
+      border: 0.1rem solid var(--gd-secondary);
+      @include border-radius(0);
+      @include box-shadow(none);
+      color: var(--gd-text);
+      font-family: $gd-font-family;
+      font-size: $gd-font-size;
+      line-height: $gd-line-height;
+
+      &:focus {
+        border-color: var(--gd-primary);
+      }
+    }
   }
 }
 
 /* List table legend */
 .gd-list-table-bottom-left {
   padding: 0.4rem 0;
+  width: 100%;
 
   .gd-list-table-bottom-left-legend {
+    width: 100%;
+
     .gd-list-table-bottom-left-legend-title {
       color: var(--gd-secondary);
       font-size: 1.2rem;
       margin-left: 0.8rem;
-      min-width: 13.5rem;
+      min-width: 13.6rem;
       text-transform: uppercase;
     }
+
+    .gd-list-table-bottom-left-legend-items {
+      @include flex_align_items(flex-start);
+      @include flex(flex);
+      @include flex_direction(row);
+      @include flex_wrap(wrap);
+      @include flex_justify(flex-start);
+      width: 100%;
+    }
   
-    .gd-list-table-bottom-left-legend-item {
+    .gd-list-table-bottom-left-legend-items-item {
       @include flex_align_items(center);
       @include flex(flex);
       @include flex_direction(row);
+      @include flex_wrap(nowrap);
       font-size: 1.2rem;
       margin-left: 0.8rem;
   
@@ -528,5 +569,15 @@
         margin-right: 0.4rem;
       }
     }
+  }
+}
+
+/* List table pagination */
+.gd-list-table-bottom-right {
+  min-width: 42rem;
+
+  @include breakpoint('xs') {
+    min-width: 100%;
+    width: 100%;
   }
 }

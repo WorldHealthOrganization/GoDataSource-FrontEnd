@@ -56,7 +56,7 @@
             neverFloatLabel="true"
             (ngModelChange)="filterInputs()"
             autocomplete="off"
-            [suffixIconButtons]="filterByValue ? filterSuffixIconButtons : undefined">
+            [suffixIconButtons]="filterSuffixIconButtons">
           </app-form-input-v2>
 
         </div>
@@ -207,6 +207,7 @@
               [clearable]="input.clearable"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              [suffixIconButtons]="input.suffixIconButtons"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-select-single-v2>
 
             <!-- Dropdown - multiple -->
@@ -267,8 +268,21 @@
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-toggle-checkbox-v2>
+
+            <!-- Color -->
+            <app-form-color-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.COLOR"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-color-v2>
 
             <!-- Key-Value -->
             <div
@@ -283,6 +297,33 @@
               <!-- Value -->
               <div
                 class="gd-app-side-dialog-v2-content-middle-item-input-value">{{input.value | translate}}</div>
+
+            </div>
+
+            <!-- Key-Link Value -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.KEY_LINK_VALUE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              fxLayout="row" fxLayoutAlign="start" fxLayoutGap="1.6rem">
+
+              <!-- Key -->
+              <div
+                class="gd-app-side-dialog-v2-content-middle-item-input-key">{{input.placeholder | translate}}</div>
+
+              <!-- Value -->
+              <div
+                class="gd-app-side-dialog-v2-content-middle-item-input-link-value">
+                <!-- Link -->
+                <a
+                  *ngIf="input.link.src?.length; else noLink"
+                  target="_blank"
+                  [routerLink]="input.link.src"
+                  [queryParams]="input.link.params">{{input.link.label | translate}}</a>
+
+                <!-- no link ? -->
+                <ng-template
+                  #noLink>{{input.link.label | translate}}</ng-template>
+              </div>
 
             </div>
 
@@ -460,7 +501,7 @@
 
                 <!-- Filter tab -->
                 <mat-tab
-                  [label]="'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE' | translate">
+                  [label]="'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE' | translate:{ no: input.filters ? input.filters.length : 0 }">
 
                   <!-- Operator -->
                   <app-form-toggle-v2
@@ -609,7 +650,7 @@
 
                             <!-- Date range -->
                             <app-form-date-range-v2
-                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_DATE
+                              *ngIf="(input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_DATE || input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.DELETED_AT)
                                 && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
                               [(ngModel)]="filter.value"
                               [name]="filter.name"
@@ -697,6 +738,17 @@
                               [defaultValues]="input.optionsAsLabelValueMap[filter.filterBy.value].data.defaultValues"
                               [(ngModel)]="filter.value">
                             </app-form-select-groups-v2>
+
+                            <!-- Deleted select -->
+                            <app-form-select-single-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.DELETED"
+                              [ngModel]="filter.value === undefined ? '' : filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                              [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.yesNoAllOptions"
+                              allowDisabledToBeSelected="true"
+                              (ngModelChange)="filter.value = $event">
+                            </app-form-select-single-v2>
 
                             <!-- Questionnaire answers -->
                             <ng-container
@@ -828,7 +880,7 @@
                 <!-- Sort tab -->
                 <mat-tab
                   *ngIf="input.sortableOptionsAsLabelValue?.length > 0"
-                  [label]="'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate">
+                  [label]="'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate:{ no: input.sorts ? input.sorts.length : 0 }">
 
                   <!-- Buttons -->
                   <div
@@ -926,6 +978,7 @@
           *ngFor="let input of config?.inputs"
           class="gd-app-side-dialog-v2-content-middle-item"
           [class.gd-app-side-dialog-v2-content-middle-item-has-sort-list]="input.type === V2SideDialogConfigInputType.SORT_LIST"
+          [class.gd-app-side-dialog-v2-content-middle-item-has-group]="input.type === V2SideDialogConfigInputType.GROUP"
           [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredForceParent[input.name])">
           <ng-template
             [ngTemplateOutlet]="commonPart"

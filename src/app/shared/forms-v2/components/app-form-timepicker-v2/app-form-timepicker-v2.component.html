@@ -39,14 +39,15 @@
       [disabled]="disabled"
       [required]="required"
       autocomplete="off"
-      [ngxTimepicker]="timePicker"
+      [ngxMatTimepicker]="timePicker"
       [format]="24"
       [readonly]="true"
       (blur)="onTouchItem()"
       (input)="onChange(value)"/>
-      <ngx-material-timepicker
+      <ngx-mat-timepicker
         #timePicker
-        timepickerClass="gd-form-timepicker-v2-panel"></ngx-material-timepicker>
+        timepickerClass="gd-form-timepicker-v2-panel"
+        (opened)="opened()"></ngx-mat-timepicker>
 
     <!-- Errors -->
     <mat-error

@@ -36,7 +36,7 @@ export class ImportReferenceDataComponent {
 
   authUser: UserModel;
 
-  requiredDestinationFields = [
+  requiredDestinationFields: string[] = [
     'categoryId',
     'value'
   ];

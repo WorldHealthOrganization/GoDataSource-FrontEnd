@@ -6,6 +6,10 @@
   .gd-list-top-tile-buttons {
     padding-bottom: 2.4rem;
 
+    @include breakpoint('lt-lg') {
+      padding-bottom: 0.8rem;
+    }
+
     /* Page title & view button */
     .gd-list-top-tile-buttons-title {
       overflow: hidden;
@@ -183,28 +187,62 @@
     .gd-list-table-header {
       padding: 1.6rem;
 
+      @include breakpoint('lt-lg') {
+        padding: 0.8rem;
+      }
+
       .gd-list-table-header-left {
         .gd-list-table-header-left-text {
+          @include flex_align_items(baseline);
+          @include flex(flex);
+          @include flex_direction(row);
+          gap: 0.4rem;
           margin-right: 0.4rem;
           white-space: nowrap;
 
           &::first-letter {
             text-transform: capitalize;
           }
+
+          .gd-list-table-header-left-counter-label {
+            color: var(--gd-secondary);
+            font-size: 1.2rem;
+            letter-spacing: 0.05rem;
+            line-height: 1;
+            text-transform: uppercase;
+            white-space: nowrap;
+          }
+
+          .gd-list-table-header-left-counter-value {
+            color: var(--gd-primary);
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
+          }
         }
 
         .gd-list-table-header-left-show-total {
+          background: var(--gd-primary);
+          border-radius: 0.4rem;
+          color: var(--gd-background);
+          font-size: 1.2rem;
+          font-weight: 400;
           line-height: $gd-line-height;
-          padding: 0 0.2rem;
+          margin-left: 0.4rem;
+          padding: 0.2rem 0.4rem;
           @include transition(color 0.24s ease-in-out 0s);
+        }
+      }
 
-          &:hover,
-          &:focus {
-            color: var(--gd-primary-alt);
-          }
+      .gd-list-table-header-right {
+        .mat-flat-button {
+          @include breakpoint('xxs') {
+            padding: 0.8rem;
 
-          &:active {
-            color: var(--gd-primary);
+            .mat-icon {
+              display: none;
+            }
           }
         }
       }
@@ -223,7 +261,8 @@
         }
       }
 
-      .gd-list-table-header-right-header-filters-active {
+      .gd-list-table-header-right-header-filters-active,
+      .gd-list-table-header-right-footer-active {
         background: rgba(var(--gd-primary-rgb), 0.25);
         color: var(--gd-primary);
       }
@@ -234,5 +273,11 @@
   .gd-list-table-bottom {
     @include border-radius(0 0 0.4rem 0.4rem);
     min-height: 4.8rem;
+
+    &.gd-list-table-bottom-collapsed {
+      height: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
   }
 }

@@ -4,6 +4,7 @@ import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { BaseModel } from './base.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 export class ClusterModel extends BaseModel
   implements
@@ -19,7 +20,13 @@ export class ClusterModel extends BaseModel
   /**
    * Advanced filters
    */
-  static generateAdvancedFilters(): V2AdvancedFilter[] {
+  static generateAdvancedFilters(data: {
+    authUser: UserModel,
+    options: {
+      createdOn: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
+    }
+  }): V2AdvancedFilter[] {
     // initialize
     const advancedFilters: V2AdvancedFilter[] = [
       {
@@ -33,8 +40,50 @@ export class ClusterModel extends BaseModel
         field: 'description',
         label: 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'colorCode',
+        label: 'LNG_CLUSTER_FIELD_LABEL_COLOR',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdOn',
+        label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_ON',
+        options: data.options.createdOn,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'createdAt',
+        label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_AT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'updatedAt',
+        label: 'LNG_CLUSTER_FIELD_LABEL_UPDATED_AT',
+        sortable: true
       }
     ];
+
+    // allowed to filter by user ?
+    if (UserModel.canListForFilters(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'createdBy',
+        label: 'LNG_CLUSTER_FIELD_LABEL_CREATED_BY',
+        options: data.options.user,
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'updatedBy',
+        label: 'LNG_CLUSTER_FIELD_LABEL_UPDATED_BY',
+        options: data.options.user,
+        sortable: true
+      });
+    }
 
     // finished
     return advancedFilters;

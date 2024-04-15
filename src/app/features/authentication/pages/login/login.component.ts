@@ -15,6 +15,8 @@ import { SafeHtml } from '@angular/platform-browser';
 import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Constants } from '../../../../core/models/constants';
+import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
 
 @Component({
   selector: 'app-login',
@@ -43,6 +45,7 @@ export class LoginComponent {
   // constants
   RenderMode = RenderMode;
   CaptchaDataFor = CaptchaDataFor;
+  Constants = Constants;
 
   /**
    * Constructor
@@ -55,6 +58,7 @@ export class LoginComponent {
     private router: Router,
     private captchaDataService: CaptchaDataService,
     private userDataService: UserDataService,
+    private bulkCacheHelperService: BulkCacheHelperService,
     activatedRoute: ActivatedRoute
   ) {
     // enable back dirty changes
@@ -86,6 +90,9 @@ export class LoginComponent {
       // generate captcha
       this.refreshCaptcha();
     }
+
+    // cleanup
+    this.bulkCacheHelperService.clearBulkSelected(false);
   }
 
   /**

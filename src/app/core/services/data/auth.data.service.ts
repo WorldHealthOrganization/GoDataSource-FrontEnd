@@ -8,12 +8,12 @@ import { AuthModel, IAuthTwoFactor, ITokenInfo } from '../../models/auth.model';
 import { UserModel } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { DebounceTimeCaller, DebounceTimeCallerType } from '../../helperClasses/debounce-time-caller';
 import { SystemSettingsDataService } from './system-settings.data.service';
 import { environment } from '../../../../environments/environment';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
+import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
 
 @Injectable()
 export class AuthDataService {
@@ -86,15 +86,27 @@ export class AuthDataService {
           // get user info
           return this.userDataService.getUser(auth.userId)
             .pipe(
-              map((userInstance: UserModel) => {
+              switchMap((userInstance) => {
+                return this.systemSettingsDataService.getAPIVersionNoCache()
+                  .pipe(map((conf) => {
+                    return {
+                      user: userInstance,
+                      conf
+                    };
+                  }));
+              }),
+              map((data: {
+                user: UserModel,
+                conf: SystemSettingsVersionModel
+              }) => {
                 // keep user info
-                auth.user = userInstance;
+                auth.user = data.user;
 
                 // cache auth data with authenticated user information
                 this.storageService.set(StorageKey.AUTH_DATA, auth);
 
                 // initialize auth info
-                this.initializeTokenInfo();
+                this.initializeTokenInfo(data.conf.tokenTTL);
 
                 // finished
                 return auth;
@@ -115,15 +127,27 @@ export class AuthDataService {
     // get user info
     return this.userDataService.getUser(userId)
       .pipe(
-        map((userInstance: UserModel) => {
+        switchMap((userInstance) => {
+          return this.systemSettingsDataService.getAPIVersionNoCache()
+            .pipe(map((conf) => {
+              return {
+                user: userInstance,
+                conf
+              };
+            }));
+        }),
+        map((data: {
+          user: UserModel,
+          conf: SystemSettingsVersionModel
+        }) => {
           // keep user info
-          authData.user = userInstance;
+          authData.user = data.user;
 
           // cache auth data with authenticated user information
           this.storageService.set(StorageKey.AUTH_DATA, authData);
 
           // initialize auth info
-          this.updateTokenInfo();
+          this.updateTokenInfo(data.conf.tokenTTL);
 
           // finished
           return authData;
@@ -224,9 +248,9 @@ export class AuthDataService {
   }
 
   /**
-     * Initialize token information - time to live etc
-     */
-  private initializeTokenInfo(defaultTTL: number = -1) {
+   * Initialize token information - time to live etc
+   */
+  private initializeTokenInfo(tokenTTL: number) {
     // release previous
     this.destroyTokenInfo();
 
@@ -236,29 +260,13 @@ export class AuthDataService {
       return;
     }
 
-    // check if we have ttl time, otherwise retrieve it
-    if (defaultTTL === -1) {
-      this.systemSettingsDataService
-        .getAPIVersionNoCache()
-        .subscribe((data) => {
-          // update token info
-          if (this.tokenInfo) {
-            // update default time to live
-            this.tokenInfo.ttl = data.tokenTTL;
-
-            // determine info
-            this.resetTokenInfo();
-          }
-        });
-    }
-
     // initialize token into
     this.tokenInfo = {
       token: authToken,
-      ttl: defaultTTL,
-      lastReset: moment(),
+      ttl: tokenTTL,
+      lastReset: LocalizationHelper.now(),
       info: {
-        ttl: defaultTTL,
+        ttl: tokenTTL,
         isValid: false,
         approximatedExpireInSeconds: -1,
         approximatedExpireInSecondsReal: -1
@@ -270,12 +278,12 @@ export class AuthDataService {
   }
 
   /**
-     * Update token information
-     */
-  private updateTokenInfo() {
+   * Update token information
+   */
+  private updateTokenInfo(tokenTTL: number) {
     // initialize token info if we need to
     if (!this.tokenInfo) {
-      this.initializeTokenInfo();
+      this.initializeTokenInfo(tokenTTL);
     }
 
     // we must be authenticated to update
@@ -305,7 +313,7 @@ export class AuthDataService {
     }
 
     // determine number of seconds passed since we last made a request to api that should've reset the token ttl
-    const passedSecondsSinceCreation: number = Math.floor(moment().diff(this.tokenInfo.lastReset) / 1000);
+    const passedSecondsSinceCreation: number = Math.floor(LocalizationHelper.now().diff(this.tokenInfo.lastReset) / 1000);
 
     // determine approximate remaining seconds
     if (this.tokenInfo.ttl > 0) {
@@ -339,7 +347,7 @@ export class AuthDataService {
     // check if the minimum number of seconds have passed since our last call
     if (
       this.lastTokenInfoCalledSubscribers &&
-            Math.floor(moment().diff(this.lastTokenInfoCalledSubscribers) / 1000) <= AuthDataService.TOKEN_INFO_CALL_FREQUENCY_SECONDS
+            Math.floor(LocalizationHelper.now().diff(this.lastTokenInfoCalledSubscribers) / 1000) <= AuthDataService.TOKEN_INFO_CALL_FREQUENCY_SECONDS
     ) {
       return;
     }
@@ -348,7 +356,7 @@ export class AuthDataService {
     this.tokenInfoSubscriberSubject.next(this.tokenInfo.info);
 
     // update last call time
-    this.lastTokenInfoCalledSubscribers = moment();
+    this.lastTokenInfoCalledSubscribers = LocalizationHelper.now();
   }
 
   /**
@@ -361,7 +369,7 @@ export class AuthDataService {
     }
 
     // reset token time
-    this.tokenInfo.lastReset = moment();
+    this.tokenInfo.lastReset = LocalizationHelper.now();
 
     // do the math
     this.determineTokenInfo();

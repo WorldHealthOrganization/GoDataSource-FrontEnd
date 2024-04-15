@@ -6,7 +6,6 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -24,12 +23,14 @@ import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/c
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleLocation, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-locations-list',
   templateUrl: './locations-list.component.html'
 })
-export class LocationsListComponent extends ListComponent<LocationModel> implements OnDestroy {
+export class LocationsListComponent extends ListComponent<LocationModel, IV2Column> implements OnDestroy {
   // parent location ID
   private _parentId: string;
 
@@ -60,8 +61,10 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
     private dialogV2Service: DialogV2Service
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
     );
 
     // get data
@@ -384,9 +387,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
         label: 'LNG_LOCATION_FIELD_LABEL_CREATED_BY',
         notVisible: true,
         format: {
-          type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.createdBy].name :
-            ''
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -397,10 +398,26 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_LOCATION_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
       },
       {
         field: 'createdAt',
@@ -419,9 +436,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
         label: 'LNG_LOCATION_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
         format: {
-          type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.updatedBy].name :
-            ''
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -432,7 +447,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }
@@ -561,9 +576,25 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
                     url: 'locations/hierarchical/export',
                     async: false,
                     method: ExportDataMethod.GET,
-                    fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
+                    fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE') } - ${ LocalizationHelper.now().format('YYYY-MM-DD') }`,
                     allow: {
                       types: [ExportDataExtension.JSON]
+                    },
+                    inputs: {
+                      append: [
+                        {
+                          type: V2SideDialogConfigInputType.CHECKBOX,
+                          placeholder: 'LNG_PAGE_LIST_LOCATIONS_EXPORT_DELETED_INFORMATION',
+                          name: 'includeDeletedLocations',
+                          checked: false
+                        },
+                        {
+                          type: V2SideDialogConfigInputType.CHECKBOX,
+                          placeholder: 'LNG_PAGE_LIST_LOCATIONS_EXPORT_REPLACE_UPDATED_AT_AS_CURRENT_DATE',
+                          name: 'replaceUpdatedAtAsCurrentDate',
+                          checked: false
+                        }
+                      ]
                     }
                   }
                 });
@@ -716,11 +747,16 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
    * Re(load) the list of Locations
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
     // refresh
     this.records$ = this.locationDataService
       .getLocationsListByParent(
         this._parentId,
-        this.queryBuilder
+        this.queryBuilder,
+        true
       )
       .pipe(
         // should be the last pipe
@@ -744,6 +780,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

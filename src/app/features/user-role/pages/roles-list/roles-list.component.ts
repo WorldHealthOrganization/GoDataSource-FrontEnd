@@ -14,15 +14,36 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { PermissionModel } from '../../../../core/models/permission.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import {
+  ExportDataExtension,
+  ExportDataMethod
+} from '../../../../core/services/helper/models/dialog-v2.model';
+import * as momentOriginal from 'moment/moment';
 
 @Component({
   selector: 'app-roles-list',
   templateUrl: './roles-list.component.html'
 })
-export class RolesListComponent extends ListComponent<UserRoleModel> implements OnDestroy {
+export class RolesListComponent extends ListComponent<UserRoleModel, IV2Column> implements OnDestroy {
+  // role fields
+  roleFields: ILabelValuePairModel[] = [
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_NAME', value: 'name' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS', value: 'permissionIds' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION', value: 'description' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+  ];
+
   /**
    * Constructor
    */
@@ -35,8 +56,10 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
     private i18nService: I18nService
   ) {
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
     );
   }
 
@@ -284,6 +307,82 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
           groupOptionHiddenKey: 'hidden',
           defaultValues: PermissionModel.HIDDEN_PERMISSIONS
         }
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: 'createdByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        link: (data) => {
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
+            `/users/${data.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_CREATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: 'updatedByUser.nameAndEmail'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        link: (data) => {
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_UPDATED_AT',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
       }
     ];
   }
@@ -304,6 +403,7 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = UserRoleModel.generateAdvancedFilters({
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         permission: this.activatedRoute.snapshot.data.permission
       }
@@ -313,12 +413,94 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
   /**
    * Initialize table quick actions
    */
-  protected initializeQuickActions(): void {}
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return UserRoleModel.canExport(this.authUser) ||
+          UserRoleModel.canImport(this.authUser);
+      },
+      menuOptions: [
+        // Export roles
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USER_ROLES_EXPORT_BUTTON'
+          },
+          action: {
+            click: () => {
+              // remove the includeUsers flag because users are exported separately
+              const qb: RequestQueryBuilder = new RequestQueryBuilder();
+              qb.merge(this.queryBuilder);
+              qb.filter.removeFlag('includeUsers');
+
+              // export
+              this.exportRoles(qb);
+            }
+          },
+          visible: (): boolean => {
+            return UserRoleModel.canExport(this.authUser);
+          }
+        },
+
+        // Import roles
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USER_ROLES_IMPORT_BUTTON'
+          },
+          action: {
+            link: () => ['/import-export-data', 'user-role-data', 'import']
+          },
+          visible: (): boolean => {
+            return UserRoleModel.canImport(this.authUser);
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {}
+  protected initializeGroupActions(): void {
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => UserRoleModel.canExport(this.authUser),
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USER_ROLES_GROUP_ACTION_EXPORT_SELECTED_USER_ROLES'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect('id', selected, true, null);
+
+              // allow deleted records
+              qb.includeDeleted();
+
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
+              }
+
+              // export
+              this.exportRoles(qb);
+            }
+          },
+          visible: (): boolean => {
+            return UserRoleModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table add action
@@ -372,7 +554,12 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
       'name',
       'description',
       'users',
-      'permissionIds'
+      'permissionIds',
+      'createdBy',
+      'createdOn',
+      'createdAt',
+      'updatedBy',
+      'updatedAt'
     ];
   }
 
@@ -380,6 +567,10 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
    * Re(load) the User Roles list
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
     // make sure we include user information
     this.queryBuilder.filter.flag(
       'includeUsers',
@@ -411,6 +602,7 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
@@ -433,6 +625,44 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
         takeUntil(this.destroyed$)
       ).subscribe((response) => {
         this.pageCount = response;
+      });
+  }
+
+  /**
+   * Export selected records
+   */
+  private exportRoles(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_USER_ROLES_EXPORT_TITLE'
+        },
+        export: {
+          url: 'roles/export',
+          async: true,
+          method: ExportDataMethod.POST,
+          fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_USER_ROLES_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
+          queryBuilder: qb,
+          allow: {
+            types: [
+              ExportDataExtension.CSV,
+              ExportDataExtension.XLS,
+              ExportDataExtension.XLSX,
+              ExportDataExtension.JSON,
+              ExportDataExtension.ODS,
+              ExportDataExtension.PDF
+            ],
+            anonymize: {
+              fields: this.roleFields
+            },
+            fields: {
+              options: this.roleFields
+            },
+            dbColumns: true,
+            dbValues: true,
+            jsonReplaceUndefinedWithNull: true
+          }
+        }
       });
   }
 }

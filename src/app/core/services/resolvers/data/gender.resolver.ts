@@ -21,7 +21,7 @@ export class GenderDataResolver implements IMapResolverV2<ReferenceDataEntryMode
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.GENDER)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_GENDER)
       .pipe(
         map((data) => {
           // construct map

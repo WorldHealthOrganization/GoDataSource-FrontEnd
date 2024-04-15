@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
-import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { TeamModel } from '../../models/team.model';
 import { IBasicCount } from '../../models/basic-count.interface';
 
@@ -16,45 +16,30 @@ export class TeamDataService {
   }
 
   /**
-     * Retrieve the list of Teams
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<TeamModel[]>}
-     */
+   * Retrieve the list of Teams
+   */
   getTeamsList(
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
-    includeLocationsAndMembers: boolean = true
+    usePost?: boolean
   ): Observable<TeamModel[]> {
-    const qb = new RequestQueryBuilder();
-
-    // include roles and permissions in response
-    if (includeLocationsAndMembers) {
-      qb.include('locations', true);
-      qb.include('members', true);
+    // use post
+    if (usePost) {
+      const filter = queryBuilder.buildQuery(false);
+      return this.modelHelper.mapObservableListToModel(
+        this.http.post(
+          'teams/filter', {
+            filter
+          }
+        ),
+        TeamModel
+      );
     }
 
-    qb.merge(queryBuilder);
-    const filter = qb.buildQuery();
+    // default
+    const filter = queryBuilder.buildQuery();
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`teams?filter=${filter}`),
       TeamModel
-    );
-  }
-
-  /**
-     * Retrieve reduced list used by dropdowns ( only id & name fields, sorted ascending by name )
-     * @param queryBuilder
-     */
-  getTeamsListReduced(
-    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-  ): Observable<TeamModel[]> {
-    const qb = new RequestQueryBuilder();
-    qb.fields('id', 'name');
-    qb.sort.by('name', RequestSortDirection.ASC);
-
-    qb.merge(queryBuilder);
-    return this.getTeamsList(
-      qb,
-      false
     );
   }
 

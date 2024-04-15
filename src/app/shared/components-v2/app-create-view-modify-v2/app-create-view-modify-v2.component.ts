@@ -1,7 +1,17 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
-import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList, ICreateViewModifyV2TabTable } from './models/tab.model';
-import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
+import {
+  CreateViewModifyV2ActionType,
+  CreateViewModifyV2MenuType,
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2,
+  ICreateViewModifyV2Config,
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputAddress,
+  ICreateViewModifyV2TabInputChanged,
+  ICreateViewModifyV2TabInputList,
+  ICreateViewModifyV2TabTable, ICreateViewModifyV2TabTableRecordsList
+} from './models/tab.model';
+import { IV2Breadcrumb, IV2BreadcrumbInfo } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { NgForm } from '@angular/forms';
@@ -33,8 +43,17 @@ import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Params } from '@angular/router';
 import { MatTabGroup } from '@angular/material/tabs';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputGroup,
+  IV2SideDialogConfigInputMap,
+  IV2SideDialogConfigInputSortList,
+  IV2SideDialogData,
+  V2SideDialogConfigInput,
+  V2SideDialogConfigInputType
+} from '../app-side-dialog-v2/models/side-dialog-config.model';
 import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-mode';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -49,6 +68,9 @@ import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-m
 export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // constants
   private static readonly GENERAL_SETTINGS_TAB_ORDER: string = 'tabsOrder';
+
+  // language handler
+  languageSubscription: Subscription;
 
   // page type
   // - determined from route data
@@ -89,6 +111,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
+  @Input() breadcrumbInfos: IV2BreadcrumbInfo[];
 
   // title
   @Input() pageTitle: string;
@@ -113,6 +136,27 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     (this.tabData?.tabs || []).forEach((tab, tabIndex) => {
       // keep default tab order
       this._tabsDefaultOrder[tab.name || tab.label] = tabIndex;
+
+      // map inputs
+      if (tab.type === CreateViewModifyV2TabInputType.TAB) {
+        tab.nameToInput = {};
+        tab.sections?.forEach((section) => {
+          section.inputs?.forEach((input) => {
+            // nothing to do ?
+            const inputWithName: {
+              name?: string
+            } = input as {
+              name?: string
+            };
+            if (!inputWithName.name) {
+              return;
+            }
+
+            // map
+            tab.nameToInput[inputWithName.name] = input;
+          });
+        });
+      }
 
       // not important ?
       if (tab.type !== CreateViewModifyV2TabInputType.TAB_TABLE) {
@@ -208,7 +252,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // search
   expandListSearchValue: string;
-  expandListSearchValueTimeout: any;
+  expandListSearchValueTimeout: number;
   expandListSearchSuffixButtons: IAppFormIconButtonV2[] = [
     {
       icon: 'clear',
@@ -375,6 +419,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     return this._enableTabReorder;
   }
 
+  // custom tab configuration settings
+  @Input() tabConfiguration: ICreateViewModifyV2Config;
+
   // user settings key
   private _pageSettingsKey: string;
   @Input() set pageSettingsKey(pageSettingsKey: string) {
@@ -400,6 +447,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // switch viewed item
   @Output() expandListChangeRecord = new EventEmitter<any>();
 
+  // timers
+  private _resizeTableTimer: number;
+  private _markArrayItemsAsDirtyTimer: number;
+  private _detectChangesTimer: number;
+
   // constants
   CreateViewModifyV2TabInputType = CreateViewModifyV2TabInputType;
   Constants = Constants;
@@ -420,18 +472,19 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
     protected storageService: StorageService,
-    protected activatedRoute: ActivatedRoute
-  ) {
-    // update render mode
-    this.updateRenderMode();
-  }
+    protected activatedRoute: ActivatedRoute,
+    protected i18nService: I18nService
+  ) {}
 
   /**
    * Initialize resources
    */
   ngOnInit(): void {
-    // update table size
-    this.resizeTable();
+    // update render mode
+    this.updateRenderMode();
+
+    // subscribe to language change
+    this.initializeLanguageChangeListener();
   }
 
   /**
@@ -443,6 +496,52 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // stop refresh list from search typing
     this.expandListStopSearchApply();
+
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+
+    // stop timers
+    this.stopResizeTableTimer();
+    this.stopMarkArrayItemsAsDirtyTimer();
+    this.stopDetectChangesTimer();
+    this.tabData?.tabs?.forEach((tab) => {
+      // no need to stop anything ?
+      if (tab.type !== CreateViewModifyV2TabInputType.TAB_TABLE) {
+        return;
+      }
+
+      // cancel requests
+      if ((tab.definition as ICreateViewModifyV2TabTableRecordsList).previousRefreshRequest) {
+        clearTimeout((tab.definition as ICreateViewModifyV2TabTableRecordsList).previousRefreshRequest);
+        (tab.definition as ICreateViewModifyV2TabTableRecordsList).previousRefreshRequest = undefined;
+      }
+    });
+  }
+
+  /**
+   *  Subscribe to language change
+   */
+  private initializeLanguageChangeListener(): void {
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update ui
+        this.detectChanges();
+      });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
   }
 
   /**
@@ -453,6 +552,16 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     if (this.expandListRecordsSubscription) {
       this.expandListRecordsSubscription.unsubscribe();
       this.expandListRecordsSubscription = undefined;
+    }
+  }
+
+  /**
+   * Stop resize table timer
+   */
+  private stopResizeTableTimer(): void {
+    if (this._resizeTableTimer) {
+      clearTimeout(this._resizeTableTimer);
+      this._resizeTableTimer = undefined;
     }
   }
 
@@ -574,6 +683,35 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Trigger changed method if we have one assigned
+   */
+  triggerListInputChanged(
+    input: ICreateViewModifyV2TabInputChanged,
+    itemIndex?: number,
+    form?: NgForm,
+    groupName?: string
+  ): void {
+    // mark all items as dirty
+    if (groupName) {
+      this.markArrayItemsAsDirty(
+        form,
+        groupName
+      );
+    }
+
+    // nothing to do ?
+    if (!input.changed) {
+      return;
+    }
+
+    // trigger change
+    input.changed(
+      input,
+      itemIndex
+    );
+  }
+
+  /**
    * Update form
    */
   updateForm(
@@ -587,15 +725,23 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Address location changed
    */
   addressLocationChanged(
-    address: AddressModel,
-    locationInfo: ILocation
+    input: ICreateViewModifyV2TabInputAddress,
+    locationInfo: ILocation,
+    parentInput?: ICreateViewModifyV2TabInputList,
+    parentItemIndex?: number
   ): void {
     // should we copy location lat & lng ?
     if (
       locationInfo &&
       locationInfo.geoLocation &&
       locationInfo.geoLocation.lat &&
-      locationInfo.geoLocation.lng
+      locationInfo.geoLocation.lng && (
+        !input.visibleMandatoryChild?.visible ||
+        input.visibleMandatoryChild.visible('geoLocation')
+      ) && (
+        !parentInput?.visibleMandatoryChild?.visible ||
+        parentInput.visibleMandatoryChild.visible('geoLocation')
+      )
     ) {
       this.dialogV2Service
         .showConfirmDialog({
@@ -616,6 +762,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           }
 
           // change location lat & lng
+          const address: AddressModel = input.value.get(parentItemIndex);
           address.geoLocation.lat = locationInfo.geoLocation.lat;
           address.geoLocation.lng = locationInfo.geoLocation.lng;
 
@@ -783,14 +930,30 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop timer
+   */
+  private stopMarkArrayItemsAsDirtyTimer(): void {
+    if (this._markArrayItemsAsDirtyTimer) {
+      clearTimeout(this._markArrayItemsAsDirtyTimer);
+      this._markArrayItemsAsDirtyTimer = undefined;
+    }
+  }
+
+  /**
    * Hack to mark an array of items as dirty since ngModelGroup isn't working with arrays
    */
   markArrayItemsAsDirty(
     form: NgForm,
     groupName: string
   ): void {
+    // stop previous
+    this.stopMarkArrayItemsAsDirtyTimer();
+
     // wait for form to catch up
-    setTimeout(() => {
+    this._markArrayItemsAsDirtyTimer = setTimeout(() => {
+      // reset
+      this._markArrayItemsAsDirtyTimer = undefined;
+
       // determine inputs that should become dirty
       Object.keys(form.controls)
         .filter((name) => name.startsWith(`${groupName}[`) || name === groupName)
@@ -905,6 +1068,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // search
     this.expandListSearchValueTimeout = setTimeout(() => {
       // reset
+      this.expandListSearchValueTimeout = undefined;
       this.expandListPageIndex = 0;
 
       // search
@@ -1012,15 +1176,20 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     if (instant) {
       tab.definition.refresh(tab);
     } else {
-      tab.definition.previousRefreshRequest = setTimeout(() => {
-        // applies only for records lists
-        if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
-          return;
-        }
+      tab.definition.previousRefreshRequest = setTimeout((function(localTab) {
+        return () => {
+          // reset
+          (localTab.definition as ICreateViewModifyV2TabTableRecordsList).previousRefreshRequest = undefined;
 
-        // refresh
-        tab.definition.refresh(tab);
-      }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
+          // applies only for records lists
+          if (localTab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+            return;
+          }
+
+          // refresh
+          localTab.definition.refresh(tab);
+        };
+      })(tab), Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
     }
   }
 
@@ -1176,7 +1345,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // initialize query paginator
     tab.definition.queryBuilder.paginator.setPage({
-      pageSize: tab.definition.queryBuilder.paginator.limit,
+      pageSize: tab.definition.queryBuilder.paginator.limit ?
+        tab.definition.queryBuilder.paginator.limit :
+        Constants.DEFAULT_PAGE_SIZE,
       pageIndex: 0
     }, true);
 
@@ -1230,7 +1401,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // initialize query paginator
     tab.definition.queryBuilder.paginator.setPage({
-      pageSize: tab.definition.queryBuilder.paginator.limit,
+      pageSize: tab.definition.queryBuilder.paginator.limit ?
+        tab.definition.queryBuilder.paginator.limit :
+        Constants.DEFAULT_PAGE_SIZE,
       pageIndex: 0
     }, true);
 
@@ -1257,8 +1430,33 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // determine render mode
     this.renderMode = determineRenderMode();
 
-    // small screen mode ?
-    this.isSmallScreenMode = determineIfSmallScreenMode();
+    // determine
+    const isSmallScreenMode = determineIfSmallScreenMode();
+
+    // update column definitions only if responsive changes
+    if (isSmallScreenMode !== this.isSmallScreenMode) {
+      // small screen mode ?
+      this.isSmallScreenMode = isSmallScreenMode;
+      this.detectChanges();
+
+      // update table size
+      this.resizeTable();
+
+      // stop previous
+      this.stopResizeTableTimer();
+
+      // wait for html to be rendered since isSmallScreenMode was changed
+      this._resizeTableTimer = setTimeout(() => {
+        // reset
+        this._resizeTableTimer = undefined;
+
+        // update
+        this.resizeTable();
+      });
+    } else {
+      // update table size
+      this.resizeTable();
+    }
   }
 
   /**
@@ -1440,27 +1638,50 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop timer
+   */
+  private stopDetectChangesTimer(): void {
+    if (this._detectChangesTimer) {
+      clearTimeout(this._detectChangesTimer);
+      this._detectChangesTimer = undefined;
+    }
+  }
+
+  /**
    * Configure tabs
    */
   configureTabs(): void {
     // construct list of configurable inputs
     const inputs: V2SideDialogConfigInput[] = [];
 
-    // order tabs
-    inputs.push(
-      {
-        type: V2SideDialogConfigInputType.DIVIDER,
-        placeholder: 'LNG_COMMON_LABEL_TABS_ORDER'
-      },
-      {
-        type: V2SideDialogConfigInputType.SORT_LIST,
-        name: 'sortedItems',
-        items: this.tabData.tabs.map((tab) => ({
-          label: tab.label,
-          value: tab.name || tab.label
-        }))
-      }
-    );
+    // do we have custom tab configuration ?
+    if (this.tabConfiguration?.inputs?.length) {
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.GROUP,
+          name: 'tabConfig',
+          inputs: _.cloneDeep(this.tabConfiguration.inputs)
+        }
+      );
+    }
+
+    // is tab ordering enabled ?
+    if (this.enableTabReorder) {
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TABS_ORDER'
+        },
+        {
+          type: V2SideDialogConfigInputType.SORT_LIST,
+          name: 'sortedItems',
+          items: this.tabData.tabs.map((tab) => ({
+            label: tab.label,
+            value: tab.name || tab.label
+          }))
+        }
+      );
+    }
 
     // display dialog
     this.dialogV2Service
@@ -1490,38 +1711,89 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         // show loading while saving the new order
         response.handler.loading.show();
 
-        // determine tabs order
-        const tabsOrder: string[] = (response.data.map.sortedItems as IV2SideDialogConfigInputSortList).items
-          .map((item) => item.value);
+        // finish handler
+        const finished = () => {
+          // close dialog
+          response.handler.hide();
+        };
 
-        // update settings
-        this.authDataService
-          .updateSettingsForCurrentUser({
-            [`${this.pageSettingsKey}.${AppCreateViewModifyV2Component.GENERAL_SETTINGS_TAB_ORDER}`]: tabsOrder
-          })
-          .pipe(
-            catchError((err) => {
-              // error
-              this.toastV2Service.error(err);
+        // handle tab custom configuration
+        const handleConfSettings = () => {
+          // there is no point in continuing if we don't have custom tab configuration ?
+          if (!this.tabConfiguration?.inputs?.length) {
+            finished();
+            return;
+          }
 
-              // send error down the road
-              return throwError(err);
-            })
-          )
-          .subscribe(() => {
-            // update settings
-            this.loadPageSettings();
-
-            // hack to fix tab drawing issue when you move a tab before teh selected tab
-            this.loadingPage = true;
-            setTimeout(() => {
-              this.loadingPage = false;
-              this.detectChanges();
-            });
-
-            // close
-            response.handler.hide();
+          // map inputs
+          const confInputs = (response.data.map.tabConfig as IV2SideDialogConfigInputGroup).inputs;
+          const confDataMap: IV2SideDialogConfigInputMap = {};
+          confInputs.forEach((item) => {
+            confDataMap[item.name] = item;
           });
+          const confData: IV2SideDialogData = {
+            inputs: confInputs,
+            map: confDataMap,
+            echo: null
+          };
+
+          // update tab configuration values to those that were applied
+          this.tabConfiguration.inputs = confInputs;
+
+          // handle tab custom configuration
+          this.tabConfiguration.apply(
+            confData,
+            () => {
+              finished();
+            }
+          );
+        };
+
+        // is tab ordering enabled ?
+        if (this.enableTabReorder) {
+          // determine tabs order
+          const tabsOrder: string[] = (response.data.map.sortedItems as IV2SideDialogConfigInputSortList).items
+            .map((item) => item.value);
+
+          // update settings
+          this.authDataService
+            .updateSettingsForCurrentUser({
+              [`${this.pageSettingsKey}.${AppCreateViewModifyV2Component.GENERAL_SETTINGS_TAB_ORDER}`]: tabsOrder
+            })
+            .pipe(
+              catchError((err) => {
+                // error
+                this.toastV2Service.error(err);
+
+                // send error down the road
+                return throwError(err);
+              })
+            )
+            .subscribe(() => {
+              // update settings
+              this.loadPageSettings();
+
+              // not really necessary
+              this.stopDetectChangesTimer();
+
+              // hack to fix tab drawing issue when you move a tab before the selected tab
+              this.loadingPage = true;
+              this._detectChangesTimer = setTimeout(() => {
+                // reset
+                this._detectChangesTimer = undefined;
+
+                // update
+                this.loadingPage = false;
+                this.detectChanges();
+              });
+
+              // handle custom tab configuration inputs
+              handleConfSettings();
+            });
+        } else {
+          // handle custom tab configuration inputs
+          handleConfSettings();
+        }
       });
   }
 }

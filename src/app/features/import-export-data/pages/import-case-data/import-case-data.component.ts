@@ -51,6 +51,7 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
     'documents[]': 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
     'dateRanges[]': 'LNG_CASE_FIELD_LABEL_DATE_RANGES',
     'vaccinesReceived[]': 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED',
+    'age': 'LNG_CASE_FIELD_LABEL_AGE',
 
     // !must be empty token - logic depends on it!
     'addresses[].geoLocation': ''
@@ -59,10 +60,13 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
   addressFields = {
     'addresses[].locationId': true,
     'dateRanges[].locationId': true,
+    'deathLocationId': true,
     'burialLocationId': true
   };
 
-  requiredDestinationFields;
+  requiredDestinationFields: string[] = [
+    'firstName'
+  ];
 
   formatDataBeforeUse = QuestionModel.formatQuestionnaireImportDefs;
 
@@ -92,18 +96,6 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
         if (selectedOutbreak && selectedOutbreak.id) {
           // outbreak
           this.selectedOutbreak = selectedOutbreak;
-
-          // set default required fields
-          this.requiredDestinationFields = [
-            'firstName',
-            'dateOfReporting',
-            'classification'
-          ];
-
-          // is dateOfOnset required for this outbreak ?
-          if (this.selectedOutbreak.isDateOfOnsetRequired) {
-            this.requiredDestinationFields.push('dateOfOnset');
-          }
 
           // set URLs
           this.importFileUrl = `outbreaks/${selectedOutbreak.id}/importable-files`;

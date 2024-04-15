@@ -7,6 +7,7 @@
   font-size: 1.2rem;
 
   .mat-paginator-container {
+    flex-wrap: nowrap;
     min-height: 4.8rem;
     padding: 0.8rem;
   }
@@ -15,6 +16,12 @@
   .mat-paginator-page-size {
     @include flex_align_items(center);
     margin-right: 0;
+
+    .mat-paginator-page-size-label {
+      @include breakpoint('xxs') {
+        display: none;
+      }
+    }
 
     .mat-paginator-page-size-select {
       height: auto;
@@ -58,6 +65,10 @@
 
   .mat-paginator-range-label {
     margin: 0 2.4rem;
+
+    @include breakpoint('xxs') {
+      margin: 0 0.8rem;
+    }
   }
 
   /* Pagination nav buttons */

@@ -2,13 +2,8 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { TranslateService } from '@ngx-translate/core';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -24,13 +19,14 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -62,6 +58,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     outcomeId: ILabelValuePairModel[],
     dateOfOutcome: ILabelValuePairModel[],
     transferRefused: ILabelValuePairModel[],
+    deathLocationId: ILabelValuePairModel[],
     safeBurial: ILabelValuePairModel[],
     dateOfBurial: ILabelValuePairModel[],
     burialLocationId: ILabelValuePairModel[],
@@ -83,25 +80,22 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected caseDataService: CaseDataService,
-    protected translateService: TranslateService,
-    protected toastV2Service: ToastV2Service,
-    protected dialogV2Service: DialogV2Service,
+    protected renderer2: Renderer2,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected router: Router,
     protected entityDataService: EntityDataService,
     protected outbreakDataService: OutbreakDataService,
-    protected locationDataService: LocationDataService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     super(
-      toastV2Service,
-      renderer2,
-      redirectService,
+      authDataService,
       activatedRoute,
-      authDataService
+      renderer2,
+      personAndRelatedHelperService.redirectService,
+      personAndRelatedHelperService.toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
 
     // retrieve cases ids
@@ -225,6 +219,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               mergeRecords,
               'transferRefused'
             ).options,
+            deathLocationId: this.getFieldOptions(
+              mergeRecords,
+              'deathLocationId'
+            ).options,
             safeBurial: this.getFieldOptions(
               mergeRecords,
               'safeBurial'
@@ -260,14 +258,14 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             questionnaireAnswers: mergeRecords
               .filter((item) => (item.model as CaseModel).questionnaireAnswers && Object.keys((item.model as CaseModel).questionnaireAnswers).length > 0)
               .map((item, index) => ({
-                label: `${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE')} ${index + 1}`,
+                label: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE')} ${index + 1}`,
                 value: index,
                 data: (item.model as CaseModel).questionnaireAnswers
               })),
             questionnaireHistoryAnswers: mergeRecords
               .filter((item) => (item.model as CaseModel).questionnaireAnswersContact && Object.keys((item.model as CaseModel).questionnaireAnswersContact).length > 0)
               .map((item, index) => ({
-                label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()} ${index + 1}`,
+                label: `${this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()} ${index + 1}`,
                 value: index,
                 data: (item.model as CaseModel).questionnaireAnswersContact
               })),
@@ -343,6 +341,9 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           data.transferRefused = this._uniqueOptions.transferRefused.length === 1 ?
             this._uniqueOptions.transferRefused[0].value :
             data.transferRefused;
+          data.deathLocationId = this._uniqueOptions.deathLocationId.length === 1 ?
+            this._uniqueOptions.deathLocationId[0].value :
+            data.deathLocationId;
           data.safeBurial = this._uniqueOptions.safeBurial.length === 1 ?
             this._uniqueOptions.safeBurial[0].value :
             data.safeBurial;
@@ -376,6 +377,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
 
           // reset data if not decease
           if (data.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
+            data.deathLocationId = null;
             data.safeBurial = null;
             data.dateOfBurial = null;
             data.burialLocationId = null;
@@ -436,11 +438,20 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
 
             // determine addresses
             ((item.model as CaseModel).addresses || []).forEach((address) => {
+              // create a full address with all fields (filter is used to remove empty strings or undefined values)
+              const addressFields = [
+                address.fullAddress,
+                address.locationId,
+                address.postalCode,
+                address.emailAddress,
+                address.phoneNumber,
+                address.geoLocation?.lat,
+                address.geoLocation?.lng
+              ].map((e) => e ? e.toString().trim() : e)
+                .filter((e) => e);
+
               // add to list ?
-              if (
-                address.locationId ||
-                address.fullAddress
-              ) {
+              if (addressFields.length) {
                 // current address ?
                 // if we have multiple current addresses then we change them to previously addresses and keep the freshest one by address.date
                 if (address.typeId === AddressType.CURRENT_ADDRESS) {
@@ -450,7 +461,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                       // address is newer?
                       if (
                         !currentAddress.date ||
-                        moment(currentAddress.date).isBefore(moment(address.date))
+                        LocalizationHelper.toMoment(currentAddress.date).isBefore(LocalizationHelper.toMoment(address.date))
                       ) {
                         currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
                         data.addresses.push(currentAddress);
@@ -505,7 +516,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           }
 
           // must retrieve locations ?
-          if (this._uniqueOptions.burialLocationId.length < 1) {
+          if (
+            this._uniqueOptions.deathLocationId.length < 1 &&
+            this._uniqueOptions.burialLocationId.length < 1
+          ) {
             // nope, we have everything
             subscriber.next(data);
             subscriber.complete();
@@ -514,6 +528,13 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             const locationIdsMap: {
               [locationId: string]: true
             } = {};
+
+            // death location
+            this._uniqueOptions.deathLocationId.forEach((item) => {
+              locationIdsMap[item.value] = true;
+            });
+
+            // burial location
             this._uniqueOptions.burialLocationId.forEach((item) => {
               locationIdsMap[item.value] = true;
             });
@@ -532,7 +553,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             );
 
             // retrieve locations
-            this.locationDataService
+            this.personAndRelatedHelperService.locationDataService
               .getLocationsList(qbLocations)
               .pipe(
                 catchError((err) => {
@@ -547,6 +568,13 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                 } = {};
                 locations.forEach((location) => {
                   locationsMap[location.id] = location;
+                });
+
+                // replace death location labels
+                this._uniqueOptions.deathLocationId.forEach((item) => {
+                  item.label = locationsMap[item.value] ?
+                    locationsMap[item.value].name :
+                    item.label;
                 });
 
                 // replace burial location labels
@@ -604,6 +632,11 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
       }
     ];
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -772,7 +805,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'visualId',
               placeholder: () => 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-              description: () => this.translateService.instant(
+              description: () => this.personAndRelatedHelperService.i18nService.instant(
                 'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this.selectedOutbreak.caseIdMask
               ),
@@ -797,7 +830,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               },
               replace: {
                 condition: () => !UserModel.canListForFilters(this.authUser),
-                html: this.translateService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -830,6 +863,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -863,6 +900,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                     }
                   }
                 }
+              },
+              visibleMandatoryChild: {
+                visible: () => true,
+                mandatory: () => false
               }
             }
           ]
@@ -912,7 +953,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               }
             },
             validators: {
-              required: () => !!this.selectedOutbreak.isDateOfOnsetRequired
+              required: () => this.selectedOutbreak?.visibleAndMandatoryFields &&
+                this.selectedOutbreak.visibleAndMandatoryFields[this.personAndRelatedHelperService.case.visibleMandatoryKey]?.dateOfOnset?.mandatory
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -976,6 +1018,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
 
                 // reset data if not decease
                 if (this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
+                  this.itemData.deathLocationId = null;
                   this.itemData.safeBurial = null;
                   this.itemData.dateOfBurial = null;
                   this.itemData.burialLocationId = null;
@@ -1006,6 +1049,21 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               set: (value) => {
                 this.itemData.transferRefused = value as any;
               }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'deathLocationId',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
+            description: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID_DESCRIPTION',
+            options: this._uniqueOptions.deathLocationId,
+            value: {
+              get: () => this.itemData.deathLocationId,
+              set: (value) => {
+                this.itemData.deathLocationId = value;
+              }
+            },
+            disabled: () => {
+              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -1153,7 +1211,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: '_selectedQuestionnaireHistoryAnswers',
-              placeholder: () => `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()}`,
+              placeholder: () => `${this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()}`,
               options: this._uniqueOptions.questionnaireHistoryAnswers,
               value: {
                 get: () => this._selectedQuestionnaireHistoryAnswers as any,
@@ -1226,6 +1284,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         },
@@ -1258,6 +1320,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                   }
                 }
               }
+            },
+            visibleMandatoryChild: {
+              visible: () => true,
+              mandatory: () => false
             }
           }]
         }
@@ -1298,7 +1364,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       name: 'questionnaire_as_contact',
-      label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT)} ${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersContact',
@@ -1438,8 +1504,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
         mergeRecords,
-        this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-        this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+        this.personAndRelatedHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.personAndRelatedHelperService.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
       );
       case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);

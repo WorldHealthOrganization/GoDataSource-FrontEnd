@@ -108,6 +108,27 @@ a.mat-icon-button {
     }
   }
 
+  &.mat-white {
+    background-color: var(--gd-background);
+    border: 0.1rem solid var(--gd-secondary);
+    color: var(--gd-primary);
+
+    &.mat-button-disabled {
+      background-color: var(--gd-background);
+      color: var(--gd-secondary);
+    }
+  }
+
+  &.gd-form-select-single-v2-suffix-button-no-click {
+    &:hover {
+      cursor: default;
+
+      .mat-button-focus-overlay {
+        @include opacity(0);
+      }
+    }
+  }
+
   .mat-button-wrapper {
     @include flex(flex);
     @include flex_align_items(center);

@@ -17,6 +17,7 @@
       padding-bottom: 0;
 
       .mat-form-field-flex {
+        @include flex_align_items(center);
         margin-top: 0;
         padding: 0 1.6rem;
 
@@ -70,7 +71,7 @@
         /* Timepicker input prefix */
         .mat-form-field-prefix {
           left: -0.4rem;
-          top: 0.5rem;
+          top: 0.2rem;
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
@@ -119,7 +120,7 @@
         .mat-form-field-suffix {
           @include flex(flex);
           @include flex_align_items(center);
-          top: 0.3rem;
+          top: 0;
 
           .mat-progress-spinner {
             margin-right: 0.4rem;
@@ -197,7 +198,7 @@
               color: var(--gd-secondary);
             }
           }
-  
+
           .mat-form-field-infix {
             .mat-form-field-label-wrapper {
               .mat-form-field-label {
@@ -205,7 +206,7 @@
               }
             }
           }
-  
+
           .mat-form-field-suffix {
             .mat-icon {
               color: var(--gd-secondary);
@@ -239,9 +240,55 @@
 }
 
 /* Timepicker Clock */
-.timepicker.gd-form-timepicker-v2-panel {
-  --button-color: #2F7977;
-  --dial-background-color: #2F7977;
-  --dial-editable-active-color: #2F7977;
-  --clock-hand-color: #2F7977;
+.ngx-mat-timepicker-dialog {
+  --timepicker-active-color: var(--gd-primary);
+  --timepicker-button-color: var(--gd-primary);
+
+  @include border-radius(0.8rem);
+
+  .mat-dialog-container {
+    background: var(--gd-background);
+    @include border-radius(0.8rem);
+    padding: 2.4rem;
+
+    .gd-form-timepicker-v2-panel {
+      .timepicker-dial__time {
+        line-height: 1;
+      }
+
+      .mat-toolbar {
+        background: var(--timepicker-active-color);
+        color: var(--gd-background);
+      }
+
+      .mat-flat-button,
+      .mat-raised-button,
+      .mat-fab,
+      .mat-mini-fab {
+        &.mat-primary {
+          background-color: var(--timepicker-button-color);
+        }
+      }
+    }
+
+    .mat-dialog-actions {
+      min-height: 0;
+
+      .mat-button {
+        color: var(--timepicker-button-color);
+
+        .mat-button-focus-overlay {
+          background-color: var(--timepicker-button-color);
+        }
+
+        &:hover {
+          &:not(.mat-button-disabled) {
+            .mat-button-focus-overlay {
+              @include opacity(0.2);
+            }
+          }
+        }
+      }
+    }
+  }
 }

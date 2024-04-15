@@ -12,6 +12,12 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { ContactOfContactChronology } from './typings/contact-of-contact-chronology';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import { forkJoin } from 'rxjs';
+import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 @Component({
   selector: 'app-view-chronology-contact-of-contact',
@@ -35,7 +41,9 @@ export class ViewChronologyContactOfContactComponent implements OnInit {
     private contactOfContactDataService: ContactsOfContactsDataService,
     private outbreakDataService: OutbreakDataService,
     private relationshipDataService: RelationshipDataService,
-    private authDataService: AuthDataService
+    private authDataService: AuthDataService,
+    private followUpsDataService: FollowUpsDataService,
+    private labResultDataService: LabResultDataService
   ) {}
 
   /**
@@ -59,25 +67,54 @@ export class ViewChronologyContactOfContactComponent implements OnInit {
               // initialize page breadcrumbs
               this.initializeBreadcrumbs();
 
-              const qb = new RequestQueryBuilder();
-              qb.include('people', true);
+              // build query to get the followUps for specified contact
+              // - used by both follow-ups and lab results
+              const qb = new RequestQueryBuilder;
+              qb.filter.byEquality(
+                'personId',
+                this.contactOfContactData.id
+              );
 
-              if (this.contactOfContactData) {
+              // build query to get the people for all relationships
+              const qqb = new RequestQueryBuilder();
+              qqb.include('people', true);
+
+              forkJoin([
                 // get relationships
                 this.relationshipDataService
                   .getEntityRelationships(
                     selectedOutbreak.id,
                     this.contactOfContactData.type,
                     this.contactOfContactData.id,
+                    qqb
+                  ),
+
+                // get follow-ups
+                this.followUpsDataService.getFollowUpsList(selectedOutbreak.id, qb),
+
+                // lab sample taken and lab result dates
+                this.labResultDataService
+                  .getOutbreakLabResults(
+                    selectedOutbreak.id,
                     qb
-                  ).subscribe((relationshipsData) => {
-                    // set data
-                    this.chronologyEntries = ContactOfContactChronology.getChronologyEntries(
-                      this.contactOfContactData,
-                      relationshipsData
-                    );
-                  });
-              }
+                  )
+              ]).subscribe(([
+                relationshipData,
+                followUps,
+                labResults
+              ]: [
+                RelationshipModel[],
+                FollowUpModel[],
+                LabResultModel[]
+              ]) => {
+                // set data
+                this.chronologyEntries = ContactOfContactChronology.getChronologyEntries(
+                  this.contactOfContactData,
+                  relationshipData,
+                  followUps,
+                  labResults
+                );
+              });
             });
         });
     });

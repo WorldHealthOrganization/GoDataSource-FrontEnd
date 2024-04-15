@@ -70,7 +70,7 @@
         /* Form textarea prefix */
         .mat-form-field-prefix {
           left: -0.4rem;
-          top: 0.5rem;
+          top: 0.2rem;
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
@@ -119,8 +119,6 @@
 
         /* Form textarea suffix */
         .mat-form-field-suffix {
-          top: 0.3rem;
-
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
             font-size: 1.6rem;

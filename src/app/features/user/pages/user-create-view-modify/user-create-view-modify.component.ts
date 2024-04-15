@@ -2,20 +2,16 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType, CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputSingleSelect
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { PhoneNumberType, UserModel } from '../../../../core/models/user.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -23,6 +19,16 @@ import { RequestFilterGenerator } from '../../../../core/helperClasses/request-q
 import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { LanguageModel } from '../../../../core/models/language.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import * as _ from 'lodash';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
 
 /**
  * Component
@@ -39,22 +45,24 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected userDataService: UserDataService,
-    protected translateService: TranslateService,
     protected router: Router,
-    protected dialogV2Service: DialogV2Service,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected dialogV2Service: DialogV2Service
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -146,7 +154,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_USER_TITLE', {
             name: this.itemData.name
           }
@@ -156,7 +164,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_USER_TITLE', {
             name: this.itemData.name
           }
@@ -165,6 +173,11 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -180,8 +193,8 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -215,7 +228,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
    * Initialize tabs - Details
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return {
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       name: 'details',
       label: this.isCreate ?
@@ -364,6 +377,9 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
                 set: (value) => {
                   // set data
                   this.itemData.outbreakIds = value;
+
+                  // update visible active outbreaks
+                  (tab.nameToInput.activeOutbreakId as ICreateViewModifyV2TabInputSingleSelect).options = this.getAllowedActiveOutbreaks();
                 }
               },
               options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -372,7 +388,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               },
               replace: {
                 condition: () => !OutbreakModel.canList(this.authUser),
-                html: this.translateService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ALL_OUTBREAKS')
+                html: this.i18nService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ALL_OUTBREAKS')
               }
             },
             {
@@ -387,14 +403,28 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
                   this.itemData.activeOutbreakId = value;
                 }
               },
-              options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: this.getAllowedActiveOutbreaks(),
               disabled: (): boolean => {
                 return !OutbreakModel.canList(this.authUser);
               },
               replace: {
                 condition: () => !OutbreakModel.canList(this.authUser),
-                html: this.translateService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ACTIVE_OUTBREAK')
+                html: this.i18nService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ACTIVE_OUTBREAK')
               }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'languageId',
+              placeholder: () => 'LNG_USER_FIELD_LABEL_LANGUAGE',
+              description: () => 'LNG_USER_FIELD_LABEL_LANGUAGE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.languageId,
+                set: (value) => {
+                  // set data
+                  this.itemData.languageId = value;
+                }
+              },
+              options: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options
             }
           ]
         },
@@ -447,6 +477,9 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
         }
       ]
     };
+
+    // finished
+    return tab;
   }
 
   /**
@@ -490,9 +523,18 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_COMMON_LABEL_DETAILS',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser, [{
+                    type: V2SideDialogConfigInputType.KEY_VALUE,
+                    name: 'lastLogin',
+                    placeholder: 'LNG_USER_FIELD_LABEL_LAST_LOGIN',
+                    value: this.itemData.lastLogin ?
+                      LocalizationHelper.displayDateTime(this.itemData.lastLogin) :
+                      '—'
+                  }]
                 );
               }
             }
@@ -579,10 +621,14 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
     this.expandListAdvancedFilters = UserModel.generateAdvancedFilters({
       authUser: this.authUser,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        language: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }
@@ -615,5 +661,32 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
+  }
+
+  /**
+   * Determine allowed active outbreaks
+   */
+  private getAllowedActiveOutbreaks(): ILabelValuePairModel[] {
+    // map allowed outbreaks
+    const allowed: {
+      [outbreakId: string]: true
+    } = {};
+    this.itemData.outbreakIds?.forEach((outbreakId) => {
+      allowed[outbreakId] = true;
+    });
+
+    // all allowed ?
+    const allAllowed: boolean = Object.keys(allowed).length < 1;
+
+    // create list of options
+    const optionsClone: ILabelValuePairModel[] = _.cloneDeep((this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options);
+
+    // disable those to which we shouldn't have access
+    optionsClone.forEach((item) => {
+      item.disabled = !allAllowed && !allowed[item.value];
+    });
+
+    // finished
+    return optionsClone;
   }
 }

@@ -24,17 +24,32 @@ import { ExposureDurationDataResolver } from '../../core/services/resolvers/data
 import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
+import { DailyFollowUpStatusDataResolver } from '../../core/services/resolvers/data/daily-follow-up-status.resolver';
+import { LabNameDataResolver } from '../../core/services/resolvers/data/lab-name.resolver';
+import { LabSampleTypeDataResolver } from '../../core/services/resolvers/data/lab-sample-type.resolver';
+import { LabTestTypeDataResolver } from '../../core/services/resolvers/data/lab-test-type.resolver';
+import { LabTestResultDataResolver } from '../../core/services/resolvers/data/lab-test-result.resolver';
+import { LabProgressDataResolver } from '../../core/services/resolvers/data/lab-progress.resolver';
+import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers/data/lab-sequence-laboratory.resolver';
+import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
+import { FollowUpCreatedAsDataResolver } from '../../core/services/resolvers/data/follow-up-created-as.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
   component: fromPages.ContactsOfContactsCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     outbreak: SelectedOutbreakDataResolver,
     gender: GenderDataResolver,
     pregnancy: PregnancyStatusDataResolver,
     occupation: OccupationDataResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     documentType: DocumentTypeDataResolver,
     addressType: AddressTypeDataResolver,
     risk: RiskDataResolver,
@@ -48,7 +63,18 @@ const createViewModifyFoundation: Route = {
     exposureDuration: ExposureDurationDataResolver,
     contextOfTransmission: ContextOfTransmissionDataResolver,
     yesNoAll: YesNoAllDataResolver,
-    entity: RelationshipPersonDataResolver
+    yesNo: YesNoDataResolver,
+    labName: LabNameDataResolver,
+    labSampleType: LabSampleTypeDataResolver,
+    labTestType: LabTestTypeDataResolver,
+    labTestResult: LabTestResultDataResolver,
+    labResultProgress: LabProgressDataResolver,
+    labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
+    labSequenceResult: LabSequenceResultDataResolver,
+    entity: RelationshipPersonDataResolver,
+    team: TeamDataResolver,
+    dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
+    followUpCreatedAs: FollowUpCreatedAsDataResolver
   }
 };
 
@@ -59,11 +85,18 @@ const routes: Routes = [
     path: '',
     component: fromPages.ContactsOfContactsListComponent,
     resolve: {
+      createdOn: CreatedOnResolver,
       risk: RiskDataResolver,
       user: UserDataResolver,
       gender: GenderDataResolver,
       yesNoAll: YesNoAllDataResolver,
-      occupation: OccupationDataResolver
+      yesNo: YesNoDataResolver,
+      occupation: OccupationDataResolver,
+      pregnancy: PregnancyStatusDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver,
+      vaccine: VaccineDataResolver,
+      vaccineStatus: VaccineStatusDataResolver
     }
   },
   // Create contact of contact
@@ -106,45 +139,53 @@ const routes: Routes = [
   // Bulk Add Contacts of Contacts
   {
     path: 'create-bulk',
-    component: fromPages.BulkCreateContactsOfContactsComponent,
+    component: fromPages.ContactsOfContactsBulkCreateModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ],
     resolve: {
+      entity: RelationshipPersonDataResolver,
       gender: GenderDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       occupation: OccupationDataResolver,
-      risk: RiskDataResolver,
       documentType: DocumentTypeDataResolver,
+      yesNo: YesNoDataResolver,
+      risk: RiskDataResolver,
       certaintyLevel: CertaintyLevelDataResolver,
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
-      contextOfTransmission: ContextOfTransmissionDataResolver
+      contextOfTransmission: ContextOfTransmissionDataResolver,
+      cluster: ClusterDataResolver
     }
   },
   // Bulk Modify Contacts of Contacts
   {
     path: 'modify-bulk',
-    component: fromPages.BulkModifyContactsOfContactsComponent,
+    component: fromPages.ContactsOfContactsBulkCreateModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ],
     resolve: {
       gender: GenderDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       occupation: OccupationDataResolver,
-      risk: RiskDataResolver
+      risk: RiskDataResolver,
+      yesNo: YesNoDataResolver
     }
   },
   // View Contact of contact movement

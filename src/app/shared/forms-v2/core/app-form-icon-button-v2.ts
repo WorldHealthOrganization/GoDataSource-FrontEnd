@@ -6,5 +6,7 @@ export interface IAppFormIconButtonV2 {
 
   // optional
   clickAction?: (input?: AppFormBaseV2<any>) => void;
+  disabled?: (input?: AppFormBaseV2<any>) => boolean;
+  visible?: (input?: AppFormBaseV2<any>) => boolean;
   tooltip?: string;
 }

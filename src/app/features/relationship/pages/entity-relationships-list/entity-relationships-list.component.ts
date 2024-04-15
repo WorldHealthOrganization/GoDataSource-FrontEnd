@@ -6,31 +6,30 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import * as _ from 'lodash';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { TranslateService } from '@ngx-translate/core';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-entity-relationships-list',
   templateUrl: './entity-relationships-list.component.html'
 })
-export class EntityRelationshipsListComponent extends ListComponent<EntityModel> implements OnDestroy {
+export class EntityRelationshipsListComponent extends ListComponent<EntityModel, IV2Column> implements OnDestroy {
   // list of relationships
   private _relationshipsListRecordsMap: {
     [idRelationship: string]: EntityModel
@@ -51,17 +50,17 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
   constructor(
     protected listHelperService: ListHelperService,
     protected activatedRoute: ActivatedRoute,
-    protected relationshipDataService: RelationshipDataService,
-    protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
     protected router: Router,
-    protected dialogV2Service: DialogV2Service,
-    protected entityHelperService: EntityHelperService
+    protected referenceDataHelperService: ReferenceDataHelperService,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
     // parent
     super(
-      listHelperService,
-      true
+      listHelperService, {
+        disableFilterCaching: true,
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
     );
 
     // disable select outbreak
@@ -98,12 +97,11 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
    * Table column - actions
    */
   protected initializeTableColumnActions(): void {
-    this.tableColumnActions = this.entityHelperService.retrieveTableColumnActions({
+    this.tableColumnActions = this.personAndRelatedHelperService.relationship.retrieveTableColumnActions({
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
       selectedOutbreak: () => this.selectedOutbreak,
       entity: this._entity,
       relationshipType: this.relationshipType,
-      authUser: this.authUser,
       refreshList: () => {
         // reload data
         this.needsRefreshList(true);
@@ -115,16 +113,32 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
-    this.tableColumns = this.entityHelperService.retrieveTableColumns({
-      authUser: this.authUser,
+    this.tableColumns = this.personAndRelatedHelperService.relationship.retrieveTableColumns(this.selectedOutbreak, {
       personType: this.activatedRoute.snapshot.data.personType,
       cluster: this.activatedRoute.snapshot.data.cluster,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
@@ -144,14 +158,31 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = this.entityHelperService.generateAdvancedFilters({
+    this.advancedFilters = this.personAndRelatedHelperService.relationship.generateAdvancedFilters(this.selectedOutbreak, {
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+        exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
       }
     });
   }
@@ -165,154 +196,190 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
    * Initialize table group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      // Share
-      {
-        label: {
-          get: () => this.relationshipType === RelationshipType.EXPOSURE ?
-            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_EXPOSURES' :
-            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // determine list of model ids
-            const selectedRecords: string[] = _.map(selected, (idRelationship: string) => this._relationshipsListRecordsMap[idRelationship].model.id)
-              .filter((record, index, self) => {
-                // keep only unique dates
-                return self.indexOf(record) === index;
-              });
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () =>
+        (
+          RelationshipModel.canShare(this.authUser) &&
+          this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) || (
+          this.relationshipType === RelationshipType.CONTACT &&
+          this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].changeSource(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) || (
+          RelationshipModel.canBulkDelete(this.authUser) &&
+          this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
+      actions: [
+        // Share
+        {
+          label: {
+            get: () => this.relationshipType === RelationshipType.EXPOSURE ?
+              'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_EXPOSURES' :
+              'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // determine list of model ids
+              const selectedRecords: string[] = _.map(selected, (idRelationship: string) => this._relationshipsListRecordsMap[idRelationship].model.id)
+                .filter((record, index, self) => {
+                  // keep only unique dates
+                  return self.indexOf(record) === index;
+                });
 
-            // redirect to next step
-            this.router.navigate(
-              [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/share`],
-              {
-                queryParams: {
-                  selectedTargetIds: JSON.stringify(selectedRecords)
-                }
-              }
-            );
-          }
-        },
-        visible: (): boolean => {
-          return RelationshipModel.canShare(this.authUser) &&
-            this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser) &&
-            this.selectedOutbreakIsActive;
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-
-      // Change source
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // pass the selected target persons for not including them in available peoples
-            const selectedTargetPersons = {};
-            _.forEach(this._relationshipsListRecordsMap, (model) => {
-              const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
-              selectedTargetPersons[targetPerson.id] = true;
-            });
-
-            // redirect
-            this.router.navigate(
-              [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/switch`],
-              {
-                queryParams: {
-                  selectedTargetIds: JSON.stringify(selected),
-                  selectedPersonsIds: JSON.stringify(Object.keys(selectedTargetPersons))
-                }
-              }
-            );
-          }
-        },
-        visible: (): boolean => {
-          return this.relationshipType === RelationshipType.CONTACT &&
-            this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].changeSource(this.authUser) &&
-            this.selectedOutbreakIsActive;
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-
-      // Bulk delete
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // create query
-            const qb = new RequestQueryBuilder();
-            qb.filter.where({
-              id: {
-                inq: selected
-              }
-            });
-
-            // ask for confirmation
-            this.dialogV2Service
-              .showConfirmDialog({
-                config: {
-                  title: {
-                    get: () => 'LNG_PAGE_ACTION_DELETE'
-                  },
-                  message: {
-                    get: () => 'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIPS'
+              // redirect to next step
+              this.router.navigate(
+                [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/share`],
+                {
+                  queryParams: {
+                    selectedTargetIds: JSON.stringify(selectedRecords)
                   }
                 }
-              })
-              .subscribe((response) => {
-                // canceled ?
-                if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                  // finished
+              );
+            }
+          },
+          visible: (): boolean => {
+            return RelationshipModel.canShare(this.authUser) &&
+              this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        },
+
+        // Change source
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // pass the selected target persons for not including them in available peoples
+              const selectedTargetPersons = {
+                // exclude entity from which we want to move contacts
+                [this._entity.id]: true
+              };
+              selected.forEach((relationshipId) => {
+                // nothing found - this shouldn't happen
+                if (!this._relationshipsListRecordsMap[relationshipId]) {
                   return;
                 }
 
-                // show loading
-                const loading = this.dialogV2Service.showLoadingDialog();
+                // we always select targets
+                const targetPerson: RelationshipPersonModel = _.find(this._relationshipsListRecordsMap[relationshipId].relationship.persons, 'target');
+                selectedTargetPersons[targetPerson.id] = true;
+              });
 
-                // delete relationships
-                this.relationshipDataService
-                  .deleteBulkRelationships(
-                    this.selectedOutbreak.id,
-                    qb
-                  )
-                  .pipe(
-                    catchError((err) => {
-                      this.toastV2Service.error(err);
+              // redirect
+              this.router.navigate(
+                [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/switch`],
+                {
+                  queryParams: {
+                    selectedTargetIds: JSON.stringify(selected),
+                    selectedPersonsIds: JSON.stringify(Object.keys(selectedTargetPersons))
+                  }
+                }
+              );
+            }
+          },
+          visible: (): boolean => {
+            return this.relationshipType === RelationshipType.CONTACT &&
+              this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].changeSource(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return RelationshipModel.canBulkDelete(this.authUser) &&
+              this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          }
+        },
+
+        // Bulk delete
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS'
+          },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          action: {
+            click: (selected: string[]) => {
+              // create query
+              const qb = new RequestQueryBuilder();
+              qb.filter.where({
+                id: {
+                  inq: selected
+                }
+              });
+
+              // ask for confirmation
+              this.personAndRelatedHelperService.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_DELETE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIPS'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // show loading
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+
+                  // delete relationships
+                  this.personAndRelatedHelperService.relationship.relationshipDataService
+                    .deleteBulkRelationships(
+                      this.selectedOutbreak.id,
+                      qb
+                    )
+                    .pipe(
+                      catchError((err) => {
+                        this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                        // hide loading
+                        loading.close();
+
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe(() => {
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE');
 
                       // hide loading
                       loading.close();
 
-                      return throwError(err);
-                    })
-                  )
-                  .subscribe(() => {
-                    this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS_SUCCESS_MESSAGE');
-
-                    // hide loading
-                    loading.close();
-
-                    this.needsRefreshList(true);
-                  });
-              });
+                      this.needsRefreshList(true);
+                    });
+                });
+            }
+          },
+          visible: (): boolean => {
+            return RelationshipModel.canBulkDelete(this.authUser) &&
+              this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return RelationshipModel.canBulkDelete(this.authUser) &&
-            this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
-            this.selectedOutbreakIsActive;
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**
@@ -334,7 +401,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
       },
       visible: (): boolean => {
         return RelationshipModel.canCreate(this.authUser) &&
-          this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].create(this.authUser) &&
+          this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].create(this.authUser) &&
           this.selectedOutbreakIsActive;
       }
     };
@@ -359,15 +426,15 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
             ['/account/my-profile']
         }
       }, {
-        label: this.entityHelperService.entityMap[this._entity.type].label,
+        label: this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].label,
         action: {
-          link: [this.entityHelperService.entityMap[this._entity.type].link]
+          link: [this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link]
         }
       }, {
         label: this._entity.name,
         action: {
           link: [
-            this.entityHelperService.entityMap[this._entity.type].link,
+            this.personAndRelatedHelperService.relationship.entityMap[this._entity.type].link,
             this._entity.id,
             'view'
           ]
@@ -393,7 +460,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
    */
   refreshList(): void {
     // request data
-    this.records$ = this.entityHelperService
+    this.records$ = this.personAndRelatedHelperService.relationship
       .retrieveRecords(
         this.relationshipType,
         this.selectedOutbreak,
@@ -430,6 +497,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
@@ -440,7 +508,7 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
     }
 
     // count
-    this.entityHelperService
+    this.personAndRelatedHelperService.relationship
       .retrieveRecordsCount(
         this.relationshipType,
         this.selectedOutbreak,

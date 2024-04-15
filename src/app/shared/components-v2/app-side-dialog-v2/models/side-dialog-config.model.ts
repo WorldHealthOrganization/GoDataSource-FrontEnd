@@ -4,12 +4,13 @@ import { NgForm } from '@angular/forms';
 import { Params } from '@angular/router';
 import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
 import { RequestFilterOperator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { SavedFilterData } from '../../../../core/models/saved-filters.model';
-import { Moment } from '../../../../core/helperClasses/x-moment';
 import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
 import { IV2NumberRange } from '../../../forms-v2/components/app-form-number-range-v2/models/number.model';
 import { IV2DateRange } from '../../../forms-v2/components/app-form-date-range-v2/models/date.model';
+import { IAppFormIconButtonV2 } from '../../../forms-v2/core/app-form-icon-button-v2';
+import { Moment } from '../../../../core/helperClasses/localization-helper';
+import { IGeneralAsyncValidatorResponse } from '../../../forms-v2/validators/general-async-validator.directive';
 
 /**
  * Side dialog config
@@ -38,6 +39,7 @@ export enum V2SideDialogConfigInputType {
   LOCATION_MULTIPLE,
   TOGGLE,
   TOGGLE_CHECKBOX,
+  COLOR,
   LINK,
   LINK_WITH_ACTION,
   GROUP,
@@ -46,6 +48,7 @@ export enum V2SideDialogConfigInputType {
   ACCORDION,
   ACCORDION_PANEL,
   KEY_VALUE,
+  KEY_LINK_VALUE,
   HTML,
   FILTER_LIST,
   FILTER_LIST_FILTER,
@@ -112,6 +115,21 @@ export interface IV2SideDialogConfigInputKeyValue extends IV2SideDialogConfigInp
   name: string;
   placeholder: string;
   value: string;
+}
+
+/**
+ * Side dialog input - key - link value
+ */
+export interface IV2SideDialogConfigInputKeyLinkValue extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.KEY_LINK_VALUE;
+  name: string;
+  placeholder: string;
+  link: {
+    label: string,
+    src: string[],
+    params?: Params
+  };
 }
 
 /**
@@ -221,6 +239,7 @@ export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogCon
   validators?: IV2SideDialogConfigInputValidator;
   clearable?: boolean;
   tooltip?: string;
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -289,6 +308,23 @@ export interface IV2SideDialogConfigInputToggleCheckbox extends IV2SideDialogCon
   type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX;
   placeholder: string;
   value: boolean;
+
+  // optional
+  tooltip?: string;
+}
+
+/**
+ * Side dialog input - color
+ */
+export interface IV2SideDialogConfigInputColor extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.COLOR;
+  placeholder: string;
+  value: string;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
+  tooltip?: string;
 }
 
 /**
@@ -504,9 +540,9 @@ export interface IV2SideDialogConfigInputSortList extends IV2SideDialogConfigInp
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputTextarea
 | IV2SideDialogConfigInputTimepicker | IV2SideDialogConfigInputDate | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown
 | IV2SideDialogConfigInputSingleLocation | IV2SideDialogConfigInputMultipleLocation | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputToggleCheckbox
-| IV2SideDialogConfigInputNumber;
+| IV2SideDialogConfigInputNumber | IV2SideDialogConfigInputColor;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputDateRange | IV2SideDialogConfigInputNumberRange
-| IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink
+| IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputKeyLinkValue | IV2SideDialogConfigInputHTML | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink
 | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup | IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow
 | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList | IV2SideDialogConfigInputSortList;
 

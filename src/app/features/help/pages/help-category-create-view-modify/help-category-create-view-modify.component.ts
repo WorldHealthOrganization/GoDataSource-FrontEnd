@@ -2,11 +2,8 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -19,10 +16,13 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-help-category-create-view-modify',
@@ -34,23 +34,24 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
    * Constructor
    */
   constructor(
-    protected router: Router,
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
-    protected helpDataService: HelpDataService,
-    protected translateService: TranslateService,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    protected dialogV2Service: DialogV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
     protected i18nService: I18nService,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected router: Router,
+    protected helpDataService: HelpDataService,
+    protected dialogV2Service: DialogV2Service
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService,
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService,
       true
     );
   }
@@ -143,7 +144,7 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_HELP_CATEGORY_TITLE', {
             name: this.itemData.name
           }
@@ -153,7 +154,7 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_HELP_CATEGORY_TITLE', {
             name: this.itemData.name
           }
@@ -162,6 +163,11 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -177,8 +183,8 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_CATEGORY_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_HELP_CATEGORY_ACTION_CREATE_CATEGORY_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -229,7 +235,7 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
               description: () => 'LNG_HELP_CATEGORY_FIELD_LABEL_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.name ?
-                  this.translateService.instant(this.itemData.name) :
+                  this.i18nService.instant(this.itemData.name) :
                   this.itemData.name,
                 set: (value) => {
                   this.itemData.name = value;
@@ -261,7 +267,7 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
               description: () => 'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
               value: {
                 get: () => this.itemData.description ?
-                  this.translateService.instant(this.itemData.description) :
+                  this.i18nService.instant(this.itemData.description) :
                   this.itemData.description,
                 set: (value) => {
                   this.itemData.description = value;
@@ -315,9 +321,11 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_COMMON_LABEL_DETAILS',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }
@@ -405,7 +413,7 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
       link: (item: HelpCategoryModel) => ['/help/categories', item.id, 'view'],
       get: {
         text: (item: HelpCategoryModel) => item.name ?
-          this.translateService.instant(item.name) :
+          this.i18nService.instant(item.name) :
           item.name
       }
     };

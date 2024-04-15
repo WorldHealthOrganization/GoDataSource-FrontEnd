@@ -25,7 +25,7 @@ export enum IconExtension {
   selector: 'app-manage-icons-create',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './manage-icons-create.component.html',
-  styleUrls: ['./manage-icons-create.component.less']
+  styleUrls: ['./manage-icons-create.component.scss']
 })
 export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements OnInit {
   // breadcrumbs
@@ -242,7 +242,11 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
     this.uploader = new FileUploader({
       allowedMimeType: this.allowedMimeTypes,
       authToken: this.authDataService.getAuthToken(),
-      url: `${environment.apiUrl}/icons`
+      url: `${environment.apiUrl}/icons`,
+      headers: [{
+        name: 'platform',
+        value: 'WEB'
+      }]
     });
 
     // don't allow multiple files to be added

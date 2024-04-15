@@ -8,9 +8,9 @@ import {
   SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-form-toggle-v2',
@@ -32,17 +32,20 @@ export class AppFormToggleV2Component
   // options
   @Input() options: ILabelValuePairModel[];
 
+  // vertical
+  @Input() vertical: boolean;
+
   /**
    * Constructor
    */
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
     super(
       controlContainer,
-      translateService,
+      i18nService,
       changeDetectorRef
     );
   }

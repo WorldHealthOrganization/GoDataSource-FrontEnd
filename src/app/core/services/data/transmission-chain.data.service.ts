@@ -14,7 +14,6 @@ import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { FilteredRequestCache } from '../../helperClasses/filtered-request-cache';
 import { catchError, map } from 'rxjs/operators';
-import { moment } from '../../helperClasses/x-moment';
 import { ContactModel } from '../../models/contact.model';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { EventModel } from '../../models/event.model';
@@ -23,6 +22,9 @@ import { CaseModel } from '../../models/case.model';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { FileSize } from '../../helperClasses/file-size';
 import { EntityModel } from '../../models/entity-and-relationship.model';
+import { IV2DateRange } from '../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
+import { IV2NumberRange } from '../../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
+import { LocalizationHelper } from '../../helperClasses/localization-helper';
 
 export interface IConvertChainToGraphElements {
   nodes: {
@@ -34,6 +36,7 @@ export interface IConvertChainToGraphElements {
   caseNodesWithoutDates: any[];
   contactNodesWithoutDates: any[];
   eventNodesWithoutDates: any[];
+  legend: any;
 }
 
 @Injectable()
@@ -151,7 +154,12 @@ export class TransmissionChainDataService {
       name?: string,
       labSeqResult?: string[],
       classification?: string[],
-      occupation?: string[]
+      occupation?: string[],
+      outcomeId?: string[],
+      gender?: string[],
+      cluster?: string[],
+      age?: IV2NumberRange,
+      date?: IV2DateRange
     }
   ): ITransmissionChainGroupPageModel[] {
     // must filter
@@ -165,6 +173,19 @@ export class TransmissionChainDataService {
       ) || (
         snapshotFilters.occupation &&
         snapshotFilters.occupation.length > 0
+      ) || (
+        snapshotFilters.outcomeId &&
+        snapshotFilters.outcomeId.length > 0
+      ) || (
+        snapshotFilters.gender &&
+        snapshotFilters.gender.length > 0
+      ) || (
+        snapshotFilters.cluster &&
+        snapshotFilters.cluster.length > 0
+      ) || (
+        !!snapshotFilters.age
+      ) || (
+        !!snapshotFilters.date
       )
     );
 
@@ -190,6 +211,19 @@ export class TransmissionChainDataService {
     let snapshotFiltersOccupation: {
       [occupation: string]: true
     };
+    let snapshotFiltersOutcomeId: {
+      [outcomeId: string]: true
+    };
+    let snapshotFiltersGender: {
+      [gender: string]: true
+    };
+    let snapshotFiltersCluster: {
+      [cluster: string]: true
+    };
+    let snapshotFiltersAge: IV2NumberRange;
+    let snapshotFiltersDate: IV2DateRange;
+
+    // filter chains
     if (mustFilterSnapshot) {
       // filter value
       snapshotFiltersName = snapshotFilters.name ? snapshotFilters.name.toLowerCase() : null;
@@ -229,6 +263,69 @@ export class TransmissionChainDataService {
           snapshotFiltersOccupation[occupation] = true;
         });
       }
+
+      // outcomeId
+      snapshotFiltersOutcomeId = null;
+      if (
+        snapshotFilters.outcomeId &&
+        snapshotFilters.outcomeId.length > 0
+      ) {
+        snapshotFiltersOutcomeId = {};
+        snapshotFilters.outcomeId.forEach((outcomeId) => {
+          snapshotFiltersOutcomeId[outcomeId] = true;
+        });
+      }
+
+      // gender
+      snapshotFiltersGender = null;
+      if (
+        snapshotFilters.gender &&
+        snapshotFilters.gender.length > 0
+      ) {
+        snapshotFiltersGender = {};
+        snapshotFilters.gender.forEach((gender) => {
+          snapshotFiltersGender[gender] = true;
+        });
+      }
+
+      // cluster
+      snapshotFiltersCluster = null;
+      if (
+        snapshotFilters.cluster &&
+        snapshotFilters.cluster.length > 0
+      ) {
+        snapshotFiltersCluster = {};
+        snapshotFilters.cluster.forEach((cluster) => {
+          snapshotFiltersCluster[cluster] = true;
+        });
+      }
+
+      // age
+      snapshotFiltersAge = snapshotFilters.age ? snapshotFilters.age : null;
+
+      // date
+      snapshotFiltersDate = snapshotFilters.date ? snapshotFilters.date : null;
+    }
+
+    // map entity to cluster
+    const modelsThatMatchClusterFilter: {
+      [entityId: string]: true
+    } = {};
+    if (
+      snapshotFiltersCluster &&
+      Object.keys(snapshotFiltersCluster).length
+    ) {
+      (chainGroup.relationships || []).forEach((relationship) => {
+        if (
+          relationship.clusterId &&
+          snapshotFiltersCluster[relationship.clusterId] &&
+          relationship.persons.length === 2
+        ) {
+          // add both persons to map
+          modelsThatMatchClusterFilter[relationship.persons[0].id] = true;
+          modelsThatMatchClusterFilter[relationship.persons[1].id] = true;
+        }
+      });
     }
 
     // filter nodes
@@ -262,6 +359,48 @@ export class TransmissionChainDataService {
             !(nodeData.model instanceof EventModel) &&
             nodeData.model.occupation &&
             snapshotFiltersOccupation[nodeData.model.occupation]
+          )
+        ) && (
+          !snapshotFiltersOutcomeId || (
+            nodeData.model instanceof CaseModel &&
+            nodeData.model.outcomeId &&
+            snapshotFiltersOutcomeId[nodeData.model.outcomeId]
+          )
+        ) && (
+          !snapshotFiltersGender || (
+            !(nodeData.model instanceof EventModel) &&
+            nodeData.model.gender &&
+            snapshotFiltersGender[nodeData.model.gender]
+          )
+        ) && (
+          !snapshotFiltersCluster ||
+          modelsThatMatchClusterFilter[nodeData.model.id]
+        ) && (
+          !snapshotFiltersAge ||
+          (
+            !(nodeData.model instanceof EventModel) &&
+            nodeData.model.age &&
+            nodeData.model.age.years && (
+              !snapshotFiltersAge.from || nodeData.model.age.years >= snapshotFiltersAge.from
+            ) && (
+              !snapshotFiltersAge.to || nodeData.model.age.years <= snapshotFiltersAge.to
+            )
+          )
+        ) && (
+          !snapshotFiltersDate || (
+            nodeData.model.dateOfReporting && (
+              (
+                !snapshotFiltersDate.startDate &&
+                LocalizationHelper.toMoment(nodeData.model.dateOfReporting).isSameOrBefore(snapshotFiltersDate.endDate)
+              ) || (
+                !snapshotFiltersDate.endDate &&
+                LocalizationHelper.toMoment(nodeData.model.dateOfReporting).isSameOrAfter(snapshotFiltersDate.startDate)
+              ) || (
+                snapshotFiltersDate.startDate &&
+                snapshotFiltersDate.endDate &&
+                LocalizationHelper.toMoment(nodeData.model.dateOfReporting).isBetween(snapshotFiltersDate.startDate, snapshotFiltersDate.endDate, undefined, '[]')
+              )
+            )
           )
         )
       ) {
@@ -459,7 +598,43 @@ export class TransmissionChainDataService {
       edges: [],
       caseNodesWithoutDates: [],
       contactNodesWithoutDates: [],
-      eventNodesWithoutDates: []
+      eventNodesWithoutDates: [],
+      legend: {}
+    };
+
+    // map chain legend node types
+    const legendNodeTypesMap: {
+      nodeColor: {
+        [categoryType: string]: true // ex: Entity Type, Occupation, Gender
+      },
+      nodeNameColor: {
+        [categoryType: string]: true // ex: Age, Gender, Occupation
+      }
+      nodeIcon: {
+        [categoryType: string]: true // ex: Occupation, Outcome, Risk Level
+      },
+      nodeShape: {
+        [categoryType: string]: true // ex: Classification, Entity Type
+      },
+      edgeColor: {
+        [categoryType: string]: true // ex: Cluster, Context of Transmission
+      },
+      edgeIcon: {
+        [categoryType: string]: true // ex: Cluster, Context of Exposure
+      },
+      labSequenceColor: {
+        [categoryType: string]: true
+      },
+      hasMoreVariantsStrains: boolean,
+    } = {
+      nodeColor: {},
+      nodeNameColor: {},
+      nodeIcon: {},
+      nodeShape: {},
+      edgeColor: {},
+      edgeIcon: {},
+      labSequenceColor: {},
+      hasMoreVariantsStrains: false
     };
 
     const selectedNodeIds: {
@@ -596,6 +771,9 @@ export class TransmissionChainDataService {
           // set node color
           if (!_.isEmpty(colorCriteria.nodeColor)) {
             if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
+              // keep the unique classification type
+              legendNodeTypesMap.nodeColor[node.model[colorCriteria.nodeColorField]] = true;
+
               // set node color
               nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
 
@@ -634,11 +812,15 @@ export class TransmissionChainDataService {
                 colorCriteria.labSequenceColor[nodeLabSequenceResultId] :
                 Constants.DEFAULT_COLOR_CHAINS;
 
+              // keep the unique lab sequence result type
+              legendNodeTypesMap.labSequenceColor[nodeLabSequenceResultId] = true;
+
               // display sequence accordingly
               nodeData.backgroundFill = 'radial-gradient';
 
               // has more ?
               if (node.labResults.length > 1) {
+                colorCriteria.hasMoreVariantsStrains = true;
                 nodeData.backgroundFillStopColors = `${Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR} ${Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR} ${nodeLabSequenceColor} ${nodeLabSequenceColor} ${nodeData.nodeColor} ${nodeData.nodeColor}`;
                 nodeData.backgroundFillStopPositions = '0% 10% 12% 28% 30% 100%';
               } else {
@@ -651,6 +833,9 @@ export class TransmissionChainDataService {
           // set node label color
           if (!_.isEmpty(colorCriteria.nodeNameColor)) {
             if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
+              // keep the unique classification type
+              legendNodeTypesMap.nodeNameColor[node.model[colorCriteria.nodeNameColorField]] = true;
+
               nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
             }
           }
@@ -658,14 +843,29 @@ export class TransmissionChainDataService {
           // set node icon
           if (!_.isEmpty(colorCriteria.nodeIcon)) {
             if (colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]]) {
+              // keep the unique icon type
+              legendNodeTypesMap.nodeIcon[node.model[colorCriteria.nodeIconField]] = true;
+
               nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
             }
           }
           // set node shape
           if (!_.isEmpty(colorCriteria.nodeShape)) {
             if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value) {
+              // keep the unique shape type
+              legendNodeTypesMap.nodeShape[node.type] = true;
+
               nodeData.setNodeShapeType(node);
             } else if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.CLASSIFICATION.value) {
+              if (
+                node.model.type === EntityType.CASE &&
+                node.model instanceof CaseModel &&
+                node.model.classification
+              ) {
+                // keep the unique shape type
+                legendNodeTypesMap.nodeShape[node.model.classification] = true;
+              }
+
               nodeData.setNodeShapeClassification(node);
             }
           }
@@ -698,14 +898,14 @@ export class TransmissionChainDataService {
               node.model instanceof EventModel &&
               node.model.date
             ) {
-              nodeData.label = moment(node.model.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              nodeData.label = LocalizationHelper.displayDate(node.model.date);
             }
             if (
               node.type === EntityType.CASE &&
               node.model instanceof CaseModel &&
               node.model.dateOfOnset
             ) {
-              nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              nodeData.label = LocalizationHelper.displayDate(node.model.dateOfOnset);
             }
             // gender
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
@@ -730,17 +930,18 @@ export class TransmissionChainDataService {
             // location
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
             nodeData.label = '';
-            if (node.type !== EntityType.EVENT) {
-              const mainAddr = node.model.mainAddress;
-              if (
-                mainAddr &&
-                mainAddr.locationId &&
-                locationsListMap[mainAddr.locationId] &&
-                locationsListMap[mainAddr.locationId].name
-              ) {
-                nodeData.label = locationsListMap[mainAddr.locationId].name;
-              }
-            } else {
+            const mainAddr = node.model.mainAddress;
+            if (
+              mainAddr &&
+              mainAddr.locationId &&
+              locationsListMap[mainAddr.locationId] &&
+              locationsListMap[mainAddr.locationId].name
+            ) {
+              nodeData.label = locationsListMap[mainAddr.locationId].name;
+            }
+
+            // put a default value if no location found
+            if (!nodeData.label) {
               nodeData.label = node.model.name;
             }
             // initials
@@ -754,43 +955,21 @@ export class TransmissionChainDataService {
             }
             // visual id
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.VISUAL_ID.value) {
-            if (
-              node.type !== EntityType.EVENT &&
-              !(node.model instanceof EventModel)
-            ) {
-              nodeData.label = node.model.visualId ? node.model.visualId : '';
-            } else {
-              nodeData.label = node.model.name;
-            }
+            nodeData.label = node.model.visualId ? node.model.visualId : '';
             // visual id and location
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
+            // visual id
+            nodeData.label = node.model.visualId ? node.model.visualId : '';
+
+            // location
+            const mainAddr = node.model.mainAddress;
             if (
-              node.type !== EntityType.EVENT &&
-              !(node.model instanceof EventModel)
+              mainAddr &&
+              mainAddr.locationId &&
+              locationsListMap[mainAddr.locationId] &&
+              locationsListMap[mainAddr.locationId].name
             ) {
-              if (node.model.visualId) {
-                nodeData.label = node.model.visualId;
-              }
-              const mainAddr = node.model.mainAddress;
-              if (
-                mainAddr &&
-                mainAddr.locationId &&
-                locationsListMap[mainAddr.locationId] &&
-                locationsListMap[mainAddr.locationId].name
-              ) {
-                nodeData.label = (node.model.visualId ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
-              }
-            } else {
-              nodeData.label = node.model.name;
-              const mainAddr = node.model.mainAddress;
-              if (
-                mainAddr &&
-                mainAddr.locationId &&
-                locationsListMap[mainAddr.locationId] &&
-                locationsListMap[mainAddr.locationId].name
-              ) {
-                nodeData.label = (node.model.name ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
-              }
+              nodeData.label = (node.model.visualId ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
             }
             // concatenated details
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
@@ -828,7 +1007,7 @@ export class TransmissionChainDataService {
               let onset = '';
               if (node.model instanceof CaseModel) {
                 onset = node.model.dateOfOnset ?
-                  '\n' + onsetLabel + ' ' + moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + (node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '') :
+                  '\n' + onsetLabel + ' ' + LocalizationHelper.displayDate(node.model.dateOfOnset) + (node.model.isDateOfOnsetApproximate ? onsetApproximateLabel : '') :
                   '';
               }
               // concatenate results
@@ -840,10 +1019,10 @@ export class TransmissionChainDataService {
 
           // check min / max dates
           if (nodeData.dateTimeline) {
-            if (moment(nodeData.dateTimeline).isAfter(maxTimelineDate) || !maxTimelineDate) {
+            if (LocalizationHelper.toMoment(nodeData.dateTimeline).isAfter(maxTimelineDate) || !maxTimelineDate) {
               maxTimelineDate = nodeData.dateTimeline;
             }
-            if (moment(nodeData.dateTimeline).isBefore(minTimelineDate) || !minTimelineDate) {
+            if (LocalizationHelper.toMoment(nodeData.dateTimeline).isBefore(minTimelineDate) || !minTimelineDate) {
               minTimelineDate = nodeData.dateTimeline;
             }
           }
@@ -853,12 +1032,12 @@ export class TransmissionChainDataService {
       });
 
       // generate checkpoint nodes
-      const counterDate = moment(minTimelineDate);
+      const counterDate = LocalizationHelper.toMoment(minTimelineDate);
       counterDate.subtract(1, 'days');
-      const momentMaxTimelineDate = moment(maxTimelineDate);
+      const momentMaxTimelineDate = LocalizationHelper.toMoment(maxTimelineDate);
       while (counterDate.isBefore(momentMaxTimelineDate)) {
         counterDate.add(1, 'days');
-        const counterDateFormatted = counterDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        const counterDateFormatted = LocalizationHelper.displayDate(counterDate);
         // generate node
         const checkpointNode = new GraphNodeModel({
           dateTimeline: counterDateFormatted,
@@ -896,6 +1075,9 @@ export class TransmissionChainDataService {
       // set colors
       if (!_.isEmpty(colorCriteria.edgeColor)) {
         if (colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]]) {
+          // keep the unique certainty level type
+          legendNodeTypesMap.edgeColor[relationship[colorCriteria.edgeColorField]] = true;
+
           graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
         }
       }
@@ -963,19 +1145,24 @@ export class TransmissionChainDataService {
           sourceDate &&
           targetDate
         ) {
-          const momentTargetDate = moment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-          const momentSourceDate = moment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-          noDays = Math.round(moment.duration(momentTargetDate.diff(momentSourceDate)).asDays());
+          const momentTargetDate = LocalizationHelper.toMoment(targetDate, LocalizationHelper.getDateDisplayFormat());
+          const momentSourceDate = LocalizationHelper.toMoment(sourceDate, LocalizationHelper.getDateDisplayFormat());
+          noDays = Math.round(LocalizationHelper.duration(momentTargetDate.diff(momentSourceDate)).asDays());
           graphEdge.label = String(noDays);
         }
       }
 
       // set edge icon
+      // keep also the icon type
       if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+        legendNodeTypesMap.edgeIcon[relationship.socialRelationshipTypeId] = true;
+
         graphEdge.setEdgeIconContextOfTransmission(relationship);
         graphEdge.fontFamily = 'Material Icons';
 
       } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
+        legendNodeTypesMap.edgeIcon[relationship.exposureTypeId] = true;
+
         graphEdge.setEdgeIconExposureType(relationship);
         graphEdge.fontFamily = 'Material Icons';
       } else if (
@@ -984,6 +1171,8 @@ export class TransmissionChainDataService {
         clusterIconMap &&
         clusterIconMap[relationship.clusterId]
       ) {
+        legendNodeTypesMap.edgeIcon[relationship.clusterId] = true;
+
         graphEdge.label = clusterIconMap[relationship.clusterId];
         graphEdge.fontFamily = 'Material Icons';
       }
@@ -991,6 +1180,29 @@ export class TransmissionChainDataService {
       // add edge
       graphData.edges.push({ data: graphEdge });
     });
+
+    // remove the unrelated categories from the legend
+    graphData.legend = { ...colorCriteria };
+    graphData.legend.nodeColor = { ..._.pick(graphData.legend.nodeColor, Object.keys(legendNodeTypesMap.nodeColor)) };
+    graphData.legend.nodeColorKeys = graphData.legend.nodeColorKeys.filter((type) => legendNodeTypesMap.nodeColor[type]);
+
+    graphData.legend.nameColor = { ..._.pick(graphData.legend.nameColor, Object.keys(legendNodeTypesMap.nodeNameColor)) };
+    graphData.legend.nodeNameColorKeys = graphData.legend.nodeNameColorKeys.filter((type) => legendNodeTypesMap.nodeNameColor[type]);
+
+    graphData.legend.edgeColor = { ..._.pick(graphData.legend.edgeColor, Object.keys(legendNodeTypesMap.edgeColor)) };
+    graphData.legend.edgeColorKeys = graphData.legend.edgeColorKeys.filter((type) => legendNodeTypesMap.edgeColor[type]);
+
+    graphData.legend.labSequenceColor = { ..._.pick(graphData.legend.labSequenceColor, Object.keys(legendNodeTypesMap.labSequenceColor)) };
+    graphData.legend.labSequenceColorKeys = graphData.legend.labSequenceColorKeys.filter((type) => legendNodeTypesMap.labSequenceColor[type]);
+
+    graphData.legend.nodeIcon = { ..._.pick(graphData.legend.nodeIcon, Object.keys(legendNodeTypesMap.nodeIcon)) };
+    graphData.legend.nodeIconKeys = graphData.legend.nodeIconKeys.filter((type) => legendNodeTypesMap.nodeIcon[type]);
+
+    graphData.legend.nodeShape = { ..._.pick(graphData.legend.nodeShape, Object.keys(legendNodeTypesMap.nodeShape)) };
+    graphData.legend.nodeShapeKeys = graphData.legend.nodeShapeKeys.filter((type) => legendNodeTypesMap.nodeShape[type]);
+
+    graphData.legend.edgeIcon = { ..._.pick(graphData.legend.edgeIcon, Object.keys(legendNodeTypesMap.edgeIcon)) };
+    graphData.legend.edgeIconKeys = graphData.legend.edgeIconKeys.filter((type) => legendNodeTypesMap.edgeIcon[type]);
 
     // finished
     return graphData;

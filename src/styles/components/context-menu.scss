@@ -1,0 +1,59 @@
+/* Context Menu */
+.gd-context-menu {
+  background-color: var(--gd-background);
+  @include border-radius(0.4rem);
+  @include box-shadow(0 0.3rem 0.3rem -0.2rem rgba(0, 0, 0, 0.2),
+                        0 0.3rem 0.4rem 0 rgba(0, 0, 0, 0.14),
+                        0 0.1rem 0.8rem 0 rgba(0, 0, 0, 0.12));
+  @include flex(flex);
+  @include flex_direction(column);
+  max-width: 36rem;
+  min-width: 20rem;
+
+  hr {
+    background-color: rgba(var(--gd-secondary-rgb), 0.25);
+    height: 0.1rem;
+    margin: 0;
+    width: 100%;
+  }
+
+  .gd-context-menu-item {
+    background-color: transparent;
+    border: 0 none;
+    cursor: pointer;
+    @include flex(flex);
+    @include flex_align_items(center);
+    @include flex_direction(row);
+    @include flex_val(1);
+    font-family: $gd-font-family;
+    font-size: $gd-font-size;
+    line-height: $gd-line-height;
+    padding: 0.4rem 0.8rem;
+    user-select: none;
+
+    &:hover,
+    &:active {
+      background-color: rgba(var(--gd-primary-rgb), 0.15);
+    }
+
+    &[disabled],
+    &.disabled,
+    &:disabled {
+      color: var(--gd-secondary);
+      cursor: default;
+
+      &:hover,
+      &:active {
+        background-color: transparent;
+      }
+    }
+
+    .gd-context-menu-item-label {
+      text-align: left;
+
+      + div {
+        margin-left: 0.8rem;
+      }
+    }
+  }
+}

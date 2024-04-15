@@ -53,7 +53,7 @@ export interface IV2ColumnBasic {
   centerHeader?: boolean;
   link?: (any) => string;
   cssCellClass?: string;
-  sortable?: boolean;
+  sortable?: true | string;
   filter?: V2Filter;
   highlight?: string;
 }
@@ -189,7 +189,7 @@ export interface IV2ColumnButton {
   alwaysVisible?: boolean;
   centerHeader?: boolean;
   cssCellClass?: string;
-  sortable?: boolean;
+  sortable?: true | string;
   filter?: V2Filter;
 }
 
@@ -216,10 +216,12 @@ export interface IV2ColumnAction {
  * Status column form type
  */
 export enum IV2ColumnStatusFormType {
+  EMPTY,
   CIRCLE,
   SQUARE,
   TRIANGLE,
-  STAR
+  STAR,
+  HEXAGON
 }
 
 /**
@@ -227,7 +229,7 @@ export enum IV2ColumnStatusFormType {
  */
 interface IV2ColumnStatusFormShape {
   // required
-  type: IV2ColumnStatusFormType.CIRCLE | IV2ColumnStatusFormType.SQUARE | IV2ColumnStatusFormType.TRIANGLE | IV2ColumnStatusFormType.STAR;
+  type: IV2ColumnStatusFormType.CIRCLE | IV2ColumnStatusFormType.SQUARE | IV2ColumnStatusFormType.TRIANGLE | IV2ColumnStatusFormType.STAR | IV2ColumnStatusFormType.HEXAGON;
   color: string;
 
   // optional
@@ -235,17 +237,26 @@ interface IV2ColumnStatusFormShape {
 }
 
 /**
+ * Status column form - shape placeholder
+ */
+interface IV2ColumnStatusFormShapeEmpty {
+  // required
+  type: IV2ColumnStatusFormType.EMPTY;
+}
+
+/**
  * Status column form
  */
-export type V2ColumnStatusForm = IV2ColumnStatusFormShape;
+export type V2ColumnStatusForm = IV2ColumnStatusFormShapeEmpty | IV2ColumnStatusFormShape;
 
 /**
  * Status column - legend
  */
 interface IV2ColumnLegendStatusItem {
   // required
-  form: V2ColumnStatusForm;
+  form: IV2ColumnStatusFormShape;
   label: string;
+  order: number | undefined;
 }
 
 /**
@@ -385,7 +396,7 @@ export interface IV2ColumnExpandRow {
   alwaysVisible?: boolean;
   centerHeader?: boolean;
   cssCellClass?: string;
-  sortable?: boolean;
+  sortable?: true | string;
   filter?: V2Filter;
 }
 
@@ -424,7 +435,6 @@ export const applyFilterBy = (
 
   // filter accordingly
   switch (column.filter.type) {
-
     // text
     case V2FilterType.TEXT:
 
@@ -551,10 +561,9 @@ export const applyFilterBy = (
     case V2FilterType.ADDRESS_FIELD:
     case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
       // remove the previous conditions
-      query.filter.removePathCondition('address');
-      query.filter.removePathCondition('addresses');
-      query.filter.removePathCondition('and.address');
-      query.filter.removePathCondition('and.addresses');
+      // IMPORTANT: and => and => and => is required to make it unique, so it doesn't interfere with advanced by address filters
+      query.filter.removePathCondition('and.and.and.and.address');
+      query.filter.removePathCondition('and.and.and.and.addresses');
 
       // create a query builder
       const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(

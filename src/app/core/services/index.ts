@@ -43,7 +43,6 @@ import { DeviceDataService } from './data/device.data.service';
 import { SavedFiltersService } from './data/saved-filters.data.service';
 import { SavedImportMappingService } from './data/saved-import-mapping.data.service';
 import { RedirectService } from './helper/redirect.service';
-import { EntityHelperService } from './helper/entity-helper.service';
 import { ContactsOfContactsDataService } from './data/contacts-of-contacts.data.service';
 import { CaptchaDataService } from './data/captcha.data.service';
 import { ListHelperService } from './helper/list-helper.service';
@@ -99,8 +98,6 @@ import { LanguageUserResolver } from './resolvers/language-user.resolver';
 import { LanguageDataResolver } from './resolvers/data/language.resolver';
 import { PersonDataResolver } from './resolvers/data/person.resolver';
 import { NotAuthRedirectGuard } from './guards/not-auth-redirect-guard.service';
-import { EntityFollowUpHelperService } from './helper/entity-follow-up-helper.service';
-import { EntityLabResultService } from './helper/entity-lab-result-helper.service';
 import { SecurityQuestionDataResolver } from './resolvers/data/security-question.resolver';
 import { MapVectorTypeDataResolver } from './resolvers/data/map-vector-type.resolver';
 import { OutbreakTemplateDataResolver } from './resolvers/data/outbreak-template.resolver';
@@ -142,6 +139,20 @@ import { EventCategoryDataResolver } from './resolvers/data/event-category.resol
 import { FollowUpGroupByDataResolver } from './resolvers/data/follow-up-group-by.resolver';
 import { FontResolver } from './resolvers/font-resolver';
 import { ImageResolver } from './resolvers/image-resolver';
+import { ReferenceDataDiseaseSpecificCategoriesResolver } from './resolvers/data/reference-data-disease-specific-categories.resolver';
+import { ReferenceDataHelperService } from './helper/reference-data-helper.service';
+import { BulkCacheHelperService } from './helper/bulk-cache-helper.service';
+import { RestoreLogDataService } from './data/restore-log.data.service';
+import {
+  SyncPackageStatusStepBackupRestoreResolver
+} from './resolvers/data/sync-package-status-step-backup-restore.resolver';
+import { OutbreakAndOutbreakTemplateHelperService } from './helper/outbreak-and-outbreak-template-helper.service';
+import { PersonAndRelatedHelperService } from './helper/person-and-related-helper.service';
+import { CreatedOnResolver } from './resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from './resolvers/data/deleted-user.resolver';
+import { ClientApplicationDataService } from './data/client-application.data.service';
+import { ClientApplicationHelperService } from './helper/client-application-helper.service';
+import { FollowUpCreatedAsDataResolver } from './resolvers/data/follow-up-created-as.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -152,6 +163,7 @@ export const services: any[] = [
   BackupModuleDataResolver,
   BackupStatusDataResolver,
   BackupTypesDataResolver,
+  BulkCacheHelperService,
   CertaintyLevelDataResolver,
   ClassificationDataResolver,
   ClusterDataResolver,
@@ -165,8 +177,10 @@ export const services: any[] = [
   CotNodeShapeDataResolver,
   CotSnapshotStatusDataResolver,
   CountryDataResolver,
+  CreatedOnResolver,
   DailyFollowUpStatusDataResolver,
   DateRangeCenterDataResolver,
+  DeletedUserDataResolver,
   DiseaseDataResolver,
   DocumentTypeDataResolver,
   EpiCurveWeekTypesDataResolver,
@@ -211,6 +225,7 @@ export const services: any[] = [
   QuestionnaireAnswerTypeDataResolver,
   QuestionnaireQuestionCategoryDataResolver,
   ReferenceDataCategoryDataResolver,
+  ReferenceDataDiseaseSpecificCategoriesResolver,
   RelationshipPersonDataResolver,
   RiskDataResolver,
   SavedImportMappingDataResolver,
@@ -224,6 +239,7 @@ export const services: any[] = [
   SyncPackageExportTypeDataResolver,
   SyncPackageModuleDataResolver,
   SyncPackageStatusDataResolver,
+  SyncPackageStatusStepBackupRestoreResolver,
   TeamDataResolver,
   UpstreamServersDataResolver,
   UserDataResolver,
@@ -233,9 +249,11 @@ export const services: any[] = [
   VaccineDataResolver,
   VaccineStatusDataResolver,
   VersionDataResolver,
+  FollowUpCreatedAsDataResolver,
 
   // data services
   AuthDataService,
+  ClientApplicationDataService,
   UserDataService,
   UserRoleDataService,
   OutbreakDataService,
@@ -274,6 +292,7 @@ export const services: any[] = [
   ImportLogDataService,
   ImportResultDataService,
   ExportLogDataService,
+  RestoreLogDataService,
 
   // guard services
   AuthGuard,
@@ -282,18 +301,19 @@ export const services: any[] = [
   PageChangeConfirmationGuard,
 
   // helper services
-  StorageService,
-  LoggerService,
-  ModelHelperService,
-  FormHelperService,
-  I18nService,
   CacheService,
+  ClientApplicationHelperService,
   DialogV2Service,
   DomService,
-  EntityFollowUpHelperService,
-  EntityLabResultService,
-  EntityHelperService,
+  FormHelperService,
+  I18nService,
   ListHelperService,
+  LoggerService,
+  ModelHelperService,
+  OutbreakAndOutbreakTemplateHelperService,
+  PersonAndRelatedHelperService,
   RedirectService,
+  ReferenceDataHelperService,
+  StorageService,
   ToastV2Service
 ];

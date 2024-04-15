@@ -1,26 +1,33 @@
 import * as _ from 'lodash';
-import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { BaseModel } from './base.model';
 import { CaseModel } from './case.model';
-import { Constants } from './constants';
 import { ContactModel } from './contact.model';
+import { ContactOfContactModel } from './contact-of-contact.model';
 import { EntityType } from './entity-type';
 import { LabResultSequenceModel } from './lab-result-sequence.model';
 import { OutbreakModel } from './outbreak.model';
-import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRestorable } from './permission.interface';
+import {
+  IPermissionBasic,
+  IPermissionBasicBulk,
+  IPermissionExportable,
+  IPermissionImportable,
+  IPermissionRestorable
+} from './permission.interface';
 import { PERMISSION } from './permission.model';
 import { IAnswerData } from './question.model';
 import { UserModel } from './user.model';
-import { Moment } from '../helperClasses/x-moment';
+import { SafeHtml } from '@angular/platform-browser';
+import { Constants } from './constants';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class LabResultModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRestorable,
-        IPermissionImportable,
-        IPermissionExportable {
+    IPermissionBasic,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionImportable,
+    IPermissionExportable {
   id: string;
   sampleIdentifier: string;
   dateSampleTaken: string | Moment;
@@ -39,96 +46,17 @@ export class LabResultModel
   };
   personId: string;
   personType: EntityType;
-  person: CaseModel | ContactModel;
+  person: CaseModel | ContactModel | ContactOfContactModel;
   testedFor: string;
   sequence: LabResultSequenceModel;
 
+  // used by ui
+  alerted: boolean = false;
+  uiStatusForms: SafeHtml;
+
   /**
-   * Advanced filters
+   * Static Permissions - IPermissionBasic
    */
-  static generateAdvancedFilters(data: {
-    selectedOutbreak: () => OutbreakModel,
-    options: {
-      labName: ILabelValuePairModel[],
-      labSampleType: ILabelValuePairModel[],
-      labTestType: ILabelValuePairModel[],
-      labTestResult: ILabelValuePairModel[],
-    }
-  }) {
-    // initialize
-    const advancedFilters: V2AdvancedFilter[] = [
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'sampleIdentifier',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateSampleTaken',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateSampleDelivered',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfResult',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'labName',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
-        options: data.options.labName,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'sampleType',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
-        options: data.options.labSampleType,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'testType',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
-        options: data.options.labTestType,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'result',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-        options: data.options.labTestResult
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'testedFor',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-        field: 'questionnaireAnswers',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        template: () => data.selectedOutbreak().labResultsTemplate
-      }
-    ];
-
-    // finished
-    return advancedFilters;
-  }
-
-  /**
-     * Static Permissions - IPermissionBasic
-     */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_VIEW) : false); }
   static canList(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_LIST) : false); }
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_CREATE) : false); }
@@ -136,31 +64,48 @@ export class LabResultModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_DELETE) : false); }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
+  static canBulkCreate(): boolean { return false; }
+  static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_MODIFY) : false); }
+  static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_DELETE) : false); }
+  static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_RESTORE) : false); }
+
+  /**
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.LAB_RESULT_RESTORE) : false; }
 
   /**
-     * Static Permissions - IPermissionImportable
-     */
+   * Static Permissions - IPermissionImportable
+   */
   static canImport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_IMPORT) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_EXPORT) : false); }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 
     this.person = _.get(data, 'person');
     if (!_.isEmpty(this.person)) {
-      this.person = this.person.type === EntityType.CONTACT ?
-        new ContactModel(this.person) :
-        new CaseModel(this.person);
+      switch (this.person.type) {
+        case EntityType.CONTACT:
+          this.person = new ContactModel(this.person);
+          break;
+        case EntityType.CONTACT_OF_CONTACT:
+          this.person = new ContactOfContactModel(this.person);
+          break;
+        // case EntityType.CASE:
+        default:
+          this.person = new CaseModel(this.person);
+          break;
+      }
     }
 
     this.id = _.get(data, 'id');
@@ -174,7 +119,7 @@ export class LabResultModel
     this.testType = _.get(data, 'testType');
     this.result = _.get(data, 'result');
     this.notes = _.get(data, 'notes');
-    this.status = _.get(data, 'status', Constants.PROGRESS_OPTIONS.IN_PROGRESS.value);
+    this.status = _.get(data, 'status', Constants.LAB_TEST_RESULT_STATUS.IN_PROGRESS);
     this.quantitativeResult = _.get(data, 'quantitativeResult');
     this.personId = _.get(data, 'personId');
     this.personType = _.get(data, 'personType');
@@ -194,6 +139,14 @@ export class LabResultModel
   canCreate(user: UserModel): boolean { return LabResultModel.canCreate(user); }
   canModify(user: UserModel): boolean { return LabResultModel.canModify(user); }
   canDelete(user: UserModel): boolean { return LabResultModel.canDelete(user); }
+
+  /**
+   * Permissions - IPermissionBasicBulk
+   */
+  canBulkCreate(): boolean { return LabResultModel.canBulkCreate(); }
+  canBulkModify(user: UserModel): boolean { return LabResultModel.canBulkModify(user); }
+  canBulkDelete(user: UserModel): boolean { return LabResultModel.canBulkDelete(user); }
+  canBulkRestore(user: UserModel): boolean { return LabResultModel.canBulkRestore(user); }
 
   /**
      * Permissions - IPermissionRestorable

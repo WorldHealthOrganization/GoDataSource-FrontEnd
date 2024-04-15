@@ -22,6 +22,10 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIcon, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { Router } from '@angular/router';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import {
+  AppFormCheckboxV2Component
+} from '../../../../shared/forms-v2/components/app-form-checkbox-v2/app-form-checkbox-v2.component';
+import { IV2Column } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-duplicate-records-list',
@@ -29,7 +33,7 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
   templateUrl: './duplicate-records-list.component.html',
   styleUrls: ['./duplicate-records-list.component.scss']
 })
-export class DuplicateRecordsListComponent extends ListComponent<any> implements OnDestroy {
+export class DuplicateRecordsListComponent extends ListComponent<any, IV2Column> implements OnDestroy {
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
 
@@ -53,6 +57,10 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     'age',
     'address'
   ];
+
+  // ignore
+  private _ignoreCheckAllToggle: boolean = false;
+  private _ignoreCheckOneToggle: boolean = false;
 
   // action
   actionButton: IV2ActionIcon;
@@ -224,6 +232,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
     this.duplicatesListCount$ = this.outbreakDataService
       .getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder)
       .pipe(
@@ -238,13 +247,23 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   /**
    * Check all checkboxes
    */
-  checkAllToggle(form: NgForm) {
-    // toggle value
-    const newValue: boolean = form.controls.checkAll.value;
+  checkAllToggle(input: AppFormCheckboxV2Component) {
+    // ignore ?
+    if (this._ignoreCheckAllToggle) {
+      return;
+    }
 
     // set children checkboxes values
-    _.each(form.controls, (checkbox: UntypedFormControl) => {
-      checkbox.setValue(newValue);
+    _.each(input.control.parent.controls, (checkbox: UntypedFormControl) => {
+      // ignore check all input
+      if (checkbox === input.control) {
+        return;
+      }
+
+      // update value
+      this._ignoreCheckOneToggle = true;
+      checkbox.setValue(input.value);
+      this._ignoreCheckOneToggle = false;
     });
   }
 
@@ -252,6 +271,11 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
    * Check all checkboxes
    */
   checkOneToggle(form: NgForm) {
+    // ignore ?
+    if (this._ignoreCheckOneToggle) {
+      return;
+    }
+
     // set children checkboxes values
     let newValue: boolean = true;
     _.each(form.controls, (checkbox: UntypedFormControl, name: string) => {
@@ -261,7 +285,9 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     });
 
     // set all checkbox value
+    this._ignoreCheckAllToggle = true;
     form.controls.checkAll.setValue(newValue);
+    this._ignoreCheckAllToggle = false;
   }
 
   /**

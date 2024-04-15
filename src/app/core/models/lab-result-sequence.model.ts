@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Moment } from '../helperClasses/x-moment';
+import { Moment } from '../helperClasses/localization-helper';
 
 export class LabResultSequenceModel {
   hasSequence: boolean;

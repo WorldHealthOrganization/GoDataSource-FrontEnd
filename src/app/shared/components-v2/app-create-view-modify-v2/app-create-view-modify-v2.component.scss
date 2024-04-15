@@ -17,9 +17,14 @@
     height: calc(100% + 5.2rem);
     margin: -1.2rem -4rem -4rem;
 
+    @include breakpoint('lg') {
+      height: calc(100% + 2.4rem);
+      margin: -0.8rem -1.6rem -1.6rem;
+    }
+
     @include breakpoint('lt-md') {
-      height: calc(100% + 3.2rem);
-      margin: -1.2rem -2rem -2rem;
+      height: calc(100% + 2.4rem);
+      margin: -0.8rem -1.6rem -1.6rem;
     }
 
     .gd-create-view-modify-list {
@@ -57,6 +62,10 @@
               @include breakpoint('gt-lg') {
                 text-orientation: upright;
                 writing-mode: vertical-lr;
+
+                @include safari {
+                  word-spacing: 1rem;
+                }
               }
             }
 
@@ -261,6 +270,10 @@
       overflow: hidden;
       padding: 1.2rem 4rem 4rem;
 
+      @media only screen and (max-height: 599px) {
+        overflow-y: overlay;
+      }
+
       @include breakpoint('lt-md') {
         padding: 1.2rem 2rem 2rem;
       }
@@ -337,7 +350,6 @@
         @include border-radius(0 0.4rem 0.4rem 0);
         padding: 1rem;
         right: -3.8rem;
-        top: 0;
       }
 
       .material-icons {
@@ -367,11 +379,15 @@
   .gd-create-view-modify-top {
     padding-bottom: 2.4rem;
 
-    @include breakpoint('xs') {
-      padding-bottom: 1.6rem;
+    @include breakpoint('lt-lg') {
+      padding-bottom: 0.8rem;
     }
 
     .gd-create-view-modify-top-title-buttons {
+      @include breakpoint('xs') {
+        margin-top: 0.4rem;
+      }
+
       .gd-create-view-modify-top-title-buttons-title {
         overflow: hidden;
 
@@ -418,7 +434,11 @@
   .gd-create-view-modify-bottom {
     position: relative;
 
-    .gd-order-tabs-button {
+    @media only screen and (max-height: 599px) {
+      min-height: 35rem;
+    }
+
+    .gd-conf-tabs-button {
       @include border-radius(0.4rem 0.4rem 0 0);
       position: absolute;
       z-index: 10;
@@ -558,6 +578,10 @@
 
                     > .gd-create-view-modify-bottom-section-content-input {
                       width: 100%;
+
+                      .gd-form-input-v2-viewonly {
+                        margin-bottom: 1.6rem;
+                      }
                     }
 
                     .gd-create-view-modify-bottom-section-content-input-list-multiple-rows {
@@ -642,7 +666,9 @@
 
       > form,
       .gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire,
-      .gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire {
+      .gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire,
+      .gd-create-view-modify-bottom-section-content-input-has-tree-editor,
+      .gd-create-view-modify-bottom-section-content-input-has-visible-and-mandatory {
         height: 100%;
       }
     }
@@ -660,7 +686,7 @@
   }
 
   .gd-create-view-modify-bottom {
-    .gd-order-tabs-button {
+    .gd-conf-tabs-button {
       right: 0;
       top: -3.6rem;
 
@@ -677,7 +703,7 @@
 .gd-create-view-modify-modify,
 .gd-create-view-modify-view {
   .gd-create-view-modify-bottom {
-    .gd-order-tabs-button {
+    .gd-conf-tabs-button {
       left: 0;
       top: 0.2rem;
 
@@ -690,7 +716,27 @@
 
       + .mat-tab-group {
         .mat-tab-header {
-          padding-left: 8rem;
+          @include breakpoint('gt-md') {
+            padding-left: 8rem;
+          }
+
+          @include breakpoint('md') {
+            padding-left: 6rem;
+          }
+
+          @include breakpoint('sm') {
+            padding-left: 6rem;
+          }
+
+          @include breakpoint('xs') {
+            padding-left: 4rem;
+          }
+
+          &.mat-tab-header-pagination-controls-enabled {
+            @include breakpoint('xs') {
+              padding-left: 6rem;
+            }
+          }
         }
       }
     }
@@ -744,6 +790,10 @@
                       > div:not(.gd-create-view-modify-bottom-section-content-input-list-multiple-rows) {
                         > * {
                           margin-bottom: 1.6rem;
+                        }
+
+                        .gd-form-input-v2-viewonly {
+                          margin-bottom: 0;
                         }
                       }
                     }

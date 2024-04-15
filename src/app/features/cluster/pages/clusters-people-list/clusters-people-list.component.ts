@@ -27,12 +27,13 @@ import { of } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
 
 @Component({
   selector: 'app-clusters-people-list',
   templateUrl: './clusters-people-list.component.html'
 })
-export class ClustersPeopleListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+export class ClustersPeopleListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel, IV2Column> implements OnDestroy {
   // present cluster
   private _selectedCluster: ClusterModel;
 
@@ -45,10 +46,16 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
     private clusterDataService: ClusterDataService,
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
-    private locationDataService: LocationDataService
+    private locationDataService: LocationDataService,
+    private referenceDataHelperService: ReferenceDataHelperService
   ) {
     // parent
-    super(listHelperService);
+    super(
+      listHelperService, {
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
+    );
 
     // disable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
@@ -182,7 +189,11 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           includeNoValue: true
         }
       },
@@ -236,7 +247,7 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
           }
         },
         link: (data) => {
-          return data.mainAddress?.location?.name ?
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
             `/locations/${ data.mainAddress.location.id }/view` :
             undefined;
         }
@@ -266,7 +277,8 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
                   type: IV2ColumnStatusFormType.CIRCLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           }
@@ -284,6 +296,10 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
               type: IV2ColumnStatusFormType.CIRCLE,
               color: (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type].getColorCode(),
               tooltip: this.i18nService.instant(data.type)
+            });
+          } else {
+            forms.push({
+              type: IV2ColumnStatusFormType.EMPTY
             });
           }
 
@@ -496,6 +512,7 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

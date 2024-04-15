@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestFilterOperator } from '../../helperClasses/request-query-builder';
 import { OutbreakDataService } from './outbreak.data.service';
 import { FollowUpsDataService } from './follow-ups.data.service';
 import { Observable, of } from 'rxjs';
@@ -8,11 +8,11 @@ import { RelationshipDataService } from './relationship.data.service';
 import { MetricContactsLostToFollowUpModel } from '../../models/metrics/metric-contacts-lost-to-follow-up.model';
 import { Constants } from '../../models/constants';
 import * as _ from 'lodash';
-import { RequestFilterOperator } from '../../helperClasses/request-query-builder/request-filter';
 import { ContactDataService } from './contact.data.service';
 import { DateType } from '../../enums/date-types.enum';
 import { map, mergeMap } from 'rxjs/operators';
-import { Moment, moment } from '../../helperClasses/x-moment';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
+import { MetricCasesLostToFollowUpModel } from '../../models/metrics/metric-cases-lost-to-follow-up.model';
 
 @Injectable()
 export class ListFilterDataService {
@@ -61,10 +61,10 @@ export class ListFilterDataService {
         qb.filter
           .byEquality(
             'startDate',
-            moment(date).startOf('day').toISOString()
+            LocalizationHelper.toMoment(date).startOf('day').toISOString()
           ).byEquality(
             'endDate',
-            moment(date).endOf('day').toISOString()
+            LocalizationHelper.toMoment(date).endOf('day').toISOString()
           );
       }
 
@@ -101,6 +101,68 @@ export class ListFilterDataService {
   }
 
   /**
+   * Create the query builder for filtering the list of cases
+   * @returns {RequestQueryBuilder}
+   */
+  filterCasesOnFollowUpLists(
+    date,
+    location,
+    classificationId
+  ): Observable<RequestQueryBuilder> {
+    return this.handleFilteringOfLists((selectedOutbreak) => {
+      // add global filters
+      const qb = this.getGlobalFilterQB(
+        null,
+        null,
+        'address.parentLocationIdFilter',
+        location
+      );
+
+      // date
+      if (date) {
+        qb.filter
+          .byEquality(
+            'startDate',
+            LocalizationHelper.toMoment(date).startOf('day').toISOString()
+          ).byEquality(
+            'endDate',
+            LocalizationHelper.toMoment(date).endOf('day').toISOString()
+          );
+      }
+
+      // classification
+      // !!! must be on first level and not under $and
+      if (!_.isEmpty(classificationId)) {
+        qb.filter.bySelect(
+          'classification',
+          classificationId,
+          false,
+          null
+        );
+      }
+
+      // change the way we build query
+      qb.filter.firstLevelConditions();
+
+      // filter
+      return this.followUpDataService
+        .getCountIdsOfCasesOnTheFollowUpList(selectedOutbreak.id, qb)
+        .pipe(
+          map((result) => {
+            // update queryBuilder filter with desired cases ids
+            const filterQueryBuilder = new RequestQueryBuilder();
+            filterQueryBuilder.filter.where({
+              id: {
+                'inq': result.caseIDs
+              }
+            }, true);
+            return filterQueryBuilder;
+          })
+        );
+    });
+  }
+
+  /**
      * Create the query builder for filtering the list of contacts
      * @param date
      * @param location
@@ -126,7 +188,7 @@ export class ListFilterDataService {
       if (_.isNumber(noDaysNotSeen)) {
         // add number of days until current day
         if (date) {
-          noDaysNotSeen += moment().endOf('day').diff(moment(date).endOf('day'), 'days');
+          noDaysNotSeen += LocalizationHelper.today().endOf('day').diff(LocalizationHelper.toMoment(date).endOf('day'), 'days');
         }
 
         // create filter
@@ -140,7 +202,7 @@ export class ListFilterDataService {
       if (date) {
         qb.filter.where({
           date: {
-            lte: moment(date).toISOString()
+            lte: LocalizationHelper.toMoment(date).toISOString()
           }
         });
       }
@@ -180,6 +242,84 @@ export class ListFilterDataService {
   }
 
   /**
+   * Create the query builder for filtering the list of cases
+   * @param date
+   * @param location
+   * @param classificationId
+   * @param {number} noDaysNotSeen
+   * @returns {Observable<RequestQueryBuilder>}
+   */
+  filterCasesNotSeen(
+    date,
+    location,
+    classificationId,
+    noDaysNotSeen
+  ): Observable<RequestQueryBuilder> {
+    return this.handleFilteringOfLists((selectedOutbreak) => {
+      // add global filters
+      const qb = new RequestQueryBuilder();
+
+      // change the way we build query
+      qb.filter.firstLevelConditions();
+
+      // convert
+      noDaysNotSeen = _.isNumber(noDaysNotSeen) || _.isEmpty(noDaysNotSeen) ? noDaysNotSeen : _.parseInt(noDaysNotSeen);
+      if (_.isNumber(noDaysNotSeen)) {
+        // add number of days until current day
+        if (date) {
+          noDaysNotSeen += LocalizationHelper.today().endOf('day').diff(LocalizationHelper.toMoment(date).endOf('day'), 'days');
+        }
+
+        // create filter
+        qb.filter.byEquality(
+          'noDaysNotSeen',
+          noDaysNotSeen
+        );
+      }
+
+      // date
+      if (date) {
+        qb.filter.where({
+          date: {
+            lte: LocalizationHelper.toMoment(date).toISOString()
+          }
+        });
+      }
+
+      // location
+      if (location) {
+        qb.filter.byEquality('addresses.parentLocationIdFilter', location);
+      }
+
+      // classification
+      // !!! must be on first level and not under $and
+      if (!_.isEmpty(classificationId)) {
+        qb.filter.bySelect(
+          'classification',
+          classificationId,
+          false,
+          null
+        );
+      }
+
+      return this.followUpDataService
+        .getCountIdsOfCasesNotSeen(selectedOutbreak.id, qb)
+        .pipe(
+          map((result) => {
+            // update queryBuilder filter with desired contacts ids
+            const filterQueryBuilder = new RequestQueryBuilder();
+            filterQueryBuilder.filter.where({
+              id: {
+                'inq': result.caseIDs
+              }
+            }, true);
+            return filterQueryBuilder;
+          })
+        );
+    });
+  }
+
+  /**
      * Construct hospitalized condition
      * @param negated
      */
@@ -196,7 +336,7 @@ export class ListFilterDataService {
                 }
               }, {
                 startDate: {
-                  $lte: moment(date).endOf('day').toISOString()
+                  $lte: LocalizationHelper.toMoment(date).endOf('day').toISOString()
                 }
               }
             ]
@@ -208,7 +348,7 @@ export class ListFilterDataService {
                 }
               }, {
                 endDate: {
-                  $gte: moment(date).startOf('day').toISOString()
+                  $gte: LocalizationHelper.toMoment(date).startOf('day').toISOString()
                 }
               }
             ]
@@ -283,7 +423,7 @@ export class ListFilterDataService {
                   }
                 }, {
                   startDate: {
-                    $lte: moment(date).endOf('day').toISOString()
+                    $lte: LocalizationHelper.toMoment(date).endOf('day').toISOString()
                   }
                 }
               ]
@@ -295,7 +435,7 @@ export class ListFilterDataService {
                   }
                 }, {
                   endDate: {
-                    $gte: moment(date).startOf('day').toISOString()
+                    $gte: LocalizationHelper.toMoment(date).startOf('day').toISOString()
                   }
                 }
               ]
@@ -404,7 +544,7 @@ export class ListFilterDataService {
       if (date) {
         qb.filter.where({
           dateOfReporting: {
-            lte: moment(date).toISOString()
+            lte: LocalizationHelper.toMoment(date).toISOString()
           }
         });
       }
@@ -443,6 +583,64 @@ export class ListFilterDataService {
   }
 
   /**
+   * Create the query builder for filtering the list of cases that are lost to follow-up
+   * @returns {RequestQueryBuilder}
+   */
+  filterCasesLostToFollowUp(
+    date,
+    location,
+    classificationId
+  ): Observable<RequestQueryBuilder> {
+    return this.handleFilteringOfLists((selectedOutbreak) => {
+      // add global filters
+      const qb = new RequestQueryBuilder();
+
+      // change the way we build query
+      qb.filter.firstLevelConditions();
+
+      // date
+      if (date) {
+        qb.filter.where({
+          dateOfReporting: {
+            lte: LocalizationHelper.toMoment(date).toISOString()
+          }
+        });
+      }
+
+      // location
+      if (location) {
+        qb.filter.byEquality('addresses.parentLocationIdFilter', location);
+      }
+
+      // classification
+      // !!! must be on first level and not under $and
+      if (!_.isEmpty(classificationId)) {
+        qb.filter.bySelect(
+          'classification',
+          classificationId,
+          false,
+          null
+        );
+      }
+
+      return this.followUpDataService
+        .getNumberOfCasesWhoAreLostToFollowUp(selectedOutbreak.id, qb)
+        .pipe(
+          map((result: MetricCasesLostToFollowUpModel) => {
+            // update queryBuilder filter with desired contacts ids
+            const filterQueryBuilder = new RequestQueryBuilder();
+            filterQueryBuilder.filter.where({
+              id: {
+                'inq': result.caseIDs
+              }
+            }, true);
+            return filterQueryBuilder;
+          })
+        );
+    });
+  }
+
+  /**
      * Create the query builder for filtering the list of cases
      * @param date
      * @param location
@@ -468,7 +666,7 @@ export class ListFilterDataService {
       if (_.isNumber(noDaysInChains)) {
         // add number of days until current day
         if (date) {
-          noDaysInChains += moment().endOf('day').diff(moment(date).endOf('day'), 'days');
+          noDaysInChains += LocalizationHelper.today().endOf('day').diff(LocalizationHelper.toMoment(date).endOf('day'), 'days');
         }
 
         // create filter
@@ -482,7 +680,7 @@ export class ListFilterDataService {
       if (date) {
         qb.filter.where({
           contactDate: {
-            lte: moment(date).toISOString()
+            lte: LocalizationHelper.toMoment(date).toISOString()
           }
         });
       }
@@ -567,7 +765,7 @@ export class ListFilterDataService {
       if (date) {
         qb.filter.where({
           dateOfReporting: {
-            lte: moment(date).toISOString()
+            lte: LocalizationHelper.toMoment(date).toISOString()
           }
         });
       }
@@ -577,7 +775,7 @@ export class ListFilterDataService {
       if (_.isNumber(noDaysAmongContacts)) {
         // add number of days until current day
         if (date) {
-          noDaysAmongContacts += moment().endOf('day').diff(moment(date).endOf('day'), 'days');
+          noDaysAmongContacts += LocalizationHelper.today().endOf('day').diff(LocalizationHelper.toMoment(date).endOf('day'), 'days');
         }
 
         // create filter
@@ -613,7 +811,7 @@ export class ListFilterDataService {
     const filterQueryBuilder = new RequestQueryBuilder();
     const labResultsQueryBuilder = filterQueryBuilder.include('labResults');
     labResultsQueryBuilder.queryBuilder.filter.where({
-      status: Constants.PROGRESS_OPTIONS.IN_PROGRESS.value
+      status: Constants.LAB_TEST_RESULT_STATUS.IN_PROGRESS
     }, true);
 
     return filterQueryBuilder;
@@ -696,15 +894,15 @@ export class ListFilterDataService {
 
       // empty date ?
       if (_.isEmpty(date)) {
-        date = moment();
+        date = LocalizationHelper.today();
       }
 
       // filter by date
       qb.filter.byDateRange(
         'date', {
           // clone date
-          startDate: moment(date).startOf('day'),
-          endDate: moment(date).endOf('day')
+          startDate: LocalizationHelper.toMoment(date).startOf('day'),
+          endDate: LocalizationHelper.toMoment(date).endOf('day')
         }
       );
 
@@ -730,6 +928,57 @@ export class ListFilterDataService {
   }
 
   /**
+   * Create the query builder for filtering the cases seen on selected date
+   * @param {date} date
+   * @param {string} location
+   * @param {string[]} classificationId
+   * @returns {Observable<any>}
+   */
+  filterCasesSeen(
+    date: Moment,
+    location: string,
+    classificationId: string[]
+  ): Observable<any> {
+    // get the outbreakId
+    return this.handleFilteringOfLists((selectedOutbreak: OutbreakModel) => {
+      // build the query builder
+      const qb = new RequestQueryBuilder();
+
+      // empty date ?
+      if (_.isEmpty(date)) {
+        date = LocalizationHelper.today();
+      }
+
+      // filter by date
+      qb.filter.byDateRange(
+        'date', {
+          // clone date
+          startDate: LocalizationHelper.toMoment(date).startOf('day'),
+          endDate: LocalizationHelper.toMoment(date).endOf('day')
+        }
+      );
+
+      // location
+      if (location) {
+        qb.filter.byEquality('addresses.parentLocationIdFilter', location);
+      }
+
+      // classification
+      if (!_.isEmpty(classificationId)) {
+        qb.filter
+          .bySelect(
+            'classification',
+            classificationId,
+            false,
+            null
+          );
+      }
+
+      return this.followUpDataService.getNumberOfCasesSeenEachDay(selectedOutbreak.id, qb);
+    });
+  }
+
+  /**
      * Create the query builder for filtering the contacts that have been successfully followed up
      * @param {date} date
      * @param {string} location
@@ -748,15 +997,15 @@ export class ListFilterDataService {
 
       // empty date ?
       if (_.isEmpty(date)) {
-        date = moment();
+        date = LocalizationHelper.today();
       }
 
       // filter by date
       qb.filter.byDateRange(
         'date', {
           // clone date
-          startDate: moment(date).startOf('day'),
-          endDate: moment(date).endOf('day')
+          startDate: LocalizationHelper.toMoment(date).startOf('day'),
+          endDate: LocalizationHelper.toMoment(date).endOf('day')
         }
       );
 
@@ -779,6 +1028,59 @@ export class ListFilterDataService {
 
       // filter
       return this.followUpDataService.getContactsWithSuccessfulFollowUp(selectedOutbreak.id, qb);
+    });
+  }
+
+  /**
+   * Create the query builder for filtering the cases that have been successfully followed up
+   * @param {date} date
+   * @param {string} location
+   * @param {string[]} classificationId
+   * @returns {Observable<any>}
+   */
+  filterCasesWithSuccessfulFollowup(
+    date: Moment,
+    location: string,
+    classificationId: string[]
+  ): Observable<any> {
+    // get the outbreakId
+    return this.handleFilteringOfLists((selectedOutbreak: OutbreakModel) => {
+      // build the query builder
+      const qb = new RequestQueryBuilder();
+
+      // empty date ?
+      if (_.isEmpty(date)) {
+        date = LocalizationHelper.today();
+      }
+
+      // filter by date
+      qb.filter.byDateRange(
+        'date', {
+          // clone date
+          startDate: LocalizationHelper.toMoment(date).startOf('day'),
+          endDate: LocalizationHelper.toMoment(date).endOf('day')
+        }
+      );
+
+      // location
+      if (location) {
+        qb.include('contact').queryBuilder.filter
+          .byEquality('addresses.parentLocationIdFilter', location);
+      }
+
+      // case classification
+      if (!_.isEmpty(classificationId)) {
+        qb.include('case').queryBuilder.filter
+          .bySelect(
+            'classification',
+            classificationId,
+            false,
+            null
+          );
+      }
+
+      // filter
+      return this.followUpDataService.getCasesWithSuccessfulFollowUp(selectedOutbreak.id, qb);
     });
   }
 

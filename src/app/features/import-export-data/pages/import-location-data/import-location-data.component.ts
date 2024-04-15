@@ -34,7 +34,7 @@ export class ImportLocationDataComponent {
 
   ImportServerModelNames = ImportServerModelNames;
 
-  requiredDestinationFields = [
+  requiredDestinationFields: string[] = [
     'name',
     'geographicalLevelId'
   ];

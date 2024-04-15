@@ -5,43 +5,77 @@
   [advancedFilterType]="Constants.APP_PAGE.COT_BAR_CHART.value"
   [advancedFilters]="advancedFilters"
   advancedFiltersHideOperator="true"
+  selectedOutbreakDisabled="false"
   (advancedFilterBy)="advancedFilterBy($event)">
   <div
-    [fxShow]="!loadingData && !noData">
-    <!-- Chart details -->
-    <div
-      [innerHTML]="('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS' | translate:legendColors) | safeHtml"
-      class="transmission-chain-bars-legend">
-    </div>
+    [fxShow]="!loadingData && !noData"
+    style="height: 100%; width: 100%;">
 
-    <!-- Chart cell width -->
-    <div
-      class="transmission-chain-bars-cell-width">
-      <div>
-        {{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CELL_WIDTH_LABEL' | translate }}
+    <!-- COT Bars Legend -->
+    <div class="gd-cot-bars-legend">
+
+      <!-- Title & Collapse / Expand -->
+      <div class="gd-cot-bars-legend-title-bar">
+        <!-- Collapse / Expand -->
+        <button
+          #legendDropdownTrigger="matMenuTrigger"
+          class="gd-cot-bars-legend-title-bar-button"
+          [class.gd-cot-bars-legend-title-bar-button-expanded]="legendDropdownTrigger.menuOpen"
+          type="button"
+          mat-flat-button
+          [matMenuTriggerFor]="legendDropdown">
+          {{ 'LNG_COMMON_LABEL_LEGEND' | translate }}
+        </button>
       </div>
-      <mat-slider
-        [min]="91"
-        [max]="150"
-        [ngModel]="cellWidth"
-        [tickInterval]="10"
-        (valueChange)="cellWidthChanged($event)">
-      </mat-slider>
+
+      <!-- Legend content -->
+      <mat-menu
+        #legendDropdown="matMenu"
+        class="gd-cot-bars-legend-content">
+          <div
+            [innerHTML]="('LNG_PAGE_TRANSMISSION_CHAIN_BARS_LEGEND_DETAILS' | translate:legendColors) | safeHtml"
+            class="gd-cot-bars-legend-colors">
+          </div>
+  
+          <div class="gd-cot-bars-legend-cell-width">
+            <div>
+              <strong>{{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CELL_WIDTH_LABEL' | translate }}</strong>
+            </div>
+            <app-form-toggle-v2
+              [(ngModel)]="selectedCellWidthValue"
+              [options]="cellWidthOptions"
+              (ngModelChange)="cellWidthChanged()"></app-form-toggle-v2>
+          </div>
+      </mat-menu>
     </div>
 
     <!-- Chart -->
     <div
       #chart
-      id="chart"
-    ></div>
+      id="chart"></div>
   </div>
 
-  <div *ngIf="!loadingData && noData">
-    {{'LNG_PAGE_TRANSMISSION_CHAIN_BARS_NO_DATA' | translate}}
+  <div
+    *ngIf="!loadingData && noData"
+    fxLayout="column" fxLayoutAlign="center center"
+    class="gd-cot-bars-no-data">
+
+    <!-- Image -->
+    <div
+      class="gd-cot-bars-no-data-image"></div>
+
+    <!-- Message -->
+    <div
+      class="gd-cot-bars-no-data-text">{{'LNG_PAGE_TRANSMISSION_CHAIN_BARS_NO_DATA' | translate}}</div>
   </div>
 
-  <div *ngIf="loadingData">
-    <mat-spinner></mat-spinner>
+  <div
+    *ngIf="loadingData"
+    class="cot-bars-loading"
+    fxFlex fxLayoutAlign="center center">
+    <mat-progress-spinner
+      diameter="32"
+      mode="indeterminate"></mat-progress-spinner>
   </div>
 
 </app-basic-page-v2>

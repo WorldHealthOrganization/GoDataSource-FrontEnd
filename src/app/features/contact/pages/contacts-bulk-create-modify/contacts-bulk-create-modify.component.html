@@ -1,0 +1,12 @@
+<app-spreadsheet-editor-v2
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [records$]="records$"
+  [newRecord]="newRecord"
+  [action]="action"
+  [columns]="tableColumns"
+  [saveIgnoreGroups]="saveIgnoreGroups"
+  [saveFieldReplace]="saveFieldReplace"
+  (recordsInitialized)="recordsInitialized()"
+  (save)="save($event)">
+</app-spreadsheet-editor-v2>

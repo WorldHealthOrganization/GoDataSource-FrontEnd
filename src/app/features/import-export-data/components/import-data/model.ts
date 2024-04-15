@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 
 export enum ImportDataExtension {
   CSV = '.csv',
@@ -52,6 +53,9 @@ export class ImportableFileModel {
   // file id
   readonly id: string;
 
+  // file type
+  readonly fileType: ImportDataExtension;
+
   // file headers
   readonly fileHeaders: string[] = [];
 
@@ -83,8 +87,15 @@ export class ImportableFileModel {
   readonly modelPropertyValues: ImportableFilePropertyValuesModel;
   readonly modelPropertyValuesMap: {
     [modelProperty: string]: {
+      // from api
       id: string;
       label: string;
+      value: string;
+      active?: boolean;
+      isSystemWide?: boolean;
+
+      // set by fe
+      disabled: boolean;
     }[]
   } = {};
   readonly modelPropertyValuesMapChildMap: {
@@ -118,7 +129,7 @@ export class ImportableFileModel {
     // validate input object
     if (
       !object ||
-            !path
+      !path
     ) {
       return undefined;
     }
@@ -152,6 +163,10 @@ export class ImportableFileModel {
       fileArrayHeaders: any,
       modelProperties: any,
       modelPropertyValues: any,
+      modelPropertyToRefCategory: {
+        // path => ref category
+        [propertyPath: string]: string
+      },
       suggestedFieldMapping: any,
       modelArrayProperties: any
     },
@@ -175,10 +190,12 @@ export class ImportableFileModel {
       },
       fileType: ImportDataExtension,
       extraDataUsedToFormat: any
-    ) => void
+    ) => void,
+    selectedOutbreak: OutbreakModel
   ) {
     // file id
     this.id = data.id;
+    this.fileType = fileType;
 
     // file headers
     this.fileHeaders = (data.fileHeaders || []).map((value: any) => {
@@ -256,6 +273,18 @@ export class ImportableFileModel {
         // indexes
         modelPropertyValuesMapIndex[impLVPair.value] = {};
         _.each(this.modelPropertyValuesMap[impLVPair.value], (propValue) => {
+          // disabled ?
+          // propValue.active === false because undefined should be active in this case
+          propValue.disabled = propValue.active === false || (
+            !propValue.isSystemWide &&
+            selectedOutbreak?.allowedRefDataItems &&
+            data.modelPropertyToRefCategory &&
+            data.modelPropertyToRefCategory[impLVPair.value] &&
+            selectedOutbreak.allowedRefDataItems[data.modelPropertyToRefCategory[impLVPair.value]] &&
+            Object.keys(selectedOutbreak.allowedRefDataItems[data.modelPropertyToRefCategory[impLVPair.value]]).length > 0 &&
+            !selectedOutbreak.allowedRefDataItems[data.modelPropertyToRefCategory[impLVPair.value]][propValue.value]
+          );
+
           // label
           if (propValue.label) {
             // label translated
@@ -442,7 +471,15 @@ export class ImportableMapField {
     this._sourceFieldWithoutIndexes = this.sourceFieldWithoutIndexes ? this.sourceFieldWithoutIndexes.replace(/\[\d+\]/g, '[]') : this.sourceFieldWithoutIndexes;
 
     // determine if source contains array index ?
+    // - on non-flat file types we need to map without levels primitive arrays
     this._isSourceArray = this.sourceField ? this.sourceField.indexOf('[]') > -1 : false;
+    if (
+      this._isSourceArray &&
+      this._parent?.fileType === ImportDataExtension.JSON &&
+      this.sourceField.endsWith('[]')
+    ) {
+      this._isSourceArray = false;
+    }
 
     // determine number of max levels
     this.checkNumberOfMaxLevels();
@@ -462,6 +499,13 @@ export class ImportableMapField {
 
     // determine if destination contains array index ?
     this._isDestinationArray = this.destinationField ? this.destinationField.indexOf('[]') > -1 : false;
+    if (
+      this._isDestinationArray &&
+      this._parent?.fileType === ImportDataExtension.JSON &&
+      this.destinationField.endsWith('[]')
+    ) {
+      this._isDestinationArray = false;
+    }
 
     // determine number of max levels
     this.checkNumberOfMaxLevels();
@@ -478,7 +522,8 @@ export class ImportableMapField {
      */
   constructor(
     destinationField: string = null,
-    sourceField: string = null
+    sourceField: string = null,
+    private _parent: ImportableFileModel
   ) {
     // generate unique id
     this.id = uuid();

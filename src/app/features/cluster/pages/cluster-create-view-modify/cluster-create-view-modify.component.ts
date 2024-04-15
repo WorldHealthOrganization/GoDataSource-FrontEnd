@@ -3,11 +3,8 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
@@ -23,6 +20,13 @@ import {
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { MAT_ICONS } from '../../../../shared/forms-v2/core/mat-icons-v2';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 /**
  * Component
@@ -36,22 +40,24 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
+    protected toastV2Service: ToastV2Service,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     private router: Router,
     private clusterDataService: ClusterDataService,
-    private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
-    private dialogV2Service: DialogV2Service,
-    authDataService: AuthDataService,
-    toastV2Service: ToastV2Service,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    private dialogV2Service: DialogV2Service
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -141,7 +147,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_CLUSTER_TITLE', {
             name: this.itemData.name
           }
@@ -151,7 +157,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_CLUSTER_TITLE', {
             name: this.itemData.name
           }
@@ -160,6 +166,11 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -175,8 +186,8 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_CLUSTER_ACTION_CREATE_CLUSTER_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -240,18 +251,6 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
               }
             },
             {
-              type: CreateViewModifyV2TabInputType.TEXTAREA,
-              name: 'description',
-              placeholder: () => 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION',
-              description: () => 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
-              value: {
-                get: () => this.itemData.description,
-                set: (value) => {
-                  this.itemData.description = value;
-                }
-              }
-            },
-            {
               type: CreateViewModifyV2TabInputType.COLOR,
               name: 'colorCode',
               placeholder: () => 'LNG_CLUSTER_FIELD_LABEL_COLOR',
@@ -277,6 +276,18 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
                 get: () => this.itemData.icon,
                 set: (value) => {
                   this.itemData.icon = value;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'description',
+              placeholder: () => 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION',
+              description: () => 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+              value: {
+                get: () => this.itemData.description,
+                set: (value) => {
+                  this.itemData.description = value;
                 }
               }
             }
@@ -327,9 +338,11 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_COMMON_LABEL_DETAILS',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }
@@ -427,7 +440,13 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = ClusterModel.generateAdvancedFilters();
+    this.expandListAdvancedFilters = ClusterModel.generateAdvancedFilters({
+      authUser: this.authUser,
+      options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      }
+    });
   }
 
   /**

@@ -16,8 +16,8 @@ import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolv
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
-import { VaccineStatusDataResolver } from './../../core/services/resolvers/data/vaccine-status.resolver';
-import { VaccineDataResolver } from './../../core/services/resolvers/data/vaccine.resolver';
+import { VaccineStatusDataResolver } from '../../core/services/resolvers/data/vaccine-status.resolver';
+import { VaccineDataResolver } from '../../core/services/resolvers/data/vaccine.resolver';
 import * as fromPages from './pages';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { DocumentTypeDataResolver } from '../../core/services/resolvers/data/document-type.resolver';
@@ -40,18 +40,27 @@ import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 import { FollowUpGroupByDataResolver } from '../../core/services/resolvers/data/follow-up-group-by.resolver';
 import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
+import { InvestigationStatusDataResolver } from '../../core/services/resolvers/data/investigation-status.resolver';
+import { PersonDateTypeDataResolver } from '../../core/services/resolvers/data/person-date-type.resolver';
+import { DateRangeCenterDataResolver } from '../../core/services/resolvers/data/date-range-center.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
+import { FollowUpCreatedAsDataResolver } from '../../core/services/resolvers/data/follow-up-created-as.resolver';
 
 // Follow-ups list from a - contact / case
 const viewFollowUpsListFoundation: Route = {
   component: fromPages.IndividualContactFollowUpsListComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
     team: TeamDataResolver,
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
     user: UserDataResolver,
     entityData: PersonDataResolver,
-    yesNo: YesNoDataResolver
+    addressType: AddressTypeDataResolver,
+    followUpCreatedAs: FollowUpCreatedAsDataResolver
   }
 };
 
@@ -60,17 +69,20 @@ const dailyFollowUpsListFoundation: Route = {
   component: fromPages.ContactDailyFollowUpsListComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
     team: TeamDataResolver,
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
     risk: RiskDataResolver,
     user: UserDataResolver,
-    yesNo: YesNoDataResolver,
     gender: GenderDataResolver,
     occupation: OccupationDataResolver,
     classification: ClassificationDataResolver,
     outcome: OutcomeDataResolver,
-    entityData: PersonDataResolver
+    entityData: PersonDataResolver,
+    addressType: AddressTypeDataResolver,
+    followUpCreatedAs: FollowUpCreatedAsDataResolver
   }
 };
 
@@ -79,17 +91,20 @@ const contactFoundation: Route = {
   component: ContactsCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     outbreak: SelectedOutbreakDataResolver,
     gender: GenderDataResolver,
     pregnancy: PregnancyStatusDataResolver,
     occupation: OccupationDataResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     documentType: DocumentTypeDataResolver,
     addressType: AddressTypeDataResolver,
     risk: RiskDataResolver,
     vaccine: VaccineDataResolver,
     vaccineStatus: VaccineStatusDataResolver,
     followUpStatus: FinalFollowUpStatusDataResolver,
+    yesNoAll: YesNoAllDataResolver,
     yesNo: YesNoDataResolver,
     team: TeamDataResolver,
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
@@ -100,7 +115,6 @@ const contactFoundation: Route = {
     exposureFrequency: ExposureFrequencyDataResolver,
     exposureDuration: ExposureDurationDataResolver,
     contextOfTransmission: ContextOfTransmissionDataResolver,
-    yesNoAll: YesNoAllDataResolver,
     labName: LabNameDataResolver,
     labSampleType: LabSampleTypeDataResolver,
     labTestType: LabTestTypeDataResolver,
@@ -108,7 +122,13 @@ const contactFoundation: Route = {
     labResultProgress: LabProgressDataResolver,
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
-    entity: RelationshipPersonDataResolver
+    entity: RelationshipPersonDataResolver,
+    investigationStatus: InvestigationStatusDataResolver,
+    classification: ClassificationDataResolver,
+    outcome: OutcomeDataResolver,
+    dateRangeType: PersonDateTypeDataResolver,
+    dateRangeCenter: DateRangeCenterDataResolver,
+    followUpCreatedAs: FollowUpCreatedAsDataResolver
   }
 };
 
@@ -117,13 +137,17 @@ const followUpFoundation: Route = {
   component: fromPages.FollowUpCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     outbreak: SelectedOutbreakDataResolver,
     entityData: PersonDataResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
     team: TeamDataResolver,
     addressType: AddressTypeDataResolver,
-    yesNoAll: YesNoAllDataResolver
+    yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
+    followUpCreatedAs: FollowUpCreatedAsDataResolver
   }
 };
 
@@ -140,7 +164,8 @@ const routes: Routes = [
       ]
     },
     resolve: {
-      pregnancyStatus: PregnancyStatusDataResolver,
+      createdOn: CreatedOnResolver,
+      pregnancy: PregnancyStatusDataResolver,
       gender: GenderDataResolver,
       risk: RiskDataResolver,
       yesNoAll: YesNoAllDataResolver,
@@ -151,7 +176,19 @@ const routes: Routes = [
       vaccineStatus: VaccineStatusDataResolver,
       followUpStatus: FinalFollowUpStatusDataResolver,
       dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
-      team: TeamDataResolver
+      team: TeamDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver,
+      investigationStatus: InvestigationStatusDataResolver,
+      classification: ClassificationDataResolver,
+      outcome: OutcomeDataResolver,
+      dateRangeType: PersonDateTypeDataResolver,
+      dateRangeCenter: DateRangeCenterDataResolver,
+      certaintyLevel: CertaintyLevelDataResolver,
+      exposureType: ExposureTypeDataResolver,
+      exposureFrequency: ExposureFrequencyDataResolver,
+      exposureDuration: ExposureDurationDataResolver,
+      contextOfTransmission: ContextOfTransmissionDataResolver
     }
   },
   // Create Contact
@@ -196,45 +233,55 @@ const routes: Routes = [
   // Bulk Add Contacts
   {
     path: 'create-bulk',
-    component: fromPages.BulkCreateContactsComponent,
+    component: fromPages.ContactsBulkCreateModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CONTACT_BULK_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ],
     resolve: {
+      entity: RelationshipPersonDataResolver,
       gender: GenderDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       occupation: OccupationDataResolver,
-      risk: RiskDataResolver,
       documentType: DocumentTypeDataResolver,
+      yesNo: YesNoDataResolver,
+      risk: RiskDataResolver,
+      team: TeamDataResolver,
       certaintyLevel: CertaintyLevelDataResolver,
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
-      contextOfTransmission: ContextOfTransmissionDataResolver
+      contextOfTransmission: ContextOfTransmissionDataResolver,
+      cluster: ClusterDataResolver
     }
   },
   // Bulk Modify Contacts
   {
     path: 'modify-bulk',
-    component: fromPages.BulkModifyContactsComponent,
+    component: fromPages.ContactsBulkCreateModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CONTACT_BULK_MODIFY
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ],
     resolve: {
       gender: GenderDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       occupation: OccupationDataResolver,
       risk: RiskDataResolver,
+      yesNo: YesNoDataResolver,
+      team: TeamDataResolver,
       followUpStatus: FinalFollowUpStatusDataResolver
     }
   },
@@ -293,6 +340,16 @@ const routes: Routes = [
       ]
     }
   },
+  // Follow-ups list from a contact of contact
+  {
+    path: 'contact-of-contact-follow-ups/:contactOfContactId',
+    ...viewFollowUpsListFoundation,
+    data: {
+      permissions: [
+        PERMISSION.FOLLOW_UP_LIST
+      ]
+    }
+  },
   // Follow-ups list from a case
   {
     path: 'case-follow-ups/:caseId',
@@ -319,16 +376,17 @@ const routes: Routes = [
       team: TeamDataResolver,
       followUpGroupBy: FollowUpGroupByDataResolver,
       occupation: OccupationDataResolver,
-      risk: RiskDataResolver
+      risk: RiskDataResolver,
+      user: UserDataResolver
     }
   },
-  // Create Follow Up
+  // Contact - Create Follow Up
   {
     path: ':contactId/follow-ups/create',
     ...followUpFoundation,
     data: {
       permissions: [
-        PERMISSION.FOLLOW_UP_CREATE
+        PERMISSION.CONTACT_FOLLOW_UP_CREATE
       ],
       action: CreateViewModifyV2Action.CREATE
     },
@@ -336,7 +394,7 @@ const routes: Routes = [
       PageChangeConfirmationGuard
     ]
   },
-  // View Follow Up
+  // Contact - View Follow Up
   {
     path: ':contactId/follow-ups/:followUpId/view',
     ...followUpFoundation,
@@ -347,7 +405,7 @@ const routes: Routes = [
       action: CreateViewModifyV2Action.VIEW
     }
   },
-  // Modify Follow Up
+  // Contact - Modify Follow Up
   {
     path: ':contactId/follow-ups/:followUpId/modify',
     ...followUpFoundation,
@@ -363,7 +421,7 @@ const routes: Routes = [
   },
   // View History Follow Up
   {
-    path: ':caseId/follow-ups/:followUpId/history',
+    path: ':contactOfContactId/follow-ups/:followUpId/contactOfContact-history',
     ...followUpFoundation,
     data: {
       permissions: [
@@ -372,6 +430,45 @@ const routes: Routes = [
       action: CreateViewModifyV2Action.VIEW,
       isHistory: true
     }
+  },
+  // Case - Create Follow Up
+  {
+    path: ':caseId/follow-ups/create',
+    ...followUpFoundation,
+    data: {
+      permissions: [
+        PERMISSION.CONTACT_FOLLOW_UP_CREATE
+      ],
+      action: CreateViewModifyV2Action.CREATE
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
+  // Case - View Follow Up
+  {
+    path: ':caseId/follow-ups/:followUpId/view',
+    ...followUpFoundation,
+    data: {
+      permissions: [
+        PERMISSION.FOLLOW_UP_VIEW
+      ],
+      action: CreateViewModifyV2Action.VIEW
+    }
+  },
+  // Case - Modify Follow Up
+  {
+    path: ':caseId/follow-ups/:followUpId/modify',
+    ...followUpFoundation,
+    data: {
+      permissions: [
+        PERMISSION.FOLLOW_UP_MODIFY
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
   },
   // Modify list of Follow Ups
   {

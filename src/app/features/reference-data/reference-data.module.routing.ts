@@ -9,6 +9,9 @@ import { UserDataResolver } from '../../core/services/resolvers/data/user.resolv
 import { ReferenceDataCategoryDataResolver } from '../../core/services/resolvers/data/reference-data-category.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { IconDataResolver } from '../../core/services/resolvers/data/icon.resolver';
+import { ReferenceDataDiseaseSpecificCategoriesResolver } from '../../core/services/resolvers/data/reference-data-disease-specific-categories.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -16,7 +19,9 @@ const createViewModifyFoundation: Route = {
   canActivate: [AuthGuard],
   resolve: {
     category: ReferenceDataCategoryDataResolver,
+    diseaseSpecificCategories: ReferenceDataDiseaseSpecificCategoriesResolver,
     user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
     icon: IconDataResolver
   }
 };
@@ -31,10 +36,14 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.REFERENCE_DATA_LIST
-      ]
+      ],
+      diseaseSpecificCategoriesConf: {
+        excludeEntries: true
+      }
     },
     resolve: {
-      yesNoAll: YesNoAllDataResolver
+      yesNoAll: YesNoAllDataResolver,
+      diseaseSpecificCategories: ReferenceDataDiseaseSpecificCategoriesResolver
     }
   },
   // View Reference Data Category Entries List
@@ -45,12 +54,17 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_LIST
-      ]
+      ],
+      diseaseSpecificCategoriesConf: {
+        excludeEntries: true
+      }
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
       user: UserDataResolver,
-      category: ReferenceDataCategoryDataResolver
+      category: ReferenceDataCategoryDataResolver,
+      diseaseSpecificCategories: ReferenceDataDiseaseSpecificCategoriesResolver
     }
   },
   // Create new Reference Data entry
@@ -104,8 +118,10 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       yesNoAll: YesNoAllDataResolver,
-      category: ReferenceDataCategoryDataResolver
+      category: ReferenceDataCategoryDataResolver,
+      user: UserDataResolver
     }
   },
   // Manage Icons - Create

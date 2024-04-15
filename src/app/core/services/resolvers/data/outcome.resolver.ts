@@ -21,7 +21,7 @@ export class OutcomeDataResolver implements IMapResolverV2<ReferenceDataEntryMod
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.OUTCOME)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OUTCOME)
       .pipe(
         map((data) => {
           // construct map

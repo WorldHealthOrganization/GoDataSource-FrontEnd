@@ -59,6 +59,17 @@ body {
   }
 }
 
+/* Keyframes */
+@keyframes gd-flash {
+  0%, 50%, 100% {
+    background: rgba(var(--gd-primary-rgb), 0.15);
+  }
+
+  25%, 75% {
+    background: transparent;
+  }
+}
+
 /* Links */
 a {
   color: var(--gd-primary);
@@ -337,6 +348,10 @@ svg:not(:root) {
   -moz-osx-font-smoothing: grayscale;
   /* Support for IE. */
   font-feature-settings: 'liga';
+
+  &.mat-icon {
+    overflow: unset;
+  }
 }
 
 .mat-icon {

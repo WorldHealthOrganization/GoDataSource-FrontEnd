@@ -15,15 +15,17 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 @Component({
   selector: 'app-saved-filters',
   templateUrl: './saved-filters.component.html'
 })
-export class SavedFiltersComponent extends ListComponent<SavedFilterModel> implements OnDestroy {
+export class SavedFiltersComponent extends ListComponent<SavedFilterModel, IV2Column> implements OnDestroy {
   /**
    * Constructor
    */
@@ -32,9 +34,14 @@ export class SavedFiltersComponent extends ListComponent<SavedFilterModel> imple
     private savedFiltersService: SavedFiltersService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private i18nService: I18nService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        disableWaitForSelectedOutbreakToRefreshList: true
+      }
+    );
   }
 
   /**
@@ -288,12 +295,26 @@ export class SavedFiltersComponent extends ListComponent<SavedFilterModel> imple
         }
       },
       {
+        field: 'createdOn',
+        label: 'LNG_SAVED_FILTERS_FIELD_LABEL_CREATED_ON',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
         field: 'createdBy',
         label: 'LNG_SAVED_FILTERS_FIELD_LABEL_CREATED_BY',
         format: {
-          type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.createdBy].name :
-            ''
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -304,18 +325,27 @@ export class SavedFiltersComponent extends ListComponent<SavedFilterModel> imple
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
             `/users/${ data.createdBy }/view` :
             undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_SAVED_FILTERS_FIELD_LABEL_CREATED_AT',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
         field: 'updatedBy',
         label: 'LNG_SAVED_FILTERS_FIELD_LABEL_UPDATED_BY',
         format: {
-          type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
-            this.activatedRoute.snapshot.data.user.map[item.updatedBy].name :
-            ''
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -326,7 +356,7 @@ export class SavedFiltersComponent extends ListComponent<SavedFilterModel> imple
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }
@@ -409,7 +439,9 @@ export class SavedFiltersComponent extends ListComponent<SavedFilterModel> imple
       'name',
       'isPublic',
       'filterKey',
+      'createdOn',
       'createdBy',
+      'createdAt',
       'updatedBy',
       'updatedAt'
     ];
@@ -419,6 +451,10 @@ export class SavedFiltersComponent extends ListComponent<SavedFilterModel> imple
    * Re(load) the Saved filters list, based on the applied filter, sort criterias
    */
   refreshList() {
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
+
     // retrieve list
     this.records$ = this.savedFiltersService
       .getSavedFiltersList(this.queryBuilder)
@@ -443,6 +479,7 @@ export class SavedFiltersComponent extends ListComponent<SavedFilterModel> imple
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {

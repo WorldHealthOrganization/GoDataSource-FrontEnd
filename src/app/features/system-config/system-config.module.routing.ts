@@ -16,13 +16,30 @@ import { SyncPackageModuleDataResolver } from '../../core/services/resolvers/dat
 import { SyncPackageExportTypeDataResolver } from '../../core/services/resolvers/data/sync-package-export-type.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UpstreamServersDataResolver } from '../../core/services/resolvers/data/upstream-servers.resolver';
+import {
+  SyncPackageStatusStepBackupRestoreResolver
+} from '../../core/services/resolvers/data/sync-package-status-step-backup-restore.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
 
 // common base - create / view / modify
-const createViewModifyFoundation: Route = {
+const deviceCreateViewModifyFoundation: Route = {
   component: fromPages.SystemDevicesCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
-    user: UserDataResolver
+    user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver
+  }
+};
+
+// common base - create / view / modify
+const clientApplicationCreateViewModifyFoundation: Route = {
+  component: fromPages.ClientApplicationsCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    outbreak: OutbreakDataResolver,
+    user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver
   }
 };
 
@@ -44,6 +61,22 @@ const routes: Routes = [
       backupModules: BackupModuleDataResolver,
       backupStatus: BackupStatusDataResolver,
       backupTypes: BackupTypesDataResolver,
+      user: UserDataResolver
+    }
+  },
+  {
+    path: 'backups-restores',
+    component: fromPages.BackupsRestoresComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        PERMISSION.BACKUP_RESTORE
+      ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      syncLogsStatus: SyncPackageStatusDataResolver,
+      syncLogsStatusStep: SyncPackageStatusStepBackupRestoreResolver,
       user: UserDataResolver
     }
   },
@@ -96,23 +129,44 @@ const routes: Routes = [
           ]
         },
         resolve: {
+          createdOn: CreatedOnResolver,
           yesNoAll: YesNoAllDataResolver,
-          outbreak: OutbreakDataResolver
+          outbreak: OutbreakDataResolver,
+          user: UserDataResolver
         }
       },
       {
         path: 'create',
-        component: fromPages.ClientApplicationsCreateViewModifyComponent,
-        canActivate: [AuthGuard],
+        ...clientApplicationCreateViewModifyFoundation,
         data: {
           permissions: [
             PERMISSION.CLIENT_APPLICATION_CREATE
           ],
           action: CreateViewModifyV2Action.CREATE
-        },
-        resolve: {
-          outbreak: OutbreakDataResolver
         }
+      },
+      {
+        path: ':clientApplicationId/view',
+        ...clientApplicationCreateViewModifyFoundation,
+        data: {
+          permissions: [
+            PERMISSION.CLIENT_APPLICATION_VIEW
+          ],
+          action: CreateViewModifyV2Action.VIEW
+        }
+      },
+      {
+        path: ':clientApplicationId/modify',
+        ...clientApplicationCreateViewModifyFoundation,
+        data: {
+          permissions: [
+            PERMISSION.CLIENT_APPLICATION_MODIFY
+          ],
+          action: CreateViewModifyV2Action.MODIFY
+        },
+        canDeactivate: [
+          PageChangeConfirmationGuard
+        ]
       }
     ]
   },
@@ -131,12 +185,14 @@ const routes: Routes = [
           ]
         },
         resolve: {
-          yesNoAll: YesNoAllDataResolver
+          createdOn: CreatedOnResolver,
+          yesNoAll: YesNoAllDataResolver,
+          user: UserDataResolver
         }
       },
       {
         path: ':deviceId/view',
-        ...createViewModifyFoundation,
+        ...deviceCreateViewModifyFoundation,
         data: {
           permissions: [
             PERMISSION.DEVICE_VIEW
@@ -146,7 +202,7 @@ const routes: Routes = [
       },
       {
         path: ':deviceId/modify',
-        ...createViewModifyFoundation,
+        ...deviceCreateViewModifyFoundation,
         data: {
           permissions: [
             PERMISSION.DEVICE_MODIFY

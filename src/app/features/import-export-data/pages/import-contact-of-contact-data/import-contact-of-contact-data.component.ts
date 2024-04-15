@@ -49,6 +49,7 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
     'documents[]': 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS',
     'relationship.persons[]': 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RELATIONSHIP_PERSONS',
     'vaccinesReceived[]': 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
+    'age': 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
 
     // !must be empty token - logic depends on it!
     'addresses[].geoLocation': ''
@@ -58,12 +59,9 @@ export class ImportContactOfContactDataComponent implements OnInit, OnDestroy {
     'addresses[].locationId': true
   };
 
-  requiredDestinationFields = [
+  requiredDestinationFields: string[] = [
     'firstName',
-    'dateOfReporting',
-    'relationship.persons[].id',
-    'relationship.contactDate',
-    'relationship.certaintyLevelId'
+    'relationship.persons[].id'
   ];
 
   /**

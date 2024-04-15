@@ -1,15 +1,16 @@
-import { Component, HostListener, OnInit, ViewContainerRef, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { I18nService } from './core/services/helper/i18n.service';
 import { SystemSettingsDataService } from './core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from './core/models/system-settings-version.model';
+import { BulkCacheHelperService } from './core/services/helper/bulk-cache-helper.service';
 
 @Component({
   selector: 'app-root',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.less']
+  styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   // instance configuration
   systemSettingsVersion: SystemSettingsVersionModel;
 
@@ -17,29 +18,30 @@ export class AppComponent implements OnInit {
    * Constructor
    */
   constructor(
-    private i18nService: I18nService,
-    private systemSettingsDataService: SystemSettingsDataService,
+    i18nService: I18nService,
+    systemSettingsDataService: SystemSettingsDataService,
+    bulkCacheHelperService: BulkCacheHelperService,
     // used by ngx color picker - to display as popup
     // ngx-color-picker.mjs:1352 You are using cpUseRootViewContainer, but the root component is not exposing viewContainerRef!Please expose it by adding 'public vcRef: ViewContainerRef' to the constructor.
     public viewContainerRef: ViewContainerRef
   ) {
     // update once
     this.updateVHOnWindowResize();
-  }
 
-  /**
-   * Component initialized
-   */
-  ngOnInit() {
     // load the default language
-    this.i18nService.loadUserLanguage().subscribe();
+    i18nService.loadUserLanguage().subscribe();
 
     // determine if this is a demo or production instance
-    this.systemSettingsDataService
+    // - we need to retrieve no cache to make sure we have the latest timezone
+    systemSettingsDataService
       .getAPIVersion()
       .subscribe((systemSettingsVersion) => {
+        // retrieve api info
         this.systemSettingsVersion = systemSettingsVersion;
       });
+
+    // clear expired cache data
+    bulkCacheHelperService.clearBulkSelected(true);
   }
 
   /**

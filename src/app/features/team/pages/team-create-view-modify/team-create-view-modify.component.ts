@@ -4,8 +4,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -15,7 +13,6 @@ import {
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -28,6 +25,11 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Location } from '@angular/common';
+import { OutbreakAndOutbreakTemplateHelperService } from '../../../../core/services/helper/outbreak-and-outbreak-template-helper.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 /**
  * Component
@@ -44,23 +46,25 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
    * Constructor
    */
   constructor(
+    protected authDataService: AuthDataService,
     protected activatedRoute: ActivatedRoute,
+    protected renderer2: Renderer2,
+    protected redirectService: RedirectService,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
+    protected outbreakAndOutbreakTemplateHelperService: OutbreakAndOutbreakTemplateHelperService,
+    protected i18nService: I18nService,
     protected router: Router,
     protected dialogV2Service: DialogV2Service,
     protected teamDataService: TeamDataService,
-    protected location: Location,
-    authDataService: AuthDataService,
-    renderer2: Renderer2,
-    redirectService: RedirectService
+    protected location: Location
   ) {
     super(
-      toastV2Service,
+      authDataService,
+      activatedRoute,
       renderer2,
       redirectService,
-      activatedRoute,
-      authDataService
+      toastV2Service,
+      outbreakAndOutbreakTemplateHelperService
     );
   }
 
@@ -158,7 +162,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       });
     } else if (this.isModify) {
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_MODIFY_TEAM_TITLE', {
             name: this.itemData.name
           }
@@ -168,7 +172,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(
+        label: this.i18nService.instant(
           'LNG_PAGE_VIEW_TEAM_TITLE', {
             name: this.itemData.name
           }
@@ -177,6 +181,11 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       });
     }
   }
+
+  /**
+   * Initialize breadcrumb infos
+   */
+  protected initializeBreadcrumbInfos(): void {}
 
   /**
    * Initialize tabs
@@ -192,8 +201,8 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_PAGE_CREATE_TEAM_ACTION_CREATE_TEAM_BUTTON'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
@@ -340,9 +349,11 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
+                  this.authUser,
                   'LNG_COMMON_LABEL_DETAILS',
                   this.itemData,
-                  this.activatedRoute.snapshot.data.user
+                  this.activatedRoute.snapshot.data.user,
+                  this.activatedRoute.snapshot.data.deletedUser
                 );
               }
             }
@@ -365,6 +376,10 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
     ) => {
       // check if there are existing teams in the same locations
       const qb = new RequestQueryBuilder();
+      qb.fields(
+        'id',
+        'name'
+      );
       qb.filter.where({
         locationIds: {
           'inq': this.itemData.locationIds
@@ -382,7 +397,10 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
 
       // check
       this.teamDataService
-        .getTeamsList(qb)
+        .getTeamsList(
+          qb,
+          true
+        )
         .pipe(
           catchError((err) => {
             // show error
@@ -494,7 +512,9 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
    */
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = TeamModel.generateAdvancedFilters({
+      authUser: this.authUser,
       options: {
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
@@ -541,6 +561,11 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
 
     // construct query
     const qb = new RequestQueryBuilder();
+    qb.fields(
+      'id',
+      'name',
+      'userIds'
+    );
     qb.filter.where({
       userIds: {
         inq: this.itemData.userIds
@@ -572,7 +597,10 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
 
     // check
     this._previousCheckForMultipleTeams = this.teamDataService
-      .getTeamsList(qb)
+      .getTeamsList(
+        qb,
+        true
+      )
       .pipe(
         // should be the last pipe
         takeUntil(this.destroyed$)
@@ -594,7 +622,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
           const usersHTML: string = team.userIds
             .filter((userId) => userIdsMap[userId])
             .map((userId) => users.map[userId] ?
-              `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(`/users/${userId}/view`)}"><span>${users.map[userId].name}</span></a>` :
+              `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(`/users/${userId}/view`)}"><span>${users.map[userId].nameAndEmail}</span></a>` :
               '—'
             ).join(', ');
 

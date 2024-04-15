@@ -1,14 +1,12 @@
 import { MatMomentDateAdapterOptions, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { Moment } from 'moment';
-import * as moment from 'moment';
-import { moment as xMoment } from '../../../core/helperClasses/x-moment';
+import { LocalizationHelper, Moment } from '../../../core/helperClasses/localization-helper';
 
 export class CustomDateAdapter extends MomentDateAdapter {
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     dateLocale: string,
     _options?: MatMomentDateAdapterOptions | undefined,
@@ -21,19 +19,19 @@ export class CustomDateAdapter extends MomentDateAdapter {
   }
 
   /**
-     * Start the calendar with this day of the week
-     * 0 = Sunday
-     * 1 = Monday
-     *
-     * return number
-     */
+   * Start the calendar with this day of the week
+   * 0 = Sunday
+   * 1 = Monday
+   *
+   * return number
+   */
   getFirstDayOfWeek(): number {
     return 1;
   }
 
   /**
-     * Retrieve week names
-     */
+   * Retrieve week names
+   */
   getDayOfWeekNames(style: 'long' | 'short' | 'narrow'): string[] {
     // translate token accordingly to language
     switch (style) {
@@ -76,8 +74,8 @@ export class CustomDateAdapter extends MomentDateAdapter {
   }
 
   /**
-     * Get month name
-     */
+   * Get month name
+   */
   getMonthNames(style: 'long' | 'short' | 'narrow'): string[] {
     // translate token accordingly to language
     switch (style) {
@@ -135,8 +133,8 @@ export class CustomDateAdapter extends MomentDateAdapter {
   }
 
   /**
-     * Date names => 1 - 31
-     */
+   * Date names => 1 - 31
+   */
   getDateNames(): string[] {
     return [
       this.i18nService.instant('LNG_DATEPICKER_CALENDAR_LABEL_DATE_NAMES_1'),
@@ -177,15 +175,15 @@ export class CustomDateAdapter extends MomentDateAdapter {
      * Year name
      */
   getYearName(date: Moment): string {
-    // for now we won't translate this since it depends of date and might complicate things (too many language tokens)
+    // for now, we won't translate this since it depends on date and might complicate things (too many language tokens)
     return super.getYearName(date);
   }
 
   /**
-     * Configure moment for custom translations
-     */
+   * Configure moment for custom translations
+   */
   private configureMoment(): void {
-    moment.updateLocale(
+    LocalizationHelper.updateLocale(
       'custom', {
         months: this.getMonthNames('long'),
         monthsShort: this.getMonthNames('short')
@@ -194,23 +192,23 @@ export class CustomDateAdapter extends MomentDateAdapter {
   }
 
   /**
-     * Format date
-     */
+   * Format date
+   */
   format(date: Moment, displayFormat: string): string {
     // retrieve current locale
-    const currentLocale: string = moment.locale();
+    const currentLocale: string = LocalizationHelper.locale();
 
     // configure custom locale with custom month names
     this.configureMoment();
-    moment.locale('custom');
+    LocalizationHelper.locale('custom');
 
     // format date
     const formattedDate: string = date ?
-      xMoment(date.toISOString()).format(displayFormat) :
+      LocalizationHelper.toMoment(date).format(displayFormat) :
       '';
 
     // reset back to previous locale
-    moment.locale(currentLocale);
+    LocalizationHelper.locale(currentLocale);
 
     // finished
     return formattedDate;

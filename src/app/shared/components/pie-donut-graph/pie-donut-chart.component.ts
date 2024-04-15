@@ -108,6 +108,10 @@ implements OnInit, OnDestroy {
   private static DEFAULT_GRAPH_DONUT_INITIAL_SIZE: number = 30;
   private static DEFAULT_GRAPH_SHADOW_MULTIPLIER: number = 0.8;
 
+  // timers
+  private _redrawGraphTimer: number;
+  private _renderTimer: number;
+
   // chart id generator
   chartId: string = `chart${uuid()}`;
 
@@ -117,9 +121,16 @@ implements OnInit, OnDestroy {
     // set data
     this._chartContainer = chartContainer;
 
+    // stop previous
+    this.stopRedrawGraphTimer();
+
     // redraw after elements are rendered accordingly to new bindings
     // loading spinner was removed from dom after graph became visible even if chart is on else in *ngIf which was causing multiple size changes
-    setTimeout(() => {
+    this._redrawGraphTimer = setTimeout(() => {
+      // reset
+      this._redrawGraphTimer = undefined;
+
+      // redraw
       this.redrawGraph(false);
     });
   }
@@ -339,8 +350,8 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Remove component resources
-     */
+   * Remove component resources
+   */
   ngOnDestroy() {
     // stop size checker
     this.releasePeriodicChecks();
@@ -350,13 +361,30 @@ implements OnInit, OnDestroy {
       this._getDataSubscription.unsubscribe();
       this._getDataSubscription = undefined;
     }
+
+    // stop timers
+    this.stopRedrawGraphTimer();
+    this.stopRenderTimer();
+  }
+
+  /**
+   * Stop timer
+   */
+  private stopRedrawGraphTimer(): void {
+    if (this._redrawGraphTimer) {
+      clearTimeout(this._redrawGraphTimer);
+      this._redrawGraphTimer = undefined;
+    }
   }
 
   /**
      * Release periodic checker
      */
   private releasePeriodicChecks(): void {
-    clearTimeout(this._periodicChecker);
+    if (this._periodicChecker) {
+      clearTimeout(this._periodicChecker);
+      this._periodicChecker = undefined;
+    }
   }
 
   /**
@@ -368,6 +396,9 @@ implements OnInit, OnDestroy {
 
     // execute periodic checker
     this._periodicChecker = setTimeout(() => {
+      // reset
+      this._periodicChecker = undefined;
+
       // check size
       this.updateGraphSize(true);
 
@@ -979,8 +1010,18 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Render graph
-     */
+   * Stop timer
+   */
+  private stopRenderTimer(): void {
+    if (this._renderTimer) {
+      clearTimeout(this._renderTimer);
+      this._renderTimer = undefined;
+    }
+  }
+
+  /**
+   * Render graph
+   */
   private render(partialClear: boolean): void {
     // determine
     this.determineGraphContainer();
@@ -999,9 +1040,13 @@ implements OnInit, OnDestroy {
     // determine data that we need to render
     this._graph.dataToRender = this.data.filter((item) => item.checked);
 
+    // stop previous
+    this.stopRenderTimer();
+
     // wait for binding before determining total otherwise we get expression changed error
-    setTimeout(() => {
+    this._renderTimer = setTimeout(() => {
       // reset
+      this._renderTimer = undefined;
       this._graph.rendered = {
         totalNo: 0,
         total: '0'

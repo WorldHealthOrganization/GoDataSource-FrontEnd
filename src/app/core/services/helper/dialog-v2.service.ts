@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject, throwError } from 'rxjs';
+import { Observable, Subject, switchMap, throwError } from 'rxjs';
 import {
   IV2SideDialog,
   IV2SideDialogAdvancedFiltersResponse,
@@ -18,25 +18,52 @@ import {
   V2SideDialogConfigInput,
   V2SideDialogConfigInputType
 } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { ExportButtonKey, ExportDataExtension, ExportDataMethod, IV2ExportDataConfig, IV2ExportDataConfigLoaderConfig, IV2ExportDataConfigProgressAnswer } from './models/dialog-v2.model';
-import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import {
+  ExportButtonKey,
+  ExportDataExtension,
+  ExportDataMethod,
+  IV2ExportDataConfig,
+  IV2ExportDataConfigLoaderConfig,
+  IV2ExportDataConfigProgressAnswer
+} from './models/dialog-v2.model';
+import {
+  IV2LoadingDialogHandler
+} from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { AppLoadingDialogV2Component } from '../../../shared/components-v2/app-loading-dialog-v2/app-loading-dialog-v2.component';
+import {
+  AppLoadingDialogV2Component
+} from '../../../shared/components-v2/app-loading-dialog-v2/app-loading-dialog-v2.component';
 import { ImportExportDataService } from '../data/import-export.data.service';
 import { FormHelperService } from './form-helper.service';
-import { RequestFilterGenerator, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
+import {
+  RequestFilterGenerator,
+  RequestFilterOperator,
+  RequestQueryBuilder,
+  RequestSortDirection
+} from '../../helperClasses/request-query-builder';
 import * as _ from 'lodash';
 import { catchError } from 'rxjs/operators';
 import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 import { Constants, ExportStatusStep } from '../../models/constants';
 import { ExportLogDataService } from '../data/export-log.data.service';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
-import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
-import { IV2BottomDialogConfig, IV2BottomDialogConfigButtonType, IV2BottomDialogConfigData, IV2BottomDialogHandler, IV2BottomDialogResponse } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import {
+  AppBottomDialogV2Component
+} from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
+import {
+  IV2BottomDialogConfig,
+  IV2BottomDialogConfigButtonType,
+  IV2BottomDialogConfigData,
+  IV2BottomDialogHandler,
+  IV2BottomDialogResponse
+} from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ToastV2Service } from './toast-v2.service';
-import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort, SavedFilterModel } from '../../models/saved-filters.model';
+import {
+  SavedFilterData,
+  SavedFilterDataAppliedFilter,
+  SavedFilterDataAppliedSort,
+  SavedFilterModel
+} from '../../models/saved-filters.model';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import {
   IV2AdvancedFilterAddress,
@@ -49,20 +76,24 @@ import {
 } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { UserModel } from '../../models/user.model';
 import { SavedFiltersService } from '../data/saved-filters.data.service';
-import { TranslateService } from '@ngx-translate/core';
 import { AnswerModel, QuestionModel } from '../../models/question.model';
 import { AddressModel } from '../../models/address.model';
 import { IV2DateRange } from '../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { AuthDataService } from '../data/auth.data.service';
 import { BaseModel } from '../../models/base.model';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
-import { AppFormSelectGroupsV2Component } from '../../../shared/forms-v2/components/app-form-select-groups-v2/app-form-select-groups-v2.component';
+import {
+  AppFormSelectGroupsV2Component
+} from '../../../shared/forms-v2/components/app-form-select-groups-v2/app-form-select-groups-v2.component';
+import { ErrorModel } from '../../models/error.model';
+import { I18nService } from './i18n.service';
+import { LocalizationHelper, Moment } from '../../helperClasses/localization-helper';
 
 @Injectable()
 export class DialogV2Service {
   // export dialog width
-  private static readonly EXPORT_DIALOG_WIDTH: string = '50rem';
-  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '40rem';
+  private static readonly EXPORT_DIALOG_WIDTH: string = '60rem';
+  private static readonly STANDARD_ADVANCED_FILTER_DIALOG_WIDTH: string = '60rem';
 
   // used to show and update side dialog
   private _sideDialogSubject$: Subject<IV2SideDialog> = new Subject<IV2SideDialog>();
@@ -91,7 +122,7 @@ export class DialogV2Service {
     private matBottomSheet: MatBottomSheet,
     private toastV2Service: ToastV2Service,
     private savedFiltersService: SavedFiltersService,
-    private translateService: TranslateService,
+    private i18nService: I18nService,
     private authDataService: AuthDataService
   ) {}
 
@@ -260,7 +291,7 @@ export class DialogV2Service {
     // add divider for groups and fields
     if (
       config.export.allow.groups ||
-      config.export.allow.fields
+      config.export.allow.fields?.options?.length > 0
     ) {
       inputs.push({
         type: V2SideDialogConfigInputType.DIVIDER
@@ -276,7 +307,18 @@ export class DialogV2Service {
           placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
           name: 'fieldsGroupAll',
           checked: true,
-          change: (data): void => {
+          change: (data, handler): void => {
+            // trigger callback ?
+            if (
+              config.export.allow.groups &&
+              config.export.allow.groups.change
+            ) {
+              config.export.allow.groups.change(
+                data,
+                handler
+              );
+            }
+
             // all fields groups checked ?
             if ((data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked) {
               // clear specific groups
@@ -314,12 +356,23 @@ export class DialogV2Service {
               return !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
             }
           },
-          change: (data): void => {
+          change: (data, handler): void => {
             // nothing to do ?
-            if (
-              !config.export.allow.groups ||
-              !config.export.allow.groups.required
-            ) {
+            if (!config.export.allow.groups) {
+              // finished
+              return;
+            }
+
+            // trigger callback ?
+            if (config.export.allow.groups.change) {
+              config.export.allow.groups.change(
+                data,
+                handler
+              );
+            }
+
+            // if there are no required fields then we don't need to proceed further
+            if (!config.export.allow.groups.required) {
               // finished
               return;
             }
@@ -363,7 +416,7 @@ export class DialogV2Service {
     }
 
     // specific fields
-    if (config.export.allow.fields) {
+    if (config.export.allow.fields?.options?.length > 0) {
       // all
       inputs.push(
         {
@@ -376,7 +429,18 @@ export class DialogV2Service {
               false :
               !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
           },
-          change: (data): void => {
+          change: (data, handler): void => {
+            // trigger callback ?
+            if (
+              config.export.allow.fields &&
+              config.export.allow.fields.change
+            ) {
+              config.export.allow.fields.change(
+                data,
+                handler
+              );
+            }
+
             // all fields ?
             if ((data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked) {
               (data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown).values = [];
@@ -392,7 +456,7 @@ export class DialogV2Service {
           placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS',
           name: 'fieldsList',
           values: [],
-          options: config.export.allow.fields,
+          options: config.export.allow.fields.options,
           disabled: (data): boolean => {
             return (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked || (
               data.map.fieldsGroupAll &&
@@ -406,6 +470,18 @@ export class DialogV2Service {
                 (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked
               );
             }
+          },
+          change: (data, handler) => {
+            // trigger callback ?
+            if (
+              config.export.allow.fields &&
+              config.export.allow.fields.change
+            ) {
+              config.export.allow.fields.change(
+                data,
+                handler
+              );
+            }
           }
         }
       );
@@ -414,7 +490,7 @@ export class DialogV2Service {
     // add divider for groups and fields
     if (
       config.export.allow.groups ||
-      config.export.allow.fields
+      config.export.allow.fields?.options?.length > 0
     ) {
       inputs.push({
         type: V2SideDialogConfigInputType.DIVIDER
@@ -504,6 +580,39 @@ export class DialogV2Service {
     if (config.export.inputs?.append) {
       inputs.push(...config.export.inputs.append);
     }
+
+    // handle custom catches
+    const handleCatchError = (err: Blob | Error | ErrorModel) => {
+      // handle blob errors
+      if (
+        err instanceof Blob &&
+        err.type === 'application/json'
+      ) {
+        return new Observable((subscriber) => {
+          err.text()
+            .then((text) => {
+              // any error would be caught by promise.catch
+              const jsonErr = JSON.parse(text);
+              subscriber.next(
+                jsonErr.error ?
+                  jsonErr.error :
+                  jsonErr
+              );
+              subscriber.complete();
+            })
+            .catch((blobErr) => {
+              // couldn't handle the custom error
+              subscriber.next(blobErr);
+              subscriber.complete();
+            });
+        }).pipe(switchMap((localErr: Blob | Error | ErrorModel) => {
+          return config.export.catchError(localErr);
+        }));
+      }
+
+      // continue
+      return config.export.catchError(err);
+    };
 
     // display dialog
     this._sideDialogSubject$
@@ -596,6 +705,14 @@ export class DialogV2Service {
             });
           }
 
+          // prefilter form data
+          if (config.export.formDataPrefilter) {
+            config.export.formDataPrefilter(
+              formData,
+              qb
+            );
+          }
+
           // show loading dialog
           response.handler.loading.show();
 
@@ -623,11 +740,16 @@ export class DialogV2Service {
           )
             .pipe(
               catchError((err) => {
-                // show error
-                this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
-
                 // close dialog
                 response.handler.hide();
+
+                // custom error handler ?
+                if (config.export.catchError) {
+                  return handleCatchError(err);
+                }
+
+                // show error
+                this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                 // send error down the road
                 return throwError(err);
@@ -695,7 +817,7 @@ export class DialogV2Service {
                         processed: data.processed.toLocaleString('en'),
                         total: data.total.toLocaleString('en'),
                         estimatedEnd: data.estimatedEndDate ?
-                          data.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+                          LocalizationHelper.displayDateTime(data.estimatedEndDate) :
                           '—'
                       }
                     );
@@ -751,11 +873,16 @@ export class DialogV2Service {
                   .getExportLog((blobOrJson as { exportLogId: string }).exportLogId)
                   .pipe(
                     catchError((err) => {
-                      // show error
-                      this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
-
                       // close dialog
                       response.handler.hide();
+
+                      // custom error handler ?
+                      if (config.export.catchError) {
+                        return handleCatchError(err);
+                      }
+
+                      // show error
+                      this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                       // send error down the road
                       return throwError(err);
@@ -767,7 +894,7 @@ export class DialogV2Service {
                     if (exportLogModel.processedNo > 0) {
                       // initialize start time if necessary
                       if (!startTime) {
-                        startTime = moment();
+                        startTime = LocalizationHelper.now();
                         processedErrorForCorrectTime = exportLogModel.processedNo;
                       }
 
@@ -775,10 +902,10 @@ export class DialogV2Service {
                       const processed: number = exportLogModel.processedNo - processedErrorForCorrectTime;
                       const total: number = exportLogModel.totalNo - processedErrorForCorrectTime;
                       if (processed > 0) {
-                        const processedSoFarTimeMs: number = moment().diff(startTime);
+                        const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
                         const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
                         const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
-                        estimatedEndDate = moment().add(remainingTimeMs, 'ms');
+                        estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
                       }
                     }
 
@@ -822,11 +949,16 @@ export class DialogV2Service {
                         )
                         .pipe(
                           catchError((err) => {
-                            // show error
-                            this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
-
                             // close dialog
                             response.handler.hide();
+
+                            // custom error handler ?
+                            if (config.export.catchError) {
+                              return handleCatchError(err);
+                            }
+
+                            // show error
+                            this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                             // send error down the road
                             return throwError(err);
@@ -965,6 +1097,14 @@ export class DialogV2Service {
     filtersList.filters = [];
     filtersList.sorts = [];
 
+    // clean removed filters and sorts
+    advancedFiltersApplied.appliedFilters = advancedFiltersApplied.appliedFilters?.length ?
+      advancedFiltersApplied.appliedFilters.filter((appliedFilter) => !!filtersList.optionsAsLabelValueMap[appliedFilter.filter.uniqueKey]) :
+      advancedFiltersApplied.appliedFilters;
+    advancedFiltersApplied.appliedSort = advancedFiltersApplied.appliedSort?.length ?
+      advancedFiltersApplied.appliedSort.filter((sortCriteria) => !!filtersList.optionsAsLabelValueMap[sortCriteria.sort.uniqueKey]) :
+      advancedFiltersApplied.appliedSort;
+
     // add filters
     (advancedFiltersApplied.appliedFilters || []).forEach((appliedFilter) => {
       // add filter
@@ -992,6 +1132,32 @@ export class DialogV2Service {
 
       // filter value
       advancedFilter.value = appliedFilter.value;
+
+      // filter outbreak specific data
+      // only multi-selects are of interest
+      // - IMPORTANT: for now we don't need to handle single selects since they are used only for yes/no dropdowns and follow-ups status
+      if (
+        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value].data.type === V2AdvancedFilterType.MULTISELECT &&
+        // none = LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE
+        advancedFilter.comparator.value === V2AdvancedFilterComparatorType.NONE &&
+        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value].data.options?.length &&
+        advancedFilter.value?.length &&
+        Array.isArray(advancedFilter.value)
+      ) {
+        // map
+        const selectMap: {
+          [id: string]: true
+        } = {};
+        filtersList.optionsAsLabelValueMap[advancedFilter.filterBy.value].data.options.forEach((option) => {
+          selectMap[option.value] = true;
+        });
+
+        // get value
+        advancedFilter.value = advancedFilter.value.filter((item) =>
+          typeof item !== 'string' ||
+          selectMap[item]
+        );
+      }
 
       // if questionnaire then we need further process
       // - or within address...
@@ -1073,7 +1239,7 @@ export class DialogV2Service {
           (prefixOrder + '.') :
           ''
       ) + question.order;
-      const label: string = `${orderLabel} ${this.translateService.instant(question.text)}`;
+      const label: string = `${orderLabel} ${this.i18nService.instant(question.text)}`;
 
       // create option
       const options = {
@@ -1256,7 +1422,8 @@ export class DialogV2Service {
                   filterDefinition.field,
                   appliedFilter.value,
                   false,
-                  true
+                  true,
+                  filterDefinition.useLike
                 );
 
                 // finished
@@ -1267,7 +1434,8 @@ export class DialogV2Service {
                 qb.filter.byContainingText(
                   filterDefinition.field,
                   appliedFilter.value,
-                  false
+                  false,
+                  filterDefinition.useLike
                 );
 
                 // finished
@@ -1284,6 +1452,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  true,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1346,7 +1515,9 @@ export class DialogV2Service {
               case V2AdvancedFilterComparatorType.LOCATION:
                 qb.filter.where({
                   [`${filterDefinition.field}.parentLocationIdFilter`]: {
-                    inq: appliedFilter.value
+                    inq: filterDefinition.type === V2AdvancedFilterType.LOCATION_SINGLE ?
+                      [appliedFilter.value] :
+                      appliedFilter.value
                   }
                 });
                 break;
@@ -1445,6 +1616,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  false,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1476,6 +1648,8 @@ export class DialogV2Service {
             break;
 
           case V2AdvancedFilterType.RANGE_DATE:
+          case V2AdvancedFilterType.DELETED_AT:
+            // attach condition
             switch (appliedFilter.comparator.value) {
               case V2AdvancedFilterComparatorType.HAS_VALUE:
                 // filter
@@ -1488,6 +1662,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  false,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1504,6 +1679,11 @@ export class DialogV2Service {
                 );
             }
 
+            // we need to search deleted records ?
+            if (filterDefinition.type === V2AdvancedFilterType.DELETED_AT) {
+              qb.includeDeleted();
+            }
+
             // finished
             break;
 
@@ -1511,7 +1691,7 @@ export class DialogV2Service {
             // between
             const date = appliedFilter.value ?
               null :
-              moment(appliedFilter.value);
+              LocalizationHelper.toMoment(appliedFilter.value);
 
             // filter
             qb.filter.byDateRange(
@@ -1542,6 +1722,7 @@ export class DialogV2Service {
                 // filter
                 qb.filter.byNotHavingValue(
                   filterDefinition.field,
+                  true,
                   !!filterDefinition.havingNotHavingApplyMongo
                 );
 
@@ -1574,6 +1755,28 @@ export class DialogV2Service {
               false,
               null
             );
+
+            // finished
+            break;
+
+          // Deleted
+          case V2AdvancedFilterType.DELETED:
+            // FilterComparator.NONE
+            if (appliedFilter.value === false) {
+              qb.excludeDeleted();
+              qb.filter.remove('deleted');
+            } else {
+              qb.includeDeleted();
+              if (appliedFilter.value === true) {
+                qb.filter.where({
+                  deleted: {
+                    eq: true
+                  }
+                }, true);
+              } else {
+                qb.filter.remove('deleted');
+              }
+            }
 
             // finished
             break;
@@ -1615,7 +1818,10 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.FREE_TEXT.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.IS:
-                        valueQuery = RequestFilterGenerator.textIs(value);
+                        valueQuery = RequestFilterGenerator.textIs(
+                          value,
+                          filterDefinition.useLike
+                        );
                         break;
                       case V2AdvancedFilterComparatorType.CONTAINS_TEXT:
                         valueQuery = RequestFilterGenerator.textContains(
@@ -1624,10 +1830,8 @@ export class DialogV2Service {
                         );
                         break;
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1646,10 +1850,8 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.DATE_TIME.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1666,10 +1868,8 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1687,10 +1887,8 @@ export class DialogV2Service {
                   case Constants.ANSWER_TYPES.NUMERIC.value:
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
 
@@ -1707,10 +1905,8 @@ export class DialogV2Service {
                     // neq: null / $eq null doesn't work due to a mongodb bug ( the issue occurs when trying to filter an element from an array which is this case )
                     switch (extraComparator) {
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
-                        valueQuery = RequestFilterGenerator.hasValue();
-                        break;
                       case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
-                        // doesn't have value if handled bellow
+                        // doesn't have value and has value are handled bellow
                         // NOTHING TO DO
                         break;
                     }
@@ -1729,9 +1925,17 @@ export class DialogV2Service {
                 // do we need to attach a value condition as well ?
                 if (valueQuery) {
                   query[`${filterDefinition.field}.${question.variable}.0.value`] = valueQuery;
+                } else if (extraComparator === V2AdvancedFilterComparatorType.HAS_VALUE) {
+                  // handle has value case
+                  const condition: any = RequestFilterGenerator.hasValue(`${filterDefinition.field}.${question.variable}.0.value`);
+                  const key: string = Object.keys(condition)[0];
+                  query[key] = condition[key];
                 } else if (extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE) {
                   // handle no value case
-                  const condition: any = RequestFilterGenerator.doesntHaveValue(`${filterDefinition.field}.${question.variable}.0.value`);
+                  const condition: any = RequestFilterGenerator.doesntHaveValue(
+                    `${filterDefinition.field}.${question.variable}.0.value`,
+                    true
+                  );
                   const key: string = Object.keys(condition)[0];
                   query[key] = condition[key];
                 }
@@ -1751,6 +1955,7 @@ export class DialogV2Service {
                   // handle no value case
                   const condition: any = RequestFilterGenerator.doesntHaveValue(
                     'value',
+                    true,
                     true
                   );
                   const key: string = Object.keys(condition)[0];
@@ -1762,7 +1967,7 @@ export class DialogV2Service {
                   query.date = dateQuery;
                 }
 
-                // add extra check if date not provided and we need to retrieve all records that don't have a value
+                // add extra check if date not provided, and we need to retrieve all records that don't have a value
                 if (
                   !dateQuery &&
                   extraComparator === V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
@@ -1829,19 +2034,22 @@ export class DialogV2Service {
       }));
 
       // add sorting criteria
+      const sortField: string = typeof filterDefinition.sortable === 'string' ?
+        filterDefinition.sortable :
+        filterDefinition.field;
       if (
         objectDetailsSort &&
         objectDetailsSort[appliedSort.sortBy.value]
       ) {
         objectDetailsSort[appliedSort.sortBy.value].forEach((childProperty) => {
           queryBuilder.sort.by(
-            `${filterDefinition.field}.${childProperty}`,
+            `${sortField}.${childProperty}`,
             appliedSort.order.value as RequestSortDirection
           );
         });
       } else {
         queryBuilder.sort.by(
-          filterDefinition.field,
+          sortField,
           appliedSort.order.value as RequestSortDirection
         );
       }
@@ -1895,6 +2103,48 @@ export class DialogV2Service {
                   handler.data.map.filters as IV2SideDialogConfigInputFilterList,
                   savedData.filterData
                 );
+
+                // update icons
+                item.suffixIconButtons = [];
+
+                // public
+                if (savedData.isPublic) {
+                  item.suffixIconButtons.push({
+                    tooltip: this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_IS_PUBLIC_LABEL'),
+                    icon: 'public'
+                  });
+                }
+
+                // readonly
+                if (savedData.readOnly) {
+                  item.suffixIconButtons.push({
+                    tooltip: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL', {
+                        name: savedData.createdByUser?.name ?
+                          savedData.createdByUser?.name :
+                          ''
+                      }
+                    ),
+                    icon: 'edit_off'
+                  });
+                }
+
+                // updated at
+                if (savedData.updatedAt) {
+                  item.suffixIconButtons.push({
+                    tooltip: this.i18nService.instant(
+                      'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
+                        datetime: LocalizationHelper.displayDateTime(savedData.updatedAt)
+                      }
+                    ),
+                    icon: 'history'
+                  });
+                }
+
+                // nothing ?
+                if (item.suffixIconButtons.length < 1) {
+                  item.suffixIconButtons = undefined;
+                }
               }
             }
           }, {
@@ -1943,6 +2193,7 @@ export class DialogV2Service {
           qb.fields(
             'id',
             'name',
+            'isPublic',
             'readOnly',
             'filterData',
             'userId',
@@ -1981,10 +2232,18 @@ export class DialogV2Service {
                 // infos
                 option.infos = [];
 
+                // set info icons - public ?
+                if (item.isPublic) {
+                  option.infos.push({
+                    label: this.i18nService.instant('LNG_SIDE_FILTERS_LOAD_FILTER_IS_PUBLIC_LABEL'),
+                    icon: 'public'
+                  });
+                }
+
                 // set info icons - readonly
                 if (item.readOnly) {
                   option.infos.push({
-                    label: this.translateService.instant(
+                    label: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL', {
                         name: item.createdByUser?.name ?
                           item.createdByUser?.name :
@@ -1998,9 +2257,9 @@ export class DialogV2Service {
                 // updated at
                 if (item.updatedAt) {
                   option.infos.push({
-                    label: this.translateService.instant(
+                    label: this.i18nService.instant(
                       'LNG_SIDE_FILTERS_LOAD_FILTER_UPDATED_AT_LABEL', {
-                        datetime: moment(item.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT)
+                        datetime: LocalizationHelper.displayDateTime(item.updatedAt)
                       }
                     ),
                     icon: 'history'
@@ -2300,33 +2559,44 @@ export class DialogV2Service {
    * Show record details dialog
    */
   showRecordDetailsDialog(
+    authUser: UserModel,
     title: string,
     record: BaseModel,
     users: IResolverV2ResponseModel<UserModel>,
+    deletedUsers: IResolverV2ResponseModel<UserModel>,
     suffixInputs?: V2SideDialogConfigInput[]
   ): void {
     // construct list of details
     const detailsInputs: V2SideDialogConfigInput[] = [];
 
     // created by
-    let createdByName: string = '—';
-    if (
-      record.createdBy &&
-      users.map[record.createdBy]
-    ) {
-      createdByName = users.map[record.createdBy].name;
+    let createdBy: UserModel;
+    if (record.createdBy) {
+      createdBy = users.map[record.createdBy] ?
+        users.map[record.createdBy] : (
+          deletedUsers.map[record.createdBy] ?
+            deletedUsers.map[record.createdBy] :
+            undefined
+        );
     }
     detailsInputs.push({
-      type: V2SideDialogConfigInputType.KEY_VALUE,
+      type: V2SideDialogConfigInputType.KEY_LINK_VALUE,
       name: 'createdBy',
       placeholder: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY',
-      value: createdByName
+      link: {
+        label: createdBy ?
+          createdBy.nameAndEmail :
+          '—',
+        src: createdBy && UserModel.canView(authUser) && !createdBy.deleted ?
+          [`/users/${createdBy.id}/view`] :
+          undefined
+      }
     });
 
     // created at
     let createdAt: string = '—';
     if (record.createdAt) {
-      createdAt = moment(record.createdAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+      createdAt = LocalizationHelper.displayDateTime(record.createdAt);
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
@@ -2335,25 +2605,48 @@ export class DialogV2Service {
       value: createdAt
     });
 
-    // updated by
-    let updatedByName: string = '—';
-    if (
-      record.updatedBy &&
-      users.map[record.updatedBy]
-    ) {
-      updatedByName = users.map[record.updatedBy].name;
+    // created on
+    let createdOn: string = '—';
+    if (record.createdOn) {
+      createdOn = record.createdOn ?
+        `LNG_PLATFORM_LABEL_${record.createdOn}` :
+        record.createdOn;
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
+      name: 'createdOn',
+      placeholder: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON',
+      value: createdOn
+    });
+
+    // updated by
+    let updatedBy: UserModel;
+    if (record.updatedBy) {
+      updatedBy = users.map[record.updatedBy] ?
+        users.map[record.updatedBy] : (
+          deletedUsers.map[record.updatedBy] ?
+            deletedUsers.map[record.updatedBy] :
+            undefined
+        );
+    }
+    detailsInputs.push({
+      type: V2SideDialogConfigInputType.KEY_LINK_VALUE,
       name: 'updatedBy',
       placeholder: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY',
-      value: updatedByName
+      link: {
+        label: updatedBy ?
+          updatedBy.nameAndEmail :
+          '—',
+        src: updatedBy && UserModel.canView(authUser) && !updatedBy.deleted ?
+          [`/users/${updatedBy.id}/view`] :
+          undefined
+      }
     });
 
     // updated at
     let updatedAt: string = '—';
     if (record.updatedAt) {
-      updatedAt = moment(record.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+      updatedAt = LocalizationHelper.displayDateTime(record.updatedAt);
     }
     detailsInputs.push({
       type: V2SideDialogConfigInputType.KEY_VALUE,
@@ -2372,7 +2665,7 @@ export class DialogV2Service {
       title: {
         get: () => title
       },
-      width: '45rem',
+      width: '60rem',
       inputs: detailsInputs,
       bottomButtons: [{
         type: IV2SideDialogConfigButtonType.CANCEL,

@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -19,34 +19,49 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputMultiDropdown,
+  IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputText,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import * as moment from 'moment';
-import { TranslateService } from '@ngx-translate/core';
+import { BulkCacheHelperService } from '../../../../core/services/helper/bulk-cache-helper.service';
+import { ReferenceDataHelperService } from '../../../../core/services/helper/reference-data-helper.service';
+import {
+  ContactOfContactModel,
+  IContactOfContactIsolated
+} from '../../../../core/models/contact-of-contact.model';
+import { Location } from '@angular/common';
+import { DocumentModel } from '../../../../core/models/document.model';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { IV2ColumnToVisibleMandatoryConf } from '../../../../shared/forms-v2/components/app-form-visible-mandatory-v2/models/visible-mandatory.model';
+import { PersonAndRelatedHelperService } from '../../../../core/services/helper/person-and-related-helper.service';
+import { LocalizationHelper, Moment } from '../../../../core/helperClasses/localization-helper';
 
 @Component({
   selector: 'app-contacts-list',
   templateUrl: './contacts-list.component.html'
 })
 export class ContactsListComponent
-  extends ListComponent<ContactModel>
+  extends ListComponent<ContactModel, IV2ColumnToVisibleMandatoryConf>
   implements OnDestroy
 {
+  // constants
+  private static readonly RELATIONSHIP_DATA: string = 'relationship';
+
   // contact fields
   contactFields: ILabelValuePairModel[] = [
     { label: 'LNG_CONTACT_FIELD_LABEL_ID', value: 'id' },
@@ -54,7 +69,6 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
     { label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME', value: 'lastName' },
     { label: 'LNG_CONTACT_FIELD_LABEL_GENDER', value: 'gender' },
-    { label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', value: 'phoneNumber' },
     { label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION', value: 'occupation' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', value: 'dob' },
     { label: 'LNG_CONTACT_FIELD_LABEL_AGE', value: 'age' },
@@ -65,21 +79,22 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_TYPE', value: 'type' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
     { label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
     { label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION', value: 'classification' },
     { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase' },
     { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT', value: 'wasContact' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CONTACT_OF_CONTACT', value: 'wasContactOfContact' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', value: 'dateBecomeContact' },
     { label: 'LNG_CONTACT_FIELD_LABEL_OUTCOME_ID', value: 'outcomeId' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome' },
-    { label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused' },
     { label: 'LNG_CONTACT_FIELD_LABEL_SAFE_BURIAL', value: 'safeBurial' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
     { label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP', value: 'followUp' },
@@ -88,9 +103,9 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
     { label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
     { label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
-    { label: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP', value: 'relationship' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP', value: ContactsListComponent.RELATIONSHIP_DATA },
     { label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID', value: 'followUpTeamId' },
-    { label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' }
   ];
 
@@ -110,13 +125,13 @@ export class ContactsListComponent
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', value: 'socialRelationshipDetail' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', value: 'clusterId' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', value: 'comment' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   /**
@@ -125,16 +140,21 @@ export class ContactsListComponent
   constructor(
     protected listHelperService: ListHelperService,
     private activatedRoute: ActivatedRoute,
-    private contactDataService: ContactDataService,
-    private locationDataService: LocationDataService,
-    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private dialogV2Service: DialogV2Service,
     private genericDataService: GenericDataService,
-    private translateService: TranslateService,
-    private entityHelperService: EntityHelperService
+    private bulkCacheHelperService: BulkCacheHelperService,
+    private referenceDataHelperService: ReferenceDataHelperService,
+    private router: Router,
+    private clusterDataService: ClusterDataService,
+    private location: Location,
+    private personAndRelatedHelperService: PersonAndRelatedHelperService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService, {
+        initializeTableColumnsAfterSelectedOutbreakChanged: true,
+        initializeTableAdvancedFiltersAfterSelectedOutbreakChanged: true
+      }
+    );
   }
 
   /**
@@ -212,18 +232,67 @@ export class ContactsListComponent
               cssClasses: () => 'gd-list-table-actions-action-menu-warning',
               action: {
                 click: (item: ContactModel): void => {
+                  // data
+                  const message: {
+                    get: string,
+                    data?: {
+                      name: string,
+                      numberOfContacts: string
+                    }
+                  } = {
+                    get: ''
+                  };
+
                   // determine what we need to delete
-                  this.dialogV2Service
+                  this.personAndRelatedHelperService.dialogV2Service
                     .showConfirmDialog({
                       config: {
                         title: {
                           get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({ name: item.name })
+                          data: () => ({
+                            name: item.name
+                          })
                         },
                         message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_CONTACT',
-                          data: () => ({ name: item.name })
+                          get: () => message.get,
+                          data: () => message.data
                         }
+                      },
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK',
+                      initialized: (handler) => {
+                        // display loading
+                        handler.loading.show();
+
+                        // determine if contact has exposed contacts
+                        this.personAndRelatedHelperService.contact.contactDataService
+                          .getIsolatedContactsForContact(this.selectedOutbreak.id, item.id)
+                          .pipe(
+                            catchError((err) => {
+                              // show error
+                              this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                              // hide loading
+                              handler.loading.hide();
+
+                              // send error down the road
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe((exposedContacts: { count: number }) => {
+                            // set message data
+                            message.data = {
+                              name: item.name,
+                              numberOfContacts: exposedContacts?.count.toLocaleString('en')
+                            };
+
+                            // determine message label
+                            message.get = !exposedContacts?.count ?
+                              'LNG_DIALOG_CONFIRM_DELETE_CONTACT' :
+                              'LNG_DIALOG_CONFIRM_DELETE_CONTACT_WITH_EXPOSED_CONTACTS';
+
+                            // hide loading
+                            handler.loading.hide();
+                          });
                       }
                     })
                     .subscribe((response) => {
@@ -234,15 +303,15 @@ export class ContactsListComponent
                       }
 
                       // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
+                      const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                       // delete contact
-                      this.contactDataService
+                      this.personAndRelatedHelperService.contact.contactDataService
                         .deleteContact(this.selectedOutbreak.id, item.id)
                         .pipe(
                           catchError((err) => {
                             // show error
-                            this.toastV2Service.error(err);
+                            this.personAndRelatedHelperService.toastV2Service.error(err);
 
                             // hide loading
                             loading.close();
@@ -253,7 +322,7 @@ export class ContactsListComponent
                         )
                         .subscribe(() => {
                           // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
+                          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                           // hide loading
                           loading.close();
@@ -281,7 +350,7 @@ export class ContactsListComponent
               }
             },
 
-            // Convert Contact to Contact
+            // Convert Contact to Case
             {
               label: {
                 get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE'
@@ -289,57 +358,100 @@ export class ContactsListComponent
               cssClasses: () => 'gd-list-table-actions-action-menu-warning',
               action: {
                 click: (item: ContactModel): void => {
-                  // show confirm dialog to confirm the action
-                  this.dialogV2Service
-                    .showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_CONVERT',
-                          data: () => ({
-                            name: item.name,
-                            type: this.translateService.instant(EntityType.CASE)
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE',
-                          data: () => item as any
-                        }
-                      }
-                    })
-                    .subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
+                  // show loading
+                  let loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
+                  // determine if contact has at least one exposed contact (contact of contact)
+                  const qb = new RequestQueryBuilder();
+                  qb.filter.where({
+                    type: {
+                      'inq': [EntityType.CONTACT_OF_CONTACT]
+                    }
+                  });
+                  qb.limit(1);
+                  this.personAndRelatedHelperService.relationship.relationshipDataService
+                    .getEntityContacts(
+                      this.selectedOutbreak.id,
+                      item.type,
+                      item.id,
+                      qb
+                    )
+                    .pipe(
+                      catchError((err) => {
+                        // show error
+                        this.personAndRelatedHelperService.toastV2Service.error(err);
 
-                      // convert
-                      this.contactDataService
-                        .convertContactToCase(this.selectedOutbreak.id, item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
+                        // hide loading
+                        loading.close();
 
-                            // hide loading
-                            loading.close();
+                        // send error down the road
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe((exposedContacts: EntityModel[]) => {
+                      // hide loading
+                      loading.close();
 
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
+                      // show warning if there is at least one contact of contact as contact ?
+                      const exposedContactsWarning: string = exposedContacts?.length ?
+                        this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE_CONTACTS_WARNING') :
+                        '';
 
-                          // hide loading
-                          loading.close();
+                      // show confirm dialog to confirm the action
+                      this.personAndRelatedHelperService.dialogV2Service
+                        .showConfirmDialog({
+                          config: {
+                            title: {
+                              get: () => 'LNG_COMMON_LABEL_CONVERT',
+                              data: () => ({
+                                name: item.name,
+                                type: this.personAndRelatedHelperService.i18nService.instant(EntityType.CASE)
+                              })
+                            },
+                            message: {
+                              get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE',
+                              data: () => ({
+                                name: item.name,
+                                warning: exposedContactsWarning
+                              })
+                            }
+                          }
+                        })
+                        .subscribe((response) => {
+                          // canceled ?
+                          if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                            // finished
+                            return;
+                          }
 
-                          // reload data
-                          this.needsRefreshList(true);
+                          // show loading
+                          loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+
+                          // convert
+                          this.personAndRelatedHelperService.contact.contactDataService
+                            .convertContactToCase(this.selectedOutbreak.id, item.id)
+                            .pipe(
+                              catchError((err) => {
+                                // show error
+                                this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                                // hide loading
+                                loading.close();
+
+                                // send error down the road
+                                return throwError(err);
+                              })
+                            )
+                            .subscribe(() => {
+                              // success
+                              this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
+
+                              // hide loading
+                              loading.close();
+
+                              // reload data
+                              this.needsRefreshList(true);
+                            });
                         });
                     });
                 }
@@ -351,13 +463,183 @@ export class ContactsListComponent
               }
             },
 
+            // Convert Contact to Contact of Contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CONTACT_OF_CONTACT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: ContactModel): void => {
+                  // show loading
+                  let loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+
+                  // determine if contact has isolated contacts
+                  this.personAndRelatedHelperService.contact.contactDataService
+                    .getIsolatedContactsForContact(this.selectedOutbreak.id, item.id)
+                    .pipe(
+                      catchError((err) => {
+                        // show error
+                        this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                        // hide loading
+                        loading.close();
+
+                        // send error down the road
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe((isolatedContacts: { count: number, contacts: IContactOfContactIsolated[] }) => {
+                      // hide loading
+                      loading.close();
+
+                      // show isolated contacts ?
+                      let isolatedContactLinks: string = '';
+                      if (isolatedContacts?.count) {
+                        // get the isolated contacts
+                        isolatedContactLinks = this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_ACTION_ISOLATED_CONTACTS') +
+                          isolatedContacts.contacts
+                            .map((entity) => {
+                              // create contact full name
+                              const fullName = [entity.firstName, entity.middleName, entity.lastName]
+                                .filter(Boolean)
+                                .join(' ');
+
+                              // check rights
+                              if (!ContactOfContactModel.canView(this.authUser)) {
+                                return `${fullName} (${this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT_OF_CONTACT)})`;
+                              }
+
+                              // create url
+                              const url = `contacts-of-contacts/${entity.id}/view`;
+
+                              // finished
+                              return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${fullName}</span></a>`;
+                            })
+                            .join(', ');
+                      }
+
+                      // show confirm dialog to confirm the action
+                      this.personAndRelatedHelperService.dialogV2Service.showConfirmDialog({
+                        config: {
+                          title: {
+                            get: () => 'LNG_COMMON_LABEL_CONVERT',
+                            data: () => ({
+                              name: item.name,
+                              type: this.personAndRelatedHelperService.i18nService.instant(EntityType.CONTACT_OF_CONTACT)
+                            })
+                          },
+                          message: {
+                            get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CONTACT_OF_CONTACT',
+                            data: () => ({
+                              name: item.name,
+                              isolatedContacts: isolatedContactLinks
+                            })
+                          }
+                        },
+                        yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
+                      }).subscribe((dialogResponse) => {
+                        // canceled ?
+                        if (dialogResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                          // finished
+                          return;
+                        }
+
+                        // show loading
+                        loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+
+                        // check if there is at least one legacy exposure (case/event)
+                        const qb = new RequestQueryBuilder();
+                        qb.filter.where({
+                          type: {
+                            'inq': [EntityType.CONTACT]
+                          }
+                        });
+                        qb.limit(1);
+                        this.personAndRelatedHelperService.relationship.relationshipDataService
+                          .getEntityExposures(
+                            this.selectedOutbreak.id,
+                            item.type,
+                            item.id,
+                            qb
+                          )
+                          .pipe(
+                            catchError((err) => {
+                              // show error
+                              this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                              // hide loading
+                              loading.close();
+
+                              // send error down the road
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe((exposedContacts: EntityModel[]) => {
+                            // if there is no case/event as exposure, redirect to add exposures
+                            if (!exposedContacts?.length) {
+                              // hide loading
+                              loading.close();
+
+                              // redirect
+                              this.router.navigate(
+                                [`/relationships/${item.type}/${item.id}/exposures/add`]
+                              );
+                              return;
+                            } else {
+                              // convert
+                              this.personAndRelatedHelperService.contact.contactDataService
+                                .convertContactToContactOfContact(this.selectedOutbreak.id, item.id)
+                                .pipe(
+                                  catchError((err) => {
+                                    // show error
+                                    this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                                    // hide loading
+                                    loading.close();
+
+                                    // send error down the road
+                                    return throwError(err);
+                                  })
+                                )
+                                .subscribe(() => {
+                                  // success
+                                  this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
+
+                                  // hide loading
+                                  loading.close();
+
+                                  // reload data
+                                  this.needsRefreshList(true);
+                                });
+                            }
+                          });
+                      });
+                    });
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canConvertToContactOfContact(this.authUser) &&
+                  ContactModel.canListIsolatedContacts(this.authUser) &&
+                  this.selectedOutbreak.isContactsOfContactsActive &&
+                  ContactModel.canList(this.authUser) &&
+                  ContactModel.canView(this.authUser);
+              }
+            },
+
             // Divider
             {
               visible: (item: ContactModel): boolean => {
                 // visible only if at least one of the first two items is visible
                 return !item.deleted &&
-                  this.selectedOutbreakIsActive &&
-                  ContactModel.canConvertToCase(this.authUser);
+                  this.selectedOutbreakIsActive && (
+                  ContactModel.canConvertToCase(this.authUser) || (
+                    ContactModel.canConvertToContactOfContact(this.authUser) &&
+                    this.selectedOutbreak.isContactsOfContactsActive
+                  )
+                );
               }
             },
 
@@ -397,7 +679,7 @@ export class ContactsListComponent
                 },
                 linkQueryParams: (item: ContactModel): Params => {
                   return {
-                    entityType: EntityType.CONTACT_OF_CONTACT,
+                    entityType: EntityType.CONTACT,
                     entityId: item.id
                   };
                 }
@@ -442,7 +724,7 @@ export class ContactsListComponent
               visible: (item: ContactModel): boolean => {
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
-                  FollowUpModel.canCreate(this.authUser);
+                  ContactModel.canCreateFollowUp(this.authUser);
               }
             },
 
@@ -452,7 +734,7 @@ export class ContactsListComponent
                 // visible only if at least one of the previous two items is visible
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
-                  FollowUpModel.canCreate(this.authUser);
+                  ContactModel.canCreateFollowUp(this.authUser);
               }
             },
 
@@ -531,6 +813,7 @@ export class ContactsListComponent
               visible: (item: ContactModel): boolean => {
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
+                  this.selectedOutbreak.isContactLabResultsActive &&
                   LabResultModel.canList(this.authUser) &&
                   ContactModel.canListLabResult(this.authUser);
               }
@@ -599,7 +882,7 @@ export class ContactsListComponent
               action: {
                 click: (item: ContactModel) => {
                   // show confirm dialog to confirm the action
-                  this.dialogV2Service
+                  this.personAndRelatedHelperService.dialogV2Service
                     .showConfirmDialog({
                       config: {
                         title: {
@@ -610,7 +893,8 @@ export class ContactsListComponent
                           get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CONTACT',
                           data: () => item as any
                         }
-                      }
+                      },
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                     })
                     .subscribe((response) => {
                       // canceled ?
@@ -620,15 +904,15 @@ export class ContactsListComponent
                       }
 
                       // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
+                      const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
 
                       // convert
-                      this.contactDataService
+                      this.personAndRelatedHelperService.contact.contactDataService
                         .restoreContact(this.selectedOutbreak.id, item.id)
                         .pipe(
                           catchError((err) => {
                             // show error
-                            this.toastV2Service.error(err);
+                            this.personAndRelatedHelperService.toastV2Service.error(err);
 
                             // hide loading
                             loading.close();
@@ -639,7 +923,7 @@ export class ContactsListComponent
                         )
                         .subscribe(() => {
                           // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+                          this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                           // hide loading
                           loading.close();
@@ -676,6 +960,10 @@ export class ContactsListComponent
       {
         field: 'lastName',
         label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'lastName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -686,6 +974,10 @@ export class ContactsListComponent
       {
         field: 'middleName',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'middleName'
+        ),
         notVisible: true,
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -697,6 +989,10 @@ export class ContactsListComponent
       {
         field: 'firstName',
         label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'firstName'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -707,6 +1003,10 @@ export class ContactsListComponent
       {
         field: 'visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'visualId'
+        ),
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -715,8 +1015,27 @@ export class ContactsListComponent
         }
       },
       {
+        field: 'pregnancyStatus',
+        label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'pregnancyStatus'
+        ),
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
         field: 'location',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.locationId'
+        ),
         format: {
           type: 'mainAddress.location.name'
         },
@@ -727,7 +1046,7 @@ export class ContactsListComponent
           fieldIsArray: true
         },
         link: (data) => {
-          return data.mainAddress?.location?.name ?
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.mainAddress.location.id}/view` :
             undefined;
         }
@@ -735,6 +1054,10 @@ export class ContactsListComponent
       {
         field: 'addresses.emailAddress',
         label: 'LNG_CONTACT_FIELD_LABEL_EMAIL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.emailAddress'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.emailAddress'
@@ -751,6 +1074,10 @@ export class ContactsListComponent
       {
         field: 'addresses.addressLine1',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.addressLine1'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.addressLine1'
@@ -767,6 +1094,10 @@ export class ContactsListComponent
       {
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.city'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.city'
@@ -783,6 +1114,10 @@ export class ContactsListComponent
       {
         field: 'addresses.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.geoLocation'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lat'
@@ -791,6 +1126,10 @@ export class ContactsListComponent
       {
         field: 'addresses.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.geoLocation'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.geoLocation.lng'
@@ -799,6 +1138,10 @@ export class ContactsListComponent
       {
         field: 'addresses.postalCode',
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.postalCode'
+        ),
         notVisible: true,
         format: {
           type: 'mainAddress.postalCode'
@@ -814,7 +1157,11 @@ export class ContactsListComponent
       },
       {
         field: 'addresses.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
+        label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_MANUAL_COORDINATES',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.geoLocationAccurate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN,
@@ -833,6 +1180,10 @@ export class ContactsListComponent
       {
         field: 'age',
         label: 'LNG_CONTACT_FIELD_LABEL_AGE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'ageDob'
+        ),
         format: {
           type: V2ColumnFormat.AGE
         },
@@ -846,6 +1197,10 @@ export class ContactsListComponent
       {
         field: 'dob',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'ageDob'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -858,6 +1213,10 @@ export class ContactsListComponent
       {
         field: 'gender',
         label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'gender'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -867,6 +1226,10 @@ export class ContactsListComponent
       {
         field: 'phoneNumber',
         label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'addresses.phoneNumber'
+        ),
         format: {
           type: 'mainAddress.phoneNumber'
         },
@@ -879,18 +1242,109 @@ export class ContactsListComponent
         }
       },
       {
-        field: 'riskLevel',
-        label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
+        field: 'outcomeId',
+        label: 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'outcomeId'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
           includeNoValue: true
+        }
+      },
+      {
+        field: 'dateOfOutcome',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'dateOfOutcome'
+        ),
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'transferRefused',
+        label: 'LNG_CONTACT_FIELD_LABEL_TRANSFER_REFUSED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'transferRefused'
+        ),
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'riskLevel',
+        label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'riskLevel'
+        ),
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          ),
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'riskReason',
+        label: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'riskReason'
+        ),
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'occupation',
+        label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'occupation'
+        ),
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: this.referenceDataHelperService.filterPerOutbreakOptions(
+            this.selectedOutbreak,
+            (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            undefined
+          )
         }
       },
       {
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -903,6 +1357,10 @@ export class ContactsListComponent
       {
         field: 'followUpTeamId',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'followUpTeamId'
+        ),
         notVisible: true,
         format: {
           type: (contact) => {
@@ -921,7 +1379,7 @@ export class ContactsListComponent
           return !TeamModel.canList(this.authUser);
         },
         link: (data) => {
-          return data.followUpTeamId ?
+          return data.followUpTeamId && TeamModel.canView(this.authUser) ?
             `/teams/${data.followUpTeamId}/view` :
             undefined;
         }
@@ -929,6 +1387,7 @@ export class ContactsListComponent
       {
         field: 'followUp.endDate',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATE
@@ -941,22 +1400,45 @@ export class ContactsListComponent
       {
         field: 'statuses',
         label: 'LNG_COMMON_LABEL_STATUSES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.STATUS
         },
         notResizable: true,
         pinned: true,
         legends: [
+          // outcome
+          {
+            title: 'LNG_CONTACT_FIELD_LABEL_OUTCOME',
+            items: this.referenceDataHelperService.filterPerOutbreak(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).list
+            ).map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.HEXAGON,
+                  color: item.getColorCode()
+                },
+                label: item.id,
+                order: item.order
+              };
+            })
+          },
+
           // risk
           {
             title: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
-            items: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+            items: this.referenceDataHelperService.filterPerOutbreak(
+              this.selectedOutbreak,
+              (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).list
+            ).map((item) => {
               return {
                 form: {
                   type: IV2ColumnStatusFormType.TRIANGLE,
                   color: item.getColorCode()
                 },
-                label: item.id
+                label: item.id,
+                order: item.order
               };
             })
           },
@@ -969,21 +1451,24 @@ export class ContactsListComponent
                 type: IV2ColumnStatusFormType.SQUARE,
                 color: 'var(--gd-status-follow-up-not-started)'
               },
-              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED'
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED',
+              order: undefined
             },
             {
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
                 color: 'var(--gd-status-under-follow-up)'
               },
-              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP'
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP',
+              order: undefined
             },
             {
               form: {
                 type: IV2ColumnStatusFormType.SQUARE,
                 color: 'var(--gd-status-follow-up-ended)'
               },
-              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP'
+              label: 'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP',
+              order: undefined
             }]
           },
 
@@ -995,19 +1480,24 @@ export class ContactsListComponent
                 type: IV2ColumnStatusFormType.STAR,
                 color: 'var(--gd-danger)'
               },
-              label: ' '
+              label: ' ',
+              order: undefined
             }]
           }
         ],
-        forms: (_column, data: ContactModel): V2ColumnStatusForm[] => ContactModel.getStatusForms({
+        forms: (_column, data: ContactModel): V2ColumnStatusForm[] => this.personAndRelatedHelperService.contact.getStatusForms({
           item: data,
-          translateService: this.translateService,
-          risk: this.activatedRoute.snapshot.data.risk
+          risk: this.activatedRoute.snapshot.data.risk,
+          outcome: this.activatedRoute.snapshot.data.outcome
         })
       },
       {
         field: 'followUp.status',
         label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'followUp[status]'
+        ),
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1017,6 +1507,111 @@ export class ContactsListComponent
       {
         field: 'wasCase',
         label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'wasContactOfContact',
+        label: 'LNG_CONTACT_FIELD_LABEL_WAS_CONTACT_OF_CONTACT',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        },
+        sortable: true
+      },
+      {
+        field: 'documents',
+        label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'documents.type'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'documents.number'
+        ),
+        format: {
+          type: (item: ContactModel): string => {
+            // must format ?
+            if (!item.uiDocuments) {
+              item.uiDocuments = DocumentModel.arrayToString(
+                this.personAndRelatedHelperService.i18nService,
+                item.documents
+              );
+            }
+
+            // finished
+            return item.uiDocuments;
+          }
+        },
+        notVisible: true
+      },
+      {
+        field: 'vaccinesReceived',
+        label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'vaccinesReceived.vaccine'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'vaccinesReceived.date'
+        ) || this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'vaccinesReceived.status'
+        ),
+        format: {
+          type: (item: ContactModel): string => {
+            // must format ?
+            if (!item.uiVaccines) {
+              item.uiVaccines = VaccineModel.arrayToString(
+                this.personAndRelatedHelperService.i18nService,
+                item.vaccinesReceived
+              );
+            }
+
+            // finished
+            return item.uiVaccines;
+          }
+        },
+        notVisible: true
+      },
+      {
+        field: 'dateOfReporting',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'dateOfReporting'
+        ),
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'isDateOfReportingApproximate'
+        ),
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1031,9 +1626,13 @@ export class ContactsListComponent
       {
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        visibleMandatoryIf: () => this.shouldVisibleMandatoryTableColumnBeVisible(
+          this.personAndRelatedHelperService.contact.visibleMandatoryKey,
+          'responsibleUserId'
+        ),
         notVisible: true,
         format: {
-          type: 'responsibleUser.name'
+          type: 'responsibleUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1044,7 +1643,7 @@ export class ContactsListComponent
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) && !data.responsibleUser?.deleted ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -1052,6 +1651,7 @@ export class ContactsListComponent
       {
         field: 'numberOfContacts',
         label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.BUTTON
         },
@@ -1062,7 +1662,9 @@ export class ContactsListComponent
         sortable: true,
         notVisible: true,
         cssCellClass: 'gd-cell-button',
-        buttonLabel: (item) => (item.numberOfContacts || '').toLocaleString('en'),
+        buttonLabel: (item) => item.numberOfContacts === 0 ?
+          item.numberOfContacts.toLocaleString('en') :
+          (item.numberOfContacts || '').toLocaleString('en'),
         color: 'text',
         click: (item) => {
           // if we do not have contacts return
@@ -1071,7 +1673,7 @@ export class ContactsListComponent
           }
 
           // display dialog
-          this.entityHelperService.contacts(this.selectedOutbreak, item);
+          this.personAndRelatedHelperService.relationship.contacts(this.selectedOutbreak, item);
         },
         disabled: (data) =>
           !RelationshipModel.canList(this.authUser) ||
@@ -1080,6 +1682,7 @@ export class ContactsListComponent
       {
         field: 'numberOfExposures',
         label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        visibleMandatoryIf: () => true,
         format: {
           type: V2ColumnFormat.BUTTON
         },
@@ -1090,7 +1693,9 @@ export class ContactsListComponent
         sortable: true,
         notVisible: true,
         cssCellClass: 'gd-cell-button',
-        buttonLabel: (item) => (item.numberOfExposures || '').toLocaleString('en'),
+        buttonLabel: (item) => item.numberOfExposures === 0 ?
+          item.numberOfExposures.toLocaleString('en') :
+          (item.numberOfExposures || '').toLocaleString('en'),
         color: 'text',
         click: (item) => {
           // if we do not have exposures return
@@ -1099,7 +1704,7 @@ export class ContactsListComponent
           }
 
           // display dialog
-          this.entityHelperService.exposures(this.selectedOutbreak, item);
+          this.personAndRelatedHelperService.relationship.exposures(this.selectedOutbreak, item);
         },
         disabled: (data) =>
           !RelationshipModel.canList(this.authUser) ||
@@ -1108,6 +1713,7 @@ export class ContactsListComponent
       {
         field: 'deleted',
         label: 'LNG_CONTACT_FIELD_LABEL_DELETED',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
@@ -1120,11 +1726,42 @@ export class ContactsListComponent
         sortable: true
       },
       {
-        field: 'createdBy',
-        label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY',
+        field: 'deletedAt',
+        label: 'LNG_CONTACT_FIELD_LABEL_DELETED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: 'createdByUser.name'
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'createdOn',
+        label: 'LNG_CONTACT_FIELD_LABEL_CREATED_ON',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: (item) => item.createdOn ?
+            this.personAndRelatedHelperService.i18nService.instant(`LNG_PLATFORM_LABEL_${item.createdOn}`) :
+            item.createdOn
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          includeNoValue: true
+        },
+        sortable: true
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_CONTACT_FIELD_LABEL_CREATED_BY',
+        visibleMandatoryIf: () => true,
+        notVisible: true,
+        format: {
+          type: 'createdByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1135,12 +1772,15 @@ export class ContactsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ? `/users/${data.createdBy}/view` : undefined;
+          return data.createdBy && UserModel.canView(this.authUser) && !data.createdByUser?.deleted ?
+            `/users/${data.createdBy}/view` :
+            undefined;
         }
       },
       {
         field: 'createdAt',
         label: 'LNG_CONTACT_FIELD_LABEL_CREATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1153,9 +1793,10 @@ export class ContactsListComponent
       {
         field: 'updatedBy',
         label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_BY',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
-          type: 'updatedByUser.name'
+          type: 'updatedByUser.nameAndEmail'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1166,12 +1807,15 @@ export class ContactsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ? `/users/${data.updatedBy}/view` : undefined;
+          return data.updatedBy && UserModel.canView(this.authUser) && !data.updatedByUser?.deleted ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
         }
       },
       {
         field: 'updatedAt',
         label: 'LNG_CONTACT_FIELD_LABEL_UPDATED_AT',
+        visibleMandatoryIf: () => true,
         notVisible: true,
         format: {
           type: V2ColumnFormat.DATETIME
@@ -1187,7 +1831,67 @@ export class ContactsListComponent
   /**
    * Initialize process data
    */
-  protected initializeProcessSelectedData(): void {}
+  protected initializeProcessSelectedData(): void {
+    this.processSelectedData = [
+      // all selected records were not deleted ?
+      {
+        key: 'allNotDeleted',
+        shouldProcess: () => ContactModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive,
+        process: (
+          dataMap: {
+            [id: string]: ContactModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allNotDeleted: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (dataMap[selected[index]]?.deleted) {
+              // at least one not deleted
+              allNotDeleted = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allNotDeleted;
+        }
+      },
+
+      // all selected records were deleted ?
+      {
+        key: 'allDeleted',
+        shouldProcess: () => ContactModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive,
+        process: (
+          dataMap: {
+            [id: string]: ContactModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allDeleted: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (!dataMap[selected[index]]?.deleted) {
+              // at least one not deleted
+              allDeleted = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allDeleted;
+        }
+      }
+    ];
+  }
 
   /**
    * Initialize table infos
@@ -1198,22 +1902,107 @@ export class ContactsListComponent
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = ContactModel.generateAdvancedFilters({
-      authUser: this.authUser,
+    this.advancedFilters = this.personAndRelatedHelperService.contact.generateAdvancedFilters(this.selectedOutbreak, {
       contactInvestigationTemplate: () => this.selectedOutbreak.contactInvestigationTemplate,
       contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
-        occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        createdOn: (this.activatedRoute.snapshot.data.createdOn as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        occupation: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
         followUpStatus: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        pregnancyStatus: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        vaccineStatus: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        vaccine: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        vaccineStatus: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
         dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        documentType: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        addressType: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        risk: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        classification: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        clusterLoad: (finished) => {
+          this.clusterDataService
+            .getResolveList(this.selectedOutbreak.id)
+            .pipe(
+              // handle error
+              catchError((err) => {
+                // show error
+                this.personAndRelatedHelperService.toastV2Service.error(err);
+
+                // not found
+                finished(null);
+
+                // send error down the road
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((data) => {
+              finished(data);
+            });
+        },
+        outcome: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        dateRangeType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        dateRangeCenter: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        exposureType: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureFrequency: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        exposureDuration: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        ),
+        contextOfTransmission: this.referenceDataHelperService.filterPerOutbreakOptions(
+          this.selectedOutbreak,
+          (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          undefined
+        )
       }
     });
   }
@@ -1375,7 +2164,7 @@ export class ContactsListComponent
           },
           action: {
             click: () => {
-              this.dialogV2Service.showExportData({
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
                 title: {
                   get: () =>
                     'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE'
@@ -1386,7 +2175,7 @@ export class ContactsListComponent
 
                   // dialog fields for daily follow-ups print
                   this.genericDataService
-                    .getRangeFollowUpGroupByOptions(true)
+                    .getRangeFollowUpGroupByOptions([Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.RISK.value])
                     .subscribe((options) => {
                       // options should be assigned to groupBy
                       (handler.data.map.groupBy as IV2SideDialogConfigInputSingleDropdown).options = options.map((option) => {
@@ -1404,7 +2193,7 @@ export class ContactsListComponent
                   url: `/outbreaks/${this.selectedOutbreak.id}/contacts/daily-list/export`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD')}`,
                   queryBuilder: this.queryBuilder,
                   allow: {
                     types: [ExportDataExtension.PDF]
@@ -1441,7 +2230,7 @@ export class ContactsListComponent
           },
           action: {
             click: () => {
-              this.dialogV2Service.showExportData({
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
                 title: {
                   get: () =>
                     'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE'
@@ -1450,7 +2239,7 @@ export class ContactsListComponent
                   url: `/outbreaks/${this.selectedOutbreak.id}/contacts/export-daily-follow-up-form`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD')}`,
                   queryBuilder: this.queryBuilder,
                   allow: {
                     types: [ExportDataExtension.PDF]
@@ -1471,134 +2260,416 @@ export class ContactsListComponent
    * Initialize table group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect('id', selected, true, null);
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => ContactModel.canExport(this.authUser) ||
+        ContactModel.canExportDossier(this.authUser) ||
+        ContactModel.canExportRelationships(this.authUser) ||
+        (
+          ContactModel.canBulkModify(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
+        (
+          ContactModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
+        (
+          ContactModel.canBulkRestore(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect('id', selected, true, null);
 
-            // allow deleted records
-            qb.includeDeleted();
+              // allow deleted records
+              qb.includeDeleted();
 
-            // keep sort order
-            if (!this.queryBuilder.sort.isEmpty()) {
-              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
+              }
+
+              // export
+              this.exportContacts(qb);
             }
-
-            // export
-            this.exportContacts(qb);
+          },
+          visible: (): boolean => {
+            return ContactModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
         },
-        visible: (): boolean => {
-          return ContactModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // remove id from list
-            const anonymizeFields = this.contactFields.filter((item) => {
-              return item.value !== 'id';
-            });
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // remove id from list
+              const anonymizeFields = this.contactFields.filter((item) => {
+                return item.value !== 'id';
+              });
 
-            // export dossier
-            this.dialogV2Service.showExportData({
-              title: {
-                get: () =>
-                  'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER_DIALOG_TITLE'
-              },
-              export: {
-                url: `outbreaks/${this.selectedOutbreak.id}/contacts/dossier`,
-                async: false,
-                method: ExportDataMethod.POST,
-                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
-                extraFormData: {
-                  append: {
-                    contacts: selected
-                  }
+              // export dossier
+              this.personAndRelatedHelperService.dialogV2Service.showExportData({
+                title: {
+                  get: () =>
+                    'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER_DIALOG_TITLE'
                 },
-                allow: {
-                  types: [ExportDataExtension.ZIP],
-                  anonymize: {
-                    fields: anonymizeFields,
-                    key: 'data'
+                export: {
+                  url: `outbreaks/${this.selectedOutbreak.id}/contacts/dossier`,
+                  async: false,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
+                  extraFormData: {
+                    append: {
+                      contacts: selected
+                    }
+                  },
+                  allow: {
+                    types: [ExportDataExtension.ZIP],
+                    anonymize: {
+                      fields: anonymizeFields,
+                      key: 'data'
+                    }
                   }
                 }
-              }
-            });
-          }
-        },
-        visible: (): boolean => {
-          return ContactModel.canExportDossier(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            const personsQb = qb.addChildQueryBuilder('person');
-
-            // retrieve only relationships that have at least one persons as desired type
-            qb.filter.byEquality('persons.type', EntityType.CONTACT);
-
-            // id
-            personsQb.filter.bySelect('id', selected, true, null);
-
-            // type
-            personsQb.filter.byEquality('type', EntityType.CONTACT);
-
-            // export contact relationships
-            this.exportContactsRelationship(qb);
-          }
-        },
-        visible: (): boolean => {
-          return ContactModel.canExportRelationships(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS'
-        },
-        action: {
-          link: (): string[] => {
-            return ['/contacts', 'modify-bulk'];
+              });
+            }
           },
-          linkQueryParams: (selected: string[]): Params => {
-            return {
-              contactIds: JSON.stringify(selected)
-            };
+          visible: (): boolean => {
+            return ContactModel.canExportDossier(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
         },
-        visible: (): boolean => {
-          return ContactModel.canBulkModify(this.authUser) &&
-            this.selectedOutbreakIsActive;
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              const personsQb = qb.addChildQueryBuilder('person');
+
+              // retrieve only relationships that have at least one persons as desired type
+              qb.filter.byEquality('persons.type', EntityType.CONTACT);
+
+              // id
+              personsQb.filter.bySelect('id', selected, true, null);
+
+              // type
+              personsQb.filter.byEquality('type', EntityType.CONTACT);
+
+              // export contact relationships
+              this.exportContactsRelationship(qb);
+            }
+          },
+          visible: (): boolean => {
+            return ContactModel.canExportRelationships(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
         },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // set data into local storage since query url might be too long for hundreds of ids
+              const cacheKey: string = this.bulkCacheHelperService.storeBulkSelected(selected);
+
+              // redirect
+              this.router.navigate(
+                ['/contacts', 'modify-bulk'],
+                {
+                  queryParams: {
+                    cacheKey
+                  }
+                }
+              );
+            }
+          },
+          visible: (): boolean => {
+            return ContactModel.canBulkModify(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
+          }
+        },
+
+        // Divider
+        {
+          visible: () => (
+            ContactModel.canExport(this.authUser) ||
+            ContactModel.canExportDossier(this.authUser) ||
+            ContactModel.canExportRelationships(this.authUser) ||
+            (
+              ContactModel.canBulkModify(this.authUser) &&
+              this.selectedOutbreakIsActive
+            )
+          ) && (
+            (
+              ContactModel.canBulkDelete(this.authUser) ||
+              ContactModel.canBulkRestore(this.authUser)
+            ) &&
+            this.selectedOutbreakIsActive
+          )
+        },
+
+        // bulk delete
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_DELETE_SELECTED_CONTACTS'
+          },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allNotDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_DELETE_SELECTED_CONTACTS_DESCRIPTION') :
+            undefined,
+          action: {
+            click: (selected: string[]) => {
+              // ask for confirmation
+              this.personAndRelatedHelperService.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_DELETE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_CONTACTS'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // show loading
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+                  loading.message({
+                    message: 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_WAIT_MESSAGE',
+                    messageData: {
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
+                      date: '—'
+                    }
+                  });
+
+                  // delete - we can't use bulk here since deleting contacts triggers many hooks
+                  let startTime: Moment;
+                  const selectedShallowClone: string[] = [...selected];
+                  const nextDelete = () => {
+                    // finished ?
+                    if (selectedShallowClone.length < 1) {
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_SUCCESS_MESSAGE');
+                      loading.close();
+                      this.needsRefreshList(true);
+                      return;
+                    }
+
+                    // delete
+                    this.personAndRelatedHelperService.contact.contactDataService
+                      .deleteContact(
+                        this.selectedOutbreak.id,
+                        selectedShallowClone.shift()
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // hide loading
+                          loading.close();
+
+                          // error
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // determine estimated end time
+                        let estimatedEndDate: Moment;
+
+                        // initialize start time if necessary
+                        if (!startTime) {
+                          startTime = LocalizationHelper.now();
+                        }
+
+                        // determine estimated time
+                        const processed: number = selected.length - selectedShallowClone.length;
+                        const total: number = selected.length;
+                        if (processed > 0) {
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
+                          const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
+                          const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
+                        }
+
+                        // update progress
+                        loading.message({
+                          message: 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SELECTED_CONTACTS_WAIT_MESSAGE',
+                          messageData: {
+                            no: processed.toLocaleString('en'),
+                            total: total.toLocaleString('en'),
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
+                          }
+                        });
+
+                        // next
+                        nextDelete();
+                      });
+                  };
+
+                  // start delete
+                  nextDelete();
+                });
+            }
+          },
+          visible: (): boolean => {
+            return ContactModel.canBulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
+          }
+        },
+
+        // bulk restore
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_RESTORE_SELECTED_CONTACTS'
+          },
+          cssClasses: () => 'gd-list-table-selection-header-button-warning',
+          tooltip: (selected: string[]) => selected.length > 0 && !this.tableV2Component.processedSelectedResults.allDeleted ?
+            this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_RESTORE_SELECTED_CONTACTS_DESCRIPTION') :
+            undefined,
+          action: {
+            click: (selected: string[]) => {
+              // ask for confirmation
+              this.personAndRelatedHelperService.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_RESTORE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_CONTACTS'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // show loading
+                  const loading = this.personAndRelatedHelperService.dialogV2Service.showLoadingDialog();
+                  loading.message({
+                    message: 'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_WAIT_MESSAGE',
+                    messageData: {
+                      no: '1',
+                      total: selected.length.toLocaleString('en'),
+                      date: '—'
+                    }
+                  });
+
+                  // restore - we can't use bulk here since restoring contacts triggers many hooks
+                  let startTime: Moment;
+                  const selectedShallowClone: string[] = [...selected];
+                  const nextRestore = () => {
+                    // finished ?
+                    if (selectedShallowClone.length < 1) {
+                      this.personAndRelatedHelperService.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_SUCCESS_MESSAGE');
+                      loading.close();
+                      this.needsRefreshList(true);
+                      return;
+                    }
+
+                    // restore
+                    this.personAndRelatedHelperService.contact.contactDataService
+                      .restoreContact(
+                        this.selectedOutbreak.id,
+                        selectedShallowClone.shift()
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // hide loading
+                          loading.close();
+
+                          // error
+                          this.personAndRelatedHelperService.toastV2Service.error(err);
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // determine estimated end time
+                        let estimatedEndDate: Moment;
+
+                        // initialize start time if necessary
+                        if (!startTime) {
+                          startTime = LocalizationHelper.now();
+                        }
+
+                        // determine estimated time
+                        const processed: number = selected.length - selectedShallowClone.length;
+                        const total: number = selected.length;
+                        if (processed > 0) {
+                          const processedSoFarTimeMs: number = LocalizationHelper.now().diff(startTime);
+                          const requiredTimeForAllMs: number = processedSoFarTimeMs * total / processed;
+                          const remainingTimeMs = requiredTimeForAllMs - processedSoFarTimeMs;
+                          estimatedEndDate = LocalizationHelper.now().add(remainingTimeMs, 'ms');
+                        }
+
+                        // update progress
+                        loading.message({
+                          message: 'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SELECTED_CONTACTS_WAIT_MESSAGE',
+                          messageData: {
+                            no: processed.toLocaleString('en'),
+                            total: total.toLocaleString('en'),
+                            date: estimatedEndDate ? LocalizationHelper.displayDateTime(estimatedEndDate) : '—'
+                          }
+                        });
+
+                        // next
+                        nextRestore();
+                      });
+                  };
+
+                  // start restore
+                  nextRestore();
+                });
+            }
+          },
+          visible: (): boolean => {
+            return ContactModel.canBulkRestore(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allDeleted;
+          }
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**
@@ -1631,7 +2702,10 @@ export class ContactsListComponent
           item.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED'
         ) {
           // clear
-          this.queryBuilder.filter.byNotHavingValue('riskLevel');
+          this.queryBuilder.filter.byNotHavingValue(
+            'riskLevel',
+            true
+          );
         } else {
           // search
           this.queryBuilder.filter.byEquality(
@@ -1660,7 +2734,7 @@ export class ContactsListComponent
           clonedQueryBuilder.filter.remove('riskLevel');
 
           // load data
-          return this.contactDataService
+          return this.personAndRelatedHelperService.contact.contactDataService
             .getContactsGroupedByRiskLevel(
               this.selectedOutbreak.id,
               clonedQueryBuilder
@@ -1697,19 +2771,21 @@ export class ContactsListComponent
               values = values.sort((item1, item2) => {
                 // if same order, compare labels
                 if (item1.order === item2.order) {
-                  return this.translateService
+                  return this.personAndRelatedHelperService.i18nService
                     .instant(item1.label)
-                    .localeCompare(this.translateService.instant(item2.label));
+                    .localeCompare(this.personAndRelatedHelperService.i18nService.instant(item2.label));
                 }
 
                 // format order
                 let order1: number = Number.MAX_SAFE_INTEGER;
                 try {
-                  order1 = parseInt(item1.order, 10);
+                  order1 = typeof item1.order === 'number' ? item1.order : parseInt(item1.order, 10);
+                  order1 = isNaN(order1) ? Number.MAX_SAFE_INTEGER : order1;
                 } catch (e) {}
                 let order2: number = Number.MAX_SAFE_INTEGER;
                 try {
-                  order2 = parseInt(item2.order, 10);
+                  order2 = typeof item2.order === 'number' ? item2.order : parseInt(item2.order, 10);
+                  order2 = isNaN(order2) ? Number.MAX_SAFE_INTEGER : order2;
                 } catch (e) {}
 
                 // compare order
@@ -1768,20 +2844,33 @@ export class ContactsListComponent
       'firstName',
       'middleName',
       'visualId',
+      'pregnancyStatus',
       'addresses',
+      'documents',
+      'vaccinesReceived',
+      'dateOfReporting',
+      'isDateOfReportingApproximate',
       'age',
       'dob',
       'gender',
+      'outcomeId',
+      'dateOfOutcome',
+      'transferRefused',
       'riskLevel',
+      'riskReason',
+      'occupation',
       'dateOfLastContact',
       'followUpTeamId',
       'followUp',
       'wasCase',
+      'wasContactOfContact',
       'responsibleUserId',
       'numberOfContacts',
       'numberOfExposures',
       'questionnaireAnswers',
       'deleted',
+      'deletedAt',
+      'createdOn',
       'createdBy',
       'createdAt',
       'updatedBy',
@@ -1793,7 +2882,7 @@ export class ContactsListComponent
    * Export selected records
    */
   private exportContacts(qb: RequestQueryBuilder): void {
-    this.dialogV2Service.showExportDataAfterLoadingData({
+    this.personAndRelatedHelperService.dialogV2Service.showExportDataAfterLoadingData({
       title: {
         get: () => 'LNG_PAGE_LIST_CONTACTS_EXPORT_TITLE'
       },
@@ -1805,7 +2894,7 @@ export class ContactsListComponent
             // handle errors
             catchError((err) => {
               // show error
-              this.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
 
               // send error further
               return throwError(err);
@@ -1835,7 +2924,7 @@ export class ContactsListComponent
                 url: `/outbreaks/${this.selectedOutbreak.id}/contacts/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_TITLE')} - ${LocalizationHelper.now().format('YYYY-MM-DD HH:mm')}`,
                 queryBuilder: qb,
                 allow: {
                   types: [
@@ -1852,9 +2941,45 @@ export class ContactsListComponent
                   },
                   groups: {
                     fields: contactFieldGroups,
-                    required: contactFieldGroupsRequires
+                    required: contactFieldGroupsRequires,
+                    change: (data, handler) => {
+                      // do we need to de-select exposure person data ?
+                      const includeExposurePersonDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox;
+                      const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                      const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+                      if (
+                        includeExposurePersonDataCheckbox?.checked &&
+                        !allGroups && (
+                          !fieldsGroupListDropdown.values?.length ||
+                          fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0
+                        )
+                      ) {
+                        // de-select exposure person data
+                        includeExposurePersonDataCheckbox.checked = false;
+                        handler.detectChanges();
+                      }
+                    }
                   },
-                  fields: this.contactFields,
+                  fields: {
+                    options: this.contactFields,
+                    change: (data, handler) => {
+                      // do we need to de-select exposure person data ?
+                      const includeExposurePersonDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox;
+                      const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                      const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+                      if (
+                        includeExposurePersonDataCheckbox?.checked &&
+                        !allFields && (
+                          !fieldsListDropdown.values?.length ||
+                          fieldsListDropdown.values.indexOf(ContactsListComponent.RELATIONSHIP_DATA) < 0
+                        )
+                      ) {
+                        // de-select exposure person data
+                        includeExposurePersonDataCheckbox.checked = false;
+                        handler.detectChanges();
+                      }
+                    }
+                  },
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true,
@@ -1864,10 +2989,67 @@ export class ContactsListComponent
                   append: [
                     {
                       type: V2SideDialogConfigInputType.CHECKBOX,
-                      placeholder:
-                        'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
                       tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
                       name: 'includeCaseFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CONTACT_OF_CONTACT_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CONTACT_OF_CONTACT_INFORMATION_DESCRIPTION',
+                      name: 'includeContactOfContactFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_EXPOSURE_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_EXPOSURE_INFORMATION_DESCRIPTION',
+                      name: 'includePersonExposureFields',
+                      checked: false,
+                      change: (data, handler) => {
+                        // check if we need to make adjustments
+                        const includeExposurePersonData: boolean = (data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox)?.checked;
+                        if (includeExposurePersonData) {
+                          // check groups & fields
+                          const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                          const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                          if (!allGroups) {
+                            // do we need to select relationship data ?
+                            const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+                            if (fieldsGroupListDropdown) {
+                              // initialize if necessary
+                              fieldsGroupListDropdown.values = fieldsGroupListDropdown.values || [];
+
+                              // select relationship data since this is necessary
+                              if (fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0) {
+                                // select relationship data
+                                fieldsGroupListDropdown.values.push(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA);
+                                fieldsGroupListDropdown.values = [...fieldsGroupListDropdown.values];
+                                handler.detectChanges();
+                              }
+                            }
+                          } else if (!allFields) {
+                            // do we need to select relationship data ?
+                            const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+                            if (fieldsListDropdown) {
+                              // initialize if necessary
+                              fieldsListDropdown.values = fieldsListDropdown.values || [];
+
+                              // select relationship data since this is necessary
+                              if (fieldsListDropdown.values.indexOf(ContactsListComponent.RELATIONSHIP_DATA) < 0) {
+                                // select relationship data
+                                fieldsListDropdown.values.push(ContactsListComponent.RELATIONSHIP_DATA);
+                                fieldsListDropdown.values = [...fieldsListDropdown.values];
+                                handler.detectChanges();
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE_DESCRIPTION',
+                      name: 'retrieveOldestExposure',
                       checked: false
                     }
                   ]
@@ -1883,7 +3065,7 @@ export class ContactsListComponent
    * Export relationships for selected contacts
    */
   private exportContactsRelationship(qb: RequestQueryBuilder) {
-    this.dialogV2Service.showExportDataAfterLoadingData({
+    this.personAndRelatedHelperService.dialogV2Service.showExportDataAfterLoadingData({
       title: {
         get: () => 'LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIPS_TITLE'
       },
@@ -1895,7 +3077,7 @@ export class ContactsListComponent
             // handle errors
             catchError((err) => {
               // show error
-              this.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
 
               // send error further
               return throwError(err);
@@ -1925,7 +3107,7 @@ export class ContactsListComponent
                 url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                fileName: `${this.personAndRelatedHelperService.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${LocalizationHelper.now().format('YYYY-MM-DD')}`,
                 queryBuilder: qb,
                 allow: {
                   types: [
@@ -1944,7 +3126,9 @@ export class ContactsListComponent
                     fields: relationshipFieldGroups,
                     required: relationshipFieldGroupsRequires
                   },
-                  fields: this.relationshipFields,
+                  fields: {
+                    options: this.relationshipFields
+                  },
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true
@@ -1960,7 +3144,7 @@ export class ContactsListComponent
    * Change Contact Followup status for all records matching this.queryBuilder
    */
   private changeContactFinalFollowUpStatus() {
-    this.dialogV2Service
+    this.personAndRelatedHelperService.dialogV2Service
       .showSideDialog({
         // title
         title: {
@@ -2012,7 +3196,7 @@ export class ContactsListComponent
           qb.fields('id', 'followUp');
 
           // count contacts
-          this.contactDataService.getContactsList(this.selectedOutbreak.id, qb).subscribe(
+          this.personAndRelatedHelperService.contact.contactDataService.getContactsList(this.selectedOutbreak.id, qb).subscribe(
             (records: ContactModel[]) => {
 
               handler.update.changeTitle('LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS_DIALOG_TITLE', { count: records.length.toLocaleString() });
@@ -2041,20 +3225,20 @@ export class ContactsListComponent
         }));
 
         // update statuses
-        this.contactDataService
+        this.personAndRelatedHelperService.contact.contactDataService
           .bulkModifyContacts(
             this.selectedOutbreak.id,
             putRecordsData
           )
           .pipe(
             catchError((err) => {
-              this.toastV2Service.error(err);
+              this.personAndRelatedHelperService.toastV2Service.error(err);
               return throwError(err);
             })
           )
           .subscribe(() => {
             // success message
-            this.toastV2Service.success(
+            this.personAndRelatedHelperService.toastV2Service.success(
               'LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE', {
                 count: response.data.echo.recordsList.length.toLocaleString('en')
               }
@@ -2086,7 +3270,7 @@ export class ContactsListComponent
     }
 
     // retrieve the list of Contacts
-    this.records$ = this.contactDataService
+    this.records$ = this.personAndRelatedHelperService.contact.contactDataService
       .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         switchMap((data) => {
@@ -2119,7 +3303,7 @@ export class ContactsListComponent
           qb.filter.bySelect('id', locationIds, false, null);
 
           // retrieve locations
-          return this.locationDataService.getLocationsList(qb).pipe(
+          return this.personAndRelatedHelperService.locationDataService.getLocationsList(qb).pipe(
             map((locations) => {
               // map locations
               const locationsMap: {
@@ -2175,6 +3359,7 @@ export class ContactsListComponent
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
+    countQueryBuilder.clearFields();
 
     // apply has more limit
     if (this.applyHasMoreLimit) {
@@ -2182,11 +3367,11 @@ export class ContactsListComponent
     }
 
     // count
-    this.contactDataService
+    this.personAndRelatedHelperService.contact.contactDataService
       .getContactsCount(this.selectedOutbreak.id, countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.toastV2Service.error(err);
+          this.personAndRelatedHelperService.toastV2Service.error(err);
           return throwError(err);
         }),
 

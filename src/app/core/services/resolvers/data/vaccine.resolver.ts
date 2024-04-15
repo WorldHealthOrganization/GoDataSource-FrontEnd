@@ -21,7 +21,7 @@ export class VaccineDataResolver implements IMapResolverV2<ReferenceDataEntryMod
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.VACCINES)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_VACCINE)
       .pipe(
         map((data) => {
           // construct map

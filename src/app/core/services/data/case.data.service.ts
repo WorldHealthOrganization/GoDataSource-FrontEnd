@@ -9,24 +9,23 @@ import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-co
 import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
 import { AddressModel } from '../../models/address.model';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../models/metrics/metric-cases-delay-between-onset-lab-test.model';
-import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
 import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../models/metrics/metric-cases-delay-between-onset-hospitalization.model';
 import { Constants } from '../../models/constants';
-import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import { MetricCasesCountStratifiedOutcome } from '../../models/metrics/metric-cases-count-stratified-outcome.model';
 import { MetricCasesBasedOnContactStatusModel } from '../../models/metrics/metric-cases-based-on-contact-status.model';
 import { catchError, map } from 'rxjs/operators';
-import { moment } from '../../helperClasses/x-moment';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ICasesHospitalizedCount } from '../../models/cases-hospitalized-count.interface';
+import { LocalizationHelper } from '../../helperClasses/localization-helper';
+import { IGeneralAsyncValidatorResponse } from '../../../shared/forms-v2/validators/general-async-validator.directive';
 
 @Injectable()
 export class CaseDataService {
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private http: HttpClient,
     private modelHelper: ModelHelperService,
@@ -34,18 +33,32 @@ export class CaseDataService {
   ) {}
 
   /**
-     * Retrieve the list of Cases for an Outbreak
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<CaseModel[]>}
-     */
+   * Retrieve the list of Cases for an Outbreak
+   */
   getCasesList(
     outbreakId: string,
-    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(),
+    usePost?: boolean
   ): Observable<CaseModel[]> {
+    // date range filter
     const qb: RequestQueryBuilder = new RequestQueryBuilder();
     qb.include('dateRangeLocations', true);
     qb.merge(queryBuilder);
+
+    // use post
+    if (usePost) {
+      const filter = queryBuilder.buildQuery(false);
+      return this.modelHelper.mapObservableListToModel(
+        this.http.post(
+          `outbreaks/${outbreakId}/cases/filter`, {
+            filter
+          }
+        ),
+        CaseModel
+      );
+    }
+
+    // default
     const filter = qb.buildQuery();
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`outbreaks/${outbreakId}/cases?filter=${filter}`),
@@ -54,11 +67,8 @@ export class CaseDataService {
   }
 
   /**
-     * Retrieve a Case of an Outbreak
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @returns {Observable<CaseModel>}
-     */
+   * Retrieve a Case of an Outbreak
+   */
   getCase(outbreakId: string, caseId: string): Observable<CaseModel> {
     return this.modelHelper.mapObservableToModel(
       this.http.get(`outbreaks/${outbreakId}/cases/${caseId}`),
@@ -67,11 +77,8 @@ export class CaseDataService {
   }
 
   /**
-     * Retrieve Case movement information
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @returns {Observable<AddressModel[]>}
-     */
+   * Retrieve Case movement information
+   */
   getCaseMovement(outbreakId: string, caseId: string): Observable<AddressModel[]> {
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/movement`),
@@ -80,40 +87,15 @@ export class CaseDataService {
   }
 
   /**
-     * Find case duplicates
-     * @param outbreakId
-     * @param caseData
-     */
-  findDuplicates(
-    outbreakId: string,
-    caseData: any
-  ): Observable<EntityDuplicatesModel> {
-    return this.modelHelper.mapObservableToModel(
-      this.http.post(
-        `outbreaks/${outbreakId}/cases/duplicates/find`,
-        caseData
-      ),
-      EntityDuplicatesModel
-    );
-  }
-
-  /**
-     * Add a new Case for an Outbreak
-     * @param {string} outbreakId
-     * @param caseData
-     * @returns {Observable<any>}
-     */
+   * Add a new Case for an Outbreak
+   */
   createCase(outbreakId: string, caseData): Observable<any> {
     return this.http.post(`outbreaks/${outbreakId}/cases`, caseData);
   }
 
   /**
-     * Modify an existing Case of an Outbreak
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @param caseData
-     * @returns {Observable<CaseModel>}
-     */
+   * Modify an existing Case of an Outbreak
+   */
   modifyCase(outbreakId: string, caseId: string, caseData): Observable<CaseModel> {
     return this.modelHelper.mapObservableToModel(
       this.http.put(`outbreaks/${outbreakId}/cases/${caseId}`, caseData),
@@ -122,31 +104,35 @@ export class CaseDataService {
   }
 
   /**
-     * Delete an existing Case of an Outbreak
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @returns {Observable<any>}
-     */
+   * Modify multiple cases
+   */
+  bulkModifyCases(
+    outbreakId: string,
+    contactsData: any
+  ) {
+    return this.http.put(
+      `outbreaks/${outbreakId}/cases/bulk`,
+      contactsData
+    );
+  }
+
+  /**
+   * Delete an existing Case of an Outbreak
+   */
   deleteCase(outbreakId: string, caseId: string): Observable<any> {
     return this.http.delete(`outbreaks/${outbreakId}/cases/${caseId}`);
   }
 
   /**
-     * Get exposed contacts for a case that user want to delete
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @returns {Observable<Object>}
-     */
+   * Get exposed contacts for a case that user want to delete/convert
+   */
   getExposedContactsForCase(outbreakId: string, caseId: string) {
     return this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/isolated-contacts`);
   }
 
   /**
-     * Return count of cases
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<IBasicCount>}
-     */
+   * Return count of cases
+   */
   getCasesCount(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -156,30 +142,24 @@ export class CaseDataService {
   }
 
   /**
-     * Count Cases grouped by Classification
-     * @param outbreakId
-     * @param queryBuilder
-     */
+   * Count Cases grouped by Classification
+   */
   getCasesGroupedByClassification(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<any> {
     const filter = queryBuilder.buildQuery();
     return this.http.get(`outbreaks/${outbreakId}/cases/per-classification/count?filter=${filter}`);
   }
+
   /**
-     * Count Cases grouped by Classification
-     * @param outbreakId
-     * @param queryBuilder
-     */
+   * Count Cases grouped by Classification
+   */
   getCasesHospitalized(outbreakId: string, queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<ICasesHospitalizedCount> {
     const filter = queryBuilder.buildQuery();
     return this.http.get<ICasesHospitalizedCount>(`outbreaks/${outbreakId}/cases/hospitalized/count?filter=${filter}`);
   }
 
   /**
-     * Return count of deceased cases
-     * @param {string} outbreakId
-     * @param queryBuilder
-     * @returns {Observable<any>}
-     */
+   * Return count of deceased cases
+   */
   getDeceasedCasesCount(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -203,12 +183,8 @@ export class CaseDataService {
   }
 
   /**
-     * Return count of hospitalised cases
-     * @param {string} outbreakId
-     * @param date
-     * @param queryBuilder
-     * @returns {Observable<any>}
-     */
+   * Return count of hospitalised cases
+   */
   getHospitalisedCasesCount(
     outbreakId: string,
     date,
@@ -216,7 +192,7 @@ export class CaseDataService {
   ): Observable<any> {
     // set default date ?
     if (!date) {
-      date = moment();
+      date = LocalizationHelper.today();
     }
 
     // get the query builder and call the endpoint
@@ -233,71 +209,8 @@ export class CaseDataService {
   }
 
   /**
-     * Return count of not hospitalised cases
-     * @param {string} outbreakId
-     * @param date
-     * @param queryBuilder
-     * @returns {Observable<any>}
-     */
-  getNotHospitalisedCasesCount(
-    outbreakId: string,
-    date,
-    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-  ): Observable<any> {
-    // set default date ?
-    if (!date) {
-      date = moment();
-    }
-
-    // get the query builder and call the endpoint
-    const filterQueryBuilder = this.listFilterDataService.filterCasesNotHospitalized(date);
-
-    // add other conditions
-    if (!queryBuilder.isEmpty()) {
-      filterQueryBuilder.merge(queryBuilder);
-    }
-
-    // call endpoint
-    const filter = filterQueryBuilder.buildQuery();
-    return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
-  }
-
-  /**
-     * Return count of isolated cases
-     * @param {string} outbreakId
-     * @param date
-     * @param queryBuilder
-     * @returns {Observable<any>}
-     */
-  getIsolatedCasesCount(
-    outbreakId: string,
-    date,
-    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-  ): Observable<any> {
-    // set default date ?
-    if (!date) {
-      date = moment();
-    }
-
-    // construct query builder
-    const filterQueryBuilder = this.listFilterDataService.filterCasesIsolated(date);
-
-    // add other conditions
-    if (!queryBuilder.isEmpty()) {
-      filterQueryBuilder.merge(queryBuilder);
-    }
-
-    // call endpoint
-    const filter = filterQueryBuilder.buildQuery();
-    return this.http.get(`outbreaks/${outbreakId}/cases/filtered-count?filter=${filter}`);
-  }
-
-  /**
-     * Return count of suspect cases pending lab result
-     * @param {string} outbreakId
-     * @param queryBuilder
-     * @returns {Observable<any>}
-     */
+   * Return count of suspect cases pending lab result
+   */
   getCasesPendingLabResultCount(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -316,11 +229,8 @@ export class CaseDataService {
   }
 
   /**
-     * Return count of cases refusing to be transferred to a treatment unit
-     * @param {string} outbreakId
-     * @param queryBuilder
-     * @returns {Observable<any>}
-     */
+   * Return count of cases refusing to be transferred to a treatment unit
+   */
   getCasesRefusingTreatmentCount(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -339,11 +249,8 @@ export class CaseDataService {
   }
 
   /**
-     * Cases count stratified by classification over time
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<MetricCasesCountStratified[]>}
-     */
+   * Cases count stratified by classification over time
+   */
   getCasesStratifiedByClassificationOverTime(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -370,11 +277,8 @@ export class CaseDataService {
   }
 
   /**
-     * Cases count stratified by classification over reporting time
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<MetricCasesCountStratified[]>}
-     */
+   * Cases count stratified by classification over reporting time
+   */
   getCasesStratifiedByClassificationOverReportingTime(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -401,11 +305,8 @@ export class CaseDataService {
   }
 
   /**
-     * Cases count stratified by outcome over time
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<MetricCasesCountStratifiedOutcome[]>}
-     */
+   * Cases count stratified by outcome over time
+   */
   getCasesStratifiedByOutcomeOverTime(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -432,11 +333,8 @@ export class CaseDataService {
   }
 
   /**
-     * Retrieve cases per location metrics
-     * @param {string} outbreakId
-     * @param queryBuilder
-     * @returns {Observable<MetricCasesPerLocationCountsModel>}
-     */
+   * Retrieve cases per location metrics
+   */
   getCasesPerLocation(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -449,11 +347,8 @@ export class CaseDataService {
   }
 
   /**
-     * get delay between date of onset and date of first lab testing - gantt chart
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<MetricCasesDelayBetweenOnsetLabTestModel[]>}
-     */
+   * Get delay between date of onset and date of first lab testing - gantt chart
+   */
   getDelayBetweenOnsetAndLabTesting(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -466,11 +361,8 @@ export class CaseDataService {
   }
 
   /**
-     * get delay between date of onset and date of hospitalization / isolation - first - gantt chart
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<MetricCasesDelayBetweenOnsetHospitalizationModel[]>}
-     */
+   * Get delay between date of onset and date of hospitalization / isolation - first - gantt chart
+   */
   getDelayBetweenOnsetAndHospitalization(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -483,11 +375,8 @@ export class CaseDataService {
   }
 
   /**
-     * Cases based on contact status report
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<MetricCasesBasedOnContactStatusModel[]>}
-     */
+   * Cases based on contact status report
+   */
   getCasesBasedOnContactStatusReport(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -511,31 +400,22 @@ export class CaseDataService {
   }
 
   /**
-     *  Restore a case that was deleted
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @returns {Observable<any>}
-     */
+   * Restore a case that was deleted
+   */
   restoreCase(outbreakId: string, caseId: string): Observable<any> {
     return this.http.post(`/outbreaks/${outbreakId}/cases/${caseId}/restore`, {});
   }
 
   /**
-     * Convert a case to contact
-     * @param {string} outbreakId
-     * @param {string} caseId
-     * @returns {Observable<any>}
-     */
+   * Convert a case to contact
+   */
   convertToContact(outbreakId: string, caseId: string): Observable<any> {
     return this.http.post(`/outbreaks/${outbreakId}/cases/${caseId}/convert-to-contact`, {});
   }
 
   /**
-     * Generate Case Visual ID
-     * @param outbreakId
-     * @param visualIdMask
-     * @param personId Optional
-     */
+   * Generate Case Visual ID
+   */
   generateCaseVisualID(
     outbreakId: string,
     visualIdMask: string,
@@ -567,12 +447,8 @@ export class CaseDataService {
   }
 
   /**
-     * Check if visual ID is valid
-     * @param outbreakId
-     * @param visualIdRealMask
-     * @param visualIdMask
-     * @param personId Optional
-     */
+   * Check if visual ID is valid
+   */
   checkCaseVisualIDValidity(
     outbreakId: string,
     visualIdRealMask: string,
@@ -601,25 +477,22 @@ export class CaseDataService {
   }
 
   /**
-     * Get case relationships count
-     * @param {string} outbreakId
-     * @param {string} caseId
-     */
+   * Get case relationships count
+   */
   getCaseRelationshipsCount(outbreakId: string, caseId: string): Observable<any> {
     return this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/relationships/filtered-count`);
   }
 
   /**
-     * Retrieve the list of usual place of residences for cases that have geo location on the usual place of residence
-     * @param {string} outbreakId
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {Observable<{ lat: number, lng: number }[]>}
-     */
+   * Retrieve the list of usual place of residences for cases that have geo location on the usual place of residence
+   */
   getCaseCountMapAddresses(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
   ): Observable<{ lat: number, lng: number }[]> {
-    const whereFilter = queryBuilder.filter.generateCondition(true);
+    // generate filter
+    const filter = queryBuilder.buildQuery(false);
+    const whereFilter = JSON.stringify(filter.where || {});
     return this.http.get(`outbreaks/${outbreakId}/cases/count-map?where=${whereFilter}`) as Observable<{ lat: number, lng: number }[]>;
   }
 }

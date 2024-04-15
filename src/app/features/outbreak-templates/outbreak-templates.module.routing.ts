@@ -21,19 +21,29 @@ import {
 } from '../../core/services/resolvers/data/questionnaire-answer-display.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import {
+  ReferenceDataDiseaseSpecificCategoriesResolver
+} from '../../core/services/resolvers/data/reference-data-disease-specific-categories.resolver';
+import { IconDataResolver } from '../../core/services/resolvers/data/icon.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // conf
 const createViewModifyFoundation: Route = {
   component: fromPages.OutbreakTemplateCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    createdOn: CreatedOnResolver,
     disease: DiseaseDataResolver,
     followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
     yesNo: YesNoDataResolver,
     questionnaireAnswerType: QuestionnaireAnswerTypeDataResolver,
     questionnaireQuestionCategory: QuestionnaireQuestionCategoryDataResolver,
     questionnaireAnswerDisplay: QuestionnaireAnswerDisplayDataResolver,
-    user: UserDataResolver
+    user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver,
+    diseaseSpecificCategories: ReferenceDataDiseaseSpecificCategoriesResolver,
+    icon: IconDataResolver
   }
 };
 
@@ -50,10 +60,12 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       disease: DiseaseDataResolver,
       followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
       yesNo: YesNoDataResolver,
-      yesNoAll: YesNoAllDataResolver
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver
     }
   },
   // create outbreak template

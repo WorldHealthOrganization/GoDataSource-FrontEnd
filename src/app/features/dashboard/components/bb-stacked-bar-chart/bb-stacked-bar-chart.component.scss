@@ -1,0 +1,51 @@
+app-bb-stacked-bar-chart {
+    .bb-legend-item {
+        cursor: default !important;
+    }
+
+    .tick {
+        font-size: 12px;
+    }
+
+    .bb-axis {
+        fill: #000000;
+    }
+    .bb-axis line, .bb-axis path {
+        stroke: #ccc;
+        fill: none !important
+    }
+    .bb-axis-y .tick line {
+        stroke: #fff;
+        fill: #fff
+    }
+
+    /* manipulate the number of ticks displayed */
+    .bb-axis-x-5n .tick text {
+        display: none !important;
+    }
+    .bb-axis-x-5n .tick:nth-child(5n) text {
+        display: block !important;
+    }
+
+    .bb-axis-x-3n .tick text {
+        display: none !important;
+    }
+    .bb-axis-x-3n .tick:nth-child(3n) text {
+        display: block !important;
+    }
+
+    .bb-axis-x-2n .tick text {
+        display: none !important;
+    }
+    .bb-axis-x-2n .tick:nth-child(2n) text {
+        display: block !important;
+    }
+
+    .bb-axis-x-n .tick text {
+        display: none !important;
+    }
+    .bb-axis-x-n .tick:nth-child(n) text {
+        display: block !important;
+    }
+
+}

@@ -9,13 +9,17 @@ import { TeamCreateViewModifyComponent } from './pages/team-create-view-modify/t
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { CreatedOnResolver } from '../../core/services/resolvers/data/created-on.resolver';
+import { DeletedUserDataResolver } from '../../core/services/resolvers/data/deleted-user.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
   component: TeamCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
-    user: UserDataResolver
+    createdOn: CreatedOnResolver,
+    user: UserDataResolver,
+    deletedUser: DeletedUserDataResolver
   }
 };
 
@@ -31,6 +35,7 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      createdOn: CreatedOnResolver,
       user: UserDataResolver,
       yesNoAll: YesNoAllDataResolver
     }

@@ -15,7 +15,8 @@
     @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
                         0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
                         0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
-    overflow-y: overlay;
+    overflow-x: overlay;
+    overflow-y: hidden;
 
     .mat-step-header {
       @include box-sizing(border-box);
@@ -25,7 +26,14 @@
 
       @include breakpoint('xs') {
         min-width: 4rem;
+      }
+
+      @include breakpoint('lt-md') {
         padding: 1.6rem 0.8rem;
+      }
+
+      @include breakpoint('gt-sm') {
+        @include flex_val(none);
       }
 
       &:hover:not([aria-disabled]),
@@ -74,7 +82,7 @@
         line-height: $gd-line-height;
         min-width: 2.4rem;
 
-        @include breakpoint('md') {
+        @include breakpoint('lt-md') {
           font-size: 1.4rem;
         }
 
@@ -119,7 +127,8 @@
     padding: 0;
 
     .mat-horizontal-stepper-content {
-      &[aria-expanded="true"] {
+      &[aria-expanded="true"],
+      &:not(.mat-horizontal-stepper-content-inactive) {
         height: 100%;
       }
     }
@@ -130,7 +139,9 @@
       padding: 1.6rem;
 
       &.gd-create-view-modify-bottom-content-edit-questionnaire,
-      &.gd-create-view-modify-bottom-content-fill-questionnaire {
+      &.gd-create-view-modify-bottom-content-fill-questionnaire,
+      &.gd-create-view-modify-bottom-content-tree-editor,
+      &.gd-create-view-modify-bottom-content-visible-and-mandatory-editor {
         height: calc(100% - 6.9rem);
         margin-right: 0;
         padding: 0;
