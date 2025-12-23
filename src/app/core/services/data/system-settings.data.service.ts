@@ -1,24 +1,30 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpBackend } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { map, tap, switchMap } from 'rxjs/operators';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { SystemSettingsModel } from '../../models/system-settings.model';
 import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
-import { map, tap } from 'rxjs/operators';
 import { LocalizationHelper } from '../../helperClasses/localization-helper';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 
 @Injectable()
 export class SystemSettingsDataService {
+  private bypassHttp: HttpClient;
+
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private http: HttpClient,
     private modelHelper: ModelHelperService,
-    private cacheService: CacheService
-  ) {}
+    private cacheService: CacheService,
+    httpBackend: HttpBackend          // ← Inject HttpBackend here
+  ) {
+    // Create a HttpClient that skips any interceptors (uses HttpBackend directly)
+    this.bypassHttp = new HttpClient(httpBackend);
+  }
 
   /**
      * Retrieve System settings
@@ -48,34 +54,43 @@ export class SystemSettingsDataService {
 
   /**
    * Retrieve api version
+   * Now reads `assets/runtime-config.json` at runtime—bypassing any interceptors—to get the apiKey.
    */
   private getAPIConf(apiUrl?: string): Observable<SystemSettingsVersionModel> {
-    return this.modelHelper
-      .mapObservableToModel(
-        this.http.get(
-          `${apiUrl ? apiUrl : ''}/system-settings/version`, {
-            headers: apiUrl ?
-              {
-                'ignore-error': 'unresponsive'
-              } :
-              undefined
-          }
-        ),
-        SystemSettingsVersionModel
-      )
-      .pipe(
-        tap((versionData) => {
-          // current instance ?
-          if (!apiUrl) {
-            // cache / update it
-            this.cacheService.set(CacheKey.API_VERSION, versionData);
+    // 1) Fetch the runtime JSON using bypassHttp so that it never goes to /api/…
+    return this.bypassHttp.get<{ apiKey: string }>('assets/runtime-config.json').pipe(
+      switchMap(config => {
+        const apiKey = config.apiKey || '';
+        // 2) Build headers using the fetched apiKey
+        const headers: any = { 'api-key': apiKey };
+        if (apiUrl) {
+          headers['ignore-error'] = 'unresponsive';
+        }
 
-            // set default timezone
-            // IMPORTANT: this could be done at user level at a later stage, for now it was proposed but WHO decided to keep it per instance
-            LocalizationHelper.initialize(versionData.timezone);
-          }
-        })
-      );
+        // 3) Call the actual version endpoint via the normal http client (this will go through any interceptors)
+
+        return this.modelHelper
+          .mapObservableToModel(
+            this.http.get(
+              `${apiUrl ? apiUrl : ''}/system-settings/version`,
+              { headers }
+            ),
+            SystemSettingsVersionModel
+          )
+          .pipe(
+            tap(versionData => {
+              // current instance?
+              if (!apiUrl) {
+                // cache / update it
+                this.cacheService.set(CacheKey.API_VERSION, versionData);
+
+                // set default timezone
+                LocalizationHelper.initialize(versionData.timezone);
+              }
+            })
+          );
+      })
+    );
   }
 
   /**
