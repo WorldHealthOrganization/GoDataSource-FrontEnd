@@ -1317,7 +1317,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.originalLegend.nodeLabel = this.colorCriteria.nodeLabelCriteria;
     // gender translations
     if (this.originalLegend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
-      this.originalLegend.nodeLabelValues = [];
+      this.originalLegend.nodeLabelValues = {};
       const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_GENDER], 'entries', []);
       _.forEach(nodeLabelValues, (value) => {
         // get gender transcriptions
@@ -1326,7 +1326,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     }
     // occupation translations
     if (this.originalLegend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
-      this.originalLegend.nodeLabelValues = [];
+      this.originalLegend.nodeLabelValues = {};
       const nodeLabelValues = _.get(this.referenceDataEntries[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OCCUPATION], 'entries', []);
       _.forEach(nodeLabelValues, (value) => {
         // get gender transcriptions
@@ -1335,7 +1335,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     }
     // populate nodeLabelValues with gender / classification / outcome values as they need to be translated
     if (this.originalLegend.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
-      this.originalLegend.genderValues = [];
+      this.originalLegend.genderValues = {};
       const genderValues = _.get(this.referenceDataEntries[ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_GENDER], 'entries', []);
       _.forEach(genderValues, (value) => {
         // get gender transcriptions

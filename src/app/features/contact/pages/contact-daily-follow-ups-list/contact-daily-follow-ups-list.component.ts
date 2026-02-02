@@ -112,6 +112,20 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     status: string[]
   };
 
+  // person type options
+  private _personTypeOptions: ILabelValuePairModel[] = [
+    {
+      label: EntityType.CONTACT_OF_CONTACT,
+      value: EntityType.CONTACT_OF_CONTACT
+    }, {
+      label: EntityType.CONTACT,
+      value: EntityType.CONTACT
+    }, {
+      label: EntityType.CASE,
+      value: EntityType.CASE
+    }
+  ];
+
   /**
    * Constructor
    */
@@ -738,6 +752,21 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           // NO relationshipKey because we want to filter using the aggregate function that has all person types (cases, contacts and contacts of contacts), if we use relationshipKey it will filter only for contacts..cases and contacts of contacts will be ignored
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'type',
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
+        visibleMandatoryIf: () => true,
+        format: {
+          type: (data) => data.person?.type ?
+            this.personAndRelatedHelperService.i18nService.instant(data.person.type) :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          childQueryBuilderKey: 'contact',
+          options: this._personTypeOptions
         }
       },
       {
@@ -2232,16 +2261,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             }
           });
         }
-      }
-
-      // list contacts
-      if (ContactModel.canList(this.authUser)) {
-        this.breadcrumbs.push({
-          label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
-          action: {
-            link: ['/contacts']
-          }
-        });
       }
 
       // current page

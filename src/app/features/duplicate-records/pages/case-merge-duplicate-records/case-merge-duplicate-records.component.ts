@@ -1138,7 +1138,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               }
             },
             validators: {
-              required: () => true
+              required: () => this.selectedOutbreak?.visibleAndMandatoryFields &&
+                this.selectedOutbreak.visibleAndMandatoryFields[this.personAndRelatedHelperService.case.visibleMandatoryKey]?.dateOfReporting?.mandatory
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,

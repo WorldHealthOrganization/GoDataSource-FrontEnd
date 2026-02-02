@@ -123,30 +123,35 @@ export class SidenavComponent implements OnInit, OnDestroy {
           '/cases',
           () => this.hasOutbreak.apply(this) // provide context to keep this functionality
         ),
+        
         new NavItem(
-          'contacts-group',
+          'contacts',
           'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
           'people',
+          [
+            PERMISSION.CONTACT_LIST
+          ],
+          [],
+          '/contacts',
+          () => this.hasOutbreak.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
+          'contacts-of-contacts',
+          'LNG_LAYOUT_MENU_ITEM_CONTACTS_OF_CONTACTS_LABEL',
+          '',
+          [
+            PERMISSION.CONTACT_OF_CONTACT_LIST
+          ],
+          [],
+          '/contacts-of-contacts',
+          () => this.hasOutbreakAndCoCEnabled.apply(this) // provide context to keep this functionality
+        ),
+        new NavItem(
+          'follow-ups',
+          'LNG_LAYOUT_MENU_ITEM_FOLLOW_UPS_LABEL',
+          'assignment',
           [],
           [
-            new ChildNavItem(
-              'contacts',
-              'LNG_LAYOUT_MENU_ITEM_CONTACTS_LABEL',
-              [
-                PERMISSION.CONTACT_LIST
-              ],
-              '/contacts',
-              () => this.hasOutbreak.apply(this) // provide context to keep this functionality
-            ),
-            new ChildNavItem(
-              'contacts-of-contacts',
-              'LNG_LAYOUT_MENU_ITEM_CONTACTS_OF_CONTACTS_LABEL',
-              [
-                PERMISSION.CONTACT_OF_CONTACT_LIST
-              ],
-              '/contacts-of-contacts',
-              () => this.hasOutbreakAndCoCEnabled.apply(this) // provide context to keep this functionality
-            ),
             new ChildNavItem(
               'contact-follow-ups',
               'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL',

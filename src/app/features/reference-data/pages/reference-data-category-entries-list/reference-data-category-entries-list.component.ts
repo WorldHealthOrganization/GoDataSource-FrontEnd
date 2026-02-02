@@ -504,7 +504,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       'value',
       'code',
       'description',
-      'iconUrl',
+      'iconId',
       'colorCode',
       'order',
       'active',
