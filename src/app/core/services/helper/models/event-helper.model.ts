@@ -184,7 +184,12 @@ export class EventHelperModel {
               name: 'responsibleUserId',
               placeholder: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
               description: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-              options: data.options.user.concat(data.options.deletedUser),
+              options: data.options.user
+                .filter(u => u.data?.outbreakIds?.includes(useToFilterOutbreak.id))
+                .concat(
+                  data.options.deletedUser
+                    .filter(u => u.data?.outbreakIds?.includes(useToFilterOutbreak.id))
+                ),
               value: {
                 get: () => data.itemData.responsibleUserId,
                 set: (value) => {
