@@ -1,6 +1,6 @@
 {
   "name": "go-data-front-end",
-  "version": "2.51",
+  "version": "2.51.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
