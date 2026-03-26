@@ -138,7 +138,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
         new NavItem(
           'contacts-of-contacts',
           'LNG_LAYOUT_MENU_ITEM_CONTACTS_OF_CONTACTS_LABEL',
-          '',
+          'groups',
           [
             PERMISSION.CONTACT_OF_CONTACT_LIST
           ],
