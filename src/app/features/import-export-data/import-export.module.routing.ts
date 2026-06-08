@@ -83,7 +83,8 @@ const routes: Routes = [
       savedImportPage: Constants.APP_IMPORT_PAGE.CASE.value
     },
     resolve: {
-      savedImportMapping: SavedImportMappingDataResolver
+      savedImportMapping: SavedImportMappingDataResolver,
+      user: UserDataResolver
     }
   },
 
@@ -131,7 +132,8 @@ const routes: Routes = [
       savedImportPage: Constants.APP_IMPORT_PAGE.CONTACT.value
     },
     resolve: {
-      savedImportMapping: SavedImportMappingDataResolver
+      savedImportMapping: SavedImportMappingDataResolver,
+      user: UserDataResolver
     }
   },
 
@@ -147,7 +149,8 @@ const routes: Routes = [
       savedImportPage: Constants.APP_IMPORT_PAGE.CONTACT_OF_CONTACT.value
     },
     resolve: {
-      savedImportMapping: SavedImportMappingDataResolver
+      savedImportMapping: SavedImportMappingDataResolver,
+      user: UserDataResolver
     }
   },
 

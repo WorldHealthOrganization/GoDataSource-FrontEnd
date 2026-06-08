@@ -49,7 +49,7 @@ export class UserDataResolver implements IMapResolverV2<UserModel> {
 
             // add option
             response.options.push({
-              label: item.nameAndEmail,
+              label: item.name,
               value: item.id,
               data: item
             });
