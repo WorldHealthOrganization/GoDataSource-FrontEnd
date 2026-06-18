@@ -29,6 +29,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { LocalizationHelper } from '../../../../core/helperClasses/localization-helper';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
  * Component
@@ -40,6 +41,7 @@ import { LocalizationHelper } from '../../../../core/helperClasses/localization-
 export class UserCreateViewModifyComponent extends CreateViewModifyComponent<UserModel> implements OnDestroy {
   // data
   private _passwordConfirm: string;
+  private _originalOutbreakIds: string[] = [];
 
   /**
    * Constructor
@@ -96,7 +98,9 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
   /**
    * Data initialized
    */
-  protected initializedData(): void {}
+  protected initializedData(): void {
+    this._originalOutbreakIds = [...(this.itemData.outbreakIds ?? [])];
+  }
 
   /**
    * Initialize page title
@@ -374,11 +378,8 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               description: () => 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION',
               value: {
                 get: () => this.itemData.outbreakIds,
-                set: (value) => {
-                  // set data
+                set: (value: string[]) => {
                   this.itemData.outbreakIds = value;
-
-                  // update visible active outbreaks
                   (tab.nameToInput.activeOutbreakId as ICreateViewModifyV2TabInputSingleSelect).options = this.getAllowedActiveOutbreaks();
                 }
               },
@@ -558,35 +559,49 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
       // cleanup
       delete data.passwordConfirm;
 
-      // create / modify
-      (
-        type === CreateViewModifyV2ActionType.CREATE ?
-          this.userDataService.createUser(
-            data
-          ) :
-          this.userDataService.modifyUser(
-            this.itemData.id,
-            data
-          )
-      ).pipe(
-        catchError((err) => {
-          // show error
-          finished(err, undefined);
+      // check if any previously saved outbreaks are being removed
+      const removedOutbreaks = this._originalOutbreakIds.filter(
+        (id) => !(data.outbreakIds ?? []).includes(id)
+      );
 
-          // finished
-          return throwError(err);
-        })
-      ).subscribe((outbreak) => {
-        // display message
-        this.toastV2Service.success(
+      const doSave = () => {
+        // create / modify
+        (
           type === CreateViewModifyV2ActionType.CREATE ?
-            'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE' :
-            'LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE'
-        );
+            this.userDataService.createUser(data) :
+            this.userDataService.modifyUser(this.itemData.id, data)
+        ).pipe(
+          catchError((err) => {
+            finished(err, undefined);
+            return throwError(err);
+          })
+        ).subscribe((outbreak) => {
+          this.toastV2Service.success(
+            type === CreateViewModifyV2ActionType.CREATE ?
+              'LNG_PAGE_CREATE_USER_ACTION_CREATE_USER_SUCCESS_MESSAGE' :
+              'LNG_PAGE_MODIFY_USER_ACTION_MODIFY_USER_SUCCESS_MESSAGE'
+          );
+          finished(undefined, outbreak);
+        });
+      };
 
-        // hide loading & redirect
-        finished(undefined, outbreak);
-      });
+      if (type === CreateViewModifyV2ActionType.UPDATE && removedOutbreaks.length) {
+        this.dialogV2Service.showConfirmDialog({
+          config: {
+            title: { get: () => 'LNG_USER_FIELD_LABEL_REMOVE_OUTBREAK_CONFIRM_TITLE' },
+            message: { get: () => 'LNG_USER_FIELD_LABEL_REMOVE_OUTBREAK_CONFIRM' }
+          }
+        }).subscribe((response) => {
+          if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+            finished(undefined, undefined);
+            return;
+          }
+          doSave();
+        });
+        return;
+      }
+
+      doSave();
     };
   }
 
