@@ -57,7 +57,7 @@
           fxLayout="row wrap"
           class="gd-form-select-multiple-v2-panel-inner">
           <ng-container
-            *ngFor="let selectedValue of value; let selectedIndex = index">
+            *ngFor="let selectedValue of validSelectedValues; let selectedIndex = index">
 
             <!-- separator -->
             <ng-container
@@ -188,7 +188,7 @@
         <ng-container
           *ngIf="value?.length > 0; else noValue">
           <ng-container
-            *ngFor="let selectedValue of value; let selectedIndex = index">
+            *ngFor="let selectedValue of validSelectedValues; let selectedIndex = index">
 
             <!-- separator -->
             <ng-container

@@ -196,6 +196,10 @@ export class AppFormSelectMultipleV2Component
     return this.allOptions;
   }
 
+  get validSelectedValues(): string[] {
+    return (this.value || []).filter((v) => !!this.allOptionsMap[v]);
+  }
+
   // allow disabled options to be selected ?
   @Input() allowDisabledToBeSelected: boolean = false;
 
