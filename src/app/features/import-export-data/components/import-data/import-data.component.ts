@@ -733,6 +733,7 @@ export class ImportDataComponent
 
   // users
   users: IResolverV2ResponseModel<UserModel>;
+  userOptionsForMapping: ILabelValuePairModel[] = [];
   userNameAndEmailMap: {
     [name: string]: string;
   } = {};
@@ -1726,7 +1727,7 @@ export class ImportDataComponent
             // try to map by name
             if (this.userNameMap[sourceOptReduced]?.length === 1) {
               destinationOpt = this.userNameMap[sourceOptReduced][0];
-            } else if (this.users && this.users[sourceOption]) {
+            } else if (this.users.map[sourceOption] && this.userOptionsForMapping.some((u) => u.value === sourceOption)) {
               destinationOpt = sourceOption;
             }
           }
@@ -2577,9 +2578,13 @@ export class ImportDataComponent
 
     // users
     this.users = (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>);
+
+    // build filtered user options (selectedOutbreak may not be set yet in constructor; rebuilt in selectedOutbreakChanged)
+    this.rebuildUserOptionsForMapping();
+
     if (this.users?.list?.length) {
       this.users.list.forEach((item: UserModel) => {
-        // map name and email to id. the name with email pair is unique
+        // map name and email to id
         const userNameAndEmail: string = _.camelCase(item.nameAndEmail).toLowerCase();
         this.userNameAndEmailMap[userNameAndEmail] = item.id;
 
@@ -2594,6 +2599,25 @@ export class ImportDataComponent
         }
       });
     }
+  }
+
+  /**
+   * Rebuild filtered user options for import mapping.
+   * Called once on init and again when selectedOutbreak changes (async subscription).
+   */
+  private rebuildUserOptionsForMapping(): void {
+    const allUserOpts = this.users?.options || [];
+    const filteredUserOpts = (this.useOutbreakLocations && this.selectedOutbreak?.id)
+      ? allUserOpts.filter((u) => !u.data?.outbreakIds?.length || u.data?.outbreakIds?.includes(this.selectedOutbreak.id))
+      : allUserOpts;
+    this.userOptionsForMapping = filteredUserOpts.map((u) => ({
+      ...u,
+      label: u.label
+    }));
+  }
+
+  protected selectedOutbreakChanged(): void {
+    this.rebuildUserOptionsForMapping();
   }
 
   /**
@@ -3626,7 +3650,7 @@ export class ImportDataComponent
     } else if (this.languageFields[destinationField]) {
       return this.languages.options;
     } else if (this.userFields[destinationField]) {
-      return this.users.options;
+      return this.userOptionsForMapping;
     }
 
     // no template found
@@ -4131,7 +4155,7 @@ export class ImportDataComponent
     } else if (this.languageFields[destinationField] && this.languages.map[destinationOption]) {
       return this.languages.map[destinationOption].name;
     } else if (this.userFields[destinationField] && this.users.map[destinationOption]) {
-      return this.users.map[destinationOption].nameAndEmail;
+      return this.users.map[destinationOption].name;
     } else {
       // general dropdown
       return this.importableObject.modelPropertyValuesMapChildMap[destinationField] &&

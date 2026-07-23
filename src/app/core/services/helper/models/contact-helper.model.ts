@@ -321,10 +321,10 @@ export class ContactHelperModel {
                 placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
                 description: () => 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
                 options: data.options.user
-                .filter(u => u.data?.outbreakIds?.includes(useToFilterOutbreak.id))
+                .filter(u => !u.data?.outbreakIds?.length || u.data?.outbreakIds?.includes(useToFilterOutbreak.id))
                 .concat(
                   data.options.deletedUser
-                    .filter(u => u.data?.outbreakIds?.includes(useToFilterOutbreak.id))
+                    .filter(u => !u.data?.outbreakIds?.length || u.data?.outbreakIds?.includes(useToFilterOutbreak.id))
                 ),
                 value: {
                   get: () => data.itemData.responsibleUserId,
@@ -1405,7 +1405,7 @@ export class ContactHelperModel {
           this.visibleMandatoryKey,
           'responsibleUserId'
         ),
-        options: data.options.user,
+        options: data.options.user.filter(u => !u.data?.outbreakIds?.length || u.data?.outbreakIds?.includes(selectedOutbreak.id)),
         sortable: true
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
@@ -1649,7 +1649,7 @@ export class ContactHelperModel {
             this.parent.followUp.visibleMandatoryKey,
             'responsibleUserId'
           ),
-          options: data.options.user,
+          options: data.options.user.filter(u => !u.data?.outbreakIds?.length || u.data?.outbreakIds?.includes(selectedOutbreak.id)),
           relationshipPath: ['followUps'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
         }, {
@@ -2342,7 +2342,7 @@ export class ContactHelperModel {
             this.parent.case.visibleMandatoryKey,
             'responsibleUserId'
           ),
-          options: data.options.user,
+          options: data.options.user.filter(u => !u.data?.outbreakIds?.length || u.data?.outbreakIds?.includes(selectedOutbreak.id)),
           relationshipPath: ['relationships', 'people'],
           relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
           extraConditions: caseCondition

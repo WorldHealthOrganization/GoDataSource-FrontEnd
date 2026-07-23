@@ -64,6 +64,10 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
     'burialLocationId': true
   };
 
+  userFields = {
+    'responsibleUserId': true
+  };
+
   requiredDestinationFields: string[] = [
     'firstName'
   ];
