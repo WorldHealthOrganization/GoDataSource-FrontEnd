@@ -24,8 +24,16 @@ export class OutbreakDataResolver implements IMapResolverV2<OutbreakModel> {
    * Retrieve data
    */
   resolve(route: ActivatedRouteSnapshot): Observable<IResolverV2ResponseModel<OutbreakModel>> {
+    // user management screens need to resolve the names of outbreaks assigned to
+    // other users even when they are outside the current user's access scope;
+    // this is gated server-side by the 'user_list' permission
+    const loadAllForUserManagement = !!route.data?.outbreakLoadAllForUserManagement;
+
     // user doesn't have rights ?
-    if (!OutbreakModel.canList(this.authDataService.getAuthenticatedUser())) {
+    if (
+      !loadAllForUserManagement &&
+      !OutbreakModel.canList(this.authDataService.getAuthenticatedUser())
+    ) {
       return of({
         list: [],
         map: {},
@@ -51,8 +59,9 @@ export class OutbreakDataResolver implements IMapResolverV2<OutbreakModel> {
       .by('name', RequestSortDirection.ASC);
 
     // retrieve records
-    return this.outbreakDataService
-      .getOutbreaksList(qb)
+    return (loadAllForUserManagement ?
+      this.outbreakDataService.getOutbreaksListForUserManagement(qb) :
+      this.outbreakDataService.getOutbreaksList(qb))
       .pipe(
         map((data) => {
           // construct map

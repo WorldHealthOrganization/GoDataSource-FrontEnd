@@ -45,7 +45,10 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_LIST
       ],
-      outbreakIncludeDeleted: true
+      outbreakIncludeDeleted: true,
+      // resolve names of outbreaks assigned to other users even when outside the
+      // current user's access scope (gated server-side by 'user_list' permission)
+      outbreakLoadAllForUserManagement: true
     },
     resolve: {
       createdOn: CreatedOnResolver,
@@ -83,7 +86,8 @@ const routes: Routes = [
         PERMISSION.USER_VIEW
       ],
       action: CreateViewModifyV2Action.VIEW,
-      outbreakIncludeDeleted: true
+      outbreakIncludeDeleted: true,
+      outbreakLoadAllForUserManagement: true
     }
   },
   // Edit user

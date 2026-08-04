@@ -73,6 +73,22 @@ export class OutbreakDataService {
   }
 
   /**
+   * Retrieve outbreaks (minimal fields) for user management screens, regardless of
+   * the current user's outbreak access restrictions. Gated server-side by the
+   * 'user_list' permission. Used to resolve names of outbreaks assigned to other
+   * users that are outside the current user's own access scope.
+   */
+  getOutbreaksListForUserManagement(
+    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+  ): Observable<OutbreakModel[]> {
+    const filter = queryBuilder.buildQuery();
+    return this.modelHelper.mapObservableListToModel(
+      this.http.get(`outbreaks/for-user-management?filter=${filter}`),
+      OutbreakModel
+    );
+  }
+
+  /**
      * Retrieve the list of Outbreaks
      * @returns {Observable<OutbreakModel[]>}
      */
